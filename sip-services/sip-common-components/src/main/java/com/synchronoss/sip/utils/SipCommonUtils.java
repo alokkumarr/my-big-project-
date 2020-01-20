@@ -5,9 +5,11 @@ import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.exceptions.UnauthorizedException;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 public class SipCommonUtils {
 
-  private static final Logger logger = LoggerFactory.getLogger(SipCommonUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SipCommonUtils.class);
   private static final String FEATURE_NAME = "My Analysis";
   private static final String MODULE_FEATURE_NAME = "Drafts";
 
@@ -33,8 +35,8 @@ public class SipCommonUtils {
     try {
       String token = getToken(request);
       ticket = TokenParser.retrieveTicket(token);
-    } catch (IllegalAccessException | IOException e) {
-      logger.error("Error occurred while fetching token", e);
+    } catch (UnauthorizedException | IOException e) {
+      LOGGER.error("Error occurred while fetching token", e);
     }
     return ticket;
   }
@@ -46,14 +48,15 @@ public class SipCommonUtils {
    * @return String
    * @throws IllegalAccessException If Authorization not found
    */
-  public static String getToken(final HttpServletRequest req) throws IllegalAccessException {
+  public static String getToken(final HttpServletRequest req) {
     String authHeader = null;
     if (!("OPTIONS".equals(req.getMethod()))) {
       authHeader = req.getHeader("Authorization");
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-        throw new IllegalAccessException("Missing or invalid Authorization header.");
+        throw new UnauthorizedException("Missing or invalid Authorization header.");
       }
-      return authHeader.substring(7); // The part after "Bearer "
+      // The part after "Bearer "
+      return authHeader.substring(7);
     }
     return authHeader;
   }
@@ -94,9 +97,7 @@ public class SipCommonUtils {
     binString = binString.length() < 16 ? "00000000".concat(binString) : binString;
 
     binString.toCharArray();
-    final int[] privCode = Stream.of(binString.split("")).mapToInt(Integer::parseInt).toArray();
-
-    return privCode;
+    return Stream.of(binString.split("")).mapToInt(Integer::parseInt).toArray();
   }
 
   /**
@@ -107,7 +108,7 @@ public class SipCommonUtils {
    * @return validation response
    */
   public static Boolean validatePrivilege(
-      ArrayList<Products> productList, Long category, PrivilegeNames privName) {
+      List<Products> productList, Long category, PrivilegeNames privName) {
     Privileges priv = new Privileges();
     if (!CollectionUtils.isEmpty(productList)) {
       for (Products product : productList) {
@@ -151,7 +152,7 @@ public class SipCommonUtils {
    */
   public static boolean authValidation(String authToken) {
     if (authToken == null || !authToken.startsWith("Bearer ")) {
-      logger.error("Invalid authentication token {}", authToken);
+      LOGGER.error("Invalid authentication token {}", authToken);
       return false;
     }
     return true;
@@ -246,7 +247,7 @@ public class SipCommonUtils {
    * @param category    analysis category id
    * @return true if any system level category matched with the analysis category Id
    */
-  public static boolean haveSystemCategory(ArrayList<Products> productList, Long category) {
+  public static boolean haveSystemCategory(List<Products> productList, Long category) {
     if (!CollectionUtils.isEmpty(productList)) {
       for (Products product : productList) {
         ArrayList<ProductModules> productModulesList =
