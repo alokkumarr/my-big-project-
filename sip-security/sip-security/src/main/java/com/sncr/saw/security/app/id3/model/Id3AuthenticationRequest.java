@@ -16,6 +16,10 @@ public class Id3AuthenticationRequest {
   @ApiModelProperty(notes = "SIP redirect Url ", name = "sipRedirectUrl")
   private String redirectUrl;
 
+  @JsonProperty("idToken")
+  @ApiModelProperty(notes = "Id3 Identity token", name = "idToken")
+  private String idToken;
+
   @JsonProperty("domainName")
   public String getDomainName() {
     return domainName;
@@ -44,5 +48,13 @@ public class Id3AuthenticationRequest {
   @JsonProperty("redirectUrl")
   public void setRedirectUrl(String redirectUrl) {
     this.redirectUrl = redirectUrl;
+  }
+
+  public String getIdToken() {
+    return idToken;
+  }
+
+  public void setIdToken(String idToken) {
+    this.idToken = idToken;
   }
 }

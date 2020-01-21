@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @Api(
@@ -126,7 +128,6 @@ public class SipId3Controller {
    * This method validates the Id3 identity token and provides the authorization code.
    *
    * @param token
-   * @param id3AuthenticationRequest
    * @param request
    * @param response
    * @return
@@ -138,13 +139,18 @@ public class SipId3Controller {
       notes = "SIP provides authorization Code for one time use")
   @PostMapping(value = "/authenticate", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public void id3SsoAuthentication(
-      @CookieValue("ID3_IDENTITY_TOKEN") String token,
-      @RequestBody Id3AuthenticationRequest id3AuthenticationRequest,
+      @RequestBody MultiValueMap<String, String> params,
       HttpServletRequest request,
       HttpServletResponse response) {
+    Map<String, String> map = params.toSingleValueMap();
     response.setHeader(CACHE_CONTROL, "no-store,must-revalidate, max-age=0");
     String authorizationCode;
-    String masterLoginId = validateId3IdentityToken.validateToken(token, id3AuthenticationRequest);
+    Id3AuthenticationRequest id3AuthenticationRequest = new Id3AuthenticationRequest();
+    id3AuthenticationRequest.setDomainName(map.get("domainName"));
+    id3AuthenticationRequest.setClientId(map.get("clientId"));
+    id3AuthenticationRequest.setRedirectUrl(map.get("redirectUrl"));
+    id3AuthenticationRequest.setIdToken(map.get("idToken"));
+    String masterLoginId = validateId3IdentityToken.validateToken(id3AuthenticationRequest.getIdToken(), id3AuthenticationRequest);
     if (masterLoginId != null) {
       authorizationCode =
           id3Repository.obtainAuthorizationCode(masterLoginId, id3AuthenticationRequest);

@@ -84,7 +84,7 @@ public class ExternalSecurityController {
             code = 415,
             message = "Unsupported Type. Representation not supported for the resource")
       })
-  @PostMapping(value = "/RoleCategoryPrivilege")
+  @PostMapping(value = "/roleCategoryPrivilege")
   public RoleCatPrivilegeResponse createRoleCategoryPrivilege(
       HttpServletRequest httpRequest,
       HttpServletResponse httpResponse,
@@ -280,7 +280,7 @@ public class ExternalSecurityController {
             code = 415,
             message = "Unsupported Type. Representation not supported for the resource")
       })
-  @GetMapping(value = "/RoleCategoryPrivilege")
+  @GetMapping(value = "/roleCategoryPrivilege")
   public RoleCatPrivilegeResponse fetchRoleCategoryPrivilege(
       HttpServletRequest httpRequest,
       HttpServletResponse httpResponse,
