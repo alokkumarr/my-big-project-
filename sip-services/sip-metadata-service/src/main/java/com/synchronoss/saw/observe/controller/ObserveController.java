@@ -80,7 +80,7 @@ public class ObserveController {
 
       Long categoryId = Long.valueOf(observe.getCategoryId());
       if (!validatePrivilege(productList, categoryId,
-          Privileges.PrivilegeNames.CREATE, Modules.OBSERVE.name())) {
+          Privileges.PrivilegeNames.CREATE,Modules.OBSERVE.name())) {
         return buildPrivilegesResponse("Create", response, observeResponse);
       }
 
