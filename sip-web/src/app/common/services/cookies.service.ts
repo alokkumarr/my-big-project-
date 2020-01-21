@@ -20,6 +20,6 @@ export class CookiesService {
   }
 
   public clear(targetKey) {
-    document.cookie = targetKey + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = `${targetKey}=; path=/; domain=${document.domain}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
   }
 }

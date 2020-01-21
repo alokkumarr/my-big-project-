@@ -35,6 +35,8 @@ export class LoginPageComponent implements OnInit {
         .authenticateWithSessionID(sessionID, domainName, clientId)
         .then(() => {
           this._cookies.clear(SESSION_ID_COOKIE_KEY);
+          this._cookies.clear(DOMAIN_NAME_COOKIE_KEY);
+          this._cookies.clear(CLIEND_ID_COOKIE_KEY);
           this._router.navigate(['']);
         });
     }

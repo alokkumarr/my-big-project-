@@ -206,12 +206,12 @@ export class UserService {
     domainName: string,
     clientId: string
   ) {
-    const route = '/authenticate';
+    const route = '/v1/id3/login/authenticate';
     const body = { domainName, clientId };
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: sessionID
+        Authorization: `Bearer ${sessionID}`
       })
     };
     return this._httpClientWithoutIntercepors
