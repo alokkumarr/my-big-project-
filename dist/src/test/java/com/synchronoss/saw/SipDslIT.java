@@ -615,9 +615,9 @@ public class SipDslIT extends BaseIT {
     ArrayNode data = a.withArray("data");
     Long countOfRows = a.get("totalRows").asLong();
     Assert.assertTrue(countOfRows > 0);
-    Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
+    Assert.assertEquals(data.get(0).get("String").asText(), testStringFilter);
     List<Map<String, String>> dataNode = response.getBody().path("data");
-    Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
+    Assert.assertEquals(dataNode.get(0).get("String"), testStringFilter);
   }
 
   @Test
@@ -628,12 +628,12 @@ public class SipDslIT extends BaseIT {
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("table", "sales");
-    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("alias", "SALES_" + CUSTOMER_CODE);
     field1.addProperty("columnName", CUSTOMER_CODE);
     field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
-    JsonArray artifactFields = new JsonArray();
-    artifactFields.add(field1);
+//    JsonArray artifactFields = new JsonArray();
+//    artifactFields.add(field1);
 
     sipDsl
         .get("sipQuery")
@@ -646,7 +646,14 @@ public class SipDslIT extends BaseIT {
         .getAsJsonArray()
         .set(1, field1);
 
-    field1.addProperty("table", "product");
+    JsonObject field2 = new JsonObject();
+    field2.addProperty("dataField", CUSTOMER_CODE);
+    field2.addProperty("table", "product");
+    field2.addProperty("alias", "PRODUCT_" + CUSTOMER_CODE);
+    field2.addProperty("columnName", CUSTOMER_CODE);
+    field2.addProperty("displayName", CUSTOMER_CODE);
+    field2.addProperty("type", "string");
+    field2.addProperty("table", "product");
     sipDsl
         .get("sipQuery")
         .getAsJsonObject()
@@ -656,7 +663,7 @@ public class SipDslIT extends BaseIT {
         .getAsJsonObject()
         .get("fields")
         .getAsJsonArray()
-        .set(1, field1);
+        .set(1, field2);
 
     JsonElement js = new JsonArray();
 
@@ -747,7 +754,7 @@ public class SipDslIT extends BaseIT {
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("table", "sales");
-    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("alias", "SALES_" + CUSTOMER_CODE);
     field1.addProperty("columnName", CUSTOMER_CODE);
     field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
@@ -852,7 +859,7 @@ public class SipDslIT extends BaseIT {
     Assert.assertTrue(data.size() == 1);
     String validateCustCode = TENANT_A;
     Assert.assertEquals(data.get(0).get("SALES_" + CUSTOMER_CODE).asText(), validateCustCode);
-    Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
+    Assert.assertEquals(data.get(0).get("String").asText(), "string 1");
 
     given(authSpec)
         .body("TestGroup2")
