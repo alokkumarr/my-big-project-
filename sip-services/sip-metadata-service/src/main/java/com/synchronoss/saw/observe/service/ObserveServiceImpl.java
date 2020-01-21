@@ -238,10 +238,17 @@ public class ObserveServiceImpl implements ObserveService {
       // validate the given analysis has valid user
       if (!analysisId.isEmpty()) {
         boolean[] haveValidAnalysis = {true};
-        analysisId.stream().forEach(id -> {
-          Analysis analysis = analysisService.getAnalysis(id, ticket);
-          haveValidAnalysis[0] = ticket.getCustCode().equals(analysis.getCustomerCode());
-        });
+        try {
+          analysisId.stream().forEach(id -> {
+            Analysis analysis = analysisService.getAnalysis(id, ticket);
+            logger.trace("Print the analysis {}", analysis);
+            haveValidAnalysis[0] = ticket.getCustCode() != null && analysis != null
+                ? ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode())
+                : haveValidAnalysis[0];
+          });
+        } catch (Exception ex) {
+          logger.error("Error while checking the analysis for dashboard:  {}", ex.getMessage());
+        }
         return haveValidAnalysis[0];
       }
     }
