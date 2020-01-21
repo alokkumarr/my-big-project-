@@ -12,6 +12,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +80,10 @@ public class GatewayController {
   private String apiGatewayOtherProperties;
   
   @Value("${sip.ssl.enable}")
-  private Boolean sipSslEnable; 
+  private Boolean sipSslEnable;
+
+  @Value("${gateway.fileupload.path}")
+  private String tmpDir;
   
   @Autowired
   private RestUtil restUtil;
@@ -149,7 +155,7 @@ public class GatewayController {
             } else {
               uploadURI = getServiceUrl(uploadURI, request);
             }
-            String tmpDir = System.getProperty("java.io.tmpdir");
+            logger.debug("temp dir : {}", tmpDir);
             Map<String, String> map = new HashMap<>();
             FileSystemResource requestfile = null;
             List<FileSystemResource> files = new ArrayList<>();
@@ -157,6 +163,8 @@ public class GatewayController {
             try {
               for (MultipartFile fileItem : uploadfiles){
                 String fileName = fileItem.getOriginalFilename();
+                Path pathToFile = Paths.get(tmpDir + File.separator + fileName);
+                Files.createDirectories(pathToFile.getParent());
                 File incomingTargetFile = new File(tmpDir + File.separator + fileName);
                 java.nio.file.Files.copy(fileItem.getInputStream(), incomingTargetFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
                 IOUtils.closeQuietly(fileItem.getInputStream());
