@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import * as get from 'lodash/get';
-import APP_CONFIG from '../../../../../appConfig';
 import { BrandingService } from './branding.service';
 import { ToastService } from '../../../common/services';
 
@@ -13,7 +11,6 @@ export class AdminBrandingComponent {
   primaryColor = '#bb0000';
   filesToUpload: any;
   binaryFormatImage: any;
-  public api = get(APP_CONFIG, 'api.url');
 
   constructor(
     private _brandingService: BrandingService,
@@ -21,7 +18,6 @@ export class AdminBrandingComponent {
   ) {}
 
   ngOnInit(): void {
-    this._brandingService.savePrimaryColor(this.primaryColor);
   }
 
   prepareBrandimgForUpload(event) {

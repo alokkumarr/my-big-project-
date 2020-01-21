@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-// import AppConfig from '../../../../../appConfig';
+import AppConfig from '../../../../../appConfig';
 import * as tinyColor from 'tinyColor2';
 import * as forEach from 'lodash/forEach';
 import { Observable } from 'rxjs';
@@ -17,7 +17,8 @@ export class BrandingService {
   constructor(private _http: HttpClient) {}
 
   uploadFile(filesToUpload, primaryColor): Observable<any> {
-    const endpoint = `http://34.228.78.7/sip/security/auth/admin/cust/brand`;
+    const url = AppConfig.login.url;
+    const endpoint = `${url}/auth/admin/cust/brand`;
     const headers = new HttpHeaders();
     headers.set('Content-Type', null);
     headers.set('Accept', 'multipart/form-data');
@@ -69,5 +70,10 @@ export class BrandingService {
       hex: c.toHexString(),
       darkContrast: c.isLight()
     };
+  }
+
+  getBrandingDetails(): Observable<any> {
+    const url = AppConfig.login.url;
+    return this._http.get(`${url}/auth/admin/cust/brand`);
   }
 }

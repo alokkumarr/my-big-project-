@@ -6,6 +6,7 @@ import {
   UserService,
   ConfigService
 } from '../../../common/services';
+import { BrandingService } from './../../../modules/admin/branding/branding.service';
 
 @Component({
   selector: 'login-form',
@@ -20,7 +21,8 @@ export class LoginComponent implements OnInit {
     public _configService: ConfigService,
     public _router: Router,
     public _route: ActivatedRoute,
-    public element: ElementRef<HTMLElement>
+    public element: ElementRef<HTMLElement>,
+    public _brandingService: BrandingService
   ) {}
 
   public dataHolder = {
@@ -42,6 +44,7 @@ export class LoginComponent implements OnInit {
         this.states.error = changePassMsg;
       }
     });
+    this._brandingService.savePrimaryColor('#0077be');
   }
 
   login() {
