@@ -15,7 +15,7 @@ export class FirstDashboardGuard implements CanActivate {
     private router: Router,
     private observe: ObserveService,
     private configService: ConfigService,
-    public jwt: JwtService
+    private jwt: JwtService
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot) {
