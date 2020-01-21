@@ -62,7 +62,7 @@ public class NGJexlExecutor extends NGExecutor {
     }
 
 
-    public void execute(Map<String, Dataset> dsMap) throws Exception {
+    public long execute(Map<String, Dataset> dsMap) throws Exception {
 
         Dataset ds = dsMap.get(inDataSetName);
         logger.debug("Initialize structAccumulator: ");
@@ -88,7 +88,7 @@ public class NGJexlExecutor extends NGExecutor {
         //Long c_adf = alignedDF.count();
         //String jschema = alignedDF.schema().prettyJson();
         //logger.debug("Second pass completed: " + c_adf + " Schema: " + jschema);
-        createFinalDS(alignedDF);
+        return createFinalDS(alignedDF);
     }
 
 

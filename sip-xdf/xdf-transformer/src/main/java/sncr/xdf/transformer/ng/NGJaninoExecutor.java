@@ -45,17 +45,17 @@ public class NGJaninoExecutor extends NGExecutor{
     }
 
 
-    public void execute(Map<String, Dataset> dsMap) throws Exception {
+    public long execute(Map<String, Dataset> dsMap) throws Exception {
         Dataset ds = dsMap.get(inDataSetName);
         JavaRDD transformationResult = transformation(ds.toJavaRDD()).cache();
         logger.debug("Intermediate result, transformation count  = " + transformationResult.count());
 
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
-        createFinalDS(df.cache());
+        return createFinalDS(df.cache());
     }
 
-    public void executeSingleProcessor(NGContext ngctx) throws Exception {
+    public long executeSingleProcessor(NGContext ngctx) throws Exception {
         Map<String, Dataset> dsMap = ngctx.datafileDFmap;
         Dataset ds = dsMap.get(ngctx.dataSetName);
         JavaRDD transformationResult = transformation(ds.toJavaRDD()).cache();
@@ -63,6 +63,6 @@ public class NGJaninoExecutor extends NGExecutor{
 
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
-        createFinalDS(df.cache());
+        return createFinalDS(df.cache());
     }
 }

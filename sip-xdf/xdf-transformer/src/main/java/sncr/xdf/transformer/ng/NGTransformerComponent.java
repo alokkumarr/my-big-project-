@@ -62,8 +62,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         logger.trace(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
-    protected long inputDSCount = 0;
-
     @Override
     protected int execute(){
         logger.debug("Processing NGTransformerComponent ......" );
@@ -91,6 +89,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
 //2. Read input datasets
             Map<String, Dataset> dsMap = new HashMap();
+            long inputDSCount = 0;
             if (ngctx.runningPipeLine) {
                 String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
                 Dataset ds = ngctx.datafileDFmap.get(transInKey);
@@ -123,6 +122,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
             Transformer.ScriptEngine engine = ngctx.componentConfiguration.getTransformer().getScriptEngine();
             Set<OutputSchema> ou = ngctx.componentConfiguration.getTransformer().getOutputSchema();
+            long outputDSCount=0;
             if (ou != null && ou.size() > 0){
 
                 StructType st = createSchema(ou);
@@ -136,9 +136,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             tempLocation,
                             st   );
                     if (ngctx.runningPipeLine)
-                        jexlExecutorWithSchema.executeSingleProcessor(ngctx);
+                        outputDSCount=jexlExecutorWithSchema.executeSingleProcessor(ngctx);
                     else
-                        jexlExecutorWithSchema.execute(dsMap);
+                        outputDSCount=jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
 
                     String preamble = "";
@@ -162,9 +162,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             st,
                             odi);
                     if (ngctx.runningPipeLine)
-                        janinoExecutor.executeSingleProcessor(ngctx);
+                        outputDSCount=janinoExecutor.executeSingleProcessor(ngctx);
                     else
-                        janinoExecutor.execute(dsMap);
+                        outputDSCount=janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);
@@ -179,7 +179,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             script,
                             ngctx.componentConfiguration.getTransformer().getThreshold(),
                             tempLocation);
-                    jexlExecutor.execute(dsMap);
+                    outputDSCount=jexlExecutor.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
                     error = "Transformation with Janino engine requires Output schema, dynamic schema mode is not supported";
                     logger.error(error);
@@ -190,6 +190,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     return -1;
                 }
             }
+            validateOutputDSCounts(inputDSCount,outputDSCount);
         } catch (Exception e) {
             logger.error("Exception in main transformer module: ",e);
             if (e instanceof XDFException) {

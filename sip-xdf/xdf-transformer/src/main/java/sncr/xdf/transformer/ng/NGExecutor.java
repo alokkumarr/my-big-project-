@@ -94,7 +94,7 @@ public abstract class NGExecutor {
         pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, loc, "replace");
     }
 
-    public abstract void execute(Map<String, Dataset> dsMap) throws Exception;
+    public abstract long execute(Map<String, Dataset> dsMap) throws Exception;
 
 
     protected void prepareRefData(Map<String, Dataset> dsMap){
@@ -117,7 +117,7 @@ public abstract class NGExecutor {
 
     }
 
-    protected void createFinalDS(Dataset<Row> ds) throws Exception {
+    protected long createFinalDS(Dataset<Row> ds) throws Exception {
         ds.schema();
         Column trRes = ds.col(TRANSFORMATION_RESULT);
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
@@ -135,11 +135,11 @@ public abstract class NGExecutor {
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        ((AbstractComponent)parent).validateOutputDSCounts(((NGTransformerComponent)parent).inputDSCount,outputResult.count());
+        return outputResult.count();
     }
 
 
-    protected void createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
+    protected long createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
 
         ds.schema();
         //getOutputDatasetDetails();
@@ -166,7 +166,7 @@ public abstract class NGExecutor {
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        ((AbstractComponent)parent).validateOutputDSCounts(((NGTransformerComponent)parent).inputDSCount,outputResult.count());
+        return outputResult.count();
     }
 
 }
