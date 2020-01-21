@@ -87,6 +87,7 @@
                   *ngFor="let notification of notifications$ | async"
                   [value]="notification.value"
                   [disabled]="!notification.enabled"
+                  [attr.e2e]="notification.label"
                   >{{ notification.label }}</mat-option
                 >
               </mat-select>
@@ -111,6 +112,7 @@
                 <mat-option
                   *ngFor="let stat of alertStatus"
                   [value]="stat.value"
+                  [attr.e2e]="stat.name"
                   >{{ stat.name }}</mat-option
                 >
               </mat-select>
@@ -162,6 +164,7 @@
                 <mat-option
                   *ngFor="let datapod of datapods$ | async"
                   [value]="datapod.id"
+                  [attr.e2e]="datapod.metricName"
                   >{{ datapod.metricName }}</mat-option
                 >
               </mat-select>
@@ -191,6 +194,7 @@
                       | filterFn: numericMetricFilter
                   "
                   [value]="metric.columnName"
+                  [attr.e2e]="metric.displayName"
                   >{{ metric.displayName }}</mat-option
                 >
               </mat-select>
@@ -216,6 +220,7 @@
                 <mat-option
                   *ngFor="let monitoringType of monitoringTypes$ | async"
                   [value]="monitoringType.id"
+                  [attr.e2e]="monitoringType.name"
                   >{{ monitoringType.name }}</mat-option
                 >
               </mat-select>
@@ -239,6 +244,7 @@
                 <mat-option
                   *ngFor="let aggr of aggregations$ | async"
                   [value]="aggr.id"
+                  [attr.e2e]="aggr.name"
                   >{{ aggr.name }}</mat-option
                 >
               </mat-select>
@@ -256,6 +262,7 @@
                 <mat-option
                   *ngFor="let op of operators$ | async"
                   [value]="op.id"
+                  [attr.e2e]="op.name"
                   >{{ op.name }}</mat-option
                 >
               </mat-select>
@@ -372,6 +379,7 @@
                       | filterFn: dateMetricFilter
                   "
                   [value]="metric.columnName"
+                  [attr.e2e]="metric.displayName"
                   >{{ metric.displayName }}</mat-option
                 >
               </mat-select>
@@ -427,6 +435,7 @@
                   <mat-option
                     *ngFor="let type of lookbackPeriodTypes"
                     [value]="type"
+                    [attr.e2e]="type"
                     >{{ type }}</mat-option
                   >
                 </mat-select>
