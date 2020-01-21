@@ -95,7 +95,14 @@ public class GatewayController {
     httpClient = restUtil.getHttpClient();
   }
 
-  
+  private static final String CONTENT_TYPE = "Content-type";
+  private static final String USER_AGENT = "User-Agent";
+  private static final String HOST = "Host";
+  private static final String ACCEPT = "Accept";
+  private static final String ORIGIN = "Origin";
+  private static final String REFERER = "Referer";
+  private static final String AUTHORIZATION = "Authorization";
+
   /**
  * @param request
  * @return
@@ -113,17 +120,17 @@ public class GatewayController {
     HttpResponse proxiedResponse = null;
     ResponseEntity<String> responseEntity = null;
     String header = null;
-    logger.trace("Request info : "+ request.getRequestURI());
-    logger.trace("filePath info : "+ filePath);
-    logger.trace("Accept {}",request.getHeader("Accept"));
-    logger.trace("Authorization {}",request.getHeader("Authorization"));
-    logger.trace("Content-type {}",request.getHeader("Content-type"));    
-    logger.trace("Host {}",request.getHeader("Host"));
-    logger.trace("Origin {}",request.getHeader("Origin"));
-    logger.trace("Referer {}",request.getHeader("Referer"));
-    logger.trace("User-Agent {}",request.getHeader("User-Agent"));
+    logger.trace("Request info : {}", request.getRequestURI());
+    logger.trace("filePath info : {}", filePath);
+    logger.trace("Accept {}", request.getHeader(ACCEPT));
+    logger.trace("Authorization {}",request.getHeader(AUTHORIZATION));
+    logger.trace("Content-type {}",request.getHeader(CONTENT_TYPE));
+    logger.trace("Host {}",request.getHeader(HOST));
+    logger.trace("Origin {}",request.getHeader(ORIGIN));
+    logger.trace("Referer {}",request.getHeader(REFERER));
+    logger.trace("User-Agent {}",request.getHeader(USER_AGENT));
     try {
-        header = request.getHeader("Authorization");
+        header = request.getHeader(AUTHORIZATION);
     }
     catch (ArrayIndexOutOfBoundsException ex) {
      throw new  TokenMissingSAWException("Token is missing on the request header.");
@@ -172,20 +179,22 @@ public class GatewayController {
                 files.add(requestfile);
                 map.put(fileName, requestfile.getPath());
               }
-            logger.trace("Map contains :" + map);
-            logger.trace("uploadURI :" + uploadURI);
+            logger.trace("Map contains : {}", map);
+            logger.trace("uploadURI : {}", uploadURI);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", request.getHeader("Authorization"));
+            headers.set(AUTHORIZATION, request.getHeader(AUTHORIZATION));
             headers.set("directoryPath", filePath);
             HttpEntity<Object> uploadHttptEntity = new HttpEntity<Object>(map, headers);
             uploadResponseEntity = restTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
-            logger.debug("uploadResponseEntity {} ", uploadResponseEntity.toString());
+            logger.debug("uploadResponseEntity {} ", uploadResponseEntity);
             } catch (Exception e) {
             logger.error("Exception thrown during file upload ", e);
           }
             for (FileSystemResource file : files){
-            logger.trace("Filename :" + file.getFilename() + " has been deleted from temp folder after uploading to the destination");
+              logger.trace(String.format(
+                  "Filename : %s has been deleted from temp folder after uploading to the destination",
+                  file.getFilename()));
             file.getFile().delete();}
             responseEntity = new ResponseEntity<>(uploadResponseEntity.getBody(), makeResponseHeadersUpload(), HttpStatus.OK);
             logger.trace("uploadResponseEntity response structure {}",  uploadResponseEntity.getBody() + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
@@ -196,7 +205,7 @@ public class GatewayController {
       } catch(HttpClientErrorException e) {
           //SAW-1374: Just keep the message hardcoded itself.
         responseEntity = new ResponseEntity<>("{\"message\":\"Invalid Token\"}", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
-        logger.info("Invalid Token: "+ responseEntity.toString());
+        logger.info("Invalid Token: {}", responseEntity);
         return responseEntity;
       }
     }
@@ -216,14 +225,14 @@ public class GatewayController {
 
   private HttpHeaders makeResponseHeaders(HttpResponse response) {
     HttpHeaders result = new HttpHeaders();
-    Header h = response.getFirstHeader("Content-Type");
+    Header h = response.getFirstHeader(CONTENT_TYPE);
     result.set(h.getName(), h.getValue());
     return result;
   }
 
   private HttpHeaders makeResponseHeadersUpload() {
     HttpHeaders result = new HttpHeaders();
-    result.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+    result.set(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     return result;
   }
 
@@ -231,11 +240,11 @@ public class GatewayController {
   private HttpHeaders makeResponseHeadersInvalid() {
         HttpHeaders result = new HttpHeaders();
         List<String> allowedHeaders = new ArrayList<String>();
-        allowedHeaders.add("Origin");
+        allowedHeaders.add(ORIGIN);
         allowedHeaders.add("X-Requested-With");
-        allowedHeaders.add("Content-Type");
-        allowedHeaders.add("Accept");
-        allowedHeaders.add("Authorization");
+        allowedHeaders.add(CONTENT_TYPE);
+        allowedHeaders.add(ACCEPT);
+        allowedHeaders.add(AUTHORIZATION);
         result.setAccessControlAllowHeaders(allowedHeaders);
         List<HttpMethod> allowedMethods = new ArrayList<HttpMethod>();
         allowedMethods.add(HttpMethod.DELETE);
@@ -257,13 +266,13 @@ public class GatewayController {
 
   private HttpHeaders setRequestHeader(HttpServletRequest request){
     HttpHeaders  requestHeaders = new HttpHeaders();
-    requestHeaders.set("Host", request.getHeader("Host"));
-    requestHeaders.set("Accept", request.getHeader("Accept"));
-    requestHeaders.set("Authorization", request.getHeader("Authorization"));
-    requestHeaders.set("Origin", request.getHeader("Origin"));
-    requestHeaders.set("Referer", request.getHeader("Referer"));
-    requestHeaders.set("User-Agent", request.getHeader("User-Agent"));
-    requestHeaders.set("Content-type", request.getHeader("Content-type"));
+    requestHeaders.set(HOST, request.getHeader(HOST));
+    requestHeaders.set(ACCEPT, request.getHeader(ACCEPT));
+    requestHeaders.set(AUTHORIZATION, request.getHeader(AUTHORIZATION));
+    requestHeaders.set(ORIGIN, request.getHeader(ORIGIN));
+    requestHeaders.set(REFERER, request.getHeader(REFERER));
+    requestHeaders.set(USER_AGENT, request.getHeader(USER_AGENT));
+    requestHeaders.set(CONTENT_TYPE, request.getHeader(CONTENT_TYPE));
     return requestHeaders;  
   }
   
@@ -288,13 +297,13 @@ public class GatewayController {
   
   @ExceptionHandler(value=NoHandlerFoundException.class)
   private String getServiceUrl(String requestURI, HttpServletRequest httpServletRequest)  {
-    logger.trace("Request Url: " + requestURI);
+    logger.trace("Request Url: {}", requestURI);
     Optional<Endpoint> endpoint =
             apiGatewayProperties.getEndpoints().stream()
                     .filter(e ->requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
                     ).findFirst();
     String endPoint = endpoint.get().getLocation() + requestURI;
-    logger.trace("Destination Url: " + endPoint);
+    logger.trace("Destination Url: {}", endPoint);
     return endPoint;
   }
   
