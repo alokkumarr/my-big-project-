@@ -460,7 +460,7 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
     return new Promise<Analysis | AnalysisDSL>((resolve, reject) => {
       this._importService
         .createAnalysis(semanticId, type)
-        .then((initializedAnalysis: Analysis | AnalysisDSL) => {
+        .then((initializedAnalysis: AnalysisDSL) => {
           let fields: Partial<Analysis | AnalysisDSL>;
           if (isDSLAnalysis(initializedAnalysis)) {
             fields = pick(initializedAnalysis, [

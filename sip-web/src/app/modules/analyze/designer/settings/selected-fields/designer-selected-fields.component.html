@@ -51,7 +51,7 @@
           <span> (&nbsp;{{ getDisplayNameForColumn(col) }}&nbsp;) </span>
         </ng-container>
         <ng-template #defaultTemplate>
-          {{ col.displayName || col.alias }}
+          {{ col.displayName ? getDisplayNameForColumn(col) : col.alias }}
         </ng-template>
 
         <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>

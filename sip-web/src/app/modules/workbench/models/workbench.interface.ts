@@ -29,6 +29,11 @@ export enum HTTP_METHODS {
   PATCH = 'PATCH'
 }
 
+export enum AUTHORIZATION_TYPES {
+  NONE = 'None',
+  BASIC = 'Basic Auth'
+}
+
 export interface ChannelObject {
   createdBy: string;
   productCode: string;

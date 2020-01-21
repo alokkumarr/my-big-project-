@@ -44,6 +44,8 @@ import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,6 +73,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   private final String tempResultTable = "onetime";
   private final String executionResultTable = "executionResult";
+  private final String analysisMetadataTable = "analysisMetadata";
   private static final String METASTORE = "services/metadata";
 
   @Value("${schema.file}")
@@ -701,8 +704,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String executionId, ExecutionType executionType, Integer page, Integer pageSize) {
     ExecutionResponse executionResponse = new ExecutionResponse();
     ObjectMapper objectMapper = new ObjectMapper();
-      ExecutionResult executionResult = null;
-    try {
+    ExecutionResult executionResult = null;
+    Instant startTime = Instant.now();
+      try {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
@@ -731,7 +735,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("time taken for returning excutions data:{}", elapsedTime);
     } catch (Exception e) {
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("Exception occured,time taken before throwing exception:{}", elapsedTime);
       logger.error("Error occurred while fetching the execution result data", e);
     }
 
@@ -990,6 +1000,24 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       return dataObj.subList(startIndex, endIndex);
     }
     return null;
+  }
+
+  @Override
+  public Boolean updateAnalysis(Analysis analysis) {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      ExecutionResultStore executionResultStore =
+          new ExecutionResultStore(analysisMetadataTable, basePath);
+      executionResultStore.update(
+          analysis.getId(), objectMapper.writeValueAsString(analysis));
+      logger.info(
+          String.format("Updated Analysis id : %s with body : %s ", analysis.getId(), analysis));
+      return true;
+    } catch (Exception e) {
+      logger.error("Error occurred while updating the analysis");
+      logger.error(e.getMessage());
+    }
+    return false;
   }
 
   @Override

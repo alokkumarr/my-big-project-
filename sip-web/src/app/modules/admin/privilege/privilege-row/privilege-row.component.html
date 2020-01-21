@@ -17,23 +17,29 @@
       fxLayoutAlign="space-between center"
       class="privilege-options-row-container"
     >
-      <mat-checkbox
+      <div style="width: 37px;">
+        <mat-checkbox *ngIf="!systemCategory"
         type="checkbox"
         [hidden]="hasOnlyAccessPrivilege"
         (change)="onAllClicked()"
         [checked]="privilegeCodeList[8]"
-      >
-        <label i18n>All</label>
-      </mat-checkbox>
+        [disabled]="isDraftsSubCategory"
+        >
+          <label i18n>All</label>
+        </mat-checkbox>
+      </div>
       <mat-checkbox
         *ngFor="let privilegeName of PRIVILEGE_NAMES; let i = index"
         type="checkbox"
         [hidden]="!allowedPrivileges[privilegeName.toUpperCase()]"
         (change)="onPrivilegeClicked(i + 1)"
-        [disabled]="privilegeCodeList[8]"
+        [disabled]="privilegeCodeList[8] ||
+        isDraftsSubCategory ||
+        checkPermissions(privilegeName)"
         [checked]="privilegeCodeList[i + 1]"
+        [attr.e2e]="'privilege-' + privilegeName"
       >
-        <label>{{ privilegeName }}</label>
+    <label>{{ privilegeName }}</label>
       </mat-checkbox>
     </div>
   </span>
