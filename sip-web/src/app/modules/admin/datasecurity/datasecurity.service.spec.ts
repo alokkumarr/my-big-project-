@@ -6,43 +6,48 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 
-import { UserAssignmentService } from './userassignment.service';
+import { DataSecurityService } from './datasecurity.service';
 import { JwtService } from '../../../common/services/jwt.service';
 import { Observable } from 'rxjs';
 import APP_CONFIG from '../../../../../appConfig';
+import {
+  DSKFilterGroup,
+  DSKFilterBooleanCriteria,
+  DSKFilterOperator
+} from './dsk-filter.model';
 
 const mockService = {};
 
 describe('User Assignment Service', () => {
   let httpTestingController: HttpTestingController;
-  let userAssignmentService: UserAssignmentService;
+  let datasecurityService: DataSecurityService;
   beforeEach(done => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        UserAssignmentService,
+        DataSecurityService,
         { provide: JwtService, useValue: mockService },
         { provide: Router, useValue: mockService },
         { provide: ActivatedRoute, useValue: mockService }
       ]
     }).compileComponents();
 
-    userAssignmentService = TestBed.get(UserAssignmentService);
+    datasecurityService = TestBed.get(DataSecurityService);
     httpTestingController = TestBed.get(HttpTestingController);
     done();
   });
 
   it('should exist', () => {
-    expect(userAssignmentService).not.toBeNull();
+    expect(datasecurityService).not.toBeNull();
   });
 
   it('getList function should exist', () => {
-    expect(userAssignmentService.getList()).not.toBeNull();
+    expect(datasecurityService.getList()).not.toBeNull();
   });
 
   it('addSecurityGroup should exist and return an Observable', inject(
-    [UserAssignmentService],
-    (observe: UserAssignmentService) => {
+    [DataSecurityService],
+    (observe: DataSecurityService) => {
       expect(observe.addSecurityGroup({}) instanceof Observable).toEqual(false);
     }
   ));
@@ -51,7 +56,7 @@ describe('User Assignment Service', () => {
     it('should return flattened dsk structure', async(() => {
       const customer = '1';
       const product = '4';
-      userAssignmentService
+      datasecurityService
         .getEligibleDSKFieldsFor(customer, product)
         .subscribe(data => {
           expect(data.length).toEqual(1);
@@ -69,5 +74,26 @@ describe('User Assignment Service', () => {
       });
       httpTestingController.verify();
     }));
+  });
+
+  describe('generatePreview', () => {
+    it('should generate preview string', () => {
+      const filterGroup: DSKFilterGroup = {
+        booleanCriteria: DSKFilterBooleanCriteria.AND,
+        booleanQuery: [
+          {
+            columnName: 'ABC',
+            model: {
+              operator: DSKFilterOperator.ISIN,
+              values: ['123']
+            }
+          }
+        ]
+      };
+      const previewString = datasecurityService.generatePreview(filterGroup);
+      expect(
+        previewString.match(filterGroup.booleanQuery[0]['columnName'])
+      ).toBeTruthy();
+    });
   });
 });

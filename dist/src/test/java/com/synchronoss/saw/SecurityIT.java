@@ -97,54 +97,6 @@ public class SecurityIT extends BaseIT {
   }
 
   @Test
-  public void testDskAttributeValues() {
-    ObjectNode secGroup = mapper.createObjectNode();
-    secGroup.put("description", "TestDesc1");
-    secGroup.put("securityGroupName", "TestGroup1");
-    given(authSpec)
-        .contentType(ContentType.JSON)
-        .body(secGroup)
-        .when()
-        .post("/security/auth/admin/security-groups")
-        .then()
-        .assertThat()
-        .statusCode(200)
-        .body("valid", equalTo(true));
-
-    Response response =
-        given(authSpec)
-            .when()
-            .get("/security/auth/admin/security-groups")
-            .then()
-            .statusCode(200)
-            .extract()
-            .response();
-    ArrayNode node = response.as(ArrayNode.class);
-    JsonNode jsonNode = node.get(0);
-    Long groupSysId = jsonNode.get("secGroupSysId").asLong();
-
-    ObjectNode root = mapper.createObjectNode();
-    root.put("attributeName", "TestAttr1");
-    root.put("value", "TestValue1");
-    given(authSpec)
-        .contentType(ContentType.JSON)
-        .body(root)
-        .when()
-        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
-        .then()
-        .assertThat()
-        .statusCode(200)
-        .body("valid", equalTo(true));
-
-    given(authSpec)
-        .when()
-        .get("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
-        .then()
-        .assertThat()
-        .statusCode(200);
-  }
-
-  @Test
   public void testAssignGroupUser() {
     ObjectNode secGroup = mapper.createObjectNode();
     secGroup.put("description", "TestDesc2");

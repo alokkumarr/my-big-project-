@@ -29,6 +29,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.datasets.conf.Dataset;
 import sncr.bda.exceptions.BDAException;
 import sncr.bda.metastore.DataSetStore;
+import java.util.Optional;
 
 
 /**
@@ -296,38 +297,39 @@ public class DLDataSetService {
     }
 
     public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size) throws Exception {
-      
-      /**
-       * Commented below code as this block is stopping 
-       * some entries in updating status to maprDB
-       */
+        return updateDS(id, ctx, ds, schema, recordCount, size,Optional.empty(),Optional.empty());
+    }
+    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
+
+        /**
+         * Commented below code as this block is stopping
+         * some entries in updating status to maprDB
+         */
       /*if (schema == null || ds == null)
           throw new IllegalArgumentException("Schema/DS descriptor must not be null");*/
 
-      JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
+        JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
 
-      DateTime currentTime = new DateTime();
-      long modifiedTime = currentTime.getMillis() / 1000;
-      logger.debug("Dataset modified at = " + modifiedTime);
+        DateTime currentTime = new DateTime();
+        long modifiedTime = currentTime.getMillis() / 1000;
+        logger.debug("Dataset modified at = " + modifiedTime);
 
-      system.addProperty(DataSetProperties.ModifiedTime.toString(), modifiedTime);
-      ds.getAsJsonObject().add(DataSetProperties.System.toString(), system);
+        system.addProperty(DataSetProperties.ModifiedTime.toString(), modifiedTime);
+        ds.getAsJsonObject().add(DataSetProperties.System.toString(), system);
 
-      JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID);
-      JsonObject trans = new JsonObject();
-      trans.addProperty("asOutput", ctx.transformationID);
-      if (schema != null) {
-          ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
-      }
-      ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
-      ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), format(size, 2));
-      ds.getAsJsonObject().add("transformations", trans);
-      ds.getAsJsonObject().add("asOfNow", status);
-
-      dsStore.update(id, ds);
-      return ds;
-  }
-    
+        JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID,returnCode,errorDesc);
+        JsonObject trans = new JsonObject();
+        trans.addProperty("asOutput", ctx.transformationID);
+        if (schema != null) {
+            ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+        }
+        ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
+        ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), format(size, 2));
+        ds.getAsJsonObject().add("transformations", trans);
+        ds.getAsJsonObject().add("asOfNow", status);
+        dsStore.update(id, ds);
+        return ds;
+    }
     
     private String format(double bytes, int digits) {
       String[] dictionary = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
