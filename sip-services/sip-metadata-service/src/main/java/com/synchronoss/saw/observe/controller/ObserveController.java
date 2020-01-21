@@ -24,6 +24,7 @@ import com.synchronoss.sip.utils.SipCommonUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,7 +46,8 @@ public class ObserveController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ObserveController.class);
 
-  private static String ERROR_MESSAGE = "Expected missing on the request body.";
+  private static final String ANALYSIS = "Analysis Id";
+  private static final String ERROR_MESSAGE = "Expected missing on the request body.";
   private static String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s privileges for dashboard!!";
 
@@ -80,8 +82,17 @@ public class ObserveController {
 
       Long categoryId = Long.valueOf(observe.getCategoryId());
       if (!validatePrivilege(productList, categoryId,
-          Privileges.PrivilegeNames.CREATE,Modules.OBSERVE.name())) {
-        return buildPrivilegesResponse("Create", response, observeResponse);
+          Privileges.PrivilegeNames.CREATE, Modules.OBSERVE.name())) {
+        return buildPrivilegesResponse("Create", UNAUTHORIZED, response, observeResponse);
+      }
+
+      // validate the given analysis for observe
+      List<Object> tiles = observe.getTiles();
+      if (tiles != null && !tiles.isEmpty()) {
+        boolean checkValidAnalysis = observeService.haveValidAnalysis(tiles, ticket);
+        if (!checkValidAnalysis) {
+          return buildPrivilegesResponse(ANALYSIS, UNAUTHORIZED, response, observeResponse);
+        }
       }
 
       observe.setEntityId(observeService.generateId());
@@ -126,7 +137,7 @@ public class ObserveController {
     if (!validatePrivilege(productList, Long.valueOf(categoryId),
         Privileges.PrivilegeNames.ACCESS, Modules.OBSERVE.name())) {
       observeResponse = new ObserveResponse();
-      return buildPrivilegesResponse("Access", response, observeResponse);
+      return buildPrivilegesResponse("Access", UNAUTHORIZED, response, observeResponse);
     } else {
       return observeResponse;
     }
@@ -156,7 +167,7 @@ public class ObserveController {
     ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
     if (!validatePrivilege(productList, Long.valueOf(categoryId),
         Privileges.PrivilegeNames.ACCESS, Modules.OBSERVE.name())) {
-      return buildPrivilegesResponse("Access", response, observeResponse);
+      return buildPrivilegesResponse("Access", UNAUTHORIZED, response, observeResponse);
     }
 
     Observe observe = new Observe();
@@ -186,7 +197,7 @@ public class ObserveController {
       @PathVariable(name = "Id", required = true) String entityId,
       @RequestBody ObserveRequestBody requestBody) {
     LOGGER.debug("dashboardId {}", entityId);
-    LOGGER.debug("Request Body", requestBody);
+    LOGGER.debug("Request Body : {}", requestBody);
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
@@ -205,7 +216,15 @@ public class ObserveController {
           ? Long.valueOf(observe.getCategoryId()) : 0L;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.EDIT, Modules.OBSERVE.name())) {
-        return buildPrivilegesResponse("Edit", response, observeResponse);
+        return buildPrivilegesResponse("Edit", UNAUTHORIZED, response, observeResponse);
+      }
+      // validate the given analysis for observe
+      List<Object> tiles = observe.getTiles();
+      if (tiles != null && !tiles.isEmpty()) {
+        boolean haveValidAnalysis = observeService.haveValidAnalysis(tiles, ticket);
+        if (!haveValidAnalysis) {
+          return buildPrivilegesResponse(ANALYSIS, UNAUTHORIZED, response, observeResponse);
+        }
       }
 
       observe.setEntityId(entityId);
@@ -251,7 +270,7 @@ public class ObserveController {
       Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.DELETE, Modules.OBSERVE.name())) {
-        return buildPrivilegesResponse("Delete", response, responseObjectFuture);
+        return buildPrivilegesResponse("Delete", UNAUTHORIZED, response, responseObjectFuture);
       }
       responseObjectFuture = observeService.deleteDashboard(observe);
     } catch (Exception ex) {
@@ -270,14 +289,15 @@ public class ObserveController {
    * @return AlertRuleResponse
    */
   public ObserveResponse buildPrivilegesResponse(String privileges,
+                                                 String message,
                                                  HttpServletResponse response,
                                                  ObserveResponse observeResponse) {
     try {
       LOGGER.error(String.format(UNAUTHORIZED, privileges));
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       response.sendError(HttpStatus.UNAUTHORIZED.value(),
-          String.format(UNAUTHORIZED, privileges));
-      observeResponse.setMessage(String.format(UNAUTHORIZED, privileges));
+          String.format(message, privileges));
+      observeResponse.setMessage(String.format(message, privileges));
       return observeResponse;
     } catch (IOException ex) {
       LOGGER.error("Error while validating permission {}", ex);
