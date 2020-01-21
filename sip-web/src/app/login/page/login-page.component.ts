@@ -19,6 +19,8 @@ const CLIEND_ID_COOKIE_KEY = 'clientId';
   ]
 })
 export class LoginPageComponent implements OnInit {
+  public isUserAuthenticatingWithId3 = false;
+
   constructor(
     public _title: Title,
     private _cookies: CookiesService,
@@ -30,14 +32,24 @@ export class LoginPageComponent implements OnInit {
     const sessionID = this._cookies.get(SESSION_ID_COOKIE_KEY);
     const domainName = this._cookies.get(DOMAIN_NAME_COOKIE_KEY);
     const clientId = this._cookies.get(CLIEND_ID_COOKIE_KEY);
-    if (sessionID && domainName && clientId) {
+    this.isUserAuthenticatingWithId3 = sessionID && domainName && clientId;
+    if (this.isUserAuthenticatingWithId3) {
       this._userService
         .authenticateWithSessionID(sessionID, domainName, clientId)
-        .then(() => {
-          this._cookies.clear(SESSION_ID_COOKIE_KEY);
-          this._router.navigate(['']);
-        });
+        .then(
+          () => {
+            this._cookies.clear(SESSION_ID_COOKIE_KEY);
+            this._cookies.clear(DOMAIN_NAME_COOKIE_KEY);
+            this._cookies.clear(CLIEND_ID_COOKIE_KEY);
+            this._router.navigate(['']);
+          },
+          () => {
+            this.isUserAuthenticatingWithId3 = false;
+          }
+        );
+      this._title.setTitle(`Authenticating`);
+    } else {
+      this._title.setTitle(`Login`);
     }
-    this._title.setTitle(`Login`);
   }
 }

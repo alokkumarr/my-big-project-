@@ -211,7 +211,7 @@ export class UserService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: sessionID
+        Authorization: `Bearer ${sessionID}`
       })
     };
     return this._httpClientWithoutIntercepors
