@@ -25,9 +25,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AlertUtils {
-  private static final Logger logger = LoggerFactory.getLogger(AlertUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AlertUtils.class);
 
   private static final String INVALID_TOKEN = "Invalid Token";
+  private static final String ERROR_MESSAGE = "Error occurred while checking permission {}";
   private static String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
 
@@ -42,8 +43,7 @@ public class AlertUtils {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     LocalDateTime ldt = LocalDateTime.parse(date, formatter);
     ZoneId zoneId = ZoneId.systemDefault();
-    Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
-    return epochValue;
+    return ldt.atZone(zoneId).toInstant().toEpochMilli();
   }
 
   /**
@@ -59,19 +59,19 @@ public class AlertUtils {
       Operator operator, Double value, Double otherValue, Double metricValue) {
     switch (operator) {
       case BTW:
-        return (metricValue >= otherValue && metricValue <= value) ? true : false;
+        return (metricValue >= otherValue && metricValue <= value);
       case LT:
-        return (metricValue < value) ? true : false;
+        return (metricValue < value);
       case GT:
-        return (metricValue > value) ? true : false;
+        return (metricValue > value);
       case GTE:
-        return (metricValue >= value) ? true : false;
+        return (metricValue >= value);
       case LTE:
-        return (metricValue <= value) ? true : false;
+        return (metricValue <= value);
       case EQ:
-        return (Double.compare(metricValue, value) == 0) ? true : false;
+        return (Double.compare(metricValue, value) == 0);
       case NEQ:
-        return (Double.compare(metricValue, value) != 0) ? true : false;
+        return (Double.compare(metricValue, value) != 0);
       default:
         return false;
     }
@@ -83,7 +83,8 @@ public class AlertUtils {
    * @param productList
    * @return true if valid else false
    */
-  public boolean validAlertPrivileges(ArrayList<Products> productList) {
+  public boolean validAlertPrivileges(List<Products> productList
+      , String subcategory) {
     boolean[] haveValid = {false};
     if (productList != null && !productList.isEmpty()) {
       productList.stream().forEach(products -> {
@@ -95,9 +96,15 @@ public class AlertUtils {
           ProductModules modules = productModules.get(0);
           ArrayList<ProductModuleFeature> prodModFeature = modules.getProdModFeature();
           if (prodModFeature != null && !prodModFeature.isEmpty()) {
-            haveValid[0] = prodModFeature.stream()
-                .anyMatch(productModuleFeature ->
-                    "Alerts".equalsIgnoreCase(productModuleFeature.getProdModFeatureName()));
+            ProductModuleFeature feature = prodModFeature.stream()
+                .filter(productModuleFeature ->
+                    "Alerts".equalsIgnoreCase(productModuleFeature.getProdModFeatureName()))
+                .findAny().get();
+
+            haveValid[0] = feature.getProductModuleSubFeatures() != null
+                ? feature.getProductModuleSubFeatures().stream()
+                .anyMatch(pmf -> subcategory.equalsIgnoreCase(pmf.getProdModFeatureName()))
+                : haveValid[0];
           }
         }
       });
@@ -115,7 +122,7 @@ public class AlertUtils {
    */
   public AlertResponse emptyTicketResponse(HttpServletResponse response,
                                            AlertResponse alertResponse) {
-    logger.error(INVALID_TOKEN);
+    LOGGER.error(INVALID_TOKEN);
     response.setStatus(HttpStatus.SC_UNAUTHORIZED);
     alertResponse.setMessage(INVALID_TOKEN);
     return alertResponse;
@@ -133,13 +140,14 @@ public class AlertUtils {
                                                   String privileges) {
     try {
       // validate the alerts access privileges
-      logger.error(String.format(UNAUTHORIZED, privileges));
+      LOGGER.error(String.format(UNAUTHORIZED, privileges));
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       response.sendError(HttpStatus.SC_UNAUTHORIZED,
           String.format(UNAUTHORIZED, privileges));
       alertResponse.setMessage(String.format(UNAUTHORIZED, privileges));
       return alertResponse;
     } catch (IOException ex) {
+      LOGGER.error(ERROR_MESSAGE, ex);
       return alertResponse;
     }
   }
@@ -153,7 +161,7 @@ public class AlertUtils {
    */
   public AlertStatesResponse emptyTicketResponse(HttpServletResponse response,
                                                  AlertStatesResponse alertResponse) {
-    logger.error(INVALID_TOKEN);
+    LOGGER.error(INVALID_TOKEN);
     response.setStatus(HttpStatus.SC_UNAUTHORIZED);
     alertResponse.setMessage(INVALID_TOKEN);
     return alertResponse;
@@ -172,12 +180,13 @@ public class AlertUtils {
     try {
       // validate the alerts access privileges
       String errorMessage = String.format(UNAUTHORIZED, privileges);
-      logger.error(errorMessage);
+      LOGGER.error(errorMessage);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
       alertResponse.setMessage(errorMessage);
       return alertResponse;
     } catch (IOException ex) {
+      LOGGER.error(ERROR_MESSAGE, ex);
       return alertResponse;
     }
   }
@@ -191,7 +200,7 @@ public class AlertUtils {
    */
   public AlertRuleResponse emptyTicketResponse(HttpServletResponse response,
                                                AlertRuleResponse alertResponse) {
-    logger.error(INVALID_TOKEN);
+    LOGGER.error(INVALID_TOKEN);
     response.setStatus(HttpStatus.SC_UNAUTHORIZED);
     alertResponse.setMessage(INVALID_TOKEN);
     return alertResponse;
@@ -209,13 +218,14 @@ public class AlertUtils {
                                                       String privileges) {
     try {
       // validate the alerts access privileges
-      logger.error(String.format(UNAUTHORIZED, privileges));
+      LOGGER.error(String.format(UNAUTHORIZED, privileges));
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       response.sendError(HttpStatus.SC_UNAUTHORIZED,
           String.format(UNAUTHORIZED, "Access"));
       ruleResponse.setMessage(String.format(UNAUTHORIZED, privileges));
       return ruleResponse;
     } catch (IOException ex) {
+      LOGGER.error(ERROR_MESSAGE, ex);
       return ruleResponse;
     }
   }
@@ -227,7 +237,7 @@ public class AlertUtils {
    * @return String
    */
   public String emptyTicketResponse(HttpServletResponse response) {
-    logger.error(INVALID_TOKEN);
+    LOGGER.error(INVALID_TOKEN);
     response.setStatus(HttpStatus.SC_UNAUTHORIZED);
     return String.format(UNAUTHORIZED, "Access");
   }
@@ -243,11 +253,12 @@ public class AlertUtils {
     String errorMessage = String.format(UNAUTHORIZED, privileges);
     try {
       // validate the alerts access privileges
-      logger.error(errorMessage);
+      LOGGER.error(errorMessage);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      response.sendError(HttpStatus.SC_UNAUTHORIZED,errorMessage);
+      response.sendError(HttpStatus.SC_UNAUTHORIZED, errorMessage);
       return errorMessage;
     } catch (IOException ex) {
+      LOGGER.error(ERROR_MESSAGE, ex);
       return errorMessage;
     }
   }

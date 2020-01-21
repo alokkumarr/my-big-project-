@@ -56,14 +56,17 @@ import org.springframework.web.bind.annotation.RestController;
     })
 public class SipAlertController {
 
-  private static final Logger logger = LoggerFactory.getLogger(SipAlertController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SipAlertController.class);
 
   @Autowired
   private AlertUtils utils;
   @Autowired
   private AlertService alertService;
 
+  private static final String ACCESS = "Access";
+  private static final String VIEW_ALERT = "View Alerts";
   private static final String INVALID_TOKEN = "Invalid Token";
+  private static final String CONFIGURE_ALERT = "Configure Alerts";
   private static String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
 
@@ -97,7 +100,7 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
+    if (!utils.validAlertPrivileges(ticket.getProducts(), CONFIGURE_ALERT)) {
       return utils.validatePermissionResponse(response, alertResponse, "Create");
     }
 
@@ -143,7 +146,7 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
+    if (!utils.validAlertPrivileges(ticket.getProducts(), CONFIGURE_ALERT)) {
       return utils.validatePermissionResponse(response, alertResponse, "Edit");
     }
 
@@ -189,8 +192,8 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertRuleResponse, "Access");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertRuleResponse, ACCESS);
     }
 
     return alertService.retrieveAllAlerts(pageNumber, pageSize, ticket);
@@ -220,8 +223,8 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, "Access");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, ACCESS);
     }
     return alertService.retrieveOperatorsDetails(ticket);
   }
@@ -249,8 +252,8 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, "View");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, ACCESS);
     }
     return alertService.retrieveAggregations(ticket);
   }
@@ -291,8 +294,8 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertRuleResponse, "Access");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertRuleResponse, ACCESS);
     }
 
     return alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket);
@@ -327,8 +330,8 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertResponse, "Access");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertResponse, ACCESS);
     }
 
     alertResponse.setAlert(alertService.getAlertRule(id, ticket));
@@ -365,7 +368,7 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
+    if (!utils.validAlertPrivileges(ticket.getProducts(), CONFIGURE_ALERT)) {
       return utils.validatePermissionResponse(response, alertResponse, "Delete");
     }
 
@@ -415,8 +418,8 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertStatesResponse, "Access");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertStatesResponse, ACCESS);
     }
 
     alertStatesResponse = alertService.getAlertStates(id, pageNumber, pageSize, ticket);
@@ -464,8 +467,8 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertStatesResponse, "Access");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertStatesResponse, ACCESS);
     }
 
     return
@@ -507,24 +510,24 @@ public class SipAlertController {
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (ticket == null) {
-        logger.error(INVALID_TOKEN);
+        LOGGER.error(INVALID_TOKEN);
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);
         return alertCountResponse;
       }
 
       // validate the alerts access privileges
-      if (!utils.validAlertPrivileges(ticket.getProducts())) {
-        logger.error(String.format(UNAUTHORIZED, "Access"));
+      if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+        LOGGER.error(String.format(UNAUTHORIZED, ACCESS));
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);
         response.sendError(HttpStatus.SC_UNAUTHORIZED,
-            String.format(UNAUTHORIZED, "Access"));
+            String.format(UNAUTHORIZED, ACCESS));
         return alertCountResponse;
       }
 
       alertCountResponse =
           alertService.alertCount(alertCount, pageNumber, pageSize, alertRuleId, ticket);
     } catch (IOException ex) {
-      logger.error(ex.getMessage());
+      LOGGER.error("Error while counting the alerts : {}", ex);
     }
     return alertCountResponse;
   }
@@ -551,21 +554,22 @@ public class SipAlertController {
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (ticket == null) {
-        logger.error(INVALID_TOKEN);
+        LOGGER.error(INVALID_TOKEN);
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);
         return attributeValues;
       }
 
       // validate the alerts access privileges
-      if (!utils.validAlertPrivileges(ticket.getProducts())) {
-        logger.error(String.format(UNAUTHORIZED, "Access"));
+      if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+        LOGGER.error(String.format(UNAUTHORIZED, ACCESS));
         setUnAuthResponse(response);
         return attributeValues;
       }
 
       attributeValues = alertService.listAttribueValues(ticket);
     } catch (IOException ex) {
-      logger.error(ex.getMessage());
+      LOGGER.error("Error occurred while  fetching attribute values : {}",
+          ex.getMessage());
     }
     return attributeValues;
   }
@@ -592,8 +596,8 @@ public class SipAlertController {
       return utils.emptyTicketResponse(response);
     }
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, "Access");
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, ACCESS);
     }
     return alertService.retrieveMonitoringType(ticket);
   }

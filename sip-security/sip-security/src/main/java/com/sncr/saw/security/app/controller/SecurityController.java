@@ -1,5 +1,7 @@
 package com.sncr.saw.security.app.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,6 +63,7 @@ import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.Privileges;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -133,9 +136,9 @@ public class SecurityController {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
-  private final String AdminRole = "ADMIN";
-  private final String ALERTS = "ALERTS";
-  private final String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
+  private final static String AdminRole = "ADMIN";
+  private final static String ALERTS = "ALERTS";
+  private final static String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -246,10 +249,10 @@ public class SecurityController {
 		String masterLoginId = null;
 		while (it.hasNext()) {
 			Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
-			if (pair.getKey().equals("validUpto")) {
+			if ("validUpto".equals(pair.getKey())) {
 				validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
 			}
-			if (pair.getKey().equals("masterLoginId")) {
+			if ("masterLoginId".equals(pair.getKey())) {
 				masterLoginId = pair.getValue().toString();
 			}
 			it.remove();
@@ -350,6 +353,7 @@ public class SecurityController {
 		try {
 			return gson.toJson(tHelper.logout(ticketID));
 		} catch (DataAccessException de) {
+			logger.error("Error while logout {}", de);
 			return de.getMessage();
 		}
 	}
@@ -365,11 +369,12 @@ public class SecurityController {
         try {
              ticket = TokenParser.retrieveTicket(token);
         } catch (IOException e) {
-            logger.error("Error occurred while parsing the Token");
+            logger.error("Error occurred while parsing the Token {}",e);
         }
         try {
-            return tHelper.logout(ticket.getTicketId());
+            return tHelper.logout(ticket != null ? ticket.getTicketId() : null);
         } catch (DataAccessException de) {
+					  logger.error("Error occurred while parsing the Token {}",de);
             return de.getMessage();
         }
     }
@@ -412,17 +417,18 @@ public class SecurityController {
 		if (message == null && valid.getValid()) {
 			try {
 				message = userRepository.changePassword(loginId, newPass, oldPass);
-				if (message != null && message.equals("Password Successfully Changed.")) {
+				if ("Password Successfully Changed.".equals(message)) {
 					valid.setValid(true);
                     valid.setValidityMessage(message);
                     return valid;
-				} else if (message.equals("Value provided for old Password did not match.")) {
+				} else if ("Value provided for old Password did not match.".equals(message)) {
 				    valid.setValid(false);
 				    valid.setValidityMessage(message);
 				    return valid;
                 }
 
 			} catch (DataAccessException de) {
+				logger.error("Database error. Please contact server Administrator. {}", de);
 				valid.setValidityMessage("Database error. Please contact server Administrator.");
 				valid.setError(de.getMessage());
 				return valid;
@@ -444,10 +450,10 @@ public class SecurityController {
 		String message = null;
 		try {
 			String eMail = userRepository.getUserEmailId(resetPwdDtls.getMasterLoginId());
-			if (eMail.equals("Invalid")) {
+			if ("Invalid".equals(eMail)) {
 				logger.error("Invalid user Id, Unable to perform Reset Password Process. error message:", null, null);
 				message = "Invalid user Id";
-			} else if (eMail.equals("no email")) {
+			} else if ("no email".equals(eMail)) {
 				logger.error("Email Id is not configured for the User", null, null);
 				message = "Email Id is not configured for the User";
 			} else {
@@ -456,19 +462,15 @@ public class SecurityController {
 				userRepository.insertResetPasswordDtls(resetPwdDtls.getMasterLoginId(), randomString, createdTime,
 						createdTime + (24 * 60 * 60 * 1000));
 				String resetpwdlk = resetPwdDtls.getProductUrl();
-				// resetpwdlk = resetpwdlk+"/vfyRstPwd?rhc="+randomString;
 				resetpwdlk = resetpwdlk + "?rhc=" + randomString;
 				message = sendResetMail(resetPwdDtls.getMasterLoginId(), eMail, resetpwdlk, createdTime);
 				if (message == null) {
 					valid.setValid(true);
-					message = "Mail sent successfully to " + eMail;// + ".
-																	// Requesting
-																	// user is "
-																	// +
-																	// resetPwdDtls.getMasterLoginId();
+					message = "Mail sent successfully to " + eMail;
 				}
 			}
 		} catch (DataAccessException de) {
+			logger.error("Database error. Please contact server Administrator. {}", de);
 			valid.setValidityMessage("Database error. Please contact server Administrator.");
 			valid.setError(de.getMessage());
 			return valid;
@@ -485,7 +487,7 @@ public class SecurityController {
 	@RequestMapping(value = "/vfyRstPwd", method = RequestMethod.POST)
 	public ResetValid vfyRstPwd(@RequestBody RandomHashcode randomHashcode) {
 		// P2: handle expired password scenario
-		ResetValid rv = null;
+		ResetValid rv = new ResetValid();
 		try {
 			rv = userRepository.validateResetPasswordDtls(randomHashcode.getRhc());
 		} catch (DataAccessException de) {
@@ -501,12 +503,9 @@ public class SecurityController {
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 		Properties mailProperties = new Properties();
-		// mailProperties.put("mail.smtp.auth", auth);
-		// mailProperties.put("mail.smtp.starttls.enable", starttls);
 		mailSender.setJavaMailProperties(mailProperties);
 		mailSender.setHost(nSSOProperties.getMailHost());
 		mailSender.setPort(nSSOProperties.getMailPort());
-		// mailSender.setProtocol(protocol);
 
 		mailSender.setUsername(nSSOProperties.getMailUserName());
 		if (nSSOProperties.getMailPassword().length != 0) {
@@ -1233,7 +1232,7 @@ public class SecurityController {
             return valid;
         }
         DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups,custId);
-        if (dskValidity.getValid().booleanValue() == true)  {
+        if (dskValidity.getValid().booleanValue())  {
             return dskValidity;
         }
         else {
@@ -1265,7 +1264,7 @@ public class SecurityController {
             return valid;
         }
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1294,7 +1293,7 @@ public class SecurityController {
         }
         Valid dskValidity = dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
 
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1322,7 +1321,7 @@ public class SecurityController {
             return valid;
         }
         Valid dskValidity = dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1363,7 +1362,7 @@ public class SecurityController {
         dskList.add(0,securityGroupId.toString());
         dskList.add(1,attributeName);
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1392,7 +1391,7 @@ public class SecurityController {
             return valid;
         }
         Valid dskValidity = dataSecurityKeyRepository.updateUser(securityGroupName,userSysId,custId);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -2188,24 +2187,24 @@ public class SecurityController {
 	    UserPreferences userPreferences = new UserPreferences();
 			try {
 				Ticket ticket = SipCommonUtils.getTicket(request);
-				userPreferences.setUserID(ticket.getMasterLoginId());
+				userPreferences.setUserID(ticket.getUserId().toString());
 				userPreferences.setCustomerID(ticket.getCustID());
 				Preference preference = preferenceList.stream().
-						filter(p -> p.getPreferenceName().equalsIgnoreCase("defaultDashboardCategory")).findFirst().get();
-				Long customerId = preference != null && preference.getPreferenceValue() != null ?
+						filter(p -> "defaultDashboardCategory".equalsIgnoreCase(p.getPreferenceName())).findFirst().get();
+				Long categoryId = preference != null && preference.getPreferenceValue() != null ?
 						Long.valueOf(preference.getPreferenceValue()) : 0L;
 
-				if (securityService.haveValidCustomerId(ticket, customerId)) {
+				if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.CREATE)) {
 					userPreferences.setPreferences(preferenceList);
-					return preferenceRepository.upsertPreferences(userPreferences);
+					userPreferences = preferenceRepository.upsertPreferences(userPreferences);
 				} else {
-					userPreferences.setMessage("Customer Id not matched, please correct customer id.");
-					return userPreferences;
+					userPreferences.setMessage(UNAUTHORIZED_USER);
+					response.setStatus(HttpStatus.UNAUTHORIZED.value());
+					response.sendError(HttpStatus.UNAUTHORIZED.value(),UNAUTHORIZED_USER);
 				}
 			}catch (Exception ex) {
-				String message = (ex instanceof DataAccessException) ? "Database error." : "Error.";
-				userPreferences.setMessage(message + " Please contact server Administrator");
-				logger.error(message);
+				userPreferences.setMessage("Please contact server Administrator" + ex.getMessage());
+				logger.error("Please contact server Administrator {}", ex);
 			}
 			return userPreferences;
     }
@@ -2221,29 +2220,28 @@ public class SecurityController {
         UserPreferences userPreferences = new UserPreferences();
 				try {
 					Ticket ticket = SipCommonUtils.getTicket(request);
-					userPreferences.setUserID(ticket.getMasterLoginId());
+					userPreferences.setUserID(ticket.getUserId().toString());
 					userPreferences.setCustomerID(ticket.getCustID());
 					Preference preference = preferenceList.stream().
-							filter(p -> p.getPreferenceName().equalsIgnoreCase("defaultDashboardCategory")).findFirst().get();
-					Long customerId = preference != null && preference.getPreferenceValue() != null ?
+							filter(p -> "defaultDashboardCategory".equalsIgnoreCase(p.getPreferenceName())).findFirst().get();
+					Long categoryId = preference != null && preference.getPreferenceValue() != null ?
 							Long.valueOf(preference.getPreferenceValue()) : 0L;
 
-					if (securityService.haveValidCustomerId(ticket, customerId)) {
+					if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.DELETE)) {
 						userPreferences.setPreferences(preferenceList);
 						if (inactivateAll!=null && inactivateAll) {
 							return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
-						}
-						else {
+						} else {
 							return preferenceRepository.deletePreferences(userPreferences,false);
 						}
 					} else {
-						userPreferences.setMessage("Customer Id not matched, please correct customer id.");
-						return userPreferences;
+						userPreferences.setMessage(UNAUTHORIZED_USER);
+						response.setStatus(HttpStatus.UNAUTHORIZED.value());
+						response.sendError(HttpStatus.UNAUTHORIZED.value(),	UNAUTHORIZED_USER);
 					}
 				}catch (Exception ex) {
-					String message = (ex instanceof DataAccessException) ? "Database error." : "Error.";
-					userPreferences.setMessage(message + " Please contact server Administrator");
-					logger.error(message);
+					userPreferences.setMessage("Please contact server Administrator" + ex.getMessage());
+					logger.error("Please contact server Administrator {}", ex);
 				}
 			return userPreferences;
     }
