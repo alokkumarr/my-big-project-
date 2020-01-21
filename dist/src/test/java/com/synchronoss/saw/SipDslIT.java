@@ -632,8 +632,6 @@ public class SipDslIT extends BaseIT {
     field1.addProperty("columnName", CUSTOMER_CODE);
     field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
-//    JsonArray artifactFields = new JsonArray();
-//    artifactFields.add(field1);
 
     sipDsl
         .get("sipQuery")
