@@ -6,4 +6,7 @@ public interface CommonQueryConstants {
   static final String BUCKET_FILTER = "bucket_filter";
   static final String SCRIPT_AND = "&&";
   static final String SCRIPT_OR = "||";
+  static final String UNDERSCORE = "_";
+  static final String DOT_WITH_ESCAPE_CHARACTER = "\\.";
+
 }

@@ -293,36 +293,48 @@ public class SIPAggregationBuilder {
     aggregationFilter.stream()
         .forEach(
             filter -> {
-              String scriptSourceName;
-              if (filter.getAggregate() != null) {
-                Field aggregateField = new Field();
-                aggregateField.setColumnName(filter.getColumnName());
-                aggregateField.setAggregate(filter.getAggregate());
-                String fieldName =
-                    filter.getAggregate()
-                        + "_"
-                        + filter.getColumnName()
-                        + random.nextInt(BOUND_VALUE);
-                aggregateField.setDataField(fieldName);
-                aggregationBuilder.subAggregation(
-                    QueryBuilderUtil.aggregationBuilderDataField(aggregateField));
-                bucketsPathsMap.put(fieldName, fieldName + BuilderUtil.VALUE);
-                scriptSourceName = fieldName;
-              } else {
-                bucketsPathsMap.put(
-                    filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
-                scriptSourceName = filter.getColumnName();
+              if (filter.getIsRuntimeFilter() == null
+                  || !filter.getIsRuntimeFilter()
+                  || (filter.getIsRuntimeFilter() != null
+                      && filter.getIsRuntimeFilter()
+                      && filter.getModel() != null)) {
+                String scriptSourceName;
+                if (filter.getAggregate() != null) {
+                  Field aggregateField = new Field();
+                  aggregateField.setColumnName(filter.getColumnName());
+                  aggregateField.setAggregate(filter.getAggregate());
+                  String fieldName =
+                      filter.getAggregate()
+                          + "_"
+                          + filter
+                              .getColumnName()
+                              .replaceAll(
+                                  CommonQueryConstants.DOT_WITH_ESCAPE_CHARACTER,
+                                  CommonQueryConstants.UNDERSCORE)
+                          + random.nextInt(BOUND_VALUE);
+                  aggregateField.setDataField(fieldName);
+                  aggregationBuilder.subAggregation(
+                      QueryBuilderUtil.aggregationBuilderDataField(aggregateField));
+                  bucketsPathsMap.put(fieldName, fieldName + BuilderUtil.VALUE);
+                  scriptSourceName = fieldName;
+                } else {
+                  bucketsPathsMap.put(
+                      filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
+                  scriptSourceName = filter.getColumnName();
+                }
+                aggregateScript.add(
+                    QueryBuilderUtil.prepareAggregationFilter(filter, scriptSourceName));
               }
-              aggregateScript.add(
-                  QueryBuilderUtil.prepareAggregationFilter(filter, scriptSourceName));
             });
-    Script script =
-        new Script(StringUtils.join(aggregateScript, getScriptBooleanOperator(booleanCriteria)));
-    BucketSelectorPipelineAggregationBuilder bs =
-        PipelineAggregatorBuilders.bucketSelector(
-            CommonQueryConstants.BUCKET_FILTER, bucketsPathsMap, script);
-    aggregationBuilder.subAggregation(bs);
 
+    if (!aggregateScript.isEmpty()) {
+      Script script =
+          new Script(StringUtils.join(aggregateScript, getScriptBooleanOperator(booleanCriteria)));
+      BucketSelectorPipelineAggregationBuilder bs =
+          PipelineAggregatorBuilders.bucketSelector(
+              CommonQueryConstants.BUCKET_FILTER, bucketsPathsMap, script);
+      aggregationBuilder.subAggregation(bs);
+    }
     return aggregationBuilder;
   }
 
