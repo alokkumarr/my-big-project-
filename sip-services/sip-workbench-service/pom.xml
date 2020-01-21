@@ -32,8 +32,8 @@
 		<snotify>1.1</snotify>
 		<common.io>2.6</common.io>
 		<mapr.core.version>6.1.0</mapr.core.version>
-		  <spark-version>2.3.2</spark-version>
-    <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
+		<spark-version>2.3.2</spark-version>
+		<mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -46,17 +46,17 @@
 		</repository>
 	</repositories>
 	<dependencies>
-	<dependency>
-      <groupId>com.mapr.hadoop</groupId>
-      <artifactId>maprfs</artifactId>
-      <version>${mapr.core.version}-mapr</version>
-      <scope>provided</scope>
-    </dependency>
-     <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
-        </dependency>
+		<dependency>
+			<groupId>com.mapr.hadoop</groupId>
+			<artifactId>maprfs</artifactId>
+			<version>${mapr.core.version}-mapr</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
+		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -64,15 +64,29 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+      <exclusion>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-logging</artifactId>
+      </exclusion>
+
+   </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-    <dependency>
-	    <groupId>io.micrometer</groupId>
-	    <artifactId>micrometer-registry-prometheus</artifactId>
-    </dependency>
+		<dependency>
+
+			<groupId>org.springframework.boot</groupId>
+
+			<artifactId>spring-boot-starter-validation</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -102,27 +116,27 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-config</artifactId>
-    </dependency>
-     <dependency>
-      <groupId>com.mapr.streams</groupId>
-      <artifactId>mapr-streams</artifactId>
-      <version>${mapr.core.version}-mapr</version>
-    </dependency>
-     <dependency>
-      <groupId>org.apache.kafka</groupId>
-      <artifactId>kafka-clients</artifactId>
-      <version>1.0.1-mapr-1803</version>
-    </dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.mapr.streams</groupId>
+			<artifactId>mapr-streams</artifactId>
+			<version>${mapr.core.version}-mapr</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+			<version>1.0.1-mapr-1803</version>
+		</dependency>
 
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-web</artifactId>
-    </dependency>
-		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+
 		<!-- Spring integration related service -->
-	
+
 
 		<!-- Spring integration related service -->
 		<dependency>
@@ -168,95 +182,95 @@
 			<artifactId>commons-io</artifactId>
 			<version>${common.io}</version>
 		</dependency>
-		
+
 		<dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf</artifactId>
-      <version>${revision}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-        <!--Exclude the xdf-esloader lib to resolve conflict with hadoop-es lib.-->
-        <exclusion>
-          <groupId>com.synchronoss.bda</groupId>
-          <artifactId>xdf-esloader</artifactId>
-        </exclusion>
-        <exclusion>
-        	<groupId>org.elasticsearch</groupId>
-        	<artifactId>elasticsearch-spark-${scala.version.exclude}</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-component</artifactId>
-      <version>${revision}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-ext</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-sql</artifactId>
-      <version>${revision}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-parser</artifactId>
-      <version>${revision}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-     <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_2.11</artifactId>
-      <version>${spark-version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-      <dependency>
-      <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt</artifactId>
-      <version>${jjwt.version}</version>
-    </dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf</artifactId>
+			<version>${revision}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<!--Exclude the xdf-esloader lib to resolve conflict with hadoop-es lib. -->
+				<exclusion>
+					<groupId>com.synchronoss.bda</groupId>
+					<artifactId>xdf-esloader</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.elasticsearch</groupId>
+					<artifactId>elasticsearch-spark-${scala.version.exclude}</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-component</artifactId>
+			<version>${revision}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-ext</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-sql</artifactId>
+			<version>${revision}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-parser</artifactId>
+			<version>${revision}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_2.11</artifactId>
+			<version>${spark-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
 
 		<!-- This is the SIP Batch plug-ins -->
-		
-    <dependency>
-      <groupId>com.synchronoss.saw</groupId>
-      <artifactId>sip-inspect-data-api</artifactId>
-      <version>${revision}</version>
-    </dependency>
-<dependency>
-      <groupId>com.synchronoss.bda.sip</groupId>
-      <artifactId>sip-common-components</artifactId>
-      <version>${revision}</version>
-    </dependency>
-		
+
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>sip-inspect-data-api</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda.sip</groupId>
+			<artifactId>sip-common-components</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
@@ -274,110 +288,93 @@
 					<showWarnings>true</showWarnings>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<classifier>exec</classifier>
-					<!--
-					    The spring-boot-start-test dependency adds JUnit in the
-					    compile scope so exclude JUnit explicitly from packaging
-					-->
+					<!-- The spring-boot-start-test dependency adds JUnit in the compile 
+						scope so exclude JUnit explicitly from packaging -->
 					<excludeGroupIds>junit</excludeGroupIds>
 				</configuration>
 			</plugin>
-			<!--  plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
+			<!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-assembly-plugin</artifactId> 
+				<executions> <execution> <id>create-bundle</id> <phase>package</phase> <goals> 
+				<goal>single</goal> </goals> <configuration> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> 
+				</descriptorRefs> </configuration> </execution> </executions> </plugin -->
+			<plugin>
+				<groupId>de.dentrassi.maven</groupId>
+				<artifactId>rpm</artifactId>
+				<version>0.10.0</version>
 				<executions>
 					<execution>
-						<id>create-bundle</id>
-						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
+							<packageName>sip-workbench</packageName>
+							<version>${revision.nodash}</version>
+							<obsoletes>saw-workbench</obsoletes>
+							<entries>
+								<entry>
+									<name>/opt/bda/saw-workbench-service</name>
+									<directory>true</directory>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-workbench-service/conf</name>
+									<directory>true</directory>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>
+									<file>target/sip-workbench-service-${revision}-exec.jar</file>
+								</entry>
+								<!-- entry> <name>/opt/bda/saw-workbench-service/saw-workbench-spark.jar</name> 
+									<file>target/sip-workbench-service-${revision}-jar-with-dependencies.jar</file> 
+									</entry -->
+								<entry>
+									<name>/usr/lib/systemd/system/sip-workbench.service</name>
+									<file>src/main/system/sip-workbench.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/sip-workbench-proxy.service</name>
+									<file>src/main/system/sip-workbench-proxy.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/sip-workbench-proxy.socket</name>
+									<file>src/main/system/sip-workbench-proxy.socket</file>
+								</entry>
+							</entries>
+							<afterInstallation>
+								<script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+								<script>systemctl daemon-reload</script>
+							</afterRemoval>
+							<signature>
+								<skip>true</skip>
+							</signature>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin-->
-			<plugin>
-        <groupId>de.dentrassi.maven</groupId>
-        <artifactId>rpm</artifactId>
-        <version>0.10.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>rpm</goal>
-            </goals>
-            <configuration>
-              <packageName>sip-workbench</packageName>
-              <version>${revision.nodash}</version>
-              <obsoletes>saw-workbench</obsoletes>
-              <entries>
-                <entry>
-                  <name>/opt/bda/saw-workbench-service</name>
-                  <directory>true</directory>
-                </entry>
-                <entry>
-                  <name>/opt/bda/saw-workbench-service/conf</name>
-                  <directory>true</directory>
-                </entry>
-                <entry>
-                  <name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>
-                  <file>target/sip-workbench-service-${revision}-exec.jar</file>
-                </entry>
-                <!-- entry>
-                  <name>/opt/bda/saw-workbench-service/saw-workbench-spark.jar</name>
-                  <file>target/sip-workbench-service-${revision}-jar-with-dependencies.jar</file>
-                </entry-->
-                <entry>
-                  <name>/usr/lib/systemd/system/sip-workbench.service</name>
-                  <file>src/main/system/sip-workbench.service</file>
-                </entry>
-                <entry>
-                  <name>/usr/lib/systemd/system/sip-workbench-proxy.service</name>
-                  <file>src/main/system/sip-workbench-proxy.service</file>
-                </entry>
-                <entry>
-                  <name>/usr/lib/systemd/system/sip-workbench-proxy.socket</name>
-                  <file>src/main/system/sip-workbench-proxy.socket</file>
-                </entry>
-              </entries>
-              <afterInstallation>
-                <script>systemctl daemon-reload</script>
-              </afterInstallation>
-              <afterRemoval>
-                <script>systemctl daemon-reload</script>
-              </afterRemoval>
-              <signature>
-                <skip>true</skip>
-              </signature>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-			
+			</plugin>
+
 		</plugins>
 	</build>
-  <distributionManagement>
-    <repository>
-      <id>client-releases</id>
-      <name>SNCR Repository</name>
-      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
-    </repository>
-    <snapshotRepository>
-      <id>client-snapshots</id>
-      <name>SNCR Snapshot Repository</name>
-      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
-    </snapshotRepository>
-    <site>
-      <id>sncr-libs-releases</id>
-      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
-    </site>
-  </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>client-releases</id>
+			<name>SNCR Repository</name>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>client-snapshots</id>
+			<name>SNCR Snapshot Repository</name>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+		</snapshotRepository>
+		<site>
+			<id>sncr-libs-releases</id>
+			<url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+		</site>
+	</distributionManagement>
 </project>

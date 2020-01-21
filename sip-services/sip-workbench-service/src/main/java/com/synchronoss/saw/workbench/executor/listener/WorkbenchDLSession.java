@@ -1,4 +1,4 @@
-package com.synhronoss.sw.workbench.executor.listener;
+package com.synchronoss.saw.workbench.executor.listener;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;

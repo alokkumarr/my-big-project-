@@ -1,6 +1,8 @@
 info:
   component: Synchronoss Workbench Service
 spring:
+  main:
+    banner-mode: 'off'
   application:
     name: saw-workbench-service
   servlet:
@@ -10,47 +12,51 @@ spring:
       file-size-threshold: 2KB
 logging:
   level:
-    com.synchronoss.saw.workbench: INFO
-    sncr.bda: INFO
+    org.springframework: INFO
+    com.synchronoss.saw.workbench: DEBUG
+    com.synchronoss.bda: DEBUG
+    org.apache.http.client: INFO
 server:
   address: localhost
   port: 9701
   servlet:
     context-path: ''
-  #ssl:
-   # key-store: /Users/spau0004/Desktop/keystore/keystore.jks
-   # key-store-password: sip@123
-   # trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
-   # trust-store-password: sip@123  
   max-http-header-size:  65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+
+ 
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: info, health, prometheus
 application:
     async:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
 
-connector: http
+  
+sip:
+  ssl:
+    enable : false
+
+
+
+connector : http
+
+
 workbench:
         project-key: "workbench"
-        project-path: "/Desktop" 
-        project-root: "/Users/nareshgangishetty/workbench-data"
-        preview-limit: 10000
-        livy-uri: http://localhost:8998
-        storage-url: ${connector}://localhost:9800
-
+        project-path: "/workbench"
+        project-root: "maprfs:///var/sip"
+        preview-limit: 100
+        livy-uri: "http://sip-mapr:8998/"
+        storage-uri: ${connector}://localhost:9800
 metastore:
-    base:  hdfs:///var/sip
-
-sip:
-   ssl:
-     enable : false
-   trust:
-       store: /Users/spau0004/Desktop/keystore/truststore.jks
-       password: sip@123
-   key:
-      store: /Users/spau0004/Desktop/keystore/keystore.jks
-      password: sip@123
-         
+    base: "maprfs:///var/sip"

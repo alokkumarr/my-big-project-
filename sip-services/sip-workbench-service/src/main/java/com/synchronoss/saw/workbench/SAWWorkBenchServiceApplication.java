@@ -13,12 +13,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 
-import com.synhronoss.sw.workbench.executor.listener.WorkbenchDLSession;
+import com.synchronoss.saw.workbench.executor.listener.WorkbenchDLSession;
 
 import info.faljse.SDNotify.SDNotify;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.synchronoss.saw.workbench", "com.synchronoss.sip.utils"})
+@ComponentScan(basePackages = {"com.synchronoss.saw.workbench", "com.synchronoss.saw.workbench.executor.service", "com.synchronoss.sip.utils"})
 public class SAWWorkBenchServiceApplication {
 	
 	

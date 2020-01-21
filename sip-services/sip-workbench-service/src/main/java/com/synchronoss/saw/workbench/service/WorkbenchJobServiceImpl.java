@@ -15,6 +15,7 @@ import org.ojai.DocumentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
@@ -29,16 +30,16 @@ import sncr.xdf.services.NGContextServices;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 
-public class WorkbenchServiceImpl implements WorkbenchService {
+@Service
+public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 
-	  private static final Logger logger = LoggerFactory.getLogger(SAWWorkbenchServiceImpl.class);
+	  private static final Logger logger = LoggerFactory.getLogger(WorkbenchJobServiceImpl.class);
 	  
-	  @Autowired
-	  private SparkSession sparkSession;
+	
 	  
 	@Override
 	public Object executeJob(String root, String cfg, String project, String component, String batchID) {
-		
+		     logger.debug("Inside execute Job!!....######");
 			  
 			 // createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
 			    
@@ -50,9 +51,9 @@ public class WorkbenchServiceImpl implements WorkbenchService {
 
 			    NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
 			    contextServices.initContext();
-
+			    logger.debug("Init content done ....######");
 			    contextServices.registerOutputDataSet();
-
+			    logger.debug("register output done ....######");
 			    NGContext ngctx = contextServices.getNgctx();
 
 			    ngctx.serviceStatus.put(ComponentServices.InputDSMetadata, true);
@@ -65,6 +66,7 @@ public class WorkbenchServiceImpl implements WorkbenchService {
 			        aac = new NGSQLComponent(ngctx);
 			        break;
 			      case "parser":
+			    	  logger.debug("Invoking Parser !!!! ....######");
 			        aac = new NGParser(ngctx);
 			        break;
 			      case "transformer":

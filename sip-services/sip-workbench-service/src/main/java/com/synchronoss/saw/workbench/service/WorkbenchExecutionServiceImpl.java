@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,8 @@ import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
-import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorService;
-import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorServiceImpl;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutor;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorImpl;
 
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
@@ -58,11 +59,15 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Value("${workbench.project-root}/services/metadata/previews")
   @NotNull
   private String previewsTablePath;
+  
+  @Autowired
+  WorkbenchExecutor executor;
 
  
 
   @PostConstruct
   private void init() throws Exception {
+	  log.info("#### Inside Post Construct ####");
       /* Workaround: If the "/apps/spark" directory does not exist in
        * the data lake, Apache Livy will fail with a file not found
        * error.  So create the "/apps/spark" directory here.  */
@@ -140,8 +145,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     NGContext workBenchcontext = contextServices.getNgctx();
 
     workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-    WorkbenchExecutorService service = new WorkbenchExecutorServiceImpl();
-    service.executeJob(project, name, component, cfg);
+    executor.executeJob(project, name, component, cfg);
     
     //String project, String name, String component, String cfg
     //client.submit(new WorkbenchExecuteJob(workBenchcontext));
@@ -199,7 +203,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     /* Submit job to Livy for reading out preview data */
 //    WorkbenchClient client = getWorkbenchClient();
     String id = UUID.randomUUID().toString();
-    WorkbenchExecutorService service = new WorkbenchExecutorServiceImpl();
+    WorkbenchExecutor service = new WorkbenchExecutorImpl();
     
     service.createPreview(id, location, previewLimit, id, project, name);
     //service.preview(id, location, previewLimit, id, project, name);

@@ -1,39 +1,49 @@
-package com.synchronoss.saw.workbench.executor.service;
+package com.synchronoss.saw.workbench.service;
 
 import java.io.File;
 import java.util.Properties;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.mapr.streams.Admin;
 import com.mapr.streams.StreamDescriptor;
 import com.mapr.streams.Streams;
+import com.synchronoss.saw.workbench.executor.listener.WorkbenchExecutorListener;
 
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.alert.AlertQueueManager;
 
-public class WorkbenchExecutorQueuManager {
+@Service
+public class WorkbenchExecutorQueue {
 
-	  private static final Logger logger = Logger.getLogger(WorkbenchExecutorQueuManager.class);
-	  private String streamBasePath;
+	  private static final Logger logger = LoggerFactory.getLogger(WorkbenchExecutorQueue.class);
+	  private String streamBasePath = "";
+	  private String project="";
+	  private String name="";
+	  private String component="";
+	  private String cfg="";
+	  private String topic="";
+	  private String workbenchExecutorStream="";
+	  KafkaProducer<String, String> producer=null;
+	  @Autowired
+	  WorkbenchExecutorListener listener;
 
-	  private String project;
-	  private String name;
-	  private String component;
-	  private String cfg;
-	  private String topic;
-	  private String workbenchExecutorStream;
-
-	  public WorkbenchExecutorQueuManager(String basePath) {
+	  @PostConstruct
+	  public void init() {
+		  logger.info("#### Post construct of WorkbenchQueue Manager");
 	      String sipBasePath = "";
 	     
 	      this.streamBasePath = sipBasePath + File.separator + "services/workbench/executor";
 	      this.workbenchExecutorStream = this.streamBasePath
-          + File.separator
-          + "sip-workbench-executor";
+        + File.separator
+        + "sip-workbench-executor";
 	      this.topic = workbenchExecutorStream + ":executions";
 
 	      
@@ -83,29 +93,48 @@ public class WorkbenchExecutorQueuManager {
 	        streamAdmin.close();
 	      }
 	    }
+	    logger.info("####### Starting workbench consumer thread....");
+	    Runnable r =
+		        () -> {
+		          try {
+		        	  
+		      	    listener.runWorkbenchConsumer();
+		          } catch (Exception e) {
+		            logger.error("Error occurred while running the stream consumer : " + e);
+		          }
+		        };
+		    new Thread(r).start();
+		    logger.info("#######Workbench consumer thread started");
+		    
+		    
+	    
+	    if(producer == null) {
+	    	Properties properties = new Properties();
+		    properties.setProperty(
+		        "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		    properties.setProperty(
+		        "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		    
+		    producer = new KafkaProducer(properties);
+	    }
+	    
+	    
+	    
 	  }
 
 	  public boolean sendWorkbenchMessageToStream(String recordContent) {
-	    Properties properties = new Properties();
-	    properties.setProperty(
-	        "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-	    properties.setProperty(
-	        "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-	    properties.setProperty(
-		        "bootstrap.servers", "localhost:9092");
+	   
 
-	    KafkaProducer<String, String> producer = new KafkaProducer(properties);
-
-	   // String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s", project, name,component,cfg);
-	    logger.debug("Record content = " + recordContent);
+	    logger.debug("######## Sending record content to kafka Queue ######" );
 
 	    ProducerRecord<String, String> record = new ProducerRecord<>(this.topic, recordContent);
+	    logger.debug("#### Sending to topic ####"+ this.topic);
 
 	    logger.debug("Writing data to stream " + record);
 	    producer.send(record);
 	    producer.flush();
 	    producer.close();
-
+	    logger.debug("######## Sent record content to kafka Queue ######" );
 	    return true;
 	  }
 

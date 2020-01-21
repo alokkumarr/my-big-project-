@@ -1,4 +1,4 @@
-package com.synhronoss.sw.workbench.executor.listener;
+package com.synchronoss.saw.workbench.executor.listener;
 
 import java.io.File;
 import java.util.Collections;
@@ -15,33 +15,37 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.spark.sql.SparkSession;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonSyntaxException;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutionType;
-import com.synchronoss.saw.workbench.service.WorkbenchService;
-import com.synchronoss.saw.workbench.service.WorkbenchServiceImpl;
+import com.synchronoss.saw.workbench.service.WorkbenchJobService;
+import com.synchronoss.saw.workbench.service.WorkbenchJobServiceImpl;
 
-
+@Service
 public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener{
 	
 	 private static final Logger logger = LoggerFactory.getLogger(WorkbenchExecutorListenerImpl.class);
-	 @Value("${sip.service.metastore.base}")
-	  @NotNull
-	  private String basePath;
+	 //@Value("${sip.service.metastore.base}")
+	 // @NotNull
+	 // private String basePath="";
 	 
 	 @Value("${workbench.project-root}")
 	  @NotNull
 	  private String root;
 
 	  private String streamPath = null;
-	  private String evaluatorstream = null;
 	  private String workbenchTopics= null;
+	  
+	  @Autowired
+	  WorkbenchJobService service;
+
+	private String evaluatorstream;
 
 	  /**
 	   * Init method for listener.
@@ -50,9 +54,19 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	   */
 	  @PostConstruct
 	  public void init() {
-	    streamPath = basePath + File.separator + "services/workbench/executor";
-	    evaluatorstream = streamPath + File.separator + "sip-workbench-executor-stream";
-	    workbenchTopics = evaluatorstream + ":executions";
+		String basePath = "";
+		logger.debug("#####Inside post construct of listener #####");
+		
+		String sipBasePath = "";
+	     
+	      this.streamPath = sipBasePath + File.separator + "services/workbench/executor";
+	      this.evaluatorstream = this.streamPath
+      + File.separator
+      + "sip-workbench-executor";
+	      this.workbenchTopics = evaluatorstream + ":executions";
+	      
+	      
+	   
 	  }
 	  
 	  
@@ -65,23 +79,23 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 
 	@Override
 	public void runWorkbenchConsumer() throws Exception {
-	    try {
-	        createIfNotExists(10);
-	      } catch (Exception e) {
-	        logger.error("Error occurred while initializing the AlertEvaluator stream ", e);
-	      }
+
 
 	      logger.debug("Starting receive:");
 	      Properties properties = new Properties();
-	      properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "sip-evaluator");
+	      properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "sip-workbench");
 	      properties.setProperty(
 	          ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 	      properties.setProperty(
 	          ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 	      properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "5");
-
+	      
+	      logger.debug("######### Creating consumer ######");
 	      KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+	      logger.debug("######### Consumer  created ######" + consumer);
+	      logger.debug("######### Subscribing to topic  ::"+ this.workbenchTopics);
 	      consumer.subscribe(Collections.singletonList(this.workbenchTopics));
+	      logger.debug("######### Subscribing completed!!  $##########");
 	      receiveMessages(consumer);
 	    }
 
@@ -98,24 +112,32 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	   * @throws Exception when unable to process the messages.
 	   */
 	  private void receiveMessages(KafkaConsumer<String, String> consumer) {
+		logger.debug("Inside recieve messages");
+		logger.debug("########Consumer ::"+ consumer);
 	    long pollTimeout = 60 * 60 * 1000;
 	    while (true) {
+	    	logger.debug("Inside while loop");
 	      ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
-	      
+	      logger.debug("################Inside polling for  messages");
+	      logger.debug("#################Number of records recieved in polling"+ records.count());
 	      records.forEach(
 	          record-> {
 	        	  ExecutorService executor = Executors.newFixedThreadPool(10);
 	        	  Future<Long> result = executor.submit(new Callable<Long>() {
 						@Override
 						public Long call() throws Exception {
+							 logger.debug("Consumer processing message....");
 							try {
-				        		  String[] content =   record.value().split(" ");
+				        		  String[] content =   record.value().split("˜˜");
+				        		  
+				        		  logger.debug("#### content ::"+ content);
 				        		  
 				        		  WorkbenchExecutionType executionType = WorkbenchExecutionType.valueOf(content[0]);
 				        		  
 				        		  
 				        		  switch(executionType) {
 				        		  case EXECUTE_JOB:
+				        			  logger.debug("Processing exeucte job type in consumer ....");
 
 					        		  if(content.length == 5) {
 					        			  	String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
@@ -124,7 +146,6 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 							    			  String name = content[2];
 							    			  String component = content[3];
 							    			  String cfg = content[4];
-							    			  WorkbenchService service = new WorkbenchServiceImpl();
 							    			  service.executeJob(root, cfg, project, component, batchID);
 							    			  
 					        		  }
@@ -139,7 +160,7 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 							        		  String previewsTablePath= content[3];
 							    			  String project = content[4];
 							    			  String name = content[5];
-							    			  WorkbenchService service = new WorkbenchServiceImpl();
+							    			  WorkbenchJobService service = new WorkbenchJobServiceImpl();
 							    			  service.createPreview(id, location, previewLimit, previewsTablePath, project, name);
 							    			  break;
 							    			  
@@ -170,6 +191,7 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	        	  
 	        	  
 	      consumer.commitAsync();
+	      logger.debug("####End of while loop one iteration");
 	    }
 	  }
 

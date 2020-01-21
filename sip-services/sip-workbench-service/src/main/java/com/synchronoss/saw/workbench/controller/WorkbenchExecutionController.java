@@ -72,7 +72,7 @@ public class WorkbenchExecutionController {
       throws JsonProcessingException, Exception {
     log.info("Create dataset: body = {}", body);
     log.debug("Create dataset: project = {}", project);
-    log.debug("Auth token = {}", authToken);
+    //log.debug("Auth token = {}", authToken);
     if (authToken.startsWith("Bearer")) {
        authToken = authToken.substring("Bearer ".length());
     }
