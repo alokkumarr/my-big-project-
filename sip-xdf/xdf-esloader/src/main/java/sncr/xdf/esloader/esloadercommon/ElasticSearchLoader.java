@@ -77,8 +77,6 @@ public class ElasticSearchLoader {
             this.esConfig.put(ES_MAPPING_ID, esLoader.getDocumentIDField());
         }
 
-        logger.debug("ES Config = " + this.esConfig);
-
 
         this.esClient = new ESHttpClient(config);
 
