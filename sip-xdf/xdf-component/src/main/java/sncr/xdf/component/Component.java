@@ -31,6 +31,7 @@ import sncr.bda.services.TransformationService;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.Context;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by asor0002 on 9/8/2017.
@@ -239,25 +240,25 @@ public abstract class Component {
       String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
       String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
       if (configAsStr == null || configAsStr.isEmpty()) {
-        throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter,
+        throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER,
             "configuration file name");
       }
 
       String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
       if (appId == null || appId.isEmpty()) {
-        throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter,
+        throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER,
             "Project/application name");
       }
 
       String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
       if (batchId == null || batchId.isEmpty()) {
-        throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter,
+        throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER,
             "batch id/session id");
       }
 
       String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
       if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-        throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter,
+        throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER,
             "XDF Data root");
       }
 
