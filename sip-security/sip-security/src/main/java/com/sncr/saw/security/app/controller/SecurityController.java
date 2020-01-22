@@ -2275,9 +2275,11 @@ public class SecurityController {
         brandResponse.setMessage("Brand details are upserted.");
       } else {
         brandResponse.setMessage("Operation failed for brand upsert.");
+				response.setStatus(HttpStatus.FORBIDDEN.value());
       }
     }catch (IOException ex) {
       logger.error("Error while adding the branding details.");
+			response.setStatus(HttpStatus.FORBIDDEN.value());
     }
     return brandResponse;
   }
