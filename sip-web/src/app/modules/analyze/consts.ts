@@ -495,8 +495,8 @@ export const STRING_FILTER_OPERATORS_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(STRING_FILTER_OPERATORS);
 
-export const getFilterValue = (filter) => {
-  const { type } = filter;
+export const getFilterValue = filter => {
+  const { type, isAggregationFilter } = filter;
   if (!filter.model) {
     return '';
   }
@@ -511,15 +511,15 @@ export const getFilterValue = (filter) => {
     gte
   } = filter.model;
 
-  if (type === 'string') {
-    const operatoLabel = STRING_FILTER_OPERATORS_OBJ[operator].label;
-    return `: ${operatoLabel} ${modelValues.join(', ')}`;
-  } else if (NUMBER_TYPES.includes(type)) {
+  if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
     const operatoLabel = NUMBER_FILTER_OPERATORS_OBJ[operator].label;
     if (operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value) {
       return `: ${operatoLabel} ${value}`;
     }
     return `: ${otherValue} ${operatoLabel} ${value}`;
+  } else if (type === 'string') {
+    const operatoLabel = STRING_FILTER_OPERATORS_OBJ[operator].label;
+    return `: ${operatoLabel} ${modelValues.join(', ')}`;
   } else if (DATE_TYPES.includes(type)) {
     if (preset === CUSTOM_DATE_PRESET_VALUE) {
       return `: From ${gte} To ${lte}`;

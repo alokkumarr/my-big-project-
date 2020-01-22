@@ -24,7 +24,7 @@ import { DesignerPreviewDialogComponent } from '../designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
-import { ConfirmDialogData, isDSLAnalysis } from '../../../common/types';
+import { ConfirmDialogData } from '../../../common/types';
 import { ArtifactDSL } from 'src/app/models';
 
 @Injectable()
@@ -112,15 +112,18 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterPromptDialog(filters, analysis: Analysis | AnalysisDSL) {
+  openFilterPromptDialog(
+    filters,
+    analysis: AnalysisDSL,
+    supportsAggregationFilters = false
+  ) {
     const data: DesignerFilterDialogData = {
       filters,
-      artifacts: isDSLAnalysis(analysis)
-        ? this._store.selectSnapshot(
-            state => state.common.metrics[analysis.semanticId]
-          ).artifacts
-        : analysis.artifacts,
+      artifacts: this._store.selectSnapshot(
+        state => state.common.metrics[analysis.semanticId]
+      ).artifacts,
       analysisType: analysis.type,
+      supportsAggregationFilters,
       isInRuntimeMode: true,
       showFilterOptions: true
     };

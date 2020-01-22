@@ -73,6 +73,14 @@ export class DesignerFilterRowComponent implements OnInit {
     if (this.filter.isRuntimeFilter) {
       delete this.filter.model;
     }
+
+    if (
+      this.filter.isAggregationFilter &&
+      !this.filter.aggregate &&
+      this.filter.type
+    ) {
+      this.filter.aggregate = this.supportedAggregates[0].value;
+    }
   }
 
   clearInput() {
@@ -132,6 +140,11 @@ export class DesignerFilterRowComponent implements OnInit {
   onRuntimeCheckboxToggle(filter: Filter, checked: boolean) {
     filter.isRuntimeFilter = checked;
     delete filter.model;
+    if (checked && filter.isAggregationFilter) {
+      filter.aggregate = null;
+    } else if (filter.isAggregationFilter) {
+      filter.aggregate = this.supportedAggregates[0].value;
+    }
     this.filterModelChange.emit();
   }
 

@@ -1,5 +1,5 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DesignerContainerComponent } from './designer-container.component';
 import { DesignerService } from '../designer.service';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
@@ -9,18 +9,7 @@ import { JwtService } from '../../../../common/services';
 import { Store } from '@ngxs/store';
 import { MatDialog } from '@angular/material';
 import { of } from 'rxjs';
-import { AnalysisDSL } from '../types';
-
-@Component({
-  // tslint:disable-next-line
-  selector: 'designer-container',
-  template: 'DesignerContainer'
-})
-class DesignerStubComponent {
-  @Input() public analysisStarter;
-  @Input() public analysis;
-  @Input() public designerMode;
-}
+import { FilterService } from '../../services/filter.service';
 
 const dialogStub = {
   open: () => {}
@@ -32,7 +21,7 @@ const analysisStub = {
 
 const storeStub = {
   dispatch: () => {},
-  selectSnapshot: () => {}
+  selectSnapshot: () => ({ analysis: { sipQuery: {} } })
 };
 
 describe('Designer Component', () => {
@@ -48,9 +37,10 @@ describe('Designer Component', () => {
         { provide: AnalyzeService, useValue: {} },
         { provide: JwtService, useValue: {} },
         { provide: Store, useValue: storeStub },
-        { provide: MatDialog, useValue: dialogStub }
+        { provide: MatDialog, useValue: dialogStub },
+        { provide: FilterService, useValue: {} }
       ],
-      declarations: [DesignerContainerComponent, DesignerStubComponent],
+      declarations: [DesignerContainerComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));
@@ -179,13 +169,15 @@ describe('Designer Component', () => {
     expect(filtersColumns).not.toBeNull();
   });
 
-  it('should check if aggregation filters can be applied before opening filter dialog', () => {
-    const analysis = {
-      type: 'report',
-      sipQuery: { artifacts: [{ fields: [{ columnName: 'abc' }] }] }
-    };
-    expect(
-      component.supportsAggregatedFilters(analysis as AnalysisDSL)
-    ).toBeFalsy();
+  it('should clean sorts', () => {
+    component.sorts = [{ columnName: 'abc', order: 'desc', type: 'double' }];
+    component.cleanSorts();
+    expect(component.sorts.length).toEqual(0);
+  });
+
+  describe('canRequestReport', () => {
+    it('should not be able to request report for default blank analysis', () => {
+      expect(component.canRequestReport(null)).toEqual(false);
+    });
   });
 });

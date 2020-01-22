@@ -24,6 +24,12 @@
     min-height: 200px;
     display: block;
 
+    &__aggregated {
+      ::ng-deep .filter__number-field {
+        max-width: 60px;
+      }
+    }
+
     .filter__table-name {
       color: $primary-blue-b2;
       margin-bottom: 10px;
