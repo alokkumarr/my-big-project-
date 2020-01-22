@@ -12,7 +12,7 @@
     	 ADD COLUMN IF NOT EXISTS BRAND_COLOR VARCHAR(50);
 
 	ALTER TABLE CUSTOMERS
-    	 ADD COLUMN IF NOT EXISTS BRAND_LOGO VARCHAR (50);
+    	 ADD COLUMN IF NOT EXISTS BRAND_LOGO BLOB;
 
     /*******************************************************************************
 	 ALTER Table Scripts Ends

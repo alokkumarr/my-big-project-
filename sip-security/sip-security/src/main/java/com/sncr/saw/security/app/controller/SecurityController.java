@@ -11,7 +11,6 @@ import com.sncr.saw.security.app.repository.CustomerRepository;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
-import com.sncr.saw.security.app.service.CustomerBrandService;
 import com.sncr.saw.security.app.service.SecurityService;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
@@ -72,6 +71,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -126,8 +126,6 @@ public class SecurityController {
 	private NSSOProperties nSSOProperties;
   @Autowired
   private SecurityService securityService;
-  @Autowired
-  private CustomerBrandService brandService;
 	@Autowired
 	private SSORequestHandler ssoRequestHandler;
 	@Autowired
@@ -2230,17 +2228,17 @@ public class SecurityController {
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
 
-	@ApiOperation(value = "Create customer brand",
-			nickname = "createCustomerBrand",
-			notes = "",
-			response = CustomerBrandResponse.class)
-	@ApiResponses(
-			value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
-					@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-					@ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
-					@ApiResponse(code = 400, message = "Bad request"),
-					@ApiResponse(code = 401, message = "Unauthorized")})
-	@RequestMapping(value = "/auth/admin/cust/brand",
+  @ApiOperation(value = "Create customer brand",
+      nickname = "createCustomerBrand",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CustomerBrandResponse createCustomerBrand(@RequestParam("brandColor") String brandColor,
@@ -2266,35 +2264,39 @@ public class SecurityController {
       brandResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
       return brandResponse;
     }
-
-    brandResponse = brandService.storeFile(file);
-    Valid valid = customerRepository.upsertCustomerBrand(customerId, brandColor, brandResponse.getBrandLogoName());
-
-    brandResponse.setBrandColor(brandColor);
-    // build final response for the user
-    if (valid.getValid()) {
-      brandResponse.setMessage("Brand details are upserted.");
-    } else {
-      brandResponse.setMessage("Operation failed for brand upsert.");
+    Valid valid = new Valid();
+    try {
+      byte[] brandLogo = file.getBytes();
+      valid = customerRepository.upsertCustomerBrand(customerId, brandColor, brandLogo);
+      brandResponse.setBrandColor(brandColor);
+      brandResponse.setBrandImage(brandLogo);
+      // build final response for the user
+      if (valid.getValid()) {
+        brandResponse.setMessage("Brand details are upserted.");
+      } else {
+        brandResponse.setMessage("Operation failed for brand upsert.");
+      }
+    }catch (IOException ex) {
+      logger.error("Error while adding the branding details.");
     }
     return brandResponse;
   }
 
 
-	@ApiOperation(value = "Fetch customer branding details.",
-			nickname = "fetchBrandDetails",
-			notes = "",
-			response = CustomerBrandResponse.class)
-	@ApiResponses(
-			value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
-					@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-					@ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
-					@ApiResponse(code = 400, message = "Bad request"),
-					@ApiResponse(code = 401, message = "Unauthorized")})
-  @RequestMapping(value = "/auth/admin/cust/brand/logo",
+  @ApiOperation(value = "Fetch customer branding details.",
+      nickname = "fetchBrandDetails",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Resource> fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+  public CustomerBrandResponse fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     CustomerBrandResponse brandResponse = new CustomerBrandResponse();
 
@@ -2302,43 +2304,75 @@ public class SecurityController {
     if (ticket == null) {
       response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
       brandResponse.setMessage("Unauthorized customer to perform the operation.");
-      return ResponseEntity.ok().body(null);
+      return brandResponse;
     }
 
     Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
     if (customerId == 0) {
       response.setStatus(HttpStatus.BAD_REQUEST.value());
       brandResponse.setMessage("No Customer exit for branding.");
-			return ResponseEntity.ok().body(null);
+      return brandResponse;
     }
 
-    BrandDetails brandDetails = customerRepository.fetchCustomerBrand(customerId);
-    if (brandDetails != null) {
-      brandResponse.setBrandColor(brandDetails.getBrandColor());
-      brandResponse.setBrandLogoName(brandDetails.getBrandName());
-    }
-
-    // Try to determine file's logo location
+    // Try to determine file's logo details
     try {
-      // Load file as Resource
-      Resource resource = brandService.loadFileAsResource(brandDetails.getBrandName());
-      brandResponse.setMessage("Brand details fetched successfully.");
-
-			String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-			if(contentType == null) {
-				contentType = "application/octet-stream";
-			}
-
-			return ResponseEntity.ok()
-					.contentType(MediaType.parseMediaType(contentType))
-					.header(HttpHeaders.CONTENT_DISPOSITION, resource.getFilename())
-					.body(resource);
-
-    } catch (IOException ex) {
+      BrandDetails brandDetails = customerRepository.fetchCustomerBrand(customerId);
+      if (brandDetails != null) {
+        brandResponse.setBrandColor(brandDetails.getBrandColor());
+        Blob blob = brandDetails.getBrandLogo();
+        brandResponse.setBrandImage(blob.getBytes(1,(int)blob.length()));
+        brandResponse.setMessage("Brand details are fetched.");
+      }
+    } catch (Exception ex) {
       String error = "Could not determine logo location.";
       logger.error(error);
       brandResponse.setMessage(error);
     }
-    return null;
+    return brandResponse;
+  }
+
+  @ApiOperation(value = "Delete customer branding details.",
+      nickname = "deleteBrandDetails",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
+      method = RequestMethod.DELETE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse deleteBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+
+
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the delete operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage("No Customer exit for branding.");
+      return brandResponse;
+    }
+
+    // Try to determine file's logo location
+    try {
+      boolean brandDetailsCleared = customerRepository.deleteCustomerBrand(customerId);
+      if (brandDetailsCleared) {
+        brandResponse.setMessage("Brand details are cleared.");
+      }
+    } catch (Exception ex) {
+      String error = "Could not determine logo location.";
+      logger.error(error);
+      brandResponse.setMessage(error);
+    }
+    return brandResponse;
   }
 }

@@ -1,6 +1,7 @@
 package com.sncr.saw.security.common.bean.repo;
 
 import java.io.Serializable;
+import java.sql.Blob;
 
 /**
  * @author alok.kumarr
@@ -11,7 +12,7 @@ public class BrandDetails implements Serializable {
   private static final long serialVersionUID = 8604685133559450551L;
 
   private String brandColor;
-  private String brandName;
+  private Blob brandLogo;
 
   public String getBrandColor() {
     return brandColor;
@@ -21,11 +22,11 @@ public class BrandDetails implements Serializable {
     this.brandColor = brandColor;
   }
 
-  public String getBrandName() {
-    return brandName;
+  public Blob getBrandLogo() {
+    return brandLogo;
   }
 
-  public void setBrandName(String brandName) {
-    this.brandName = brandName;
+  public void setBrandLogo(Blob brandLogo) {
+    this.brandLogo = brandLogo;
   }
 }

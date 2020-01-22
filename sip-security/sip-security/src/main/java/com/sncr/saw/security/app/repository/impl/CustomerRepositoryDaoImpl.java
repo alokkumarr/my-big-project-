@@ -59,9 +59,9 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
     String sql = "select 1";
     SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
     int rowCount = 0;
-    System.out.println("Customer information:");
-    while(srs.next()) {
-      System.out.println(srs.getRow());
+    logger.info("Customer information:");
+    while (srs.next()) {
+      logger.info("{}", srs.getRow());
       rowCount++;
     }
     return rowCount;
@@ -101,14 +101,14 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
   }
 
   @Override
-  public Valid upsertCustomerBrand(Long customerId, String brandColor, String fileLocation) {
+  public Valid upsertCustomerBrand(Long customerId, String brandColor, byte[] brandLogo) {
     String sql = "UPDATE CUSTOMERS SET BRAND_COLOR = ?, BRAND_LOGO = ? " +
         "WHERE CUSTOMER_SYS_ID = ?";
     Valid valid = new Valid();
     try {
       int updated = jdbcTemplate.update(sql, preparedStatement -> {
         preparedStatement.setString(1, brandColor);
-        preparedStatement.setString(2, fileLocation);
+        preparedStatement.setBytes(2, brandLogo);
         preparedStatement.setLong(3, customerId);
       });
       if (updated > 0) {
@@ -133,5 +133,20 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
       logger.error("Exception occured during the branding upsert.");
     }
     return null;
+  }
+
+  @Override
+  public boolean deleteCustomerBrand(Long customerId) {
+    String sql = "UPDATE CUSTOMERS SET BRAND_COLOR = null, BRAND_LOGO = null " +
+        "WHERE CUSTOMER_SYS_ID = ?";
+    boolean deletedBrandDetails = false;
+    try {
+      if (jdbcTemplate.update(sql, ps -> ps.setLong(1, customerId)) == 1) {
+        deletedBrandDetails = true;
+      }
+    } catch (DataAccessException ex) {
+      logger.error("Exception occured during the branding upsert.");
+    }
+    return deletedBrandDetails;
   }
 }

@@ -19,7 +19,7 @@ public class BrandDetailsExtractor implements ResultSetExtractor<BrandDetails> {
     BrandDetails details = new BrandDetails();
     while (resultSet.next()) {
       details.setBrandColor(resultSet.getString("BRAND_COLOR"));
-      details.setBrandName(resultSet.getString("BRAND_LOGO"));
+      details.setBrandLogo(resultSet.getBlob("BRAND_LOGO"));
     }
     return details;
   }
