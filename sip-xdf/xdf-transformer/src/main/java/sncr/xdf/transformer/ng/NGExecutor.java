@@ -17,8 +17,6 @@ import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.context.XDFReturnCode;
-import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.util.*;
 
@@ -94,7 +92,7 @@ public abstract class NGExecutor {
         pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, loc, "replace");
     }
 
-    public abstract long execute(Map<String, Dataset> dsMap) throws Exception;
+    public abstract void execute(Map<String, Dataset> dsMap) throws Exception;
 
 
     protected void prepareRefData(Map<String, Dataset> dsMap){
@@ -117,7 +115,7 @@ public abstract class NGExecutor {
 
     }
 
-    protected long createFinalDS(Dataset<Row> ds) throws Exception {
+    protected void createFinalDS(Dataset<Row> ds) throws Exception {
         ds.schema();
         Column trRes = ds.col(TRANSFORMATION_RESULT);
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
@@ -128,18 +126,22 @@ public abstract class NGExecutor {
             .drop(trRC);
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
+
         logger.debug("Final DS: " + successTransformationsCount.value());
         logger.debug("Rejected DS: " + failedTransformationsCount.value());
+
         writeResults(outputResult, outDataSetName, tempLoc);
+        
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
-            writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        return outputResult.count();
+        
+
     }
 
 
-    protected long createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
+    protected void createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
 
         ds.schema();
         //getOutputDatasetDetails();
@@ -159,14 +161,15 @@ public abstract class NGExecutor {
 
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
-        long outputDSCount = outputResult.count();
-        logger.debug("Final DS: " + outputDSCount + " Schema: " + outputResult.schema().prettyJson());
+
+        logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
+        //logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+
         writeResults(outputResult, outDataSetName, tempLoc);
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
-            writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        return outputResult.count();
     }
 
 }

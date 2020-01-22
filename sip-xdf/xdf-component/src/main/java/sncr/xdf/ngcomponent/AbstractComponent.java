@@ -37,6 +37,7 @@ import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.context.XDFReturnCodes;
 import java.util.Optional;
+import sncr.xdf.context.RequiredNamedParameters;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
@@ -900,9 +901,18 @@ public abstract class AbstractComponent implements WithContext{
         return rc;
     }
 
-    public void validateOutputDSCounts(long inputDSCount, long outputDSCount){
-        logger.info("outputDSCount : " + outputDSCount);
+    public void validateOutputDSCounts(long inputDSCount){
         logger.info("inputDSCount : " + inputDSCount);
+        String outDataSetName = null;
+        for( String outK: ngctx.outputs.keySet()){
+            if (outK.equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
+                outDataSetName = outK;
+            }
+        }
+        logger.info("outDataSetName : " + outDataSetName);
+        Map<String, Object> outDS = ngctx.outputDataSets.get(outDataSetName);
+        long outputDSCount = (long)outDS.get(DataSetProperties.RecordCount.name());
+        logger.info("outputDSCount : " + outputDSCount);
         if(outputDSCount == 0){
             throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
         }else if(inputDSCount > outputDSCount){

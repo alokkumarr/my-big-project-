@@ -406,10 +406,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
         }
-		long outputDSCount = ngctx.datafileDFmap.get(ngctx.dataSetName).count();
-        logger.debug("Count for parser in dataset :: " + outputDataSetName + " - " + outputDSCount);
         logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
-        validateOutputDSCounts(inputDSCount,outputDSCount);
+        validateOutputDSCounts(inputDSCount);
         return retval;
     }
 	
