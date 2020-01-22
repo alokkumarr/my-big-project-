@@ -95,13 +95,13 @@ public class GatewayController {
     httpClient = restUtil.getHttpClient();
   }
 
-  private static final String CONTENT_TYPE = "Content-type";
-  private static final String USER_AGENT = "User-Agent";
-  private static final String HOST = "Host";
-  private static final String ACCEPT = "Accept";
-  private static final String ORIGIN = "Origin";
-  private static final String REFERER = "Referer";
-  private static final String AUTHORIZATION = "Authorization";
+  private static final String CONTENT_TYPE = HttpHeaders.CONTENT_TYPE;
+  private static final String USER_AGENT = HttpHeaders.USER_AGENT;
+  private static final String HOST = HttpHeaders.HOST;
+  private static final String ACCEPT = HttpHeaders.ACCEPT;
+  private static final String ORIGIN = HttpHeaders.ORIGIN;
+  private static final String REFERER = HttpHeaders.ORIGIN;
+  private static final String AUTHORIZATION = HttpHeaders.AUTHORIZATION;
 
   /**
  * @param request
