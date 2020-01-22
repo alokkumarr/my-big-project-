@@ -228,8 +228,6 @@ public class ElasticSearchLoader {
                         .persist(StorageLevel.MEMORY_AND_DISK_SER());
             }
 
-            logger.debug("Data = " + finalFrame + ", Destination Index = " + destinationIdx + ", Config = " + esConfig);
-
             JavaEsSparkSQL.saveToEs(finalFrame, destinationIdx, esConfig);
 
             logger.debug("Loading " + location.getValue() + " complete");
