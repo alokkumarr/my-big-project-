@@ -497,7 +497,8 @@ public class ElasticSearchQueryBuilder {
       }
       if (item.getIsRuntimeFilter() != null
           && item.getIsRuntimeFilter()
-          && item.getModel() != null) {
+          && item.getModel() != null
+          && (item.getAggregationFilter() == null || !item.getAggregationFilter())) {
         if (item.getType().value().equals(Filter.Type.DATE.value())
             || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
           if (item.getModel().getPreset() != null
