@@ -15,7 +15,6 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.exceptions.XDFException;
-import sncr.bda.conf.Input;
 
 
 /**
@@ -161,10 +160,6 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                   {
                         logger.debug("Add output object to data object repository: " + o.getDataSet());
 
-                        Input.Dstype dsType = getOutputDatasetType();
-                        logger.debug("Output DS Type : " + dsType);
-                        o.setDstype(dsType);
-
                         if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
                             JsonElement ds = services.md.readOrCreateDataSet(ngctx, ngctx.outputDataSets.get(o.getDataSet()));
                             if (ds == null) {
@@ -206,24 +201,6 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             logger.error(error);
             return -1;
         }
-    }
-
-    public Input.Dstype getOutputDatasetType() {
-        String componentName = this.ngctx.componentName;
-        logger.debug("getOutputDatasetType() : componentName : " + componentName);
-        if(componentName != null && !componentName.trim().isEmpty()){
-            switch(componentName.trim().toUpperCase()){
-                case "PARSER" :
-                    return Input.Dstype.PARSED;
-                case "TRANSFORMER" :
-                    return Input.Dstype.TRANSFORMED;
-                case "SQL" :
-                    return Input.Dstype.SQL;
-                default:
-                    return Input.Dstype.BASE;
-            }
-        }
-        return Input.Dstype.BASE;
     }
 
     private int initTransformation(){

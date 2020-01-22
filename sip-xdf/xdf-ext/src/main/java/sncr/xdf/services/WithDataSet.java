@@ -384,6 +384,9 @@ public interface WithDataSet {
                 resOutput.put(DataSetProperties.Name.name(), output.getDataSet());
 
                 Integer nof = (output.getNumberOfFiles() != null)? output.getNumberOfFiles() :1;
+                Input.Dstype dsType = getOutputDatasetType();
+                logger.debug("Output DS Type : " + dsType);
+                output.setDstype(dsType);
                 resOutput.put(DataSetProperties.Type.name(), output.getDstype().toString() );
                 resOutput.put(DataSetProperties.Catalog.name(), catalog);
                 resOutput.put(DataSetProperties.Format.name(), format);
@@ -429,7 +432,23 @@ public interface WithDataSet {
             return resMap;
         }
 
-
+        public Input.Dstype getOutputDatasetType() {
+            String componentName = this.ctx.componentName;
+            logger.debug("getOutputDatasetType() : componentName : " + componentName);
+            if(componentName != null && !componentName.trim().isEmpty()){
+                switch(componentName.trim().toUpperCase()){
+                    case "PARSER" :
+                        return Input.Dstype.PARSED;
+                    case "TRANSFORMER" :
+                        return Input.Dstype.TRANSFORMED;
+                    case "SQL" :
+                        return Input.Dstype.SQL;
+                    default:
+                        return Input.Dstype.BASE;
+                }
+            }
+            return Input.Dstype.BASE;
+        }
 
         private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system, DataSetHelper aux) throws Exception {
             if (!aux.ctx.runningPipeLine && !HFileOperations.exists(location)) {
