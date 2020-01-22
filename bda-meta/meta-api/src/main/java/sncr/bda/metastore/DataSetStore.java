@@ -120,26 +120,27 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         
         // The below code is to skip filters irrespective of any project
         cond.like("system.project", "%");
-        if(searchParams != null && !searchParams.isempty()) {
-            searchParams.forEach(searchParam, value) ->{
-                if (value != null && !value.trim().isEmpty()) {
+        if(searchParams != null && !searchParams.isEmpty()) {
+            for(Map.Entry<DataSetProperties, String> entry : searchParams.entrySet()){
+                DataSetProperties searchParam = entry.getKey();
+                String value  =  entry.getValue();
+                if ( value != null && !value.trim().isEmpty()) {
                     switch (searchParam) {
-                        case DataSetProperties.Category:
+                        case Category:
                             cond = addEqOrLikeClause(cond, "userData.category", value.trim());
                             break;
-                        case DataSetProperties.SubCategory:
-                            String category = subCategory =;
+                        case SubCategory:
                             if (getDatasetSearchParam(searchParams, DataSetProperties.Category) != null) {
                                 cond = addEqOrLikeClause(cond, "userData.subCategory", value.trim());
                             }
                             break;
-                        case DataSetProperties.Catalog:
+                        case Catalog:
                             cond = addEqOrLikeClause(cond, "system.catalog", value.trim());
                             break;
-                        case DataSetProperties.DataSource:
+                        case DataSource:
                             cond = addEqOrLikeClause(cond, "userData.type", value.trim());
                             break;
-                        case DataSetProperties.Type:
+                        case Type:
                             cond = addEqOrLikeClause(cond, DataSetProperties.Type.toString(), value.trim());
                             break;
                     }
@@ -151,15 +152,14 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         return convertToString(searchAsList(table, cond));
     }
 
-    public getDatasetSearchParam(Map<DataSetProperties, String> searchParams, DataSetProperties property){
-        if(searchParams == null || searchParams.isempty()) {
+    public String getDatasetSearchParam(Map<DataSetProperties, String> searchParams, DataSetProperties property){
+        if(searchParams == null || searchParams.isEmpty()) {
             return null;
         }else{
             if (!searchParams.containsKey(property)
                 || searchParams.get(property) == null) {
                 return null;
-            }
-            esle {
+            }else {
                 String value = searchParams.get(DataSetProperties.Project).trim();
                 if (value.isEmpty()) {
                     return null;
