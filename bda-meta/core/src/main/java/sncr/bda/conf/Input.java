@@ -318,7 +318,14 @@ public class Input {
         @SerializedName("base")
         BASE("base"),
         @SerializedName("partition")
-        PARTITION("partition");
+        PARTITION("partition"),
+        @SerializedName("parsed")
+        PARSED("parsed"),
+        @SerializedName("transformed")
+        TRANSFORMED("transformed"),
+        @SerializedName("sql")
+        SQL("sql");
+
         private final String value;
         private static Map<String, Input.Dstype> constants = new HashMap<String, Input.Dstype>();
 
