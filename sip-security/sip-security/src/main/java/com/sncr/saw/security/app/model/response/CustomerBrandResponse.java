@@ -7,7 +7,7 @@ package com.sncr.saw.security.app.model.response;
 public class CustomerBrandResponse {
 
   private String brandColor;
-  private String brandLogoName;
+  private byte[] brandImage;
   private String message;
 
   public String getBrandColor() {
@@ -18,19 +18,19 @@ public class CustomerBrandResponse {
     this.brandColor = brandColor;
   }
 
-  public String getBrandLogoName() {
-    return brandLogoName;
-  }
-
-  public void setBrandLogoName(String brandLogoName) {
-    this.brandLogoName = brandLogoName;
-  }
-
   public String getMessage() {
     return message;
   }
 
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  public byte[] getBrandImage() {
+    return brandImage;
+  }
+
+  public void setBrandImage(byte[] brandImage) {
+    this.brandImage = brandImage;
   }
 }

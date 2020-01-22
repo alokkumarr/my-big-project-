@@ -10,9 +10,10 @@ import com.sncr.saw.security.common.bean.repo.BrandDetails;
 public interface CustomerRepository {
     boolean isValidCustCode(String custCode);
     long createNewCustomerDao(Customer cust);
+    boolean deleteCustomerBrand(Long customerId);
     int haveCustomerInfo();
     BrandDetails fetchCustomerBrand(Long customerId);
     Valid upsertCustomerBrand(Long customerId,
                               String brandColor,
-                              String fileLocation);
+                              byte[] brandLogo);
 }
