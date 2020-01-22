@@ -172,4 +172,13 @@ describe('Designer Component', () => {
     const filtersColumns = fixture.componentInstance.checkNodeForSorts();
     expect(filtersColumns).not.toBeNull();
   });
+
+  it('should refresh validity on updating alias', () => {
+    const spy = spyOn(component, 'canRequestData').and.returnValue(true);
+    component.handleReportChangeEvents({
+      subject: 'alias',
+      column: { alias: '', columnName: 'col1', table: 'table', format: {} }
+    } as any);
+    expect(spy).toHaveBeenCalled();
+  });
 });

@@ -106,6 +106,7 @@ import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
 import { MatDialog } from '@angular/material';
 import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
+import { findDuplicateColumns } from 'src/app/common/components/report-grid/report-grid.component';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -1113,6 +1114,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.analysis.sqlBuilder = { ...this.analysis.sqlBuilder };
         }
         this.artifacts = [...this.artifacts];
+
+        this.areMinRequirmentsMet = this.canRequestData();
         break;
       case 'artifactPosition':
     }
@@ -1405,6 +1408,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         ];
         return every(requestCondition, Boolean);
       case 'report':
+        const duplicateColumns = findDuplicateColumns(
+          this._store.selectSnapshot(
+            state => state.designerState.analysis.sipQuery.artifacts
+          )
+        );
+        if (Object.keys(duplicateColumns).length > 0) {
+          return false;
+        }
+        return this.canRequestReport(this.analysis.artifacts);
       case 'esReport':
         return this.canRequestReport(this.analysis.artifacts);
     }
