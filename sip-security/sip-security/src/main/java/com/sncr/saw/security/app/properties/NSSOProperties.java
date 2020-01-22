@@ -49,9 +49,6 @@ public class NSSOProperties {
   @Value("${user.maxUnsuccessfulLoginAttemptAllowed}")
   private int maxInvalidPwdLimit;
 
-  @Value("${upload.file.path}")
-  private String storageFileLocation;
-
   public String getRefreshTokenValidityMins() {
     return refreshTokenValidityMins;
   }
@@ -182,19 +179,5 @@ public class NSSOProperties {
   /** Sets Max number of attempts the user can retry */
   public void setMaxInvalidPwdLimit(int maxInvalidPwdLimit) {
     this.maxInvalidPwdLimit = maxInvalidPwdLimit;
-  }
-
-  /**
-   * Gets storageFileLocation
-   */
-  public String getStorageFileLocation() {
-    return storageFileLocation;
-  }
-
-  /**
-   * Sets storageFileLocation
-   */
-  public void setStorageFileLocation(String storageFileLocation) {
-    this.storageFileLocation = storageFileLocation;
   }
 }
