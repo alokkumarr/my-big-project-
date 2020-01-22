@@ -898,17 +898,17 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    filters.forEach(filter => {
-      filter.artifactsName = filter.tableName;
+    filters.forEach(filt => {
+      filt.artifactsName = filt.tableName || filt.artifactsName;
       if (
-        filter.type === 'date' &&
-        !filter.isRuntimeFilter &&
-        !filter.isGlobalFilter &&
-        filter.model.preset === CUSTOM_DATE_PRESET_VALUE
+        filt.type === 'date' &&
+        !filt.isRuntimeFilter &&
+        !filt.isGlobalFilter &&
+        filt.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
-        filter.model = {
-          gte: filter.model.gte,
-          lte: filter.model.lte,
+        filt.model = {
+          gte: filt.model.gte,
+          lte: filt.model.lte,
           format: 'yyyy-MM-dd HH:mm:ss',
           preset: CUSTOM_DATE_PRESET_VALUE
         };
