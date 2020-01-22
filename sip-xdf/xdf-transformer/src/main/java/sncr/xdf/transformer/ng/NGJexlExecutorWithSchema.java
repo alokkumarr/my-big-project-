@@ -44,7 +44,7 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
                 threshold)).cache();
         return rdd;
     }
-    public long execute(Map<String, Dataset> dsMap) throws Exception {
+    public void execute(Map<String, Dataset> dsMap) throws Exception {
         Dataset ds = dsMap.get(inDataSetName);
         prepareRefData(dsMap);
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
@@ -53,9 +53,9 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
         //df.schema().prettyJson();
         logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
-        return createFinalDS(df.cache());
+        createFinalDS(df.cache());
     }
-    public long executeSingleProcessor(NGContext ngctx) throws Exception {
+    public void executeSingleProcessor(NGContext ngctx) throws Exception {
         Map<String, Dataset> dsMap = ngctx.datafileDFmap;
         String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
         Dataset ds = dsMap.get(transInKey);
@@ -66,6 +66,6 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
         //df.schema().prettyJson();
         logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
-        return createFinalDS(df.cache(), ngctx);
+        createFinalDS(df.cache(), ngctx);
     }
 }

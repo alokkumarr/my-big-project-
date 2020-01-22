@@ -122,7 +122,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
             Transformer.ScriptEngine engine = ngctx.componentConfiguration.getTransformer().getScriptEngine();
             Set<OutputSchema> ou = ngctx.componentConfiguration.getTransformer().getOutputSchema();
-            long outputDSCount=0;
             if (ou != null && ou.size() > 0){
 
                 StructType st = createSchema(ou);
@@ -136,9 +135,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             tempLocation,
                             st   );
                     if (ngctx.runningPipeLine)
-                        outputDSCount=jexlExecutorWithSchema.executeSingleProcessor(ngctx);
+                        jexlExecutorWithSchema.executeSingleProcessor(ngctx);
                     else
-                        outputDSCount=jexlExecutorWithSchema.execute(dsMap);
+                        jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
 
                     String preamble = "";
@@ -162,9 +161,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             st,
                             odi);
                     if (ngctx.runningPipeLine)
-                        outputDSCount=janinoExecutor.executeSingleProcessor(ngctx);
+                        janinoExecutor.executeSingleProcessor(ngctx);
                     else
-                        outputDSCount=janinoExecutor.execute(dsMap);
+                        janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);
@@ -179,7 +178,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             script,
                             ngctx.componentConfiguration.getTransformer().getThreshold(),
                             tempLocation);
-                    outputDSCount=jexlExecutor.execute(dsMap);
+                    jexlExecutor.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
                     error = "Transformation with Janino engine requires Output schema, dynamic schema mode is not supported";
                     logger.error(error);
@@ -190,7 +189,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     return -1;
                 }
             }
-            validateOutputDSCounts(inputDSCount,outputDSCount);
+            validateOutputDSCounts(inputDSCount);
         } catch (Exception e) {
             logger.error("Exception in main transformer module: ",e);
             if (e instanceof XDFException) {
