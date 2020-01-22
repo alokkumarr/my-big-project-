@@ -2291,7 +2291,7 @@ public class SecurityController {
 					@ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
 					@ApiResponse(code = 400, message = "Bad request"),
 					@ApiResponse(code = 401, message = "Unauthorized")})
-  @RequestMapping(value = "/auth/admin/cust/brandlogo",
+  @RequestMapping(value = "/auth/admin/cust/brand/logo",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Resource> fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
