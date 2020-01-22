@@ -1,0 +1,22 @@
+:host {
+  width: 800px;
+  margin: auto;
+  margin-top: 5rem;
+  display: block;
+
+  input {
+    padding: 10px;
+    margin-bottom: 25px;
+  }
+}
+.changePwd-change {
+  float: left !important;
+}
+
+.changePwd-formField {
+  width: 420px !important;
+}
+
+.changePwd-cancel {
+  margin-left: 10px !important;
+}

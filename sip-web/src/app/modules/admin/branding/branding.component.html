@@ -1,0 +1,12 @@
+<div>
+  <h1 e2e="branding-details">Set Brand Color and Logo</h1>
+  <input type="text" [(ngModel)]="primaryColor" /><br/>
+  <div class="choose_file">
+    <span>Select Image For Upload</span>
+    <input name="Select File" type="file" (change)="prepareBrandimgForUpload($event)" />
+  </div>
+  <img src="http://54.160.143.70/sip/sip-web/src/assets/img/brand-logo/blackbuck.png" alt="Smiley face" height="42" width="42">
+  <button mat-raised-button color="primary" (click)="saveBrandingDetails()">Save Primary Color</button>
+</div>
+
+
