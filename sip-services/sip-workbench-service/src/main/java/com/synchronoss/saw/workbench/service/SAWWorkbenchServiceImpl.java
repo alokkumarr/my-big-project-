@@ -58,6 +58,7 @@ import sncr.bda.services.DLMetadata;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+import com.synchronoss.saw.workbench.model.DSSearchParams;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -351,14 +352,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     return inspect; }
 
   @Override
-  public List<DataSet> listOfDataSet(Project project) throws Exception {
+  public List<DataSet> listOfDataSet(Project project, Optional<DSSearchParams> optionalSearchParams) throws Exception {
     logger.trace("Getting a dataset for the project {} " + project.getProjectId());
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    Map<DataSetProperties, String> searchParams = new HashMap<>();
-    searchParams.put(DataSetProperties.Project, project.getProjectId());
-    List<String> dataSetsString = mdtStore.getListOfDS(searchParams);
+    List<String> dataSetsString = mdtStore.getListOfDS(project.getProjectId(), getDSSearchParamsMap(optionalSearchParams));
     List<DataSet> dataSetsJSON = new ArrayList<>();
     DataSet dataSet = null;
     for (String item : dataSetsString){
@@ -369,6 +368,33 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     //dataSetsJSON.addAll(listOfDataSetAvailableInESStore(project));
     logger.trace("response structure {}", objectMapper.writeValueAsString(dataSetsJSON));
     return dataSetsJSON;
+  }
+
+  public Map<DataSetProperties, String[]> getDSSearchParamsMap(Optional<DSSearchParams> optionalSearchParams){
+      if(optionalSearchParams.isPresent()){
+          Map<DataSetProperties, String[]> searchParams = new HashMap<>();
+          DSSearchParams dsSearchParams = optionalSearchParams.get();
+          if(dsSearchParams != null){
+              if(dsSearchParams.getCategory() != null && dsSearchParams.getCategory().length != 0){
+                  searchParams.put(DataSetProperties.Category, dsSearchParams.getCategory());
+              }
+              if(dsSearchParams.getSubCategory() != null && dsSearchParams.getSubCategory().length != 0){
+                  searchParams.put(DataSetProperties.SubCategory, dsSearchParams.getSubCategory());
+              }
+              if(dsSearchParams.getCatalog() != null && dsSearchParams.getCatalog().length != 0){
+                  searchParams.put(DataSetProperties.Catalog, dsSearchParams.getCatalog());
+              }
+              if(dsSearchParams.getDataSource() != null && dsSearchParams.getDataSource().length != 0){
+                  searchParams.put(DataSetProperties.DataSource, dsSearchParams.getDataSource());
+              }
+              if(dsSearchParams.getDsType() != null && dsSearchParams.getDsType().length != 0){
+                  searchParams.put(DataSetProperties.Type, dsSearchParams.getDsType());
+              }
+          }
+          return searchParams;
+      }else{
+          return null;
+      }
   }
   /**
    * This method generates the structure aligned to meta data store structure
