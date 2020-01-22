@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.apache.commons.io.FilenameUtils;
@@ -359,7 +356,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    List<String> dataSetsString = mdtStore.getListOfDS(project.getProjectId(), null, null, null, null);
+    Map<DataSetProperties, String> searchParams = new HashMap<>();
+    searchParams.put(DataSetProperties.Project, project.getProjectId());
+    List<String> dataSetsString = mdtStore.getListOfDS(searchParams);
     List<DataSet> dataSetsJSON = new ArrayList<>();
     DataSet dataSet = null;
     for (String item : dataSetsString){

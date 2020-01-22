@@ -12,6 +12,7 @@ import sncr.bda.core.file.HFileOperations;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.Optional;
+import sncr.bda.datasets.conf.DataSetProperties;
 
 /**
  * Created by srya0001 on 10/30/2017.
@@ -95,7 +96,6 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         newList.forEach( tid -> ja.add( new JsonPrimitive(tid)));
         _updatePath(id, "transformations", "asInput", ja);
     }
-
     /**
      * The method queries Data Set Meta store to get all datasets as List of serialized JSON by
      * - project AND
@@ -106,14 +106,9 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @return  - List of serialized JSON documents
      * @throws Exception
      */
-    public List<String> getListOfDS(
-            String project,
-            String dataSource,
-            String catalog,
-            String category,
-            String subCategory
-    ) throws Exception {
-        if (project.isEmpty()) {
+    public List<String> getListOfDS(Map<DataSetProperties, String> searchParams) throws Exception
+    {
+        if (getDatasetSearchParam(searchParams, DataSetProperties.Project) == null) {
             throw new Exception("ProjectService is empty");
         }
         QueryCondition cond = MapRDB.newCondition();
@@ -125,18 +120,54 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         
         // The below code is to skip filters irrespective of any project
         cond.like("system.project", "%");
-        if ( category != null && !category.isEmpty()) cond = addEqOrLikeClause(cond, "userData.category", category);
-
-        if ( subCategory != null && !subCategory.isEmpty()
-             && category != null && !category.isEmpty())
-            cond = addEqOrLikeClause(cond, "userData.subCategory", subCategory);
-
-        if ( catalog != null && !catalog.isEmpty()) cond = addEqOrLikeClause(cond, "system.catalog", catalog);
-        if ( dataSource != null && !dataSource.isEmpty()) cond = addEqOrLikeClause(cond, "userData.type", dataSource);
-
+        if(searchParams != null && !searchParams.isempty()) {
+            searchParams.forEach(searchParam, value) ->{
+                if (value != null && !value.trim().isEmpty()) {
+                    switch (searchParam) {
+                        case DataSetProperties.Category:
+                            cond = addEqOrLikeClause(cond, "userData.category", value.trim());
+                            break;
+                        case DataSetProperties.SubCategory:
+                            String category = subCategory =;
+                            if (getDatasetSearchParam(searchParams, DataSetProperties.Category) != null) {
+                                cond = addEqOrLikeClause(cond, "userData.subCategory", value.trim());
+                            }
+                            break;
+                        case DataSetProperties.Catalog:
+                            cond = addEqOrLikeClause(cond, "system.catalog", value.trim());
+                            break;
+                        case DataSetProperties.DataSource:
+                            cond = addEqOrLikeClause(cond, "userData.type", value.trim());
+                            break;
+                        case DataSetProperties.Type:
+                            cond = addEqOrLikeClause(cond, DataSetProperties.Type.toString(), value.trim());
+                            break;
+                    }
+                }
+            }
+        }
         cond.close();
         cond.build();
         return convertToString(searchAsList(table, cond));
+    }
+
+    public getDatasetSearchParam(Map<DataSetProperties, String> searchParams, DataSetProperties property){
+        if(searchParams == null || searchParams.isempty()) {
+            return null;
+        }else{
+            if (!searchParams.containsKey(property)
+                || searchParams.get(property) == null) {
+                return null;
+            }
+            esle {
+                String value = searchParams.get(DataSetProperties.Project).trim();
+                if (value.isEmpty()) {
+                    return null;
+                } else {
+                    return value;
+                }
+            }
+        }
     }
 
     public String  readDataSet(String project, String datasetName) throws Exception {
