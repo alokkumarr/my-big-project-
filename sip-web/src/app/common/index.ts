@@ -61,6 +61,7 @@ import {
   AccordionMenuLinkComponent
 } from './components/accordionMenu';
 import { SidenavComponent, SidenavMenuService } from './components/sidenav';
+import { BrandingLogoComponent } from './components/branding-logo/branding-logo.component';
 import { ErrorDetailComponent } from './components/error-detail';
 import { DataFormatDialogComponent } from './components/data-format-dialog';
 import { ConfirmDialogComponent } from './components/confirm-dialog';
@@ -148,6 +149,7 @@ const COMPONENTS = [
   DataFormatDialogComponent,
   DateFormatDialogComponent,
   SidenavComponent,
+  BrandingLogoComponent,
   AccordionMenuComponent,
   AccordionMenuLinkComponent,
   SearchBoxComponent,

@@ -4,7 +4,6 @@ import AppConfig from '../../../../../appConfig';
 import { TinyColor } from '@ctrl/tinycolor';
 import * as forEach from 'lodash/forEach';
 import { Observable } from 'rxjs';
-
 export interface Color {
   name: string;
   hex: string;
@@ -73,7 +72,14 @@ export class BrandingService {
   }
 
   getBrandingDetails(): Observable<any> {
+    console.log('getBrandingDetails');
     const url = AppConfig.login.url;
     return this._http.get(`${url}/auth/admin/cust/brand`);
+  }
+
+  reset(): Observable<any> {
+    const url = AppConfig.login.url;
+    console.log('delete');
+    return this._http.delete(`${url}/auth/admin/cust/brand`);
   }
 }

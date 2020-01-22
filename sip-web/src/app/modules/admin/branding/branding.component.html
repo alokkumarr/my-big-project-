@@ -9,7 +9,6 @@
 </div> -->
 <h1 e2e="branding-details">Brand Color and Logo</h1>
 <form [formGroup]="saveForm"
-      method="post"
       (submit)="saveBrandingDetails()">
   <div fxLayout="column" class="brand-form" style="width: 400px;">
     <mat-form-field>
@@ -31,11 +30,13 @@
       />
       <label class="file-upload">
           Click to Upload
-         <input type="file" style="visibility: hidden;" (change)="prepareBrandimgForUpload($event)"/>
+         <input type="file" style="visibility: hidden;" (change)="prepareBrandimgForUpload($event)" accept=".png,.jpeg,.jpg"/>
          {{binaryFormatImage}}
      </label>
-      <!-- <input name="Select File" type="file" (change)="prepareBrandimgForUpload($event)" /> -->
     </mat-form-field>
+    <!-- <img *ngIf="brandImage.length > 0" [src]="brandImage" width="16" height="14" alt="embedded folder icon"> -->
   </div><br/>
   <button type="submit" mat-raised-button color="primary">Save</button>
+  <button type="button" mat-button i18n (click)="resetBrandingData()">Reset to Default</button>
 </form>
+

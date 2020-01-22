@@ -22,11 +22,9 @@ export class IsUserLoggedInGuard implements CanActivate, CanActivateChild {
   }
 
   isUserLoggedIn() {
-    this._brandingService.savePrimaryColor(DEFAULT_BRANDING_COLOR);
     if (this._user.isLoggedIn()) {
       this._brandingService.getBrandingDetails().subscribe(data => {
         const brandingColor = isEmpty(data.brandColor) ? DEFAULT_BRANDING_COLOR : data.brandColor;
-
         this._brandingService.savePrimaryColor(brandingColor);
       });
       return true;

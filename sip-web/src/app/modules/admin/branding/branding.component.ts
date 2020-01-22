@@ -2,16 +2,17 @@ import { Component } from '@angular/core';
 import { BrandingService } from './branding.service';
 import { ToastService } from '../../../common/services';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import * as isEmpty from 'lodash/isEmpty';
 @Component({
   selector: 'admin-branding',
   templateUrl: './branding.component.html',
   styleUrls: ['./branding.component.scss']
 })
 export class AdminBrandingComponent {
-  primaryColor = '#bb0000';
+  primaryColor;
   filesToUpload = [];
   binaryFormatImage: any;
+  brandImage: any;
   public saveForm: FormGroup;
 
   constructor(
@@ -26,6 +27,12 @@ export class AdminBrandingComponent {
         Validators.maxLength(30)]],
       logo: ['', []]
     });
+
+    this._brandingService.getBrandingDetails().subscribe(data => {
+      this.primaryColor = isEmpty(data.brandColor) ? '0077be' : data.brandColor;
+      this.brandImage = 'data:image/gif;base64,' + data.brandImage;
+      this._brandingService.savePrimaryColor(this.primaryColor);
+    });
   }
 
   prepareBrandimgForUpload(event) {
@@ -35,8 +42,14 @@ export class AdminBrandingComponent {
 
   saveBrandingDetails() {
     this._brandingService.uploadFile(this.filesToUpload, this.saveForm.get('color').value).subscribe(data => {
-      this._brandingService.savePrimaryColor(data.brandColor);
       this._toastMessage.success(data.message);
+      window.location.reload();
+    });
+  }
+
+  resetBrandingData() {
+    this._brandingService.reset().subscribe(data => {
+      window.location.reload();
     });
   }
 }
