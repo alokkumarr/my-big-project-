@@ -100,7 +100,8 @@ import {
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
-  DesignerUpdateAggregateInSorts
+  DesignerUpdateAggregateInSorts,
+  DesignerCheckAggregateFilterSupport
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
@@ -125,6 +126,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   @Select(DesignerState.analysis) dslAnalysis$: Observable<AnalysisDSL>;
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
+  );
+  dslFilters$: Observable<Filter[]> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.sipQuery.filters)
   );
 
   sipQuery$: Observable<QueryDSL> = this.dslAnalysis$.pipe(
@@ -802,7 +806,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         );
         this._analyzeDialogService
           .openFilterDialog(
-            this.filters,
+            this._store.selectSnapshot(DesignerState.analysisFilters),
             this.artifacts,
             this.booleanCriteria,
             analysis.type,
@@ -1026,7 +1030,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this._store.dispatch(new DesignerAddArtifactColumn(event.column));
           this.loadGridWithoutData(event.column, 'add');
         } else {
-          this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
+          this._store.dispatch([
+            new DesignerRemoveArtifactColumn(event.column),
+            new DesignerCheckAggregateFilterSupport()
+          ]);
           this.loadGridWithoutData(event.column, 'remove');
         }
         this.cleanSorts();
@@ -1034,13 +1041,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.areMinRequirmentsMet = this.canRequestData();
         break;
       case 'aggregate':
-        this._store.dispatch(
+        this._store.dispatch([
           new DesignerUpdateArtifactColumn({
             columnName: event.column.columnName,
             table: event.column.table || event.column['tableName'],
             aggregate: event.column.aggregate
-          })
-        );
+          }),
+          new DesignerCheckAggregateFilterSupport()
+        ]);
         forEach(this.analysis.artifacts, artifactcolumns => {
           forEach(artifactcolumns.columns, col => {
             if (col.name === event.column.name) {

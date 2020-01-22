@@ -58,7 +58,8 @@ import {
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
-  DesignerUpdateAggregateInSorts
+  DesignerUpdateAggregateInSorts,
+  DesignerCheckAggregateFilterSupport
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -173,6 +174,11 @@ export class DesignerState {
   }
 
   @Selector()
+  static analysisFilters(state: DesignerStateModel) {
+    return get(state.analysis, 'sipQuery.filters', []);
+  }
+
+  @Selector()
   static data(state: DesignerStateModel) {
     return state.data;
   }
@@ -279,8 +285,9 @@ export class DesignerState {
     );
 
     // if sort is applied for the field that is removed, remove sort from SIPQUERY
-    const sorts = filter(sipQuery.sorts, sort =>
-      sort.columnName !== artifactColumn.columnName
+    const sorts = filter(
+      sipQuery.sorts,
+      sort => sort.columnName !== artifactColumn.columnName
     );
     patchState({
       analysis: {
@@ -385,6 +392,30 @@ export class DesignerState {
       },
       groupAdapters: [...groupAdapters]
     });
+  }
+
+  @Action(DesignerCheckAggregateFilterSupport)
+  checkAggregateFilterSupport({
+    getState,
+    dispatch
+  }: StateContext<DesignerStateModel>) {
+    const { analysis } = getState();
+    const isReport = ['report', 'esReport'].includes(analysis.type);
+    if (!isReport) {
+      return;
+    }
+
+    const analysisFilters = get(analysis, 'sipQuery.filters', []);
+    const hasAggregationFilters = analysisFilters.find(
+      f => f.isAggregationFilter
+    );
+    if (hasAggregationFilters) {
+      return dispatch(
+        new DesignerUpdateFilters(
+          analysisFilters.filter(f => !f.isAggregationFilter)
+        )
+      );
+    }
   }
 
   @Action(DesignerApplyChangesToArtifactColumns)
@@ -803,7 +834,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
