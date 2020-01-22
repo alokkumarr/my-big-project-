@@ -231,25 +231,24 @@ public class ObserveServiceImpl implements ObserveService {
       observeTiles.stream().forEach(tile -> {
         JsonNode node = mapper.convertValue(tile, JsonNode.class);
         if (node.has("id")) {
-          analysisId.add(node.get("id").toString());
+          analysisId.add(node.get("id").asText());
         }
       });
 
       // validate the given analysis has valid user
       if (!analysisId.isEmpty()) {
-        boolean[] haveValidAnalysis = {true};
         try {
-          analysisId.stream().forEach(id -> {
+          for (String id : analysisId) {
             Analysis analysis = analysisService.getAnalysis(id, ticket);
             logger.trace("Print the analysis {}", analysis);
-            haveValidAnalysis[0] = ticket.getCustCode() != null && analysis != null
-                ? ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode())
-                : haveValidAnalysis[0];
-          });
+            if (!(ticket.getCustCode() != null && analysis != null
+                && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))) {
+              return false;
+            }
+          }
         } catch (Exception ex) {
           logger.error("Error while checking the analysis for dashboard:  {}", ex.getMessage());
         }
-        return haveValidAnalysis[0];
       }
     }
     return true;
