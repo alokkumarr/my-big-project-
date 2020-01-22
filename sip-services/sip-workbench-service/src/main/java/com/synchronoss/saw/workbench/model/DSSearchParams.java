@@ -12,12 +12,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "_id",
-    "system",
-    "userData",
-    "asOfNow",
-    "schema",
-    "recordCount"
+    "category",
+    "subCategory",
+    "catalog",
+    "dataSource",
+    "dsType"
 })
 public class DSSearchParams {
     @JsonProperty("category")
