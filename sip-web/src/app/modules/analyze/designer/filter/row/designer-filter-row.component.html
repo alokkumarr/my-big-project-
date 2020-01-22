@@ -37,14 +37,18 @@
     </mat-form-field>
 
     <mat-form-field
-      *ngIf="filter.isAggregationFilter"
+      *ngIf="
+        filter.isAggregationFilter &&
+        (isInRuntimeMode
+          ? filter.isRuntimeFilter
+          : !filter.isRuntimeFilter && !filter.isGlobalFilter)
+      "
       class="select-form-field"
       style="max-width: 145px; margin-left: 10px"
       appearance="outline"
     >
       <mat-label>Aggregate</mat-label>
       <mat-select
-        [disabled]="isInRuntimeMode"
         e2e="filter-aggregate-select"
         (selectionChange)="onAggregateSelected($event.value)"
         [value]="filter.aggregate"
