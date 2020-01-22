@@ -776,7 +776,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   supportsAggregatedFilters(analysis: AnalysisDSL): boolean {
-    return ['report', 'esReport'].includes(analysis.type)
+    /* DL reports are not supported for aggregated filters yet */
+    if (analysis.type === 'report') {
+      return false;
+    }
+    return [/*'report', */ 'esReport'].includes(analysis.type)
       ? flatMap(
           analysis.sipQuery.artifacts,
           artifact => artifact.fields
