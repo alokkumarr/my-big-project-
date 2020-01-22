@@ -10,7 +10,6 @@ import scala.Tuple2;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.TransformWithSchema;
-import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.util.List;
 import java.util.Map;
