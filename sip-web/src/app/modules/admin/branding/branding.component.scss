@@ -1,22 +1,15 @@
 :host {
   width: 800px;
-  margin: auto;
-  margin-top: 5rem;
+  margin: 60px;
+  margin-top: 2rem;
   display: block;
 
-  input {
-    padding: 10px;
-    margin-bottom: 25px;
+  .brand-form input {
+    font-size: 16px;
   }
-}
-.changePwd-change {
-  float: left !important;
-}
 
-.changePwd-formField {
-  width: 420px !important;
-}
+  .file-upload {
+    cursor: pointer;
+  }
 
-.changePwd-cancel {
-  margin-left: 10px !important;
 }

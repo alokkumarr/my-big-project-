@@ -511,3 +511,5 @@ export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(NUMBER_FILTER_OPERATORS);
+
+export const DEFAULT_BRANDING_COLOR = '0077be';
