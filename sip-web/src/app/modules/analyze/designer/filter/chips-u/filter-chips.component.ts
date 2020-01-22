@@ -1,11 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Filter, Artifact } from '../../types';
-import {
-  getFilterValue
-} from './../../../../analyze/consts';
+import { getFilterValue } from './../../../../analyze/consts';
 import { AnalyzeService } from '../../../services/analyze.service';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
+import { AGGREGATE_TYPES_OBJ } from 'src/app/common/consts';
 
 @Component({
   selector: 'filter-chips-u',
@@ -30,9 +29,16 @@ export class FilterChipsComponent {
   constructor(private analyzeService: AnalyzeService) {}
 
   getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName || filter.artifactsName][
+    const columnName = this.nameMap[filter.tableName || filter.artifactsName][
       filter.columnName
     ];
+    const filterName =
+      filter.isAggregationFilter && filter.aggregate
+        ? `${
+            AGGREGATE_TYPES_OBJ[filter.aggregate].designerLabel
+          }(${columnName})`
+        : columnName;
+    return filterName + this.getFilterValue(filter);
   }
 
   onRemove(index) {
