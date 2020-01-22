@@ -93,8 +93,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -2289,23 +2291,25 @@ public class SecurityController {
 					@ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
 					@ApiResponse(code = 400, message = "Bad request"),
 					@ApiResponse(code = 401, message = "Unauthorized")})
-  @RequestMapping(value = "/auth/admin/cust/brand",
+  @RequestMapping(value = "/auth/admin/cust/brandlogo",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public CustomerBrandResponse fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity<Resource> fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+
+
     if (ticket == null) {
       response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
       brandResponse.setMessage("Unauthorized customer to perform the operation.");
-      return brandResponse;
+      return ResponseEntity.ok().body(null);
     }
 
     Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
     if (customerId == 0) {
       response.setStatus(HttpStatus.BAD_REQUEST.value());
       brandResponse.setMessage("No Customer exit for branding.");
-      return brandResponse;
+			return ResponseEntity.ok().body(null);
     }
 
     BrandDetails brandDetails = customerRepository.fetchCustomerBrand(customerId);
@@ -2318,13 +2322,23 @@ public class SecurityController {
     try {
       // Load file as Resource
       Resource resource = brandService.loadFileAsResource(brandDetails.getBrandName());
-      brandResponse.setBrandLogoUrl(resource.getFile().getAbsolutePath());
       brandResponse.setMessage("Brand details fetched successfully.");
+
+			String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+			if(contentType == null) {
+				contentType = "application/octet-stream";
+			}
+
+			return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType(contentType))
+					.header(HttpHeaders.CONTENT_DISPOSITION, resource.getFilename())
+					.body(resource);
+
     } catch (IOException ex) {
       String error = "Could not determine logo location.";
       logger.error(error);
       brandResponse.setMessage(error);
     }
-    return brandResponse;
+    return null;
   }
 }

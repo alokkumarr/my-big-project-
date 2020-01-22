@@ -8,7 +8,6 @@ public class CustomerBrandResponse {
 
   private String brandColor;
   private String brandLogoName;
-  private String brandLogoUrl;
   private String message;
 
   public String getBrandColor() {
@@ -25,14 +24,6 @@ public class CustomerBrandResponse {
 
   public void setBrandLogoName(String brandLogoName) {
     this.brandLogoName = brandLogoName;
-  }
-
-  public String getBrandLogoUrl() {
-    return brandLogoUrl;
-  }
-
-  public void setBrandLogoUrl(String brandLogoUrl) {
-    this.brandLogoUrl = brandLogoUrl;
   }
 
   public String getMessage() {

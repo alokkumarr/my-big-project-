@@ -56,10 +56,7 @@ public class CustomerBrandService {
       // Copy file to the target location (Replacing existing file with the same name)
       Path targetLocation = fileStorageLocation.resolve(fileName);
       Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
       brandResponse.setBrandLogoName(fileName);
-      brandResponse.setBrandLogoUrl(targetLocation.toString());
-
       return brandResponse;
     } catch (IOException ex) {
       String errorMessage = String.format("Could not store file %s. Please try again! %s",
