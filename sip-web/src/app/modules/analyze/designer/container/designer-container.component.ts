@@ -107,6 +107,7 @@ import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
 import { MatDialog } from '@angular/material';
 import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
+import { FilterService } from '../../services/filter.service';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -163,6 +164,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
     public _analyzeService: AnalyzeService,
+    private filterService: FilterService,
     private dialog: MatDialog,
     private _store: Store,
     private _jwtService: JwtService
@@ -775,19 +777,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  supportsAggregatedFilters(analysis: AnalysisDSL): boolean {
-    /* DL reports are not supported for aggregated filters yet */
-    if (analysis.type === 'report') {
-      return false;
-    }
-    return [/*'report', */ 'esReport'].includes(analysis.type)
-      ? flatMap(
-          analysis.sipQuery.artifacts,
-          artifact => artifact.fields
-        ).some(field => Boolean(field.aggregate))
-      : true;
-  }
-
   onToolbarAction(action: DesignerToolbarAciton) {
     const analysis = this._store.selectSnapshot(DesignerState.analysis);
     switch (action) {
@@ -815,7 +804,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             this.booleanCriteria,
             analysis.type,
             supportsGlobalFilters,
-            this.supportsAggregatedFilters(analysis)
+            this.filterService.supportsAggregatedFilters(analysis)
           )
           .afterClosed()
           .subscribe((result: IToolbarActionResult) => {

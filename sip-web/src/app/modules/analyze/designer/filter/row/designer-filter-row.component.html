@@ -44,6 +44,7 @@
     >
       <mat-label>Aggregate</mat-label>
       <mat-select
+        [disabled]="isInRuntimeMode"
         e2e="filter-aggregate-select"
         (selectionChange)="onAggregateSelected($event.value)"
         [value]="filter.aggregate"
@@ -90,11 +91,20 @@
     </ng-container>
 
     <ng-template #aggregationFields>
-      <designer-number-filter
-        (filterModelChange)="onFilterModelChange($event)"
-        [filterModel]="filter.model"
+      <div
+        *ngIf="
+          isInRuntimeMode
+            ? filter.isRuntimeFilter
+            : !filter.isRuntimeFilter && !filter.isGlobalFilter
+        "
+        style="margin-left: 10px;"
       >
-      </designer-number-filter>
+        <designer-number-filter
+          (filterModelChange)="onFilterModelChange($event)"
+          [filterModel]="filter.model"
+        >
+        </designer-number-filter>
+      </div>
     </ng-template>
   </div>
 
