@@ -116,11 +116,25 @@ export class DesignerFilterDialogComponent implements OnInit {
     }
   }
 
-  removeFilter(targetIndex, tableName) {
-    this.groupedFilters[tableName] = filter(
-      this.groupedFilters[tableName],
-      (_, index) => targetIndex !== index
-    );
+  removeFilter(targetIndex, tableName, isAggregationFilter) {
+    let aggregatedFilters = this.aggregatedFiltersFor(tableName),
+      nonAggregatedFilters = this.nonAggregatedFiltersFor(tableName);
+
+    if (isAggregationFilter) {
+      aggregatedFilters = filter(
+        aggregatedFilters,
+        (_, index) => targetIndex !== index
+      );
+    } else {
+      nonAggregatedFilters = filter(
+        nonAggregatedFilters,
+        (_, index) => targetIndex !== index
+      );
+    }
+    this.groupedFilters[tableName] = [
+      ...nonAggregatedFilters,
+      ...aggregatedFilters
+    ];
     this.onFiltersChange();
   }
 

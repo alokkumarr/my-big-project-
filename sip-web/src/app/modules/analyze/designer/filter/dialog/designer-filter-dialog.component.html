@@ -18,7 +18,11 @@
             trackBy: filterRowTrackBy
           "
           (removeRequest)="
-            removeFilter(i, artifact.artifactName || artifact.artifactsName)
+            removeFilter(
+              i,
+              artifact.artifactName || artifact.artifactsName,
+              false
+            )
           "
           (filterChange)="onFilterChange()"
           (filterModelChange)="onFilterModelChange()"
@@ -60,7 +64,11 @@
             trackBy: filterRowTrackBy
           "
           (removeRequest)="
-            removeFilter(i, artifact.artifactName || artifact.artifactsName)
+            removeFilter(
+              i,
+              artifact.artifactName || artifact.artifactsName,
+              true
+            )
           "
           (filterChange)="onFilterChange()"
           (filterModelChange)="onFilterModelChange()"
