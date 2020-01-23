@@ -1,5 +1,7 @@
 package com.synchronoss.saw.observe.service;
 
+import static com.synchronoss.saw.util.SipMetadataUtils.getCategoryIds;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
@@ -234,6 +236,7 @@ public class ObserveServiceImpl implements ObserveService {
           analysisId.add(node.get("id").asText());
         }
       });
+      List<Long> allCatIdsForTicket = getCategoryIds(ticket);
 
       // validate the given analysis has valid user
       if (!analysisId.isEmpty()) {
@@ -242,7 +245,9 @@ public class ObserveServiceImpl implements ObserveService {
             Analysis analysis = analysisService.getAnalysis(id, ticket);
             logger.trace("Print the analysis {}", analysis);
             if (!(ticket.getCustCode() != null && analysis != null
-                && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))) {
+                && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))
+                || !(analysis.getCategory() != null && allCatIdsForTicket
+                .contains(Long.valueOf(analysis.getCategory())))) {
               return false;
             }
           }
