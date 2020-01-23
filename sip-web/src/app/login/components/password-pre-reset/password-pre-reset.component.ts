@@ -18,8 +18,8 @@ export class PasswordPreResetComponent implements OnInit {
   }
 
   resetPwd() {
-    const loginId = this.loginIdControl.value;
-    this._UserService.preResetPwd({ loginId }).then((res: any) => {
+    const masterLoginId = this.loginIdControl.value;
+    this._UserService.preResetPwd({ masterLoginId }).then((res: any) => {
       this.errorMsg = res.validityMessage;
     });
   }
