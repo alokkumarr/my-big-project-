@@ -17,34 +17,32 @@
         <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../Resources/TableStyles/NewStyle.css" rel="stylesheet" data-mc-stylesheet-type="table" /><title>4.5. Category Management</title>
         <link href="../Resources/Stylesheets/saw_user_guide_DRAFT_11192018_01b.doc.css" rel="stylesheet" />
-        <script src="../../Resources/Scripts/custom.modernizr.js" type="text/javascript">
-        </script>
         <script src="../../Resources/Scripts/jquery.min.js" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.config.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.config.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" type="text/javascript">
+        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/plugins.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/plugins.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/MadCapAll.js" type="text/javascript">
+        <script src="../../Resources/Scripts/MadCapAll.js" defer="defer" type="text/javascript">
         </script>
     </head>
     <body>
         <div class="foundation-wrap off-canvas-wrapper">
             <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper="">
-                <aside class="off-canvas position-right" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
+                <aside class="off-canvas position-right" role="navigation" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
                     <ul class="off-canvas-accordion vertical menu off-canvas-list" data-accordion-menu="" data-mc-back-link="Back" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="True" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True">
                     </ul>
                 </aside>
                 <div class="off-canvas-content inner-wrap" data-off-canvas-content="">
                     <div data-sticky-container="" class="title-bar-container">
-                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true">
+                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true"><a class="skip-to-content fluid-skip showOnFocus" href="#">Skip To Main Content</a>
                             <div class="middle title-bar-section outer-row clearfix">
                                 <div class="menu-icon-container relative clearfix">
-                                    <button class="menu-icon" data-toggle="offCanvas"><span></span>
+                                    <button class="menu-icon" aria-label="Show Navigation Panel" data-toggle="offCanvas"><span></span>
                                     </button>
                                 </div>
                             </div>
@@ -61,18 +59,21 @@
                                     <div class="nav-search row">
                                         <form class="search" action="#">
                                             <div class="search-bar search-bar-container needs-pie">
-                                                <input class="search-field needs-pie" type="search" placeholder="Search" />
-                                                <div class="search-filter-wrapper">
-                                                    <div class="search-filter">
-                                                        <div class="search-filter-content">
-                                                            <ul>
-                                                                <li>All Files</li>
-                                                            </ul>
-                                                        </div>
+                                                <input class="search-field needs-pie" type="search" aria-label="Search Field" placeholder="Search" />
+                                                <div class="search-filter-wrapper"><span class="invisible-label" id="search-filters-label">Filter: </span>
+                                                    <div class="search-filter" aria-haspopup="true" aria-controls="sf-content" aria-expanded="false" aria-label="Search Filter" title="All Files" role="button" tabindex="0">
+                                                    </div>
+                                                    <div class="search-filter-content" id="sf-content">
+                                                        <ul>
+                                                            <li>
+                                                                <button class="mc-dropdown-item" aria-labelledby="search-filters-label filterSelectorLabel-00001"><span id="filterSelectorLabel-00001">All Files</span>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                                 <div class="search-submit-wrapper" dir="ltr">
-                                                    <div class="search-submit" title="Search">
+                                                    <div class="search-submit" title="Search" role="button" tabindex="0"><span class="invisible-label">Submit Search</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -82,79 +83,86 @@
                             </div>
                         </nav>
                     </div>
-                    <section class="main-section">
+                    <div class="main-section">
                         <div class="row outer-row sidenav-layout">
-                            <div class="sidenav-wrapper">
+                            <nav class="sidenav-wrapper">
                                 <div class="sidenav-container">
                                     <ul class="off-canvas-accordion vertical menu sidenav" data-accordion-menu="" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu accordion-menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="False" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True" data-mc-side-nav-menu="True">
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="body-container" data-mc-content-body="True">
-                                <h2 class="Heading2"><a name="_Ref529448560"></a><a name="_Ref529788164"></a><a name="_Ref529791487"></a><a name="_Ref529791532"></a><a name="_Ref529799630"></a><a name="_Ref529799637"></a><a name="_Ref529957751"></a><a name="_Ref529957771"></a><a name="_Ref529967602"></a><a name="_Ref529967609"></a><a name="_Toc530387628"></a><span class="span_2">4.5. </span>Category Management</h2>
-                                <p>&#160;</p>
-                                <p>Categories and Sub-Categories are used to organize and store the analysis.&#160; A Category is a method of grouping Sub-Categories.&#160; Administrators configure Privileges related to different Roles to determine access to Categories and Sub-Categories.&#160; The Category Management screen (<a href="Figure Category Management.htm#_Ref529798476" class="ParaTextOnly MCXref xref xrefParaTextOnly">Figure 31&#160; Category Management Screen</a>) contains the following:</p>
-                                <p>	Columns:</p>
-                                <ul>
-                                    <li value="1">Product – the product associated with the Category</li>
-                                    <li value="2">Module – determines the module that the Category should appear</li>
-                                    <li value="3">Category – a Category associated with the Category (e.g., Daily Data)</li>
-                                    <li value="4">Sub Categories – associated with the Category (e.g., Drafts)</li>
-                                    <li value="5">Functionality</li>
-                                    <li value="6">Add Category ( <img src="../Resources/Images/Add Category_71x23.png" style="width: 71;height: 23;" />)</li>
-                                    <li value="7">Edit a Category (<img src="../Resources/Images/Edit Icon_25x23.png" style="width: 25;height: 23;" /> )</li>
-                                    <li value="8">Delete a Category (<img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Add a user select_1_15x19.png" style="width: 15;height: 19;" /> )</li>
-                                </ul>
-                                <p>&#160;</p>
-                                <table style="mc-table-style: url('../Resources/TableStyles/NewStyle.css');border-left-style: solid;border-left-width: 0px;border-left-color: #000000;border-right-style: solid;border-right-width: 0px;border-right-color: #000000;border-top-style: solid;border-top-width: 1px;border-top-color: #000000;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: #000000;margin-left: 0;margin-right: auto;caption-side: top;" class="TableStyle-Basic" cellspacing="0">
-                                    <col style="width: 71px;" class="Column-Column1" />
-                                    <col class="Column-Column1" style="width: 741px;" />
-                                    <tbody>
-                                        <tr class="Body-Body1">
-                                            <td class="BodyB-Column1-Body1">
-                                                <img src="../Resources/Images/New Note_35x38.png" style="width: 35;height: 38;" />
-                                            </td>
-                                            <td class="BodyA-Column1-Body1"><b>NOTE:</b>  Sort columns by clicking on the column header</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <p>&#160;</p>
-                                <p class="Figure">
-                                    <img src="../Resources/Images/Category Mgmt Screen torn_769x135.png" style="width: 769;height: 135;" />
-                                </p>
-                                <p class="Caption"><a name="Figure_36_Category_Management_Screen"></a>Figure 36 Category Management Screen</p>
-                                <p class="Caption">&#160;</p>
-                                <p><span class="HowtoChar">How to<a name="_Access_the_Category_Management_Screen"></a> Access the Category Management Screen</span>
-                                </p>
-                                <ol>
-                                    <li value="1">The authorized System Admin selects the Account Settings  icon <img src="../Resources/Images/Role ICON_31x28.png" style="width: 31;height: 28;" />from the upper right-hand corner of the  screen</li>
-                                    <li value="2">From the Account Settings menu select Admin</li>
-                                </ol>
-                                <p class="Figure">
-                                    <img src="../Resources/Images/admin selection selected_145x154.png" style="width: 145;height: 154;" />
-                                </p>
-                                <p class="Caption"><a name="Figure_37_Account_Management_Settings_Menu"></a>Figure 37 Account Management Settings Menu</p>
-                                <ol data-mc-continue="true">
-                                    <li value="3">Select the menu icon <img src="../Resources/Images/Menu Icon_26x26.png" style="width: 26;height: 26;" />   located on the upper left-hand side of the screen</li>
-                                    <li value="4">Select Category from the menu options to populate the ‘Category Management’ screen</li>
-                                </ol>
-                                <p class="Figure">
-                                    <img src="../Resources/Images/Admin stuff_category_248x348.png" style="width: 248;height: 348;" />
-                                </p>
-                                <p class="Caption"><a name="Figure_38_Admin_Menu_Category_Selected"></a>Figure 38 Admin Menu_Category Selected</p>
-                                <p class="Caption">&#160;</p>
-                                <p class="Figure">
-                                    <img src="../Resources/Images/Category Mgmt Screen torn_665x117.png" style="width: 665;height: 117;" />
-                                </p>
-                                <p class="Caption"><a name="Figure_39_Category_Management_Screen"></a>Figure 39 Category Management Screen</p>
-                                <p class="Caption">&#160;</p>
-                                <p class="Caption">&#160;</p>
+                            </nav>
+                            <div class="body-container">
+                                <div id="mc-main-content" role="main" data-mc-content-body="True">
+                                    <h2 class="Heading2"><a name="_Ref529448560"></a><a name="_Ref529788164"></a><a name="_Ref529791487"></a><a name="_Ref529791532"></a><a name="_Ref529799630"></a><a name="_Ref529799637"></a><a name="_Ref529957751"></a><a name="_Ref529957771"></a><a name="_Ref529967602"></a><a name="_Ref529967609"></a><a name="_Toc530387628"></a><span class="span_2">4.5. </span>Category Management</h2>
+                                    <p>&#160;</p>
+                                    <p>Categories and Sub-Categories are used to organize and store the analysis.&#160; A Category is a method of grouping Sub-Categories.&#160; Administrators configure Privileges related to different Roles to determine access to Categories and Sub-Categories.&#160; The Category Management screen (<a href="Figure Category Management.htm#_Ref529798476" class="ParaTextOnly MCXref xref xrefParaTextOnly">Figure 31&#160; Category Management Screen</a>) contains the following:</p>
+                                    <p>	Columns:</p>
+                                    <ul>
+                                        <li value="1">Product – the product associated with the Category</li>
+                                        <li value="2">Module – determines the module that the Category should appear</li>
+                                        <li value="3">Category – a Category associated with the Category (e.g., Daily Data)</li>
+                                        <li value="4">Sub Categories – associated with the Category (e.g., Drafts)</li>
+                                        <li value="5">Functionality</li>
+                                        <li value="6">Add Category ( <img src="../Resources/Images/Add Category_71x23.png" style="width: 71;height: 23;" />)</li>
+                                        <li value="7">Edit a Category (<img src="../Resources/Images/Edit Icon_25x23.png" style="width: 25;height: 23;" /> )</li>
+                                        <li value="8">Delete a Category (<img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Add a user select_1_15x19.png" style="width: 15;height: 19;" /> )</li>
+                                    </ul>
+                                    <p>&#160;</p>
+                                    <table style="mc-table-style: url('../Resources/TableStyles/NewStyle.css');border-left-style: solid;border-left-width: 0px;border-left-color: #000000;border-right-style: solid;border-right-width: 0px;border-right-color: #000000;border-top-style: solid;border-top-width: 1px;border-top-color: #000000;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: #000000;margin-left: 0;margin-right: auto;caption-side: top;" class="TableStyle-Basic" cellspacing="0">
+                                        <col style="width: 71px;" class="Column-Column1" />
+                                        <col class="Column-Column1" style="width: 741px;" />
+                                        <tbody>
+                                            <tr class="Body-Body1">
+                                                <td class="BodyB-Column1-Body1">
+                                                    <img src="../Resources/Images/New Note_35x38.png" style="width: 35;height: 38;" />
+                                                </td>
+                                                <td class="BodyA-Column1-Body1"><b>NOTE:</b>  Sort columns by clicking on the column header</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>&#160;</p>
+                                    <p class="Figure">
+                                        <img src="../Resources/Images/Category Mgmt Screen torn_769x135.png" style="width: 769;height: 135;" />
+                                    </p>
+                                    <p class="Caption"><a name="Figure_36_Category_Management_Screen"></a>Figure 36 Category Management Screen</p>
+                                    <p class="Caption">&#160;</p>
+                                    <p><span class="HowtoChar">How to<a name="_Access_the_Category_Management_Screen"></a> Access the Category Management Screen</span>
+                                    </p>
+                                    <ol>
+                                        <li value="1">
+                                            <p>Click on the <b>Module Icon</b><img src="../Resources/Images/New Module Icon.png" />   to display the modules available for selection</p>
+                                        </li>
+                                    </ol>
+                                    <ol data-mc-continue="true">
+                                        <li value="2">Click on <b>Admin</b> to populate access the Admin Module and display the default ‘User Management’ screen</li>
+                                        <li value="3">Select the menu icon <img src="../Resources/Images/Menu Icon_26x26.png" style="width: 26;height: 26;" />   located on the upper left-hand side of the screen</li>
+                                    </ol>
+                                    <p class="Figure">
+                                        <img src="../Resources/Images/New User Management 2_791x166.png" style="width: 791;height: 166;" />
+                                    </p>
+                                    <p class="Caption"><a name="Figure_37_Account_Management_Settings_Menu"></a>Figure 37 Module Selection</p>
+                                    <ol data-mc-continue="true">
+                                        <li value="4">Select Category from the menu options to populate the ‘Category Management’ screen</li>
+                                    </ol>
+                                    <p class="Figure">
+                                        <img src="../Resources/Images/Admin stuff_category_248x348.png" style="width: 248;height: 348;" />
+                                    </p>
+                                    <p class="Caption"><a name="Figure_38_Admin_Menu_Category_Selected"></a>Figure 38 Admin Menu_Category Selected</p>
+                                    <p class="Caption">&#160;</p>
+                                    <p>The 'Category Management' Screen is displayed</p>
+                                    <p class="Caption">&#160;</p>
+                                    <p class="Figure">
+                                        <img src="../Resources/Images/Category Mgmt Screen torn_818x143.png" style="width: 818;height: 143;" />
+                                    </p>
+                                    <p class="Caption"><a name="Figure_39_Category_Management_Screen"></a>Figure 39 Category Management Screen</p>
+                                    <p class="Caption">&#160;</p>
+                                    <p class="Caption">&#160;</p>
+                                </div>
                             </div>
                         </div>
-                    </section><a data-close="true"></a>
+                    </div><a data-close="true"></a>
                 </div>
             </div>
-            <script>/* <![CDATA[ */$(document).foundation();/* ]]> */</script>
         </div>
     </body>
 </html>
