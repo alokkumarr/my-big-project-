@@ -38,6 +38,7 @@ import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.context.XDFReturnCodes;
 import java.util.Optional;
 import sncr.xdf.context.RequiredNamedParameters;
+import sncr.bda.conf.Output;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
@@ -906,7 +907,7 @@ public abstract class AbstractComponent implements WithContext{
         String outDataSetName = null;
         for( Output output: ngctx.componentConfiguration.getOutputs()){
             if (output.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
-                outDataSetName = output.getDataset();
+                outDataSetName = output.getDataSet();
             }
         }
         logger.info("outDataSetName : " + outDataSetName);
