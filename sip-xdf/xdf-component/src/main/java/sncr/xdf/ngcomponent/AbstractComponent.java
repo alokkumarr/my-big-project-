@@ -904,13 +904,14 @@ public abstract class AbstractComponent implements WithContext{
     public void validateOutputDSCounts(long inputDSCount){
         logger.info("inputDSCount : " + inputDSCount);
         String outDataSetName = null;
-        for( String outK: ngctx.outputs.keySet()){
-            if (outK.equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
-                outDataSetName = outK;
+        for( Output output: ngctx.componentConfiguration.getOutputs()){
+            if (output.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
+                outDataSetName = output.getDataset();
             }
         }
         logger.info("outDataSetName : " + outDataSetName);
         Map<String, Object> outDS = ngctx.outputDataSets.get(outDataSetName);
+        logger.info("outDS : " + outDS);
         long outputDSCount = (long)outDS.get(DataSetProperties.RecordCount.name());
         logger.info("outputDSCount : " + outputDSCount);
         if(outputDSCount == 0){
