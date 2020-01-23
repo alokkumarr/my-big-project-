@@ -128,9 +128,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.analysis = analysis;
-    this.artifacts = this.analysis.sipQuery.artifacts;
 
-    this.duplicateColumns = findDuplicateColumns(this.artifacts);
+    this.duplicateColumns = findDuplicateColumns(
+      this.analysis.sipQuery.artifacts
+    );
   }
   @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
