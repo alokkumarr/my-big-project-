@@ -907,7 +907,7 @@ public abstract class AbstractComponent implements WithContext{
         String outDataSetName = null;
         for( Output output: ngctx.componentConfiguration.getOutputs()){
             if (output.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
-                outDataSetName = output.getDataset();
+                outDataSetName = output.getDataSet();
             }
         }
         logger.info("outDataSetName : " + outDataSetName);
