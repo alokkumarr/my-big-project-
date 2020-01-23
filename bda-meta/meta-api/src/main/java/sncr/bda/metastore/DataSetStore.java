@@ -109,7 +109,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      */
     public List<String> getListOfDS(String project, Map<DataSetProperties, String[]> searchParams) throws Exception
     {
-        if (project == null || !project.trim().isEmpty()) {
+        if (project == null || project.trim().isEmpty()) {
             throw new Exception("ProjectService is empty");
         }
         QueryCondition cond = MapRDB.newCondition();
