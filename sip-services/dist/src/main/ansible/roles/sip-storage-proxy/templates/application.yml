@@ -3,6 +3,9 @@ info:
 spring:
   application:
     name: saw-storage-proxy-service
+  elasticsearch:
+    rest:
+      uris: {{ saw_elasticsearch_cluster_name }}:{{ saw_elasticsearch_port | default('9200') }}
 logging:
   level:
     com.synchronoss: INFO
