@@ -343,40 +343,34 @@ export class DashboardGridComponent
         return;
       }
 
-      const gFilters = filterGroup[tile.analysis.semanticId] || [];
+      const gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
 
-      const filters = unionWith(
-        // Global filters are being ignored by backend. Set that property
-        // false to make them execute properly.
-        map(gFilters, f => {
-          if (f.model) {
-            f.isGlobalFilter = false;
-          }
-          return f;
-        }),
-
-        (tile.origAnalysis.sqlBuilder || tile.origAnalysis.sipQuery).filters,
+      let filters = unionWith(
+        gFilters,
+        tile.origAnalysis.sipQuery.filters,
         (gFilt, filt) =>
           (gFilt.tableName || gFilt.artifactsName) ===
             (filt.tableName || filt.artifactsName) &&
-          gFilt.columnName === filt.columnName
+          gFilt.columnName === filt.columnName &&
+          gFilt.isAggregationFilter === filt.isAggregationFilter &&
+          gFilt.isGlobalFilter === filt.isGlobalFilter
       );
 
-      if (tile.origAnalysis.sqlBuilder) {
-        const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
-        tile.analysis = {
-          ...tile.origAnalysis,
-          ...{ sqlBuilder },
-          _executeTile: true
-        };
-      } else {
-        const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters } };
-        tile.analysis = {
-          ...tile.origAnalysis,
-          ...{ sipQuery },
-          _executeTile: true
-        };
-      }
+      // Global filters are being ignored by backend. Set that property
+      // false to make them execute properly.
+      filters = map(filters, f => {
+        if (f.model) {
+          f.isGlobalFilter = false;
+        }
+        return f;
+      });
+
+      const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters } };
+      tile.analysis = {
+        ...tile.origAnalysis,
+        ...{ sipQuery },
+        _executeTile: true
+      };
 
       this.dashboard.splice(id, 1, { ...tile });
     });
