@@ -334,6 +334,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(endOfProcess(component, rc, exception));
+        rc = handleErrors(component, rc, exception);
+        System.exit(rc);
     }
 }

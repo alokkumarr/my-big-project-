@@ -83,7 +83,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     }catch (Exception ex) {
         exception = ex;
     }
-    rc = AbstractComponent.endOfProcess(aac, rc, exception);
+    rc = AbstractComponent.handleErrors(aac, rc, exception);
     if (rc != 0) {
           throw new RuntimeException("XDF returned non-zero status: " + rc);
       }

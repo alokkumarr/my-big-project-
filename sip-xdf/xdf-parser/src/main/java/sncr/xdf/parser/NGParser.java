@@ -1007,7 +1007,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(endOfProcess(component, rc, exception));
+        rc = handleErrors(component, rc, exception);
+        System.exit(rc);
     }
     
     private static List<Column> createParserOutputFieldList(List<OutputFieldsList> outputs){
