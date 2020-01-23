@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -27,8 +28,8 @@ public class DSSearchParams {
     private String[] catalog;
     @JsonProperty("dataSource")
     private String[] dataSource;
-    @JsonProperty("dsType")
-    private String[] dsType;
+    @JsonProperty("dstype")
+    private String[] dstype;
 
     @JsonProperty("category")
     public String[] getCategory() {
@@ -66,13 +67,13 @@ public class DSSearchParams {
         this.dataSource = dataSource;
     }
 
-    @JsonProperty("dsType")
-    public String[] getDsType() {
-        return dsType;
+    @JsonProperty("dstype")
+    public String[] getDstype() {
+        return dstype;
     }
-    @JsonProperty("dsType")
-    public void setDsType(String[] dataSource) {
-        this.dsType = dsType;
+    @JsonProperty("dstype")
+    public void setDstype(String[] dstype) {
+        this.dstype = dstype;
     }
 
     @JsonIgnore
@@ -86,4 +87,15 @@ public class DSSearchParams {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "DSSearchParams{" +
+            "category=" + Arrays.toString(category) +
+            ", subCategory=" + Arrays.toString(subCategory) +
+            ", catalog=" + Arrays.toString(catalog) +
+            ", dataSource=" + Arrays.toString(dataSource) +
+            ", dstype=" + Arrays.toString(dstype) +
+            ", additionalProperties=" + additionalProperties +
+            '}';
+    }
 }

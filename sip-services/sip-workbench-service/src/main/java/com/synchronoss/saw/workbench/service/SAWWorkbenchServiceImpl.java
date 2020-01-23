@@ -361,7 +361,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     List<DataSet> dataSetsJSON = new ArrayList<>();
     DataSet dataSet = null;
     for (String item : dataSetsString){
-      logger.trace("item from datasets store {} ", item);
+      logger.debug("item from datasets store {} ", item);
       dataSet = objectMapper.readValue(item, DataSet.class);
       dataSetsJSON.add(dataSet);
     }
@@ -374,6 +374,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       if(optionalSearchParams.isPresent()){
           Map<DataSetProperties, String[]> searchParams = new HashMap<>();
           DSSearchParams dsSearchParams = optionalSearchParams.get();
+          logger.info("DSSearchParams: "+dsSearchParams);
           if(dsSearchParams != null){
               if(dsSearchParams.getCategory() != null && dsSearchParams.getCategory().length != 0){
                   searchParams.put(DataSetProperties.Category, dsSearchParams.getCategory());
@@ -387,8 +388,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
               if(dsSearchParams.getDataSource() != null && dsSearchParams.getDataSource().length != 0){
                   searchParams.put(DataSetProperties.DataSource, dsSearchParams.getDataSource());
               }
-              if(dsSearchParams.getDsType() != null && dsSearchParams.getDsType().length != 0){
-                  searchParams.put(DataSetProperties.Type, dsSearchParams.getDsType());
+              if(dsSearchParams.getDstype() != null && dsSearchParams.getDstype().length != 0){
+                  searchParams.put(DataSetProperties.Type, dsSearchParams.getDstype());
               }
           }
           return searchParams;

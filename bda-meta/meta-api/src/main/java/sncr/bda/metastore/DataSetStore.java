@@ -145,7 +145,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
                                     cond = addEqOrLikeClause(cond, "userData.type", value.trim());
                                     break;
                                 case Type:
-                                    cond = addEqOrLikeClause(cond, DataSetProperties.Type.toString(), value.trim());
+                                    cond = addEqOrLikeClause(cond, "system.dstype", value.trim());
                                     break;
                             }
                         }
