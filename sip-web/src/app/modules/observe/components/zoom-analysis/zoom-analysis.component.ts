@@ -15,12 +15,9 @@ import * as fpMap from 'lodash/fp/map';
 import { Filter } from './../../../analyze/types';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import {
-  NUMBER_TYPES,
-  DATE_TYPES,
   CUSTOM_DATE_PRESET_VALUE,
-  BETWEEN_NUMBER_FILTER_OPERATOR,
-  STRING_FILTER_OPERATORS_OBJ,
-  NUMBER_FILTER_OPERATORS_OBJ
+  AGGREGATE_TYPES_OBJ,
+  getFilterValue
 } from './../../../analyze/consts';
 import * as forEach from 'lodash/forEach';
 import moment from 'moment';
@@ -59,7 +56,8 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
     })
   );
 
-  @ViewChild('zoomAnalysisChartContainer', { static: true }) chartContainer: ElementRef;
+  @ViewChild('zoomAnalysisChartContainer', { static: true })
+  chartContainer: ElementRef;
 
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,
@@ -111,7 +109,9 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
     forEach(filters, filtr => {
       if (
         !filtr.isRuntimeFilter &&
-        (filtr.type === 'date' && filtr.model && filtr.model.operator === 'BTW')
+        filtr.type === 'date' &&
+        filtr.model &&
+        filtr.model.operator === 'BTW'
       ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
@@ -131,42 +131,16 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName || filter.artifactsName][
+    const columnName = this.nameMap[filter.tableName || filter.artifactsName][
       filter.columnName
     ];
-  }
-
-  getFilterValue(filter: Filter) {
-    const { type } = filter;
-    if (!filter.model) {
-      return '';
-    }
-
-    const {
-      modelValues,
-      value,
-      operator,
-      otherValue,
-      preset,
-      lte,
-      gte
-    } = filter.model;
-
-    if (type === 'string') {
-      const operatoLabel = STRING_FILTER_OPERATORS_OBJ[operator].label;
-      return `: ${operatoLabel} ${modelValues.join(', ')}`;
-    } else if (NUMBER_TYPES.includes(type)) {
-      const operatoLabel = NUMBER_FILTER_OPERATORS_OBJ[operator].label;
-      if (operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value) {
-        return `: ${operatoLabel} ${value}`;
-      }
-      return `: ${otherValue} ${operatoLabel} ${value}`;
-    } else if (DATE_TYPES.includes(type)) {
-      if (preset === CUSTOM_DATE_PRESET_VALUE) {
-        return `: From ${gte} To ${lte}`;
-      }
-      return `: ${preset}`;
-    }
+    const filterName =
+      filter.isAggregationFilter && filter.aggregate
+        ? `${
+            AGGREGATE_TYPES_OBJ[filter.aggregate].designerLabel
+          }(${columnName})`
+        : columnName;
+    return filterName + getFilterValue(filter);
   }
 
   close() {
