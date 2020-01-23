@@ -3,11 +3,15 @@ package sncr.xdf.ngcomponent;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -27,6 +31,12 @@ import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
+import sncr.bda.core.file.HFileOperations;
+import sncr.bda.CliHandler;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.context.XDFReturnCodes;
+import java.util.Optional;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
@@ -62,9 +72,7 @@ public abstract class AbstractComponent implements WithContext{
     protected final Services services = new Services();
     protected Dataset inputDataFrame;
     protected boolean isRealTime = false;
-
     protected static boolean persistMode = true;
-
     protected DLBatchReader reader;
 
     /**
@@ -75,7 +83,7 @@ public abstract class AbstractComponent implements WithContext{
     public AbstractComponent(NGContext ngctx, ComponentServices[] cs){
         if (ngctx == null)
             throw new IllegalArgumentException("NGContext must not be null");
-
+        ngctx.setStartTs();
         this.ngctx = ngctx;
         for (int i = 0; i < cs.length; i++) {
             this.ngctx.serviceStatus.put(cs[i], false);
@@ -98,9 +106,9 @@ public abstract class AbstractComponent implements WithContext{
     public AbstractComponent(NGContext ngctx,  Dataset<?> inputDataFrame){
         if (ngctx == null)
             throw new IllegalArgumentException("NGContext must not be null");
+        ngctx.setStartTs();
         if (inputDataFrame == null)
             throw new IllegalArgumentException("DataSet must not be null");
-
         this.ngctx = ngctx;
         this.inputDataFrame = inputDataFrame;
         if (this.ngctx.serviceStatus.isEmpty())
@@ -119,7 +127,7 @@ public abstract class AbstractComponent implements WithContext{
     public AbstractComponent(NGContext ngctx) {
         if (ngctx == null)
             throw new IllegalArgumentException("NGContext must not be null");
-
+        ngctx.setStartTs();
         this.ngctx = ngctx;
         logger.warn(this.ngctx.toString());
         if (this.ngctx.serviceStatus.isEmpty())
@@ -137,83 +145,75 @@ public abstract class AbstractComponent implements WithContext{
      * @return
      */
     public int run() {
-
-        if (!verifyComponentServices()) {
-            error = "Component " + componentName + " is not serviceStatus";
-            return -1;
-        }
-        ngctx.setStartTs();
-        if (updateStatus() != 0){
-            error = "Could not update datasets / could not create Audit log " +
-                "entry";
-            logger.error(error);
-            return -1;
-        }
-        
-        int ret = execute();
-        if (ngctx.runningPipeLine) {
-              ret = moveAndArchiveForPipeline(ret);
-        }
-        else
-        {
-            ret = moveAndArchive(ret);
+        int ret = 0;
+        try {
+            if (!verifyComponentServices()){
+                throw new XDFException(XDFReturnCode.VERIFY_COMPONENT_SERVICES_ERROR, componentName);
+            }
+            if (updateStatus() != 0) {
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR);
+            }
+            if(ret == 0){
+                ret = execute();
+                logger.info("Component execute() return code = " + ret);
+                if (ngctx.runningPipeLine) {
+                    moveAndArchiveForPipeline(ret);
+                } else {
+                    moveAndArchive(ret);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Could not complete execution phase! " + e.getMessage(), e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
         }
         return ret;
     }
 
 
-    public int moveAndArchive(int ret)
+    public void moveAndArchive(int ret)
     {
         if (ret == 0)
         {
             ret = move();
             if (ret == 0) {
-                ret = archive();
-                if (ret == 0) {
-                    ret = Finalize(ret);
-                } else {
-                }
-            } else {
-                logger.error("Could not complete move phase!");
+                archive(ret);
+            }else{
+                throw new XDFException(XDFReturnCode.MOVE_ERROR);
             }
-
-        } else {
-            logger.error("Could not complete execution phase!");
         }
-
-        return ret;
     }
     
-    public int moveAndArchiveForPipeline(int ret)
+    public void moveAndArchiveForPipeline(int ret)
 	{
 		if (ret == 0) {
 			if (ngctx.persistMode) {
 				ret = move();
 			}
-			if (ret == 0) {
-				
-				ret = archive();
-				
-				if (ret == 0) {
-					
-					/**
-					 * Finalize will update mapr db status and other information.
-					 * This needs to be executed irrespective of persistence flag
-					 */
-					ret = Finalize(ret);
-				} else {
-				}
-			} else {
-				logger.error("Could not complete move phase!");
-			}
-
-		} else {
-			logger.error("Could not complete execution phase!");
+            if (ret == 0) {
+                archive(ret);
+            }else{
+                throw new XDFException(XDFReturnCode.MOVE_ERROR);
+            }
 		}
-
-		return ret;
 	}
 
+	public void archive(int ret){
+        ret = archive();
+        if (ret == 0) {
+            /**
+             * Finalize will update mapr db status and other information.
+             * This needs to be executed irrespective of persistence flag
+             */
+            finalize(ret);
+        }else {
+            logger.error("Could not complete archive phase!");
+            throw new XDFException(XDFReturnCode.ARCHIVAL_ERROR);
+        }
+    }
     /**
      * In asynchronous execution this method updates output dataset with next status: IN-PROGRESS
      * @return
@@ -243,7 +243,11 @@ public abstract class AbstractComponent implements WithContext{
         } catch (Exception e) {
             logger.error("Could not create Audit log entry" +
                 ExceptionUtils.getFullStackTrace(e));
-            return -1;
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
+            }
         }
         return 0;
     }
@@ -344,11 +348,13 @@ public abstract class AbstractComponent implements WithContext{
                     ngctx.serviceStatus.put(ComponentServices.InputDSMetadata, true);
                 }
             }
-
-        } catch (Exception e) {
-            error = "component initialization (input-discovery/output-preparation) exception: " + ExceptionUtils.getFullStackTrace(e);
-            logger.error(error);
-            return -1;
+        }catch (Exception e){
+            logger.error("component initialization (input-discovery/output-preparation) exception: " + e.getMessage(), e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
         }
         return rc;
     }
@@ -443,6 +449,7 @@ public abstract class AbstractComponent implements WithContext{
      * @throws Exception
      */
     public final boolean initComponent(JavaSparkContext jsc, ComponentConfiguration cfg, String appId, String batchId, String xdfDataRootSys) throws Exception {
+
         if (ngctx == null) {
             ngctx = new NGContext(xdfDataRootSys, cfg, appId, componentName, batchId);
             ngctx.serviceStatus.put(ComponentServices.InputDSMetadata, false);
@@ -465,7 +472,7 @@ public abstract class AbstractComponent implements WithContext{
      * @throws Exception
      */
     public final boolean initComponent(JavaSparkContext jsc) throws Exception {
-    	logger.debug("Inside init component");
+        logger.debug("Inside init component");
 
         if (ngctx == null){
             throw new Exception("Incorrect call, the method can be called only NGContext is initialized");
@@ -498,7 +505,7 @@ public abstract class AbstractComponent implements WithContext{
         logger.debug("Has TransformationMetdata????"+ ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata));
         logger.debug(services.transformationMD == null &&
             ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata));
-        
+
         if (services.transformationMD == null &&
             ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
 
@@ -509,7 +516,11 @@ public abstract class AbstractComponent implements WithContext{
             } catch (Exception e) {
                 String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
                 logger.error(error);
-                return false;
+                if (e instanceof XDFException) {
+                    throw ((XDFException)e);
+                }else {
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+                }
             }
         }
 
@@ -521,18 +532,18 @@ public abstract class AbstractComponent implements WithContext{
             return false;
         }
 
-        //Initialization part-6: Initialize input datasets.
-        rc = initInputDataSets();
+        //Initialization part-6: Initialize output datasets.
+        rc = initOutputDataSets();
         if (rc != 0) {
-            error = "Could not initialize input datasets.";
+            error = "Could not initialize output datasets.";
             logger.error(error);
             return false;
         }
 
-        //Initialization part-7: Initialize output datasets.
-        rc = initOutputDataSets();
+        //Initialization part-7: Initialize input datasets.
+        rc = initInputDataSets();
         if (rc != 0) {
-            error = "Could not initialize output datasets.";
+            error = "Could not initialize input datasets.";
             logger.error(error);
             return false;
         }
@@ -588,7 +599,11 @@ public abstract class AbstractComponent implements WithContext{
             } catch (Exception e) {
                 String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
                 logger.error(error);
-                return false;
+                if (e instanceof XDFException) {
+                    throw ((XDFException)e);
+                }else {
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+                }
             }
         }
 
@@ -658,9 +673,13 @@ public abstract class AbstractComponent implements WithContext{
                     services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
                 ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
             } catch (Exception e) {
-                String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
+                String error = "Exception at sql init: " + ExceptionUtils.getFullStackTrace(e);
                 logger.error(error);
-                return false;
+                if (e instanceof XDFException) {
+                    throw ((XDFException)e);
+                }else {
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+                }
             }
         }
 
@@ -712,18 +731,14 @@ public abstract class AbstractComponent implements WithContext{
      * @param ret
      * @return
      */
-    private int Finalize(int ret)  {
+    private void finalize(int ret)  {
         String status =
             ( ret == 0)? "SUCCESS":
                 ((ret == 1)? "PARTIAL":
                     "FAILED");
-
         logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
-        int rc[] = {0}; rc[0] = 0;
         try {
-
             ngctx.setFinishTS();
-
             if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
                 services.md.writeDLFSMeta(ngctx);
 
@@ -766,21 +781,19 @@ public abstract class AbstractComponent implements WithContext{
                             logger.trace("Extracted record count " + recordCount);
 
                             services.md.updateDS(id, ngctx, ds, schema, recordCount, size);
-
-
-
                         }
                         else{
                             logger.warn("The component was not able to get schema from NG context, assume something went wrong");
                             services.md.updateDS(id, ngctx, ds, schema, 0, 0);
                         }
-                        
                     } catch (Exception e) {
-                        error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
-                        logger.error(error);
+                        logger.error("Could not update DS/ write AuditLog entry to DS, id = " + id);
                         logger.error("Native exception: " + ExceptionUtils.getFullStackTrace(e));
-                        rc[0] = -1;
-                        return;
+                        if (e instanceof XDFException) {
+                            throw ((XDFException)e);
+                        }else {
+                            throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
+                        }
                     }
                 });
                 logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
@@ -790,11 +803,13 @@ public abstract class AbstractComponent implements WithContext{
 
             }
         } catch (Exception e) {
-            error = "Exception at job finalization: " +  ExceptionUtils.getFullStackTrace(e);
-            logger.error(error);
-            return -1;
+            logger.error("Exception at job finalization: " +  ExceptionUtils.getFullStackTrace(e));
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
+            }
         }
-        return rc[0];
     }
 
     public InternalContext getICtx() {
@@ -823,6 +838,83 @@ public abstract class AbstractComponent implements WithContext{
         public TransformationService transformationMD;
     }
 
+    public void updateStatus(int ret, String status, String errorDesc) {
+        try {
+            logger.debug("######## AbstractComponent() : updateErrorStatus");
+            logger.error(errorDesc);
+            ngctx.setFinishTS();
+            if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
+                JsonObject ale = services.als.generateDSAuditLogEntry(ngctx, status, ngctx.inputDataSets, ngctx.outputDataSets);
+                logger.debug("Audit log Entry generated => " + ale);
+                String aleId = services.als.createAuditLog(ngctx, ale);
+                logger.debug("Audit log Id  => " + aleId);
+                logger.debug("ctx.mdOutputDSMap => " + ctx.mdOutputDSMap);
+                ctx.mdOutputDSMap.forEach((id, ds) -> {
+                    logger.debug("Updating DS " + id + " as FAILED");
+                    try {
+                        //TODO:: move it after merge to appropriate place
+                        //ctx.transformationID = transformationID;
+                        ngctx.ale_id = aleId;
+                        ngctx.status = status;
+                        services.md.updateDS(id, ngctx, ds, null, 0, 0, Optional.ofNullable(ret), Optional.ofNullable(errorDesc));
+                    } catch (Exception e) {
+                        logger.error("Could not update DS/ write AuditLog entry to DS, id = " + id);
+                        logger.error("Native exception: ", e);
+                        if (e instanceof XDFException) {
+                            throw ((XDFException)e);
+                        }else {
+                            throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
+                        }
+                    }
+                });
+                logger.debug("######## AbstractComponent() : ==> Status updating to:::######   " + status);
+                services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, aleId, ngctx.batchID, Optional.ofNullable(ret), Optional.ofNullable(errorDesc));
+            }
+        } catch (Exception e) {
+            logger.error("Could not update error status : ", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
+            }
+        }
+    }
 
+    public static int handleErrorIfAny(AbstractComponent component, int rc, Exception e) {
+        try {
+            if (e == null && rc != 0) {
+                if (XDFReturnCodes.getMap().containsKey(rc)) {
+                    e = new XDFException(XDFReturnCodes.getMap().get(rc));
+                } else {
+                    e = new XDFException(XDFReturnCode.INTERNAL_ERROR);
+                }
+            }
+            if (e != null) {
+                String status = "FAILED";
+                String error = e.getMessage();
+                logger.error("Exception Occurred : " + e);
+                if (e instanceof XDFException) {
+                    rc = ((XDFException)e).getReturnCode().getCode();
+                } else {
+                    rc = XDFReturnCode.INTERNAL_ERROR.getCode();
+                }
+                if (component != null) {
+                    try {
+                        component.updateStatus(rc, status, error);
+                    } catch (Exception ex) {
+                        if (ex instanceof XDFException) {
+                            rc = ((XDFException)ex).getReturnCode().getCode();
+                        } else {
+                            rc = XDFReturnCode.INTERNAL_ERROR.getCode();
+                        }
+                    }
+                }
+            }
+        }catch (Exception ex) {
+            rc = XDFReturnCode.INTERNAL_ERROR.getCode();
+        }
+        logger.info("Component Return Code :" + rc);
+        return rc;
+    }
 }
 
