@@ -48,7 +48,7 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
     }
 
     /**
-     * Test sql connection
+     * This method to check have customer info
      * @return
      */
     @Override
