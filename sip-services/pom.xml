@@ -36,7 +36,7 @@
 		<maven.compile.version>2.3.2</maven.compile.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<jackson.core.version>2.9.7</jackson.core.version>
+		<jackson.core.version>2.9.8</jackson.core.version>
 		<http.version>4.3.4</http.version>
 		<log4j.version>1.2.17</log4j.version>
 		<slfj.version>1.7.6</slfj.version>
