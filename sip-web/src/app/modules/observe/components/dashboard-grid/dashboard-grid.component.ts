@@ -353,7 +353,8 @@ export class DashboardGridComponent
             (filt.tableName || filt.artifactsName) &&
           gFilt.columnName === filt.columnName &&
           gFilt.isAggregationFilter === filt.isAggregationFilter &&
-          gFilt.isGlobalFilter === filt.isGlobalFilter
+          gFilt.isGlobalFilter === filt.isGlobalFilter &&
+          gFilt.isGlobalFilter
       );
 
       // Global filters are being ignored by backend. Set that property
