@@ -405,6 +405,18 @@ export class DesignerState {
       return;
     }
 
+    const allFields: ArtifactColumnDSL[] = fpFlatMap(
+      artifact => artifact.fields || [],
+      get(analysis, 'sipQuery.artifacts', [])
+    );
+
+    /* If selected artifacts has an aggregated field, no need to do anything. */
+    if (allFields.some(field => !!field.aggregate)) {
+      return;
+    }
+
+    /* Otherwise, remove aggregation filters. We don't support aggregation
+       filters in reports if no aggregated field is present */
     const analysisFilters = get(analysis, 'sipQuery.filters', []);
     const hasAggregationFilters = analysisFilters.find(
       f => f.isAggregationFilter

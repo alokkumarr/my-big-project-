@@ -102,4 +102,59 @@ describe('Designer State', () => {
       0
     );
   });
+
+  it('should not remove aggregation filters if they can be supported', async () => {
+    await store
+      .dispatch(
+        new DesignerUpdateAnalysisMetadata({
+          type: 'esReport',
+          sipQuery: {
+            artifacts: [
+              {
+                artifactsName: 'table',
+                fields: [
+                  {
+                    columnName: 'abc',
+                    displayName: 'def',
+                    aggregate: 'sum',
+                    alias: '',
+                    area: '',
+                    groupInterval: null,
+                    name: 'abc',
+                    type: 'double',
+                    table: 'table'
+                  }
+                ]
+              }
+            ],
+            booleanCriteria: 'AND',
+            filters: [
+              {
+                isAggregationFilter: true,
+                isRuntimeFilter: false,
+                isOptional: false,
+                tableName: 'abc',
+                columnName: 'def',
+                type: 'double'
+              }
+            ],
+            joins: [],
+            sorts: [],
+            store: { dataStore: '123', storageType: '123' },
+            semanticId: '123'
+          }
+        })
+      )
+      .toPromise();
+
+    expect(store.selectSnapshot(DesignerState.analysisFilters).length).toEqual(
+      1
+    );
+
+    await store.dispatch(new DesignerCheckAggregateFilterSupport()).toPromise();
+
+    expect(store.selectSnapshot(DesignerState.analysisFilters).length).toEqual(
+      1
+    );
+  });
 });
