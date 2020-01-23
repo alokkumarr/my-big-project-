@@ -531,3 +531,13 @@ export const getFilterValue = filter => {
     return `: ${preset}`;
   }
 };
+
+export const getFilterDisplayName = (nameMap, filter) => {
+  const columnName =
+    nameMap[filter.tableName || filter.artifactsName][filter.columnName];
+  const filterName =
+    filter.isAggregationFilter && filter.aggregate
+      ? `${AGGREGATE_TYPES_OBJ[filter.aggregate].designerLabel}(${columnName})`
+      : columnName;
+  return filterName + getFilterValue(filter);
+};

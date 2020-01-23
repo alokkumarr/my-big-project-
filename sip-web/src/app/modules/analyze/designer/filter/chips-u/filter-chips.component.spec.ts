@@ -20,25 +20,4 @@ describe('Filter Chips Component', () => {
   it('should be initialised', () => {
     expect(component).not.toBeNull();
   });
-
-  describe('getDisplayName', () => {
-    it('should contain aggregate and correct text for aggregated filters', () => {
-      component.nameMap = { table: { ABC: 'Abc' } };
-      const text = component.getDisplayName({
-        isAggregationFilter: true,
-        isRuntimeFilter: false,
-        isOptional: false,
-        columnName: 'ABC',
-        aggregate: 'count',
-        type: 'string',
-        tableName: 'table',
-        model: {
-          operator: 'EQ',
-          value: 123
-        }
-      });
-
-      expect(text).toEqual('CNT(Abc): Equal to 123');
-    });
-  });
 });

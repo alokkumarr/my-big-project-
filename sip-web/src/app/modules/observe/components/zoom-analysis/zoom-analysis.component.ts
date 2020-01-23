@@ -16,8 +16,7 @@ import { Filter } from './../../../analyze/types';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import {
   CUSTOM_DATE_PRESET_VALUE,
-  AGGREGATE_TYPES_OBJ,
-  getFilterValue
+  getFilterDisplayName
 } from './../../../analyze/consts';
 import * as forEach from 'lodash/forEach';
 import moment from 'moment';
@@ -131,16 +130,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getDisplayName(filter: Filter) {
-    const columnName = this.nameMap[filter.tableName || filter.artifactsName][
-      filter.columnName
-    ];
-    const filterName =
-      filter.isAggregationFilter && filter.aggregate
-        ? `${
-            AGGREGATE_TYPES_OBJ[filter.aggregate].designerLabel
-          }(${columnName})`
-        : columnName;
-    return filterName + getFilterValue(filter);
+    return getFilterDisplayName(this.nameMap, filter);
   }
 
   close() {

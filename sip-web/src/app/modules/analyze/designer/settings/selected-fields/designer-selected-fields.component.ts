@@ -36,7 +36,7 @@ import {
   DesignerRemoveColumnFromGroupAdapter
 } from '../../actions/designer.actions';
 import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipFormatter';
-import { getFilterValue } from './../../../consts';
+import { getFilterDisplayName } from './../../../consts';
 import { PerfectScrollbarComponent } from 'ngx-perfect-scrollbar';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
@@ -126,8 +126,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   getDisplayNameForFilter(filter) {
-    const table = filter.artifactsName || filter.tableName;
-    return this.nameMap[table][filter.columnName] || [filter.columnName];
+    return getFilterDisplayName(this.nameMap, filter);
   }
 
   getDisplayNameForColumn(column: ArtifactColumnDSL) {
@@ -265,9 +264,5 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   dragReleased() {
     this._dndPubsub.emit('dragEnd');
-  }
-
-  getFilterValue(filter) {
-    return getFilterValue(filter);
   }
 }
