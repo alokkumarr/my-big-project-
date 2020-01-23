@@ -194,7 +194,7 @@ public class SecurityController {
 	}
 
 	   @RequestMapping(value = "/auth/customer/details", method = RequestMethod.POST)
-	    public UserCustomerMetaData getCustomerDetailsbyUser(@RequestHeader("Authorization") String token) {
+	    public UserCustomerMetaData getCustomerDetailsbyUser(HttpServletResponse response, @RequestHeader("Authorization") String token) {
 	        logger.info("Authenticating & getting the customerDetails starts here");
 	        token = token.replaceAll("Bearer", "").trim();
 	        UserCustomerMetaData userRelatedMetaData = new UserCustomerMetaData();
@@ -218,9 +218,11 @@ public class SecurityController {
 	        } catch (DataAccessException de) {
 	            logger.error("Exception occured creating ticket ", de, null);
 	            userRelatedMetaData.setValid(false);
+	            setUnauthorized(response);
 	        } catch (Exception e) {
 	            logger.error("Exception occured creating ticket ", e);
 	            userRelatedMetaData.setValid(false);
+              setUnauthorized(response);
 	        }
 	        logger.info("Authenticating & getting the customerDetails ends here");
 	        return userRelatedMetaData;
@@ -2223,4 +2225,14 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
+
+  private void setUnauthorized(HttpServletResponse response) {
+    try {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, UNAUTHORIZED_USER);
+    } catch (IOException ex) {
+      logger.error("Error while validating user.");
+    }
+  }
+
 }
