@@ -947,7 +947,12 @@ public class SftpServiceImpl extends SipPluginContract {
         } else {
           if (exclusions != null) {
             filteredFiles =
-                Arrays.stream(files).filter(file -> !file.getFilename().endsWith("." + exclusions))
+                Arrays.stream(files)
+                    .filter(file -> !file.getFilename().endsWith("." + exclusions)
+                        && file.getAttrs().getSize() > 0)
+
+                    //Exclude 0byte files
+                    .filter(file -> file.getAttrs().getSize() > 0)
                     .toArray(LsEntry[]::new);
           }
         }
@@ -1047,7 +1052,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         .duplicateCheck(isDisableDuplicate, sourcelocation, entry)) {
                       logger.trace("file duplication completed " + sourcelocation + File.separator
                           + entry.getFilename() + " batchSize " + batchSize);
-                      logger.trace("Before Inprogress log jobId :: " 
+                      logger.trace("Before In progress log jobId :: "
                           + jobId);
                       prepareLogInfo(bisDataMetaInfo, pattern, path,
                           getActualRecDate(entry), entry.getAttrs().getSize(),
@@ -1055,11 +1060,12 @@ public class SftpServiceImpl extends SipPluginContract {
                           "", jobId);
 
                       sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
-                      logger.trace("After Inprogress log jobId :: " 
+                      logger.trace("After In progress log jobId :: "
                           + jobId);
                       logId = bisDataMetaInfo.getProcessId();
                       logger.trace("Thread starts downloading file with Id  : " + logId);
                     } else {
+                      logger.trace("Inside else");
                       if (!isDisableDuplicate && sipLogService.checkDuplicateFile(
                           sourcelocation + File.separator + entry.getFilename())) {
                         //logger
