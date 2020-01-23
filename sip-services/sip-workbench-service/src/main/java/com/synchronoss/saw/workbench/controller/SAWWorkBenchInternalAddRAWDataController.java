@@ -251,7 +251,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
     @RequestMapping(value = "{projectId}/datasets/search", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<DataSet> searchDataSets(
-        @PathVariable(name = "project", required = true) String projectId, @RequestBody DSSearchParams dsSearchParams) throws JSONException, Exception {
+        @PathVariable(name = "projectId", required = true) String projectId, @RequestBody DSSearchParams dsSearchParams) throws JSONException, Exception {
         logger.debug("Retrieve project details By Id {} ", projectId);
         List<DataSet> datasets = null;
         Project project = new Project();
