@@ -586,6 +586,7 @@ public class SipDslIT extends BaseIT {
     Assert.assertEquals(data.get(0).get(CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
     given(authSpec)
+        .header("Authorization", "Bearer " + customToken)
         .body("TestGroup5")
         .when()
         .delete("/security/auth/admin/security-groups/" + groupSysId)
@@ -855,6 +856,7 @@ public class SipDslIT extends BaseIT {
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
 
     given(authSpec)
+        .header("Authorization", "Bearer " + customToken)
         .body("TestGroup2")
         .when()
         .delete("/security/auth/admin/security-groups/" + groupSysId)
