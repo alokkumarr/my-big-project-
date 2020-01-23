@@ -800,7 +800,6 @@ public abstract class AbstractComponent implements WithContext{
                             // Set record count
                             recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
                             logger.trace("Extracted record count " + recordCount);
-                            logger.info("Updating DS - "+dsname+ " - status to "+status);
                         }
                         else{
                             logger.warn("The component was not able to get schema from NG context, assume something went wrong");
