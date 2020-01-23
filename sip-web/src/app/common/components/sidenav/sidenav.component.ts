@@ -16,7 +16,6 @@ export class SidenavComponent implements OnInit {
 
   public unregister: any;
   public _moduleName: string;
-  public BrandLogoBinary;
 
   ngOnInit() {
     this._sidenav.subscribe(({ menu, module }) => this.update(menu, module));

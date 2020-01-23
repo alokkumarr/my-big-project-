@@ -35,12 +35,15 @@ export class AdminBrandingComponent {
     });
   }
 
-  prepareBrandimgForUpload(event) {
+  prepareBrandingForUpload(event) {
     this.filesToUpload = event.srcElement.files;
     this.binaryFormatImage = this.filesToUpload[0].name;
   }
 
   saveBrandingDetails() {
+    if (isEmpty(this.filesToUpload) || isEmpty(this.saveForm.get('color').value)) {
+      return false;
+    }
     this._brandingService.uploadFile(this.filesToUpload, this.saveForm.get('color').value).subscribe(data => {
       this._toastMessage.success(data.message);
       window.location.reload();

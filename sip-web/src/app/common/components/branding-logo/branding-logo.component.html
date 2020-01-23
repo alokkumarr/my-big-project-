@@ -1,7 +1,7 @@
-<ng-container *ngIf="BrandLogoBinary.length > 0; then customBrandLogo; else defaultLogo"></ng-container>
+<ng-container *ngIf="brandLogoBinary.length > 0; then customBrandLogo; else defaultLogo"></ng-container>
 <ng-template #customBrandLogo>
-  <img [src]="BrandLogoBinary" *ngIf="page === 'sidenav'" style="padding-left: 43%;">
-  <img [src]="BrandLogoBinary" *ngIf="page === 'others'">
+  <img [src]="brandLogoBinary" *ngIf="page === 'sidenav'" style="padding-left: 43%;">
+  <img [src]="brandLogoBinary" *ngIf="page === 'others'">
 </ng-template>
 <ng-template #defaultLogo>
   <div *ngIf="page === 'sidenav'" class="company-logo-white" style="margin-left: 72px;"></div>

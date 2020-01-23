@@ -1,12 +1,3 @@
-<!-- <div>
-  <h1 e2e="branding-details">Set Brand Color and Logo</h1>
-  <input type="text" [(ngModel)]="primaryColor" /><br/>
-  <div class="choose_file">
-    <span>Select Image For Upload</span>
-    <input name="Select File" type="file" (change)="prepareBrandimgForUpload($event)" />
-  </div>
-  <img src="http://54.160.143.70/sip/sip-web/src/assets/img/brand-logo/blackbuck.png" alt="Smiley face" height="42" width="42">
-</div> -->
 <h1 e2e="branding-details">Brand Color and Logo</h1>
 <form [formGroup]="saveForm"
       (submit)="saveBrandingDetails()">
@@ -30,7 +21,7 @@
       />
       <label class="file-upload">
           Click to Upload
-         <input type="file" style="visibility: hidden;" (change)="prepareBrandimgForUpload($event)" accept=".png,.jpeg,.jpg"/>
+         <input type="file" style="visibility: hidden;" (change)="prepareBrandingForUpload($event)" accept=".png,.jpeg,.jpg"/>
          {{binaryFormatImage}}
      </label>
     </mat-form-field>
