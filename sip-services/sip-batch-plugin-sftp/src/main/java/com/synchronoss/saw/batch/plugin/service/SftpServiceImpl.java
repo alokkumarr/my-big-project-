@@ -948,14 +948,15 @@ public class SftpServiceImpl extends SipPluginContract {
           if (exclusions != null) {
             filteredFiles =
                 Arrays.stream(files)
-                    .filter(file -> !file.getFilename().endsWith("." + exclusions)
-                        && file.getAttrs().getSize() > 0)
-
-                    //Exclude 0byte files
-                    .filter(file -> file.getAttrs().getSize() > 0)
+                    .filter(file -> !file.getFilename().endsWith("." + exclusions))
                     .toArray(LsEntry[]::new);
           }
         }
+
+        //Exclude 0byte files
+        filteredFiles = Arrays.stream(filteredFiles)
+            .filter(file -> file.getAttrs().getSize() > 0)
+            .toArray(LsEntry[]::new);
         if (filteredFiles.length > 0) {
 
           logger.trace("Total files after filtering exclusions " + exclusions
