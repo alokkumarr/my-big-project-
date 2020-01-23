@@ -841,18 +841,27 @@ public class SecurityController {
 		return userList;
 	}
 
-    /**
-     * Fetches all the security Group Names
-     * @return List of group names
-     */
-	@RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.GET)
-        public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,HttpServletResponse response) {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
-        Long custId = Long.valueOf(extractValuesFromToken[1]);
-	    List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
-	    return groupNames;
-    }
+	/**
+	 * Fetches all the security Group Names
+	 *
+	 * @return List of group names
+	 */
+	@RequestMapping(value = "/auth/admin/security-groups", method = RequestMethod.GET)
+	@ResponseBody
+	public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,
+			HttpServletResponse response)
+			throws IOException {
+		Ticket ticket = SipCommonUtils.getTicket(request);
+		Long custId = Long.valueOf(ticket.getCustID());
+		RoleType roleType = ticket.getRoleType();
+		if (roleType != RoleType.ADMIN) {
+			response
+					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			return new ArrayList<>();
+		}
+		List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
+		return groupNames;
+	}
 
     /**
      * Adding newly security Group Name to SEC_GROUP.
@@ -860,6 +869,7 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.POST)
+		@ResponseBody
     public Object addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
@@ -893,6 +903,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
     @ApiOperation(value="Add DSK security group")
+		@ResponseBody
     public DskGroupPayload addDskGroup(HttpServletRequest request, HttpServletResponse response,
         @ApiParam(value="DSK group details")
         @RequestBody
@@ -1000,6 +1011,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.GET)
     @ApiOperation(value="Fetch security group details for a customer")
+		@ResponseBody
     public Object getAllSecGroupDetailsForCustomer(
         HttpServletRequest request,
         HttpServletResponse response
@@ -1039,6 +1051,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.GET)
     @ApiOperation(value="Fetch security group details for a given security group id")
+		@ResponseBody
     public DskGroupPayload getSecurityGroupDetails (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -1055,7 +1068,6 @@ public class SecurityController {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             payload.setValid(false);
             payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-
             return payload;
         }
 
@@ -1078,6 +1090,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete security group attributes")
+		@ResponseBody
     public Valid deleteSecurityGroupAttributeModel (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -1120,6 +1133,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
     @ApiOperation(value="Update security group attributes")
+		@ResponseBody
     public DskGroupPayload updateSecurityGroupAttributeModel (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -1219,30 +1233,43 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
+		@ResponseBody
     public Object updateSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        Long custId = Long.valueOf(extractValuesFromToken[1]);
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            Valid valid = new Valid();
-            response.setStatus(400);
+			Ticket ticket = SipCommonUtils.getTicket(request);
+			Long custId = Long.valueOf(ticket.getCustID());
+			RoleType roleType = ticket.getRoleType();
+			Valid valid;
+
+        if (roleType != RoleType.ADMIN) {
+            valid = new Valid();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
             return valid;
         }
+			valid = dataSecurityKeyRepository
+					.validateCustomerForSecGroup(securityGroupId, custId);
+			if (!valid.getValid()) {
+				valid = new Valid();
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				valid.setValid(false);
+				valid.setValidityMessage(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				valid.setError(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				return valid;
+			}
+
         DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups,custId);
         if (dskValidity.getValid().booleanValue() == true)  {
             return dskValidity;
         }
         else {
-            Valid valid = new Valid();
-            response.setStatus(400);
-            valid.setValid(false);
-            valid.setValidityMessage(dskValidity.getValidityMessage());
-            valid.setError(dskValidity.getError());
-            return valid;
+					valid = new Valid();
+					response.setStatus(HttpStatus.BAD_REQUEST.value());
+					valid.setValid(false);
+					valid.setValidityMessage(dskValidity.getValidityMessage());
+					valid.setError(dskValidity.getError());
+					return valid;
         }
     }
 
@@ -1252,24 +1279,36 @@ public class SecurityController {
      * @return Valid obj containing Boolean and success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}",method = RequestMethod.DELETE)
+		@ResponseBody
     public Valid deleteSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            Valid valid = new Valid();
-            response.setStatus(400);
+			Ticket ticket = SipCommonUtils.getTicket(request);
+			Long custId = Long.valueOf(ticket.getCustID());
+			RoleType roleType = ticket.getRoleType();
+			Valid valid;
+        if (roleType != RoleType.ADMIN) {
+            valid = new Valid();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
             return valid;
         }
+			valid = dataSecurityKeyRepository
+					.validateCustomerForSecGroup(securityGroupId, custId);
+			if (!valid.getValid()) {
+				valid = new Valid();
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				valid.setValid(false);
+				valid.setValidityMessage(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				valid.setError(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				return valid;
+			}
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId);
         if ( dskValidity.getValid().booleanValue() == true )    {
             return dskValidity;
         }
         else {
-            response.setStatus(400);
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return dskValidity;
         }
     }
