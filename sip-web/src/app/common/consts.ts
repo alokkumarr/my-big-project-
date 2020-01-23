@@ -511,3 +511,26 @@ export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(NUMBER_FILTER_OPERATORS);
+
+export const DATASET_CATEGORIES_TYPE = [
+  {
+    value: 'base',
+    displayName: 'Base'
+  },
+  {
+    value: 'partition',
+    displayName: 'Partition'
+  },
+  {
+    value: 'parsed',
+    displayName: 'Parsed'
+  },
+  {
+    value: 'transformed',
+    displayName: 'Transformed'
+  },
+  {
+    value: 'sql',
+    displayName: 'SQL'
+  }
+];
