@@ -5,6 +5,7 @@ import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.base.WithSearchInMetastore;
+import java.util.Optional;
 
 import java.util.Map;
 
@@ -36,7 +37,10 @@ public class TransformationStore extends MetadataStore implements WithSearchInMe
      * @throws Exception
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
-        JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId);
+        updateStatus(id, status, startTS, finishedTS, aleId, batchSessionId,Optional.empty(),Optional.empty());
+    }
+    public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
+        JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId, returnCode, errorDesc);
         _updatePath(id, null, "asOfNow", src);
     }
 
