@@ -124,7 +124,8 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(endOfProcess(component, rc, exception));
+        rc = handleErrors(component, rc, exception);
+        System.exit(rc);
     }
 
     @Override
