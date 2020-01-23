@@ -3,6 +3,8 @@
  */
 package com.sncr.saw.security.common.bean.repo;
 
+import com.synchronoss.bda.sip.dsk.DskDetails;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
@@ -28,12 +30,12 @@ public class TicketDetails implements Serializable {
 	private String compName;
 	private String roleCode;
 	private RoleType roleType;
-	private List<TicketDSKDetails> dataSKey;
-    private List<String> CustomConfig;
+  private List<String> CustomConfig;
 	private Long userId;
 	private ArrayList<Products> products;
 	private Integer isJvCustomer;
 	private Integer filterByCustomerCode;
+	private SipDskAttribute dskAttribute;
 
 	public Long getUserId() {
 		return userId;
@@ -66,14 +68,6 @@ public class TicketDetails implements Serializable {
 
 	public void setCustID(String custID) {
 		this.custID = custID;
-	}
-
-	public List<TicketDSKDetails> getDataSKey() {
-		return dataSKey;
-	}
-
-	public void setDataSKey(List<TicketDSKDetails> dataSKey) {
-		this.dataSKey = dataSKey;
 	}
 
     /**
@@ -174,5 +168,13 @@ public class TicketDetails implements Serializable {
 
 	public void setIsJvCustomer(Integer isJvCustomer) {
 		this.isJvCustomer = isJvCustomer;
+	}
+
+	public SipDskAttribute getDskAttribute() {
+		return dskAttribute;
+	}
+
+	public void setDskAttribute(SipDskAttribute dskAttribute) {
+		this.dskAttribute = dskAttribute;
 	}
 }

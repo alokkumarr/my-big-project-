@@ -128,19 +128,16 @@ export class DesignerState {
     /* If this is a report, and query is present, we can request data */
     if (analysis.type === 'report' && !!sipQuery.query) {
       return true;
-    } else {
-      /* Else, there should be at least one field selected in artifacts */
-      return (
-        (
-          fpFlatMap(
-            artifact => artifact.fields,
-            get(state, 'analysis.sipQuery.artifacts')
-          ) || []
-        ).length > 0
-      );
     }
-
-    return false;
+    /* Else, there should be at least one field selected in artifacts */
+    return (
+      (
+        fpFlatMap(
+          artifact => artifact.fields,
+          get(state, 'analysis.sipQuery.artifacts')
+        ) || []
+      ).length > 0
+    );
   }
 
   @Selector()
@@ -267,9 +264,10 @@ export class DesignerState {
     const artifactColumnIndex = findIndex(
       artifacts[artifactIndex].fields,
       ({ columnName, dataField, area }) =>
-        dataField
+        artifactColumn.dataField
           ? dataField === artifactColumn.dataField
-          : columnName === artifactColumn.columnName
+          : columnName === artifactColumn.columnName &&
+            area === artifactColumn.area
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
@@ -279,8 +277,9 @@ export class DesignerState {
     );
 
     // if sort is applied for the field that is removed, remove sort from SIPQUERY
-    const sorts = filter(sipQuery.sorts, sort =>
-      sort.columnName !== artifactColumn.columnName
+    const sorts = filter(
+      sipQuery.sorts,
+      sort => sort.columnName !== artifactColumn.columnName
     );
     patchState({
       analysis: {
@@ -400,14 +399,18 @@ export class DesignerState {
     const areaIndexMap = fpPipe(
       fpFlatMap(adapter => adapter.artifactColumns),
       fpReduce((accumulator, artifactColumn) => {
-        accumulator[artifactColumn.columnName] = artifactColumn.areaIndex;
+        const { dataField, columnName, area } = artifactColumn;
+        const key = dataField || `${columnName}:${area}`;
+        accumulator[key] = artifactColumn.areaIndex;
         return accumulator;
       }, {})
     )(groupAdapters);
 
     forEach(artifacts, artifact => {
       forEach(artifact.fields, field => {
-        field.areaIndex = areaIndexMap[field.columnName];
+        const { dataField, columnName, area } = field;
+        const key = dataField || `${columnName}:${area}`;
+        field.areaIndex = areaIndexMap[key];
       });
     });
 
@@ -803,7 +806,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
@@ -826,11 +829,7 @@ export class DesignerState {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
     const column = adapter.artifactColumns[columnIndex];
-    adapter.reverseTransform(column);
     groupAdapters[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // const updatedGroupAdapters = produce(groupAdapters, draft => {
-    //   draft[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // });
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });

@@ -1,0 +1,39 @@
+<div class="boolean-criteria-header">
+  <mat-chip-list aria-label="Fish selection">
+    <mat-chip color="primary" selected>{{
+      filterGroup.booleanCriteria
+    }}</mat-chip>
+  </mat-chip-list>
+</div>
+
+<div
+  class="dsk-query-child"
+  *ngFor="let child of filterGroup.booleanQuery; let childId = index"
+  [ngClass]="{ 'dsk-query-child__group': child['booleanCriteria'] }"
+>
+  <dsk-filter-group-view
+    [filterGroup]="child"
+    *ngIf="child['booleanCriteria']; else attributeFields"
+  ></dsk-filter-group-view>
+
+  <ng-template #attributeFields>
+    <div
+      class="filter-field"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      fxLayoutGap="10px"
+    >
+      <strong class="filter-field__name">
+        {{ child['columnName'] }}
+      </strong>
+      <strong class="filter-field__operator">
+        {{ child['model']?.operator }}
+      </strong>
+      <mat-chip-list aria-label="Filter Field">
+        <mat-chip *ngFor="let value of child['model'].values">
+          <strong>{{ value }}</strong>
+        </mat-chip>
+      </mat-chip-list>
+    </div>
+  </ng-template>
+</div>

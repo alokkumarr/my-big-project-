@@ -1,7 +1,23 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 ::ng-deep field-attribute-view {
   .attribute-group-grid {
     width: 99% !important;
+  }
+}
+
+code {
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  display: block;
+  font-size: 16px;
+  padding: 10px;
+
+  ::ng-deep .bool-op {
+    color: $primary-blue-b2;
+  }
+
+  ::ng-deep .operator {
+    color: $secondary-orange;
   }
 }

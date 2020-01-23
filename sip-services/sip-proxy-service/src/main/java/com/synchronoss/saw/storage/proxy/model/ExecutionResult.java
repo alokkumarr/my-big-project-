@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.model;
 
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ExecutionResult {
   Object data;
   Integer recordCount;
   List<DataSecurityKeyDef> dataSecurityKey;
+  SipDskAttribute sipDskAttribute;
 
   /**
    * Gets dslQueryId.
@@ -158,11 +160,11 @@ public class ExecutionResult {
     this.recordCount = recordCount;
   }
 
-  public List<DataSecurityKeyDef> getDataSecurityKey() {
-    return dataSecurityKey;
+  public SipDskAttribute getSipDskAttribute() {
+    return sipDskAttribute;
   }
 
-  public void setDataSecurityKey(List<DataSecurityKeyDef> dataSecurityKey) {
-    this.dataSecurityKey = dataSecurityKey;
+  public void setSipDskAttribute(SipDskAttribute sipDskAttribute) {
+    this.sipDskAttribute = sipDskAttribute;
   }
 }
