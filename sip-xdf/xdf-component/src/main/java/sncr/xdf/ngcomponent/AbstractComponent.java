@@ -38,6 +38,7 @@ import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.context.XDFReturnCodes;
 import java.util.Optional;
 import sncr.xdf.context.RequiredNamedParameters;
+import sncr.bda.conf.Output;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
