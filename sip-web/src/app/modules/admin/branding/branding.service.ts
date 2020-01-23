@@ -73,7 +73,7 @@ export class BrandingService {
 
   getBrandingDetails(): Observable<any> {
     const url = AppConfig.login.url;
-    return this._http.get(`${url}/auth/admin/cust/brand`);
+    return this._http.get(`${url}/auth/user/cust/brand`);
   }
 
   reset(): Observable<any> {
