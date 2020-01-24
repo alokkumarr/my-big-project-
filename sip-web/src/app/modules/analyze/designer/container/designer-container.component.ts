@@ -568,8 +568,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
                 semanticId: newAnalysis.semanticId,
                 createdTime: newAnalysis.createdTime,
                 createdBy: newAnalysis.createdBy,
-                userId: newAnalysis.userId,
-                parentAnalysisId: analysis.id
+                userId: newAnalysis.userId
               }
             : {
                 metric: newAnalysis.metric,
