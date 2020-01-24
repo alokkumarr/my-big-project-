@@ -37,9 +37,9 @@
     <maven.compile.version>2.3.2</maven.compile.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jackson.databind>2.9.7</jackson.databind>
-    <jackson.core>2.9.7</jackson.core>
-    <jackson.annotation>2.9.7</jackson.annotation>
+    <jackson.databind>2.9.8</jackson.databind>
+    <jackson.core>2.9.8</jackson.core>
+    <jackson.annotation>2.9.8</jackson.annotation>
     <http.version>4.3.4</http.version>
     <log4j.version>2.3</log4j.version>
     <slfj.version>1.7.6</slfj.version>
