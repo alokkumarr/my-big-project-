@@ -37,7 +37,14 @@ export class AnalyzeExportService {
         let exportData = get(data, 'data');
         let fields = this.getCheckedFieldsForExport(analysis, exportData);
         fields = this.cleanColumnNames(fields);
-        const columnNames = map(fields, 'columnName');
+        const columnNames = map(fields, field =>
+          /* For DL reports, fields with same column names can be present in two different tables.
+          In that case, user would have specified an alias, and BE also sends the data for that
+          field under alias key */
+          analysis.type === 'report'
+            ? field.alias || field.columnName
+            : field.columnName
+        );
         const exportOptions = {
           trimHeaderFields: false,
           emptyFieldValue: 'null',
@@ -51,7 +58,7 @@ export class AnalyzeExportService {
 
         exportData = wrapFieldValues(exportData);
         exportData = ['report', 'esReport'].includes(analysisType)
-          ? alterDateInData(exportData, analysis.sipQuery)
+          ? alterDateInData(exportData, analysis.sipQuery, analysis.type)
           : exportData;
 
         json2csv(
@@ -61,6 +68,7 @@ export class AnalyzeExportService {
               this._toastMessage.error(
                 'There was an error while exporting, please try again witha different dataset.'
               );
+              throw err;
             }
             const csvWithDisplayNames = this.replaceCSVHeader(
               csv,
@@ -101,10 +109,14 @@ export class AnalyzeExportService {
       */
     const displayNames = firstRowColumns
       .map(columnName => {
-        const field = fields.find(f => f.columnName === columnName);
-        if (!field) {
-          return `"${columnName}`;
-        }
+        const field = fields.find(f =>
+          /* For DL reports, fields with same column names can be present in two different tables.
+          In that case, user would have specified an alias, and BE also sends the data for that
+          field under alias key */
+          analysis.type === 'report'
+            ? f.alias === columnName || f.columnName === columnName
+            : f.columnName === columnName
+        );
         if (field.aggregate === 'distinctCount' && analysis.type === 'report') {
           return `"distinctCount(${field.alias || field.displayName})"`;
         }
