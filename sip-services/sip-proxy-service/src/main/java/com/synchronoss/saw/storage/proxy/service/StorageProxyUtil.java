@@ -15,13 +15,13 @@ import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.globalfilter.GlobalFilter;
-import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
 import com.synchronoss.sip.utils.RestUtil;
 import java.io.File;
@@ -397,5 +397,23 @@ public class StorageProxyUtil {
       }
     }
     return true;
+  }
+
+  /**
+   * This method will fetch the Analysis definition with SIP-metadata-service
+   *
+   * @param metadataAnalysisUrl Sip metadata service URL
+   * @param analysisId Analysis Id
+   * @param restUtil Restful template
+   * @return Analysis definition
+   */
+  public static Analysis fetchAnalysisDefinition(
+      String metadataAnalysisUrl, String analysisId, RestUtil restUtil) {
+    String dslUrl = metadataAnalysisUrl + "/dslanalysis/" + analysisId + "?internalCall=true";
+    logger.trace("URL for request body : ", dslUrl);
+    AnalysisResponse analysisResponse =
+        restUtil.restTemplate().getForObject(dslUrl, AnalysisResponse.class);
+    Analysis analysis = analysisResponse.getAnalysis();
+    return analysis;
   }
 }
