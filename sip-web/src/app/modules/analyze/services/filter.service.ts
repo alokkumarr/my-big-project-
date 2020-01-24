@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import * as map from 'lodash/fp/map';
+import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as get from 'lodash/get';
 import * as reduce from 'lodash/fp/reduce';
@@ -10,6 +10,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as isNumber from 'lodash/isNumber';
 import * as values from 'lodash/values';
 import * as find from 'lodash/find';
+import * as omit from 'lodash/omit';
 import { Location } from '@angular/common';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
@@ -259,8 +260,8 @@ export class FilterService {
       }
 
       const filterPayload = map(
-        this.frontend2BackendFilter.bind(this)(),
-        result.filters
+        result.filters,
+        this.frontend2BackendFilter.bind(this)()
       );
       analysis.sqlBuilder.filters = filterPayload.concat(
         filter(
@@ -273,15 +274,20 @@ export class FilterService {
     };
   }
 
-  getRuntimeFilterValues(analysis, navigateBack: string = null) {
-    const clone = cloneDeep(analysis);
+  getCleanedRuntimeFilterValues(analysis) {
     const runtimeFilters = this.getRuntimeFiltersFrom(
-      get(clone, 'sipQuery.filters', get(clone, 'sqlBuilder.filters', []))
+      get(analysis, 'sipQuery.filters', get(analysis, 'sqlBuilder.filters', []))
     );
+    return map(runtimeFilters, f => (f.isRuntimeFilter ? omit(f, 'model') : f));
+  }
 
-    if (!runtimeFilters.length) {
+  getRuntimeFilterValuesIfAvailable(analysis, navigateBack: string = null) {
+    const clone = cloneDeep(analysis);
+    const cleanedRuntimeFilters = this.getCleanedRuntimeFilterValues(clone);
+
+    if (!cleanedRuntimeFilters.length) {
       return Promise.resolve(clone);
     }
-    return this.openRuntimeModal(clone, runtimeFilters, navigateBack);
+    return this.openRuntimeModal(clone, cleanedRuntimeFilters, navigateBack);
   }
 }
