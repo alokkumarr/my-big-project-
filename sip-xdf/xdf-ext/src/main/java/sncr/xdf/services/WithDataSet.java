@@ -438,11 +438,11 @@ public interface WithDataSet {
             if(componentName != null && !componentName.trim().isEmpty()){
                 switch(componentName.trim().toUpperCase()){
                     case "PARSER" :
-                        return Input.Dstype.PARSED;
+                        return Input.Dstype.RAW_DATA_SET;
                     case "TRANSFORMER" :
-                        return Input.Dstype.TRANSFORMED;
+                        return Input.Dstype.ENRICHED_DATA_SET;
                     case "SQL" :
-                        return Input.Dstype.SQL;
+                        return Input.Dstype.AGGREGATED_DATA_SET;
                     default:
                         return Input.Dstype.BASE;
                 }
