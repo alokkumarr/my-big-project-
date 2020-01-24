@@ -1,5 +1,7 @@
 package com.synchronoss.saw.observe.service;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
@@ -241,10 +243,15 @@ public class ObserveServiceImpl implements ObserveService {
           for (String id : analysisId) {
             Analysis analysis = analysisService.getAnalysis(id, ticket);
             Long userId = analysis != null ? analysis.getUserId() : 0;
+            Long privateCatForTicket = checkForPrivateCategory(ticket);
+            privateCatForTicket = privateCatForTicket == null ? 0 : privateCatForTicket;
             logger.trace("Print the analysis {}", analysis);
             if (!(ticket.getCustCode() != null && analysis != null
-                && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode())
-                && userId.equals(ticket.getUserId()))) {
+                && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))) {
+              return false;
+            }
+            if (privateCatForTicket == Long.valueOf(analysis.getCategory())
+                && !(ticket.getUserId().equals(userId))) {
               return false;
             }
           }
