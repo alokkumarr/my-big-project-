@@ -1,5 +1,6 @@
 package com.synchronoss.saw;
 
+import static io.restassured.RestAssured.enableLoggingOfRequestAndResponseIfValidationFails;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertTrue;
@@ -33,6 +34,8 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 public class SipDslIT extends BaseIT {
@@ -47,6 +50,7 @@ public class SipDslIT extends BaseIT {
   private static final String TENANT_B = "TenantB";
   private static final String TENANT_C = "TenantC";
   private static final String CUSTOMER_CODE = "customerCode";
+  private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
   @Before
   public void setUpData() throws JsonProcessingException {
@@ -494,8 +498,8 @@ public class SipDslIT extends BaseIT {
   public void testCustomerCodeFilterWithDsk() throws IOException {
     // Add security group for TenantA customer.
     ObjectNode secGroup = mapper.createObjectNode();
-    secGroup.put("description", "TestDesc2");
-    secGroup.put("securityGroupName", "TestGroup2");
+    secGroup.put("description", "TestDesc5");
+    secGroup.put("securityGroupName", "TestGroup5");
     Response secGroupRes =
         given(spec)
             .header("Authorization", "Bearer " + customToken)
@@ -510,34 +514,43 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
+    logger.debug("security groupId : {}",groupSysId);
 
-    ObjectNode root = mapper.createObjectNode();
-    root.put("attributeName", "string");
-    root.put("value", "string 1");
+    ObjectNode dskAttValues = mapper.createObjectNode();
+    dskAttValues.put("booleanCriteria","AND");
+    ObjectNode dskValues = mapper.createObjectNode();
+    dskValues.put("columnName","string");
+    ArrayNode values = mapper.createArrayNode();
+    values.add("string 1");
+    ObjectNode model = mapper.createObjectNode();
+    model.put("operator","ISIN");
+    model.put("values",values);
+    dskValues.put("model",model);
+    ArrayNode booleanQuery = mapper.createArrayNode();
+    booleanQuery.add(dskValues);
+    dskAttValues.put("booleanQuery",booleanQuery);
+
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(root)
+        .body(dskAttValues)
         .when()
-        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+        .put("/security/auth/admin/dsk-security-groups/" + groupSysId)
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
-
     given(spec)
         .header("Authorization", "Bearer " + customToken)
-        .body("TestGroup2")
+        .body("TestGroup5")
         .when()
         .put("/security/auth/admin/users/" + 5 + "/security-group")
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
-
     JsonObject sipDsl = testData;
     sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
-
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("area", "x-axis");
@@ -547,9 +560,7 @@ public class SipDslIT extends BaseIT {
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
-
     JsonElement js = new JsonArray();
-
     sipDsl
         .get("sipQuery")
         .getAsJsonObject()
@@ -562,7 +573,6 @@ public class SipDslIT extends BaseIT {
         .set(1, field1);
     sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
     sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
-
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
     // Update token after applying DSK.
@@ -575,9 +585,8 @@ public class SipDslIT extends BaseIT {
     String validateCustCode = TENANT_A;
     Assert.assertEquals(data.get(0).get(CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
-
     given(authSpec)
-        .body("TestGroup2")
+        .body("TestGroup5")
         .when()
         .delete("/security/auth/admin/security-groups/" + groupSysId)
         .then()
@@ -795,16 +804,27 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
+    logger.debug("security groupId : {}",groupSysId);
 
-    ObjectNode root = mapper.createObjectNode();
-    root.put("attributeName", "string");
-    root.put("value", "string 1");
+    ObjectNode dskAttValues = mapper.createObjectNode();
+    dskAttValues.put("booleanCriteria","AND");
+    ObjectNode dskValues = mapper.createObjectNode();
+    dskValues.put("columnName","string");
+    ArrayNode values = mapper.createArrayNode();
+    values.add("string 1");
+    ObjectNode model = mapper.createObjectNode();
+    model.put("operator","ISIN");
+    model.put("values",values);
+    dskValues.put("model",model);
+    ArrayNode booleanQuery = mapper.createArrayNode();
+    booleanQuery.add(dskValues);
+    dskAttValues.put("booleanQuery",booleanQuery);
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(root)
+        .body(dskAttValues)
         .when()
-        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+        .put("/security/auth/admin/dsk-security-groups/" + groupSysId)
         .then()
         .assertThat()
         .statusCode(200)

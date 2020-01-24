@@ -16,6 +16,7 @@ import * as unset from 'lodash/unset';
 import * as toLower from 'lodash/toLower';
 import * as toUpper from 'lodash/toUpper';
 import * as some from 'lodash/some';
+import * as split from 'lodash/split';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -42,6 +43,7 @@ import {
   DATE_TYPES,
   GEO_TYPES,
   DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ,
   DEFAULT_DATE_INTERVAL,
   DEFAULT_PIVOT_DATE_FORMAT,
   CHART_DEFAULT_DATE_FORMAT
@@ -111,9 +113,9 @@ export class DesignerService {
     }
 
     const columnName = column.columnName || column.name;
-
+    const [trimmedColumnName] = split(columnName, '.');
     if (!!column.aggregate) {
-      return `${toLower(column.aggregate)}@@${toLower(columnName)}`;
+      return `${toLower(column.aggregate)}@@${toLower(trimmedColumnName)}`;
     }
 
     return columnName;
@@ -156,6 +158,11 @@ export class DesignerService {
 
     if (NUMBER_TYPES.includes(column.type)) {
       aggregates = AggregateChooserComponent.isAggregateEligible(analysisType);
+    } else if (column.type === 'string') {
+      aggregates = [
+        AGGREGATE_TYPES_OBJ['count'],
+        AGGREGATE_TYPES_OBJ['distinctcount']
+      ];
     }
 
     return fpPipe(
@@ -178,7 +185,10 @@ export class DesignerService {
     analysisType: string,
     analysisSubtype: string
   ) {
-    if (!NUMBER_TYPES.includes(column.type) || !!column.expression) {
+    const notNumberType = !NUMBER_TYPES.includes(column.type);
+    const notStringType = column.type !== 'string';
+    const hasExpression = Boolean(column.expression);
+    if ((notNumberType && notStringType) || hasExpression) {
       return !some(columns, col => col.columnName === column.columnName);
     }
     return (
@@ -249,6 +259,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'aggregate');
     };
 
@@ -282,10 +293,9 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
       }
     };
 
@@ -293,7 +303,8 @@ export class DesignerService {
       artifactColumn.groupInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
-    const canAcceptDataType = canAcceptNumberType;
+    const canAcceptDataType = (column: ArtifactColumnChart) =>
+      canAcceptNumberType(column) || canAcceptStringType(column);
     const canAcceptInData = () => canAcceptDataType;
     const canAcceptRowType = canAcceptAnyType;
     const canAcceptInRow = maxAllowedDecorator(canAcceptRowType);
@@ -369,6 +380,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'geoRegion');
       unset(artifactColumn, 'aggregate');
     };
@@ -403,12 +415,11 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
       }
-      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
     };
 
     const canAcceptMetricType = canAcceptNumberType;
@@ -479,6 +490,7 @@ export class DesignerService {
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn['checked'] = false;
       artifactColumn.alias = '';
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'aggregate');
       unset(artifactColumn, 'comboType');
       unset(artifactColumn, 'limitType');
@@ -552,7 +564,8 @@ export class DesignerService {
       );
     };
 
-    const canAcceptMetricType = canAcceptNumberType;
+    const canAcceptMetricType = (column: ArtifactColumnChart) =>
+      canAcceptNumberType(column) || canAcceptStringType(column);
     const canAcceptInMetric = maxAllowedDecorator(
       canAcceptMetricType,
       metricRejectFn
@@ -590,9 +603,9 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
 
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
@@ -45,10 +46,11 @@ public class SIPDSLTest {
     File file = new File(classLoader.getResource("sample.json").getPath());
     ObjectMapper objectMapper = new ObjectMapper();
     SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
-    DataSecurityKey dataSecurityKey = null;
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    SipDskAttribute sipDskAttribute = new SipDskAttribute();
     String query =
-        elasticSearchQueryBuilder.buildDataQuery(sipdsl.getSipQuery(), 100, dataSecurityKey);
+        elasticSearchQueryBuilder
+            .buildDataQuery(sipdsl.getSipQuery(), 100, sipDskAttribute);
     Assert.assertNotNull(query);
   }
 

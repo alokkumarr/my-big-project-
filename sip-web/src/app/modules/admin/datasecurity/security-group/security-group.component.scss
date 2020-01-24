@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 ::ng-deep security-group {
   .mat-toolbar {
@@ -16,13 +16,13 @@
   }
 
   div .security-group-grid {
-    width: 30% !important;
-    float: left;
     margin-left: 20px;
-    padding-right: 10px;
     margin-right: 10px;
-    border-right: 1px solid #D1D3D3;
   }
+}
+
+::ng-deep .dx-row.dx-selection {
+  font-weight: bold;
 }
 
 ::ng-deep .update-security-property {
