@@ -10,14 +10,7 @@
   "updatedBy": "1",
   "updatedByName": "system sncr admin",
   "updatedAt": "",
-  "tiles": [{
-    "type": "analysis",
-    "id": "2b6fcbf0-575d-459d-aa80-f98d58f77786",
-    "x": 0,
-    "y": 0,
-    "cols": 16,
-    "rows": 16
-  }],
+  "tiles": [],
   "filters": [],
   "options": [{"minCols": 64}]
 }]}}
