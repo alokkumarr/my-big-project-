@@ -61,11 +61,10 @@ public class JwtFilter extends GenericFilterBean {
       final String token = authHeader.substring(7); // The part after Bearer
       Claims claims = null;
       try {
-        claims =
-            Jwts.parser()
-                .setSigningKey(jwtSecretKey)
-                .parseClaimsJws(token)
-                .getBody();
+        claims = Jwts.parser()
+            .setSigningKey(jwtSecretKey)
+            .parseClaimsJws(token)
+            .getBody();
         request.setAttribute("claims", claims);
       } catch (final SignatureException e) {
         haveInValidFlow = true;
@@ -84,8 +83,12 @@ public class JwtFilter extends GenericFilterBean {
       logger.trace("Request Header URI : " + requestURI);
       if (!requestURI.equals(SIP_AUTH + "/doLogout")) {
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        Ticket ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
-        if (!ticket.isValid()) {
+        Object claimTicket = claims != null ? claims.get("ticket") : null;
+        Ticket ticket = mapper.convertValue(claimTicket, Ticket.class);
+        if (ticket == null) {
+          haveInValidFlow = true;
+          errorMessage = INVALID_TOKEN;
+        } else if (!ticket.isValid()) {
           haveInValidFlow = true;
           errorMessage = TOKEN_EXPIRED;
         } else if (requestURI.startsWith(SIP_AUTH + "/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
