@@ -191,10 +191,10 @@ public class ObserveServiceImpl implements ObserveService {
             logger.debug(
                 " element.isJsonObject() :"
                     + resultArray
-                        .getAsJsonArray()
-                        .get(i)
-                        .getAsJsonObject()
-                        .getAsJsonObject(String.valueOf(j)));
+                    .getAsJsonArray()
+                    .get(i)
+                    .getAsJsonObject()
+                    .getAsJsonObject(String.valueOf(j)));
             String jsonString =
                 resultArray
                     .getAsJsonArray()
@@ -242,14 +242,14 @@ public class ObserveServiceImpl implements ObserveService {
         try {
           for (String id : analysisId) {
             Analysis analysis = analysisService.getAnalysis(id, ticket);
-            Long userId = analysis != null ? analysis.getUserId() : 0;
             Long privateCatForTicket = checkForPrivateCategory(ticket);
-            privateCatForTicket = privateCatForTicket == null ? 0 : privateCatForTicket;
+            privateCatForTicket = privateCatForTicket == null ? 0L : privateCatForTicket;
             logger.trace("Print the analysis {}", analysis);
             if (!(ticket.getCustCode() != null && analysis != null
                 && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))) {
               return false;
             }
+            Long userId = analysis != null ? analysis.getUserId() : 0L;
             if (privateCatForTicket == Long.valueOf(analysis.getCategory())
                 && !(ticket.getUserId().equals(userId))) {
               return false;
