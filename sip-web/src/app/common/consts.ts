@@ -522,15 +522,15 @@ export const DATASET_CATEGORIES_TYPE = [
     displayName: 'Partition'
   },
   {
-    value: 'parsed',
-    displayName: 'Parsed'
+    value: 'Raw Data Set',
+    displayName: 'Raw Data Set'
   },
   {
-    value: 'transformed',
-    displayName: 'Transformed'
+    value: 'Enriched Data Set',
+    displayName: 'Enriched Data Set'
   },
   {
-    value: 'sql',
-    displayName: 'SQL'
+    value: 'Aggregated Data Set',
+    displayName: 'Aggregated Data Set'
   }
 ];

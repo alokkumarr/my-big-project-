@@ -319,12 +319,12 @@ public class Input {
         BASE("base"),
         @SerializedName("partition")
         PARTITION("partition"),
-        @SerializedName("parsed")
-        PARSED("parsed"),
-        @SerializedName("transformed")
-        TRANSFORMED("transformed"),
-        @SerializedName("sql")
-        SQL("sql");
+        @SerializedName("RawDataSet")
+        RAW_DATA_SET("Raw Data Set"),
+        @SerializedName("EnrichedDataSet")
+        ENRICHED_DATA_SET("Enriched Data Set"),
+        @SerializedName("AggregatedDataset")
+        AGGREGATED_DATA_SET("Aggregated Data Set");
 
         private final String value;
         private static Map<String, Input.Dstype> constants = new HashMap<String, Input.Dstype>();
