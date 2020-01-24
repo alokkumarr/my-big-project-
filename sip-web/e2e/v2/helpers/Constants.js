@@ -20,6 +20,10 @@ const API_ROUTES = {
   DELETE_DASHBOARD: '/saw/services/observe/dashboards',
   ALERTS: '/sip/services/alerts'
 };
+const MODULE_ID = {
+  ALERT: 9,
+  WORKBENCH: 4
+};
 
 const LOG_LEVELS = {
   error: 0,
@@ -48,5 +52,6 @@ module.exports = {
   E2E_OUTPUT_BASE_DIR,
   NUMBER_TYPES,
   SFTP_DETAILS,
-  HTTP_PROTOCOL
+  HTTP_PROTOCOL,
+  MODULE_ID
 };

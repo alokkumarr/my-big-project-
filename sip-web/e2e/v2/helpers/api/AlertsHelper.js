@@ -1,6 +1,7 @@
 'use strict';
 let RestClient = require('./RestClient');
 const Constants = require('../Constants');
+const AlertModel = require('./model/AlertModel');
 const logger = require('../../conf/logger')(__filename);
 
 class AlertsHelper {
@@ -11,10 +12,11 @@ class AlertsHelper {
    * @param {Object} alertObj
    * @returns {Object}
    */
-  addAlerts(host, token, alertObj) {
+  addAlerts(host, token, name, desc, severity) {
+    let alert = new AlertModel().getBasicAlert(name, desc, severity);
     let addAlertResponse = new RestClient().post(
       host + Constants.API_ROUTES.ALERTS,
-      alertObj,
+      alert,
       token
     );
 
@@ -34,7 +36,23 @@ class AlertsHelper {
     if (!alertList) {
       return null;
     }
-    return alertList[0].alertRulesSysId;
+    return alertList.alertRuleDetailsList;
+  }
+  getAlertDetailByName(host, token, name) {
+    let alertList = new RestClient().get(
+      host + Constants.API_ROUTES.ALERTS,
+      token
+    );
+    if (!alertList) {
+      return null;
+    }
+    let index = alertList.alertRuleDetailsList.findIndex(
+      item => item.alertRuleName == name
+    );
+    if (index >= 0) {
+      return alertList.alertRuleDetailsList[index];
+    }
+    return null;
   }
 
   deleteAlert(host, token, id) {

@@ -8,14 +8,13 @@ let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const HeaderPage = require('../../pages/components/Header');
 const AlertsHelper = require('../../helpers/api/AlertsHelper');
 const LoginPage = require('../../pages/LoginPage');
-const AlertPage = require('../../pages/alerts/alertDashboard');
+const AlertDashboard = require('../../pages/alerts/AlertDashboard');
 
 describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
   let host;
   let token;
   let alertHelper;
   let alertId;
-
   beforeAll(() => {
     logger.info('Starting alerts/editDeleteAlerts.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
@@ -32,6 +31,11 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
 
   afterEach(function(done) {
     setTimeout(function() {
+      if (alertId) {
+        logger.info(`Deleting Alert : ` + JSON.stringify(alertId));
+        alertHelper.deleteAlert(host, token, alertId);
+      }
+
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -50,16 +54,23 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
           assert.isNotNull(token, 'token cannot be null');
         }
         //Create new alert.
-        let response = alertHelper.addAlerts(host, token, data.editAlertInfo);
+        const time = new Date().getTime();
+        data.alertInfo.alertName = data.alertInfo.alertName + time;
+        data.alertInfo.alertDescription =
+          data.alertInfo.alertDescription + time;
+        let response = alertHelper.addAlerts(
+          host,
+          token,
+          data.alertInfo.alertName,
+          data.alertInfo.alertDescription
+        );
         alertId = response.alert.alertRulesSysId;
         expect(alertId).toBeTruthy();
         assert.isNotNull(alertId, 'alert id should not be null');
-
         new LoginPage().loginAs(data.user);
 
-        let updatedAlertName = 'Updated ' + data.editAlertInfo.alertName;
-        let updatedAlertDescription =
-          'Updated ' + data.editAlertInfo.alertDescription;
+        let updatedAlertName = 'up ' + data.alertInfo.alertName;
+        let updatedAlertDescription = 'up ' + data.alertInfo.alertDescription;
 
         const headerPage = new HeaderPage();
         headerPage.clickOnModuleLauncher();
@@ -67,12 +78,28 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
         headerPage.openCategoryMenu();
         headerPage.clickOnConfigureAlert();
 
-        const alertPage = new AlertPage();
-        alertPage.clickOnEditAlertButton();
+        const alertPage = new AlertDashboard();
+        alertPage.clickOnEditAlertButton(data.alertInfo.alertName);
+        // Alert name section
         alertPage.fillAlertName(updatedAlertName);
+        alertPage.clickOnAlertSeverity(data.alertInfo.severityLevel);
+        alertPage.clickOnAlertStatus(data.alertInfo.alertStatus);
         alertPage.fillAlertDescription(updatedAlertDescription);
         alertPage.clickOnToMetricSelectionButton();
+        // metric monitor section
+        alertPage.clickOnSelectDataPod(data.alertInfo.alertDataPod);
+        alertPage.clickOnSelectMetric(data.alertInfo.alertMetricName);
+        alertPage.selectMonitoringType(data.alertInfo.monitoringType);
+        alertPage.selectAggregationType(data.alertInfo.alertAggregation);
+        alertPage.selectAlertOperator(data.alertInfo.alertOperatorName);
+        alertPage.fillThresholdValue(data.alertInfo.alertThresholdValue);
         alertPage.clickOnToAlertRules();
+        //Alert rule section
+        alertPage.selectLokbackColumn(data.alertInfo.lookBackColumn);
+        alertPage.fillLookBackPeriod(data.alertInfo.lookBackPeriod);
+        alertPage.selectLookbackPeriodType(data.alertInfo.lookbackPeriodType);
+        alertPage.selectAttributeName(data.alertInfo.attributeName);
+        alertPage.selectAttributeValue(data.alertInfo.attributeValue);
         alertPage.clickOnToAddStep();
         alertPage.clickOnUpdateAlertButton();
 
@@ -80,7 +107,7 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
         alertPage.validateAddedAlerts(updatedAlertDescription); // Verify updated alert by description.
 
         // Delete Updated alert.
-        alertPage.clickOnDeleteAlertIcon();
+        alertPage.clickOnDeleteAlertIcon(updatedAlertName);
         alertPage.clickOnConfirmDeleteAlert();
       }).result.testInfo = {
         testId: id,

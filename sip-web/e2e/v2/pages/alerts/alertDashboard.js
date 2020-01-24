@@ -7,22 +7,26 @@ class AlertDashboard extends AddAlerts {
   constructor() {
     super();
     this._addAlertButton = element(by.css('button[e2e="open-add-alert"]'));
-    this._deleteAlertIcon = element(by.css('button[e2e="delete-alert"]'));
-    this._editAlertButton = element(by.css('button[e2e="edit-alert"]'));
+    this._deleteAlertIcon = value =>
+      element(by.css(`[e2e='delete-alert-${value}']`));
+    this._editAlertButton = value =>
+      element(by.css(`[e2e='edit-alert-${value}']`));
     this._tableDataText = text =>
       element(by.xpath(`//td[contains(text(),"${text}")]`));
   }
 
   clickOnAddAlertButton() {
     commonFunctions.clickOnElement(this._addAlertButton);
+    commonFunctions.waitForProgressBarToComplete();
   }
 
-  clickOnDeleteAlertIcon() {
-    commonFunctions.clickOnElement(this._deleteAlertIcon);
+  clickOnDeleteAlertIcon(value) {
+    commonFunctions.clickOnElement(this._deleteAlertIcon(value));
   }
 
-  clickOnEditAlertButton() {
-    commonFunctions.clickOnElement(this._editAlertButton);
+  clickOnEditAlertButton(value) {
+    commonFunctions.clickOnElement(this._editAlertButton(value));
+    commonFunctions.waitForProgressBarToComplete();
   }
 
   validateAddedAlerts(text) {

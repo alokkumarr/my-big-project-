@@ -9,18 +9,17 @@ const AlertsHelper = require('../../helpers/api/AlertsHelper');
 const APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const LoginPage = require('../../pages/LoginPage');
 const HeaderPage = require('../../pages/components/Header');
-const AlertPage = require('../../pages/alerts/alertDashboard');
+const AlertDashboard = require('../../pages/alerts/AlertDashboard');
 
 describe('ALERTS Module tests: addAlert.test.js', () => {
   let token;
   let host;
-  let alertHelper;
+  let alertName;
 
   beforeAll(() => {
     logger.info('Starting alerts/addAlert.test.js');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
-    alertHelper = new AlertsHelper();
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -32,8 +31,12 @@ describe('ALERTS Module tests: addAlert.test.js', () => {
 
   afterEach(function(done) {
     setTimeout(function() {
-      let id = alertHelper.getAlertList(host, token);
-      alertHelper.deleteAlert(host, token, id);
+      const alertHelper = new AlertsHelper();
+      const alert = alertHelper.getAlertDetailByName(host, token, alertName);
+      if (alert) {
+        logger.info(`Deleting Alert : ` + JSON.stringify(alert));
+        alertHelper.deleteAlert(host, token, alert.alertRulesSysId);
+      }
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -46,38 +49,54 @@ describe('ALERTS Module tests: addAlert.test.js', () => {
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        try {
-          if (!token) {
-            logger.error('token cannot be null');
-            assert.isNotNull(token, 'token cannot be null');
-          }
-          new LoginPage().loginAs(data.user);
-
-          const headerPage = new HeaderPage();
-          headerPage.clickOnModuleLauncher();
-          headerPage.clickOnAlertsLink();
-          headerPage.openCategoryMenu();
-          headerPage.clickOnConfigureAlert();
-
-          const alertPage = new AlertPage();
-          alertPage.clickOnAddAlertButton();
-          alertPage.fillAlertName(data.alertInfo.alertName);
-          alertPage.clickOnAlertSeverity(data.alertInfo.severityLevel);
-          alertPage.clickOnAlertStatus(data.alertInfo.alertStatus);
-          alertPage.fillAlertDescription(data.alertInfo.alertDescription);
-          alertPage.clickOnToMetricSelectionButton();
-          alertPage.clickOnSelectDataPod(data.alertInfo.alertDataPod);
-          alertPage.clickOnSelectMetric(data.alertInfo.alertMetricName);
-          alertPage.clickOnToAlertRules();
-          alertPage.clickOnAlertAggregationy(data.alertInfo.alertAggregation);
-          alertPage.clickOnAlertOperator(data.alertInfo.alertOperatorName);
-          alertPage.fillThresholdValue(data.alertInfo.alertThresholdValue);
-          alertPage.clickOnToAddStep();
-          alertPage.clickOnAddNewAlertButton();
-          alertPage.validateAddedAlerts(data.alertInfo.alertName);
-        } catch (e) {
-          logger.error(e);
+        if (!token) {
+          logger.error('token cannot be null');
+          assert.isNotNull(token, 'token cannot be null');
         }
+        new LoginPage().loginAs(data.user);
+
+        const headerPage = new HeaderPage();
+        headerPage.clickOnModuleLauncher();
+        headerPage.clickOnAlertsLink();
+        headerPage.openCategoryMenu();
+        headerPage.clickOnConfigureAlert();
+
+        const alertPage = new AlertDashboard();
+        alertPage.clickOnAddAlertButton();
+        // Alert name section
+        const time = new Date().getTime();
+        alertName = data.alertInfo.alertName + time;
+        data.alertInfo.alertName = alertName;
+        data.alertInfo.alertDescription =
+          data.alertInfo.alertDescription + time;
+        alertPage.fillAlertName(data.alertInfo.alertName);
+        alertPage.clickOnAlertSeverity(data.alertInfo.severityLevel);
+        alertPage.clickOnNotification();
+        alertPage.clickOnNotificationMethod(data.alertInfo.notificationMethod);
+        alertPage.FillNotificationValue('abc@test.com');
+        alertPage.clickOnAlertStatus(data.alertInfo.alertStatus);
+        alertPage.fillAlertDescription(data.alertInfo.alertDescription);
+        alertPage.clickOnToMetricSelectionButton();
+        // metric monitor section
+        alertPage.clickOnSelectDataPod(data.alertInfo.alertDataPod);
+        alertPage.clickOnSelectMetric(data.alertInfo.alertMetricName);
+        alertPage.selectMonitoringType(data.alertInfo.monitoringType);
+        alertPage.selectAggregationType(data.alertInfo.alertAggregation);
+        alertPage.selectAlertOperator(data.alertInfo.alertOperatorName);
+        alertPage.fillThresholdValue(data.alertInfo.alertThresholdValue);
+        alertPage.clickOnToAlertRules();
+        //Alert rule section
+        alertPage.selectLokbackColumn(data.alertInfo.lookBackColumn);
+        alertPage.fillLookBackPeriod(data.alertInfo.lookBackPeriod);
+        alertPage.selectLookbackPeriodType(data.alertInfo.lookbackPeriodType);
+        alertPage.selectAttributeName(data.alertInfo.attributeName);
+        alertPage.selectAttributeValue(data.alertInfo.attributeValue);
+        alertPage.clickOnToAddStep();
+        alertPage.clickOnAddNewAlertButton();
+        alertPage.validateAddedAlerts(data.alertInfo.alertName);
+        // Delete Updated alert.
+        alertPage.clickOnDeleteAlertIcon(data.alertInfo.alertName);
+        alertPage.clickOnConfirmDeleteAlert();
       }).result.testInfo = {
         testId: id,
         data: data,

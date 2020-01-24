@@ -2,7 +2,7 @@
   "ALERTS": {
     "dashboard": {
       "ALERT001": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-1",
@@ -13,12 +13,19 @@
           "alertMetricName": "Long",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 10
+          "alertThresholdValue": 10,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "minute",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT002": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-2",
@@ -29,12 +36,19 @@
           "alertMetricName": "Long",
           "alertAggregation": "Average",
           "alertOperatorName": "Less Than",
-          "alertThresholdValue": 20
+          "alertThresholdValue": 20,
+          "monitoringType": "Continuous Monitoring",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "hour",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT003": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-3",
@@ -45,12 +59,19 @@
           "alertMetricName": "Long",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than and Equal To",
-          "alertThresholdValue": 30
+          "alertThresholdValue": 30,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "day",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT004": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-4",
@@ -61,12 +82,19 @@
           "alertMetricName": "Long",
           "alertAggregation": "Average",
           "alertOperatorName": "Less Than and Equal To",
-          "alertThresholdValue": 40
+          "alertThresholdValue": 40,
+          "monitoringType": "Continuous Monitoring",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "week",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT005": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-5",
@@ -77,12 +105,19 @@
           "alertMetricName": "Long",
           "alertAggregation": "Average",
           "alertOperatorName": "Equal To",
-          "alertThresholdValue": 50
+          "alertThresholdValue": 50,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT006": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-6",
@@ -93,12 +128,19 @@
           "alertMetricName": "Long",
           "alertAggregation": "Average",
           "alertOperatorName": "Not Equal To",
-          "alertThresholdValue": 60
+          "alertThresholdValue": 60,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT007": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-7",
@@ -109,12 +151,19 @@
           "alertMetricName": "Long",
           "alertAggregation": "Average",
           "alertOperatorName": "Not Equal To",
-          "alertThresholdValue": 70
+          "alertThresholdValue": 70,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT008": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-8",
@@ -125,13 +174,20 @@
           "alertMetricName": "Float",
           "alertAggregation": "Average",
           "alertOperatorName": "Less Than",
-          "alertThresholdValue": 80
+          "alertThresholdValue": 80,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
 
       "ALERT009": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-9",
@@ -142,12 +198,19 @@
           "alertMetricName": "Float",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than and Equal To",
-          "alertThresholdValue": 90
+          "alertThresholdValue": 90,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT010": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-10",
@@ -158,12 +221,19 @@
           "alertMetricName": "Float",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 100
+          "alertThresholdValue": 100,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT011": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-11",
@@ -174,12 +244,19 @@
           "alertMetricName": "Float",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 110
+          "alertThresholdValue": 110,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT012": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-12",
@@ -190,13 +267,20 @@
           "alertMetricName": "Float",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 120
+          "alertThresholdValue": 120,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
 
       "ALERT013": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-13",
@@ -207,12 +291,19 @@
           "alertMetricName": "Integer",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 130
+          "alertThresholdValue": 130,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT014": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-14",
@@ -223,12 +314,19 @@
           "alertMetricName": "Integer",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 140
+          "alertThresholdValue": 140,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT015": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-15",
@@ -239,12 +337,19 @@
           "alertMetricName": "Integer",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 150
+          "alertThresholdValue": 150,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT016": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-16",
@@ -255,12 +360,19 @@
           "alertMetricName": "Integer",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 160
+          "alertThresholdValue": 160,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT017": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-17",
@@ -271,12 +383,19 @@
           "alertMetricName": "Integer",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 170
+          "alertThresholdValue": 170,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT018": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-18",
@@ -287,12 +406,19 @@
           "alertMetricName": "Integer",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 180
+          "alertThresholdValue": 180,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT019": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-19",
@@ -303,12 +429,19 @@
           "alertMetricName": "Integer",
           "alertAggregation": "Average",
           "alertOperatorName": "Greater Than",
-          "alertThresholdValue": 190
+          "alertThresholdValue": 190,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT020": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-20",
@@ -319,13 +452,20 @@
           "alertMetricName": "Double",
           "alertAggregation": "Average",
           "alertOperatorName": "Less Than",
-          "alertThresholdValue": 200
+          "alertThresholdValue": 200,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
 
       "ALERT021": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-21",
@@ -336,12 +476,19 @@
           "alertMetricName": "Double",
           "alertAggregation": "Average",
           "alertOperatorName": "Less Than and Equal To",
-          "alertThresholdValue": 210
+          "alertThresholdValue": 210,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT022": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-22",
@@ -352,12 +499,19 @@
           "alertMetricName": "Double",
           "alertAggregation": "Average",
           "alertOperatorName": "Not Equal To",
-          "alertThresholdValue": 220
+          "alertThresholdValue": 220,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT023": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-23",
@@ -368,12 +522,19 @@
           "alertMetricName": "Double",
           "alertAggregation": "Average",
           "alertOperatorName": "Equal To",
-          "alertThresholdValue": 230
+          "alertThresholdValue": 230,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       },
       "ALERT024": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "alertInfo": {
           "alertName": "Alert-24",
@@ -384,7 +545,14 @@
           "alertMetricName": "Double",
           "alertAggregation": "Average",
           "alertOperatorName": "Less Than",
-          "alertThresholdValue": 240
+          "alertThresholdValue": 240,
+          "monitoringType": "Aggregation Metrics",
+          "lookBackColumn": "Date",
+          "lookBackPeriod": 10,
+          "lookbackPeriodType": "month",
+          "attributeName": "String",
+          "attributeValue": "string 1",
+          "notificationMethod": "email"
         },
         "description": "Admin should be able to configure alerts."
       }
