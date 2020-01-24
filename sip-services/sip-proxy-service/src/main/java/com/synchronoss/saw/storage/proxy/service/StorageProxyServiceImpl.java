@@ -741,6 +741,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         if (authTicket != null && !authTicket.getUserFullName().isEmpty()) {
           analysisDefinition.setModifiedBy(authTicket.getUserFullName());
         }
+        // Update the new category Id for publish feature
+          analysisDefinition.setCategory(analysis.getCategory());
         updatePublishAnalysis(analysisDefinition);
       }
 
