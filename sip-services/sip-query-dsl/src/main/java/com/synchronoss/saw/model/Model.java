@@ -282,7 +282,7 @@ public class Model {
     LT("<"),
     GTE(">="),
     LTE("<="),
-    EQ("="),
+    EQ("=="),
     NEQ("!=");
 
     private final String value;

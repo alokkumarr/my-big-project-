@@ -20,10 +20,12 @@ import { ArtifactDSL } from '../../../../../models';
 
 export interface DesignerFilterDialogData {
   filters: Filter[];
+  analysisType: string;
   booleanCriteria?: string;
   artifacts;
   isInRuntimeMode: boolean;
   supportsGlobalFilters?: boolean;
+  supportsAggregationFilters?: boolean;
   showFilterOptions: boolean;
 }
 export interface DesignerFilterDialogResult {
@@ -66,6 +68,20 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
+  aggregatedFiltersFor(artifactName: string): Filter[] {
+    const allFilters = this.groupedFilters[artifactName];
+    return allFilters
+      ? allFilters.filter((f: Filter) => f.isAggregationFilter)
+      : [];
+  }
+
+  nonAggregatedFiltersFor(artifactName: string): Filter[] {
+    const allFilters = this.groupedFilters[artifactName];
+    return allFilters
+      ? allFilters.filter((f: Filter) => !f.isAggregationFilter)
+      : [];
+  }
+
   filterRowTrackBy(index, filterRow) {
     return `${index}:${filterRow.columnName}`;
   }
@@ -77,13 +93,14 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
-  addFilter(tableName, initialAdd = false) {
+  addFilter(tableName, initialAdd = false, isAggregationFilter = false) {
     const newFilter: Filter = {
       type: null,
       tableName,
       isOptional: false,
       columnName: null,
       isRuntimeFilter: false,
+      isAggregationFilter,
       isGlobalFilter: false,
       model: null
     };
@@ -99,18 +116,33 @@ export class DesignerFilterDialogComponent implements OnInit {
     }
   }
 
-  removeFilter(targetIndex, tableName) {
-    this.groupedFilters[tableName] = filter(
-      this.groupedFilters[tableName],
-      (_, index) => targetIndex !== index
-    );
+  removeFilter(targetIndex, tableName, isAggregationFilter) {
+    let aggregatedFilters = this.aggregatedFiltersFor(tableName),
+      nonAggregatedFilters = this.nonAggregatedFiltersFor(tableName);
+
+    if (isAggregationFilter) {
+      aggregatedFilters = filter(
+        aggregatedFilters,
+        (_, index) => targetIndex !== index
+      );
+    } else {
+      nonAggregatedFilters = filter(
+        nonAggregatedFilters,
+        (_, index) => targetIndex !== index
+      );
+    }
+    this.groupedFilters[tableName] = [
+      ...nonAggregatedFilters,
+      ...aggregatedFilters
+    ];
     this.onFiltersChange();
   }
 
   onFiltersChange() {
-    this.filters = fpPipe(fpToPairs, fpFlatMap(([_, filters]) => filters))(
-      this.groupedFilters
-    );
+    this.filters = fpPipe(
+      fpToPairs,
+      fpFlatMap(([_, filters]) => filters)
+    )(this.groupedFilters);
     this.areFiltersValid = this.validateFilters(this.filters);
   }
 
@@ -139,6 +171,7 @@ export class DesignerFilterDialogComponent implements OnInit {
       ({
         type,
         model,
+        isAggregationFilter,
         isRuntimeFilter,
         isGlobalFilter,
         isOptional
@@ -151,10 +184,10 @@ export class DesignerFilterDialogComponent implements OnInit {
               ? isOptional && isRuntimeFilter
               : isRuntimeFilter
           );
+        } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
+          areValid = this.isNumberFilterValid(model);
         } else if (type === 'string') {
           areValid = this.isStringFilterValid(model);
-        } else if (NUMBER_TYPES.includes(type)) {
-          areValid = this.isNumberFilterValid(model);
         } else if (DATE_TYPES.includes(type)) {
           areValid = this.isDateFilterValid(model);
         }
