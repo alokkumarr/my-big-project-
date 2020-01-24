@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @since 3.5.0
  */
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class FileNotFoundException extends RuntimeException {
-  public FileNotFoundException(String message) {
+public class SipFileNotFoundException extends RuntimeException {
+  public SipFileNotFoundException(String message) {
     super(message);
   }
 
-  public FileNotFoundException(String message, Throwable cause) {
+  public SipFileNotFoundException(String message, Throwable cause) {
     super(message, cause);
   }
 }
