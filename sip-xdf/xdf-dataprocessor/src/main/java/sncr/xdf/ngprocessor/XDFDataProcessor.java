@@ -14,7 +14,7 @@ import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.exceptions.XDFException.ErrorCodes;
+import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.services.NGContextServices;
 import java.util.HashMap;
@@ -53,15 +53,23 @@ public class XDFDataProcessor  extends AbstractComponent {
 	private boolean isRealTime;
 
     public static void main(String[] args)  {
-
-        long start_time = System.currentTimeMillis();
-
-        XDFDataProcessor processor = new XDFDataProcessor();
-        processor.processData(args);
-
-        long end_time = System.currentTimeMillis();
-        long difference = end_time-start_time;
-        logger.debug("Pipeline total time for processing all the components : " + difference );
+        int rc = 0;
+        try {
+            long start_time = System.currentTimeMillis();
+            XDFDataProcessor processor = new XDFDataProcessor();
+            rc = processor.processData(args);
+            long end_time = System.currentTimeMillis();
+            long difference = end_time - start_time;
+            logger.debug("Pipeline total time for processing all the components : " + difference);
+            logger.debug("Return Code : " + rc);
+        }catch(Exception e){
+            if (e instanceof XDFException) {
+                rc = ((XDFException)e).getReturnCode().getCode();
+            } else {
+                rc = XDFReturnCode.INTERNAL_ERROR.getCode();
+            }
+        }
+        System.exit(rc);
     }
 
     protected int execute()
@@ -69,26 +77,23 @@ public class XDFDataProcessor  extends AbstractComponent {
         return 0;
     }
 
-    protected void  processData(String[] args)
+    protected int  processData(String[] args)
     {
-    	int ret = 0 ;
-
-    	CliHandler cli = new CliHandler();
-    	this.args = args;
-    	logger.debug("Processing   ---> XDFDataProcessor "  );
-    	try {
+    	int rc = 0 ;
+        try {
+    	    CliHandler cli = new CliHandler();
+    	    this.args = args;
+    	    logger.debug("Processing   ---> XDFDataProcessor "  );
 
     		HFileOperations.init(10);
-    		Map<String, Object> parameters = cli.parse(args);
+            Map<String, Object> parameters = cli.parse(args);
 
     		PIPELINE_CONFIG = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
     		jsonObj =  loadPipelineConfig(PIPELINE_CONFIG);
-    		
+
     		JSONArray pipeline = null;
     		JSONObject rtaConfig = null;
-    		
     		Object config =  jsonObj.get("pipeline");
-    		
     		
 			if( config instanceof JSONObject) {
 				JSONObject jsonConfig = (JSONObject)config;
@@ -96,7 +101,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 			    logger.debug("### Pipeline config in XDFDataProcessor ::"+ rtaConfig);
 			} else if( config instanceof JSONArray){
 				 pipeline = (JSONArray)config;
-				 
 				 logger.debug("### Pipeline config in RTPS pipeline ::"+ pipeline);
 			}
     		
@@ -112,92 +116,82 @@ public class XDFDataProcessor  extends AbstractComponent {
     			 * If rtps component exists in configuration then its realtime
     			 */
     			if(componentConfig.get("component").toString().equals("rtps")) {
-    				processRtps(parameters,componentConfig.get("configuration").toString(),
+                    rc = processRtps(parameters,componentConfig.get("configuration").toString(),
     						isPerist);
     			} else {
     				/**
         			 * If rtps component doesnt exists in configuration then its batch processing
         			 */
-    				for(int i=0;i<pipeline.size();i++)
+    				for(int i=0;i<pipeline.size() && rc == 0;i++)
     				{
     					JSONObject pipeObj = (JSONObject)pipeline.get(i);
-
     					String component = pipeObj.get("component").toString();
     					boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
     					logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
     					switch(component)
     					{
-
-
     					case "parser" :
-    						ret = processParser(parameters,pipeObj.get("configuration").toString(),persist);
+    						rc = processParser(parameters,pipeObj.get("configuration").toString(),persist);
     						break;
 
     					case "transformer" :
-    						ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
+    						rc = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
     						break;
 
     					case "sql" :
-    						ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
+    						rc = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
     						break;
 
     					case "esloader" :
-    						ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
+    						rc = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
     						break;
     					}
     				}
     			}
-    		
-    			
     		} else if(rtaConfig != null) {
     			Object persistFlag = rtaConfig.get("persist");
-    			
     			boolean isPersist = (persistFlag==null)?false:Boolean.valueOf(rtaConfig.
     					get("persist").toString());
-    			processRtps(parameters,rtaConfig.get("configuration").toString(),
+    			rc = processRtps(parameters,rtaConfig.get("configuration").toString(),
     						isPersist);
-    			
     		}
-
-    		
-
-    	} catch (Exception e) {
-    		logger.error(e.getMessage());
-    		System.exit(ret);
-    	}
-
+        } catch(Exception e){
+            logger.error("XDFDataProcessor:processData() Exception is : ",e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
+        }
+    	return rc;
     }
 
-    
-    
-
-
-   
-    
     private int processRtps(Map<String, Object> parameters, String configPath,boolean persistFlag) {
     	 logger.debug("###### Starting RTPS #####"  );
-        int ret = 0;
+        NGRTPSComponent component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
             logger.debug("###### Config as string retrived #####"  );
 
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
             pipelineConfig = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             JSONObject jsonObj =  loadPipelineConfig(pipelineConfig);
@@ -236,32 +230,23 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngRtpsCtxSvc.getNgctx().dataSetName = rtpsKey;
             ngRtpsCtxSvc.getNgctx().runningPipeLine = runningMode;
 
-            NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx(),configPath);
-
-            if (!component.initComponent(null))
-                System.exit(-1);
-
-            ret = component.run();
-
-            if (ret != 0){
-                error = "Could not complete Parser component " + "entry";
-                throw new Exception(error);
+            component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx(),configPath);
+            if (component.initComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    datafileDFmap = new HashMap<>();
+                    logger.debug("###RTPS Dataset name::" + ngRtpsCtxSvc.getNgctx().dataSetName);
+                    datafileDFmap.put(rtpsKey, ngRtpsCtxSvc.getNgctx().datafileDFmap.get(ngRtpsCtxSvc.getNgctx().dataSetName));
+                    logger.debug("###RTPS Dataset count ::" + datafileDFmap.get(rtpsKey).count());
+                    dataSetName = rtpsKey;
+                    logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size() + "\n");
+                }
             }
-
-            datafileDFmap =  new HashMap<>();
-            logger.debug("###RTPS Dataset name::" +ngRtpsCtxSvc.getNgctx().dataSetName);
-           
-            datafileDFmap.put(rtpsKey,ngRtpsCtxSvc.getNgctx().datafileDFmap.get(ngRtpsCtxSvc.getNgctx().dataSetName));
-            logger.debug("###RTPS Dataset count ::" +datafileDFmap.get(rtpsKey).count());
-            dataSetName = rtpsKey;
-
-            logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
-        } catch (Exception e) {
-            logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
-            System.exit(-1);
+        }catch (Exception ex) {
+            logger.error("XDFDataProcessor:processRTPS() Exception is : ",ex);
+            exception = ex;
         }
-        return ret;
-    
+        return handleErrorIfAny(component, rc, exception);
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception
@@ -285,29 +270,31 @@ public class XDFDataProcessor  extends AbstractComponent {
         return pipelineObj;
     }
 
-    public int  processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    public int processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
-        int ret = 0;
+        NGParser component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices pcs[] = {
@@ -346,64 +333,52 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngParserCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
-            NGParser component = null;
-            
     		if(isRealTime) {
     			Dataset dataset =  datafileDFmap.get("DATA_STREAM");
     			component  =  	new NGParser(ngParserCtxSvc.getNgctx(), dataset, true);
             } else {
-            	
             	component  =  	new NGParser(ngParserCtxSvc.getNgctx());
-            
             }
-    		
-            		
-
-            if (!component.initComponent(null))
-                System.exit(-1);
-
-            ret = component.run();
-            
-            
-            if (ret != 0){
-                error = "Could not complete Parser component entry";
-                throw new XDFException(ErrorCodes.IncorrectCall, error);
+            if (component.initComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    datafileDFmap.putAll(ngParserCtxSvc.getNgctx().datafileDFmap);
+                    logger.debug("End Of Parser Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
+                }
             }
-
-            datafileDFmap.putAll(ngParserCtxSvc.getNgctx().datafileDFmap);
-
-            logger.debug("End Of Parser Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
-        } catch (Exception e) {
-            logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
-            System.exit(-1);
+        }catch (Exception ex) {
+            logger.error("XDFDataProcessor:processParser() Exception is : ",ex);
+            exception = ex;
         }
-        return ret;
+        return handleErrorIfAny(component, rc, exception);
     }
 
     public int processTransformer(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
-        int ret = 0;
+        NGTransformerComponent component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices[] scs =
@@ -438,53 +413,48 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngTransformerCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
 
-            NGTransformerComponent tcomponent = new NGTransformerComponent(ngTransformerCtxSvc.getNgctx());
-
-            if (!tcomponent.initTransformerComponent(null))
-                System.exit(-1);
-
-            ret = tcomponent.run();
-
-            if (ret != 0){
-                throw new XDFException(ErrorCodes.IncorrectCall, "Could not complete Transformer component");
+            component = new NGTransformerComponent(ngTransformerCtxSvc.getNgctx());
+            if (component.initTransformerComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    datafileDFmap.putAll(ngTransformerCtxSvc.getNgctx().datafileDFmap);
+                    logger.debug("End Of Transformer Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
+                }
             }
-
-            datafileDFmap.putAll(ngTransformerCtxSvc.getNgctx().datafileDFmap);
-
-            logger.debug("End Of Transformer Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
-        } catch (Exception e) {
-            logger.debug("XDFDataProcessor:processTransformer() Exception is : " + e + "\n");
-            System.exit(-1);
+        }catch (Exception ex) {
+            logger.error("XDFDataProcessor:processTransformer() Exception is : ",ex);
+            exception = ex;
         }
-        return ret;
+        return handleErrorIfAny(component, rc, exception);
     }
 
 
     public int processSQL(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
-    	
-    	int ret = 0;
+        NGSQLComponent component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices[] sqlcs =
@@ -525,56 +495,47 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
             ngSQLCtxSvc.getNgctx().pipeComponentName = "sql";
 
-            NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
-
-            if (!sqlcomponent.initComponent(null))
-                System.exit(-1);
-            
-
-            ret = sqlcomponent.run();
-
-            if (ret != 0){
-                error = "Could not complete SQL component entry";
-                logger.error(error);
-                throw new XDFException(ErrorCodes.IncorrectCall, error);
+            component = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    datafileDFmap.putAll(ngSQLCtxSvc.getNgctx().datafileDFmap);
+                    logger.debug("End Of SQL Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
+                }
             }
-
-            datafileDFmap.putAll(ngSQLCtxSvc.getNgctx().datafileDFmap);
-
-            logger.debug("End Of SQL Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
-
-        } catch (Exception e) {
-            logger.debug("XDFDataProcessor:processSQL() Exception is : " + e + "\n");
-            System.exit(-1);
+        }catch (Exception ex) {
+            logger.error("XDFDataProcessor:processSQL() Exception is : ",ex);
+            exception = ex;
         }
-        return ret;
+        return handleErrorIfAny(component, rc, exception);
     }
 
     public int processESLoader(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
-        int ret = 0;
-
+        NGESLoaderComponent component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices[] escs =
@@ -601,24 +562,19 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             ngESCtxSvc.getNgctx().datafileDFmap.putAll(datafileDFmap);
             ngESCtxSvc.getNgctx().runningPipeLine = runningMode;
-            
-            NGESLoaderComponent esloader = new NGESLoaderComponent(ngESCtxSvc.getNgctx());
 
-            if (!esloader.initComponent(null))
-                System.exit(-1);
-            ret = esloader.run();
-
-            if (ret != 0){
-                error = "Could not complete ESLoader component entry";
-                throw new XDFException(ErrorCodes.IncorrectCall , error);
+            component = new NGESLoaderComponent(ngESCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    logger.debug("End Of ESLoader Component ==>  dataSetName  & size " +  ngESCtxSvc.getNgctx().dataSetName + "," + ngESCtxSvc.getNgctx().datafileDFmap.size()+ "\n");
+                }
             }
-
-            logger.debug("End Of ESLoader Component ==>  dataSetName  & size " +  ngESCtxSvc.getNgctx().dataSetName + "," + ngESCtxSvc.getNgctx().datafileDFmap.size()+ "\n");
-
-        } catch (Exception e) {
-            logger.debug("XDFDataProcessor:processESLoader() Exception is : " + e + "\n");
+        }catch (Exception ex) {
+            logger.error("XDFDataProcessor:processESLoader() Exception is : ",ex);
+            exception = ex;
         }
-        return ret;
+        return handleErrorIfAny(component, rc, exception);
     }
 
 
@@ -631,6 +587,4 @@ public class XDFDataProcessor  extends AbstractComponent {
     {
         return 0;
     }
-
-
 }

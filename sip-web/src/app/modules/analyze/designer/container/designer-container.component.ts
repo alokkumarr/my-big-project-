@@ -503,10 +503,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     if ((this.analysisStarter || this.analysis).type !== 'chart') {
       return;
     }
-
+    const fields = get(
+      <AnalysisDSL>this.analysis,
+      'sipQuery.artifacts[0].fields'
+    );
     const dimensionGroupFields = fpFilter(({ area }) => {
       return area !== 'y';
-    })((<AnalysisDSL>this.analysis).sipQuery.artifacts[0].fields);
+    })(fields);
     forEach(dimensionGroupFields, node => {
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(

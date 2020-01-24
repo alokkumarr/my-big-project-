@@ -10,6 +10,7 @@ import sncr.bda.context.ContextMetadata;
 import sncr.bda.metastore.TransformationStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.Optional;
 
 import java.io.*;
 
@@ -58,6 +59,10 @@ public class TransformationService {
     }
 
     public void updateStatus(String transformationID, String status, String startTs, String finishedTs, String ale_id, String batchID) throws Exception {
-        ts.updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID);
+        updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID,Optional.empty(),Optional.empty());
+    }
+
+    public void updateStatus(String transformationID, String status, String startTs, String finishedTs, String ale_id, String batchID, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
+        ts.updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID, returnCode, errorDesc);
     }
 }

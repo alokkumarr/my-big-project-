@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import sncr.xdf.context.XDFReturnCode;
 
 public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
@@ -283,16 +284,16 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         ComponentConfiguration compConf = Component.analyzeAndValidate(config);
         sncr.bda.conf.Parser parserProps = compConf.getParser();
         if (parserProps == null) {
-            throw new XDFException( XDFException.ErrorCodes.InvalidConfFile);
+            throw new XDFException( XDFReturnCode.INVALID_CONF_FILE);
         }
 
         if(parserProps.getFile() == null || parserProps.getFile().length() == 0){
-            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+            throw new XDFException(XDFReturnCode.INVALID_CONF_FILE);
         }
 
         // Schema configuration is no required, as schema validation cannot be done
 //        if(parserProps.getFields() == null || parserProps.getFields().size() == 0){
-//            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+//            throw new XDFException(XDFReturnCode.InvalidConfFile);
 //        }
         return compConf;
     }

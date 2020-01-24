@@ -54,8 +54,10 @@ import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
+import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.DskGroupPayload;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -73,7 +75,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -956,9 +960,11 @@ public class SecurityController {
               return responsePayload;
           }
 
-          SipDskAttribute dskAttributes = dskGroupPayload.getDskAttributes();
+          // Prepare the list og attribute models. This will also validate for missing attributes.
+          List<SipDskAttributeModel> attributeModelList = dataSecurityKeyRepository.
+              prepareDskAttributeModelList(securityGroupSysId, dskAttribute, Optional.empty());
           Valid valid = dataSecurityKeyRepository
-              .addDskGroupAttributeModelAndValues(securityGroupSysId, dskAttributes);
+              .addDskGroupAttributeModelAndValues(securityGroupSysId, attributeModelList);
 
           if (valid.getValid() == true) {
               responsePayload =
@@ -1148,14 +1154,31 @@ public class SecurityController {
 
                 return payload;
             }
+
+            Valid valid = dataSecurityKeyRepository
+                .validateCustomerForSecGroup(securityGroupSysId, customerId);
+
+
+            if (!valid.getValid()) {
+                payload = new DskGroupPayload();
+
+                payload.setValid(false);
+                payload.setMessage(valid.getValidityMessage());
+
+                return payload;
+            }
+
+      List<SipDskAttributeModel> dskAttributeModelList =
+          dataSecurityKeyRepository.prepareDskAttributeModelList(
+              securityGroupSysId, sipDskAttributes, Optional.empty());
             // Delete the existing security group attributes
-            Valid valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
+            valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
 
             if (valid.getValid()) {
                 // Add the new security group attributes
                 logger.info("Deleted existing DSK attributes");
                 valid = dataSecurityKeyRepository
-                    .addDskGroupAttributeModelAndValues(securityGroupSysId, sipDskAttributes);
+                    .addDskGroupAttributeModelAndValues(securityGroupSysId, dskAttributeModelList);
 
                 if (valid.getValid()) {
                     logger.info("DSK attributes updated successfully");
