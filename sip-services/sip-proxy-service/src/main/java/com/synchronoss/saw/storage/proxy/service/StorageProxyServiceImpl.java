@@ -723,20 +723,25 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                 dskAttribute,
                 (List<Object>) executeResponse.getData());
         saveDslExecutionResult(executionResult);
-        // For published analysis, update analysis metadata table with the category information.
-        analysis = executionResult.getAnalysis();
-        Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
-        analysis.setUserId(uid);
-        analysis.setCreatedTime(
-            analysis.getCreatedTime() == null
-                ? Instant.now().toEpochMilli()
-                : analysis.getCreatedTime());
-        analysis.setModifiedTime(Instant.now().toEpochMilli());
-        analysis.setModifiedBy(
-            authTicket != null && !authTicket.getUserFullName().isEmpty()
-                ? authTicket.getUserFullName()
-                : analysis.getModifiedBy());
-        updateAnalysis(analysis);
+      }
+      // For published analysis, update analysis metadata table with the category information.
+      if (executionType.equals(ExecutionType.publish)) {
+        Analysis analysisDefinition =
+            StorageProxyUtil.fetchAnalysisDefinition(
+                metaDataServiceExport, analysis.getId(), restUtil);
+        if (analysisDefinition.getUserId() == null
+            && authTicket != null
+            && authTicket.getUserId() != null) {
+          analysisDefinition.setUserId(authTicket.getUserId());
+        }
+        if (analysisDefinition.getCreatedTime() == null) {
+          analysisDefinition.setCreatedTime(Instant.now().toEpochMilli());
+        }
+        analysisDefinition.setModifiedTime(Instant.now().toEpochMilli());
+        if (authTicket != null && !authTicket.getUserFullName().isEmpty()) {
+          analysisDefinition.setModifiedBy(authTicket.getUserFullName());
+        }
+        updatePublishAnalysis(analysisDefinition);
       }
 
       if (!analysis.getType().equalsIgnoreCase("report")) {
@@ -1264,13 +1269,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public Boolean updateAnalysis(Analysis analysis) {
+  public Boolean updatePublishAnalysis(Analysis analysis) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
+      // TODO:  this method needs to be coverted to rest call to SIP-metadata-service
+      // TODO: instead of directly using MaprDB operation to update publish analysis.
       ExecutionResultStore executionResultStore =
           new ExecutionResultStore(analysisMetadataTable, basePath);
-      executionResultStore.update(
-          analysis.getId(), objectMapper.writeValueAsString(analysis));
+      executionResultStore.update(analysis.getId(), objectMapper.writeValueAsString(analysis));
       logger.info(
           String.format("Updated Analysis id : %s with body : %s ", analysis.getId(), analysis));
       return true;

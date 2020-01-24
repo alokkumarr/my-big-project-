@@ -273,9 +273,10 @@ export class DesignerState {
     const artifactColumnIndex = findIndex(
       artifacts[artifactIndex].fields,
       ({ columnName, dataField, area }) =>
-        dataField
+        artifactColumn.dataField
           ? dataField === artifactColumn.dataField
-          : columnName === artifactColumn.columnName
+          : columnName === artifactColumn.columnName &&
+            area === artifactColumn.area
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
@@ -443,14 +444,18 @@ export class DesignerState {
     const areaIndexMap = fpPipe(
       fpFlatMap(adapter => adapter.artifactColumns),
       fpReduce((accumulator, artifactColumn) => {
-        accumulator[artifactColumn.columnName] = artifactColumn.areaIndex;
+        const { dataField, columnName, area } = artifactColumn;
+        const key = dataField || `${columnName}:${area}`;
+        accumulator[key] = artifactColumn.areaIndex;
         return accumulator;
       }, {})
     )(groupAdapters);
 
     forEach(artifacts, artifact => {
       forEach(artifact.fields, field => {
-        field.areaIndex = areaIndexMap[field.columnName];
+        const { dataField, columnName, area } = field;
+        const key = dataField || `${columnName}:${area}`;
+        field.areaIndex = areaIndexMap[key];
       });
     });
 
