@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import * as take from 'lodash/take';
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as debounce from 'lodash/debounce';
@@ -20,8 +21,10 @@ import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 import { DEFAULT_COLOR_PICKER_OPTION } from '../../../../../../common/components/custom-color-picker/default-color-picker-options';
+import { CHART_COLORS } from 'src/app/common/consts';
 
 const ALIAS_CHANGE_DELAY = 500;
+const Default_Chart_Colors = cloneDeep(CHART_COLORS);
 
 @Component({
   selector: 'designer-data-option-field',
@@ -67,11 +70,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       this.analysisSubtype
     );
     this.colorPickerConfig = cloneDeep(DEFAULT_COLOR_PICKER_OPTION);
+    const presetColors = take(Default_Chart_Colors, 10);
     set(
       this.colorPickerConfig,
       'bgColor',
       this.artifactColumn.seriesColor || '#ffffff'
     );
+    set(this.colorPickerConfig, 'presetColors', presetColors);
   }
 
   onAliasChange(alias) {
@@ -136,7 +141,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   selectedColor(event) {
     if (event.data) {
-      set(this.artifactColumn, 'seriesColor', event.data.color);
+      set(this.artifactColumn, 'seriesColor', event.data);
       this.change.emit({
         subject: 'seriesColorChange',
         data: { artifact: this.artifactColumn }

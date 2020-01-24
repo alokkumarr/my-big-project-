@@ -8,7 +8,7 @@ import {
   RendererStyleFlags2
 } from '@angular/core';
 
-const OFFSET_TOP_LIMIT = 250;
+const OFFSET_TOP_LIMIT = 300;
 
 @Component({
   selector: 'custom-color-picker',
@@ -26,11 +26,12 @@ export class CustomColorPickerComponent {
   constructor(private elRef: ElementRef, private renderer: Renderer2) {}
 
   chooseColor(event) {
-    if (event.color) {
-      setTimeout(() => {
-        this.change.emit({ name: 'colorPicker', data: event });
-      }, 500);
-    }
+    setTimeout(() => {
+      this.change.emit({
+        name: 'colorPicker',
+        data: event.color ? event.color : event
+      });
+    }, 500);
   }
 
   /**
@@ -45,12 +46,35 @@ export class CustomColorPickerComponent {
       this.renderer.setStyle(
         colorPickerDiv,
         'top',
-        '5px',
+        '0px',
         RendererStyleFlags2.Important
       );
     }
 
+    this.setColorPickerStyles();
     const div = this.elRef.nativeElement.querySelector('div.arrow');
     this.renderer.setStyle(div, 'display', 'none');
+  }
+
+  setColorPickerStyles() {
+    const colorDiv = this.elRef.nativeElement.querySelector(
+      'div.saturation-lightness'
+    );
+
+    const typeDiv = this.elRef.nativeElement.querySelector('div.type-policy');
+
+    this.renderer.setStyle(
+      colorDiv,
+      'height',
+      '100px',
+      RendererStyleFlags2.Important
+    );
+
+    this.renderer.setStyle(
+      typeDiv,
+      'top',
+      '190px',
+      RendererStyleFlags2.Important
+    );
   }
 }
