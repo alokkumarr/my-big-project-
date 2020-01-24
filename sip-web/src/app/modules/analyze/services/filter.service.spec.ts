@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { AnalyzeDialogService } from './analyze-dialog.service';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
+import * as every from 'lodash/every';
+
+import { AnalyzeDialogService } from './analyze-dialog.service';
 import { FilterService } from './filter.service';
 
 class AnalyzeDialogServiceStub {
@@ -14,15 +16,33 @@ class RouterStub {}
 class LocationStub {
   getMenu() {}
 }
+
+const allFiltersWithEmptyRuntimeFilters = [
+  {
+    isRuntimeFilter: true
+  },
+  {
+    isRuntimeFilter: false,
+    model: 'something'
+  }
+];
+
+const runtimeFiltersWithValues = [
+  {
+    isRuntimeFilter: true,
+    model: 'something'
+  }
+];
+
 const analysis = {
   sipQuery: {
     filters: [
       {
-        isRuntime: true,
+        isRuntimeFilter: true,
         model: 'something'
       },
       {
-        isRuntime: false,
+        isRuntimeFilter: false,
         model: 'something'
       }
     ]
@@ -56,7 +76,15 @@ describe('Filter Service', () => {
   it('should clean runtime filter values', () => {
     const cleanedFilters = service.getCleanedRuntimeFilterValues(analysis);
 
-    expect(cleanedFilters[0].model).not.toBeUndefined();
-    expect(cleanedFilters[1].model).toBeDefined();
+    expect(cleanedFilters[0].model).toBeUndefined();
+    expect(cleanedFilters.length).toBe(1);
+  });
+
+  it('should merge runtime filters with values into all filters', () => {
+    const allFiltersWithValues = service.mergeValuedRuntimeFiltersIntoFilters(
+      runtimeFiltersWithValues,
+      allFiltersWithEmptyRuntimeFilters
+    );
+    expect(every(allFiltersWithValues, 'model')).toBe(true);
   });
 });
