@@ -617,16 +617,16 @@ public class AnalyzeIT extends BaseIT {
   private ArrayNode PreferenceData() {
     ArrayNode arrayNode = mapper.createArrayNode();
     ObjectNode objectNode1 = arrayNode.addObject();
-    objectNode1.put("preferenceName", "defaultURL1");
+    objectNode1.put("preferenceName", "defaultDashboardCategory");
     objectNode1.put("preferenceValue", "http://localhost/saw/observe/1");
     ObjectNode objectNode2 = arrayNode.addObject();
-    objectNode2.put("preferenceName", "defaultURL2");
+    objectNode2.put("preferenceName", "defaultDashboardCategory");
     objectNode2.put("preferenceValue", "http://localhost/saw/observe/2");
     ObjectNode objectNode3 = arrayNode.addObject();
-    objectNode3.put("preferenceName", "defaultURL3");
+    objectNode3.put("preferenceName", "defaultDashboardCategory");
     objectNode3.put("preferenceValue", "http://localhost/saw/observe/3");
     ObjectNode objectNode4 = arrayNode.addObject();
-    objectNode4.put("preferenceName", "defaultURL4");
+    objectNode4.put("preferenceName", "defaultDashboardCategory");
     objectNode4.put("preferenceValue", "http://localhost/saw/observe/4");
     return arrayNode;
   }
