@@ -225,3 +225,7 @@ sip:
 
 
   {% endif %}
+
+gateway:
+  fileupload:
+    path: tmp
