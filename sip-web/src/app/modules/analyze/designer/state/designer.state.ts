@@ -128,19 +128,16 @@ export class DesignerState {
     /* If this is a report, and query is present, we can request data */
     if (analysis.type === 'report' && !!sipQuery.query) {
       return true;
-    } else {
-      /* Else, there should be at least one field selected in artifacts */
-      return (
-        (
-          fpFlatMap(
-            artifact => artifact.fields,
-            get(state, 'analysis.sipQuery.artifacts')
-          ) || []
-        ).length > 0
-      );
     }
-
-    return false;
+    /* Else, there should be at least one field selected in artifacts */
+    return (
+      (
+        fpFlatMap(
+          artifact => artifact.fields,
+          get(state, 'analysis.sipQuery.artifacts')
+        ) || []
+      ).length > 0
+    );
   }
 
   @Selector()
@@ -832,11 +829,7 @@ export class DesignerState {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
     const column = adapter.artifactColumns[columnIndex];
-    adapter.reverseTransform(column);
     groupAdapters[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // const updatedGroupAdapters = produce(groupAdapters, draft => {
-    //   draft[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // });
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });

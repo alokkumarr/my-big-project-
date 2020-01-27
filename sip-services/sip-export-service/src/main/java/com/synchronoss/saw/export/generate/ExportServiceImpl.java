@@ -300,11 +300,7 @@ public class ExportServiceImpl implements ExportService {
     logger.trace("recordsToSkip:{}", recordsToSkip);
     logger.trace("Column Header = " + columnHeader);
     logger.trace("Export bean header = " + StringUtils.join(exportBean.getColumnHeader(), ", "));
-
-    columnHeader.entrySet().stream().forEach(entry -> {
-        logger.trace("Key = " + entry.getKey());
-        logger.trace("Value = " + entry.getValue());
-    });
+    
     if (data == null || data.size() == 0) {
       logger.info("No data to export");
       return;

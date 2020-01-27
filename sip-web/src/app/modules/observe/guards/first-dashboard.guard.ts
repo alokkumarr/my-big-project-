@@ -7,13 +7,15 @@ import {
   PREFERENCES,
   ConfigService
 } from '../../../common/services/configuration.service';
+import { JwtService } from '../../../common/services';
 
 @Injectable()
 export class FirstDashboardGuard implements CanActivate {
   constructor(
     private router: Router,
     private observe: ObserveService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private jwt: JwtService
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot) {
@@ -45,13 +47,19 @@ export class FirstDashboardGuard implements CanActivate {
     const favouriteDashboardCategory = this.configService.getPreference(
       PREFERENCES.DEFAULT_DASHBOARD_CAT
     );
-    if (!favouriteDashboardId) {
-      this.redirectToFirstDash();
-    } else {
+    const moduleName = 'OBSERVE';
+    const canAccessFavouriteDashboard = this.jwt.hasPrivilege('ACCESS', {
+      module: moduleName,
+      subCategoryId: favouriteDashboardCategory
+    });
+
+    if (canAccessFavouriteDashboard && favouriteDashboardId) {
       this.redirectToFavoriteDashboard(
         favouriteDashboardCategory,
         favouriteDashboardId
       );
+    } else {
+      this.redirectToFirstDash();
     }
   }
 

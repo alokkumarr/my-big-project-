@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by asor0002 on 9/11/2017.
@@ -58,7 +59,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
                 try {
                     script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
-                    throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Part to SQL script is not correct: " + pathToSQLScript);
+                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, e, "Part to SQL script is not correct: " + pathToSQLScript);
                 }
             }
             logger.trace("Script to execute:\n" +  script);
@@ -99,13 +100,13 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
 
         Sql sparkSQLProps = compConf.getSql();
         if (sparkSQLProps == null) {
-            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "sql");
+            throw new XDFException(XDFReturnCode.NO_COMPONENT_DESCRIPTOR, "sql");
         }
         if (sparkSQLProps.getScript() == null || sparkSQLProps.getScript().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL does not have SQL script name.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: Spark SQL does not have SQL script name.");
         }
         if (sparkSQLProps.getScriptLocation() == null || sparkSQLProps.getScriptLocation().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
         }
         return compConf;
     }
