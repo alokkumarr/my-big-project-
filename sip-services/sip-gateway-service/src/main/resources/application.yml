@@ -204,3 +204,7 @@ sip:
   key:
     store: /Users/spau0004/Desktop/keystore/keystore.jks
     password: sip@123
+
+gateway:
+  fileupload:
+    path: tmp
