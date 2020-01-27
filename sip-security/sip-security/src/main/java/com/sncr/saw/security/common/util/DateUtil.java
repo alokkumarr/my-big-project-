@@ -23,7 +23,7 @@ public class DateUtil {
 
 	private static Logger logger = LoggerFactory.getLogger(DateUtil.class.getName());
 
-	private static final String PATTERN_MMDDYYYY = "MM/dd/yyyy";
+	public static final String PATTERN_MMDDYYYY = "MM/dd/yyyy";
 
 	public static String getDateString(Date date) {
 		return getDateString(date, PATTERN_MMDDYYYY);
