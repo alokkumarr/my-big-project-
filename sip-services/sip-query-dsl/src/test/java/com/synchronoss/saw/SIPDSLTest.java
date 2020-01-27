@@ -65,9 +65,9 @@ public class SIPDSLTest {
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     JsonNode jsonNode =
         objectMapper.readTree(new File(classLoader.getResource("response_sample.json").getPath()));
-    ElasticSearchQueryBuilder.groupByFields = new String[2];
-    ElasticSearchQueryBuilder.groupByFields[1] = "date";
-    ElasticSearchQueryBuilder.groupByFields[0] = "string";
+    String[] groupByFields = new String[2];
+    groupByFields[1] = "date";
+    groupByFields[0] = "string";
 
     ESResponseParser esResponseParser = new ESResponseParser(aggregationFields);
     List<Object> result = esResponseParser.parseData(jsonNode);

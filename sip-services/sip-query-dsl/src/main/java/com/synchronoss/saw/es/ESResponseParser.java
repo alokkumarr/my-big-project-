@@ -44,7 +44,7 @@ public class ESResponseParser {
   private List<Object> jsonNodeParser(
       JsonNode jsonNode, Map dataObj, List<Object> flatStructure, int level) {
     JsonNode childNode = jsonNode;
-    if (childNode.get(KEY) != null) {
+    if (childNode.get(KEY) != null && groupByFields != null) {
       String columnName = getColumnNames(groupByFields, level);
       if (childNode.get(KEY_AS_STRING) != null)
         dataObj.put(columnName, childNode.get(KEY_AS_STRING).textValue());
