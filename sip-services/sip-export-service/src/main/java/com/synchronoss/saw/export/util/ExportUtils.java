@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -228,5 +229,12 @@ public class ExportUtils {
 
   public static String prepareReportName(String name) {
     return name.replaceAll("[\\\\]", "");
+  }
+
+  public static LinkedCaseInsensitiveMap<Object> convert(LinkedHashMap<String, Object> linkedHashMap) {
+    LinkedCaseInsensitiveMap<Object> caseInsensitiveMap = new LinkedCaseInsensitiveMap<>();
+    caseInsensitiveMap.putAll(linkedHashMap);
+
+    return caseInsensitiveMap;
   }
 }

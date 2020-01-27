@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -62,6 +63,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -296,6 +298,13 @@ public class ExportServiceImpl implements ExportService {
     logger.trace("data size size to stream to csv report:{}", data.size());
     logger.trace("recordsTolimit:{}", recordsTolimit);
     logger.trace("recordsToSkip:{}", recordsToSkip);
+    logger.trace("Column Header = " + columnHeader);
+    logger.trace("Export bean header = " + StringUtils.join(exportBean.getColumnHeader(), ", "));
+
+    columnHeader.entrySet().stream().forEach(entry -> {
+        logger.trace("Key = " + entry.getKey());
+        logger.trace("Value = " + entry.getValue());
+    });
     if (data == null || data.size() == 0) {
       logger.info("No data to export");
       return;
@@ -307,9 +316,11 @@ public class ExportServiceImpl implements ExportService {
             line -> {
               try {
                 if (line instanceof LinkedHashMap) {
+                  logger.trace("Line = " + line);
                   String[] header = null;
                   if (exportBean.getColumnHeader() == null
                       || exportBean.getColumnHeader().length == 0) {
+                    logger.trace("Export header is null");
                     Object[] obj;
                     if (columnHeader != null && !columnHeader.isEmpty()) {
                       obj = columnHeader.keySet().toArray();
@@ -322,7 +333,13 @@ public class ExportServiceImpl implements ExportService {
                     } else {
                       header = Arrays.copyOf(obj, obj.length, String[].class);
                     }
+
+                    logger.trace("Header = " + StringUtils.join(header, ", "));
                     exportBean.setColumnHeader(header);
+
+                    logger.trace(
+                        "Export bean after setting = "
+                            + StringUtils.join(exportBean.getColumnHeader(), ", "));
                     osw.write(
                         Arrays.stream(header)
                             .map(
@@ -338,31 +355,47 @@ public class ExportServiceImpl implements ExportService {
                             .collect(Collectors.joining(",")));
                     osw.write("\n");
                     osw.write(
-                        Arrays.stream(exportBean.getColumnHeader())
-                            .map(
-                                val -> {
-                                  if (((LinkedHashMap) line).get(val) == null) {
-                                    return "null";
-                                  }
-                                  return "\"" + ((LinkedHashMap) line).get(val) + "\"";
-                                })
+                        columnHeader.entrySet().stream().map(entry -> {
+                            String key = entry.getKey();
+                            String value = entry.getValue();
+
+                            LinkedHashMap<String, Object> linkedHashMap = (LinkedHashMap) line;
+                            LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
+                                ExportUtils.convert(linkedHashMap);
+
+                            if (linkedCaseInsensitiveMap.get(key) != null) {
+                                return "\"" + linkedCaseInsensitiveMap.get(key) + "\"";
+                            } else if (linkedCaseInsensitiveMap.get(value) != null) {
+                                return "\"" + linkedCaseInsensitiveMap.get(value) + "\"";
+                            } else {
+                                return "null";
+                            }
+                        })
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
-                    logger.debug("Header for csv file: " + header);
                   } else {
                     // ideally we shouldn't be using collectors but it's a single row so it
                     // won't hamper memory consumption
+
+                    logger.trace("Export header is not null");
+
                     osw.write(
-                        Arrays.stream(exportBean.getColumnHeader())
-                            .map(
-                                val -> {
-                                  String value;
-                                  if (((LinkedHashMap) line).get(val) == null) {
-                                    return "null";
-                                  }
-                                  value = "\"" + ((LinkedHashMap) line).get(val) + "\"";
-                                  return value;
-                                })
+                        columnHeader.entrySet().stream().map(entry -> {
+                            String key = entry.getKey();
+                            String value = entry.getValue();
+
+                            LinkedHashMap<String, Object> linkedHashMap = (LinkedHashMap) line;
+                            LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
+                                ExportUtils.convert(linkedHashMap);
+
+                            if (linkedCaseInsensitiveMap.get(key) != null) {
+                                return "\"" + linkedCaseInsensitiveMap.get(key) + "\"";
+                            } else if (linkedCaseInsensitiveMap.get(value) != null) {
+                                return "\"" + linkedCaseInsensitiveMap.get(value) + "\"";
+                            } else {
+                                return "null";
+                            }
+                        })
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
                   }
