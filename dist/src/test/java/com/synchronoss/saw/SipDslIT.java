@@ -251,6 +251,7 @@ public class SipDslIT extends BaseIT {
     testDataForDl.addProperty("modifiedBy", "sipadmin@synchronoss.com");
     testDataForDl.addProperty("userId", 1);
     testDataForDl.addProperty("designerEdit", false);
+    testDataForDl.addProperty("category", "5");
     JsonObject artifact1 = new JsonObject();
     artifact1.addProperty("artifactsName", "SALES");
     sipQueryDl = new JsonObject();
