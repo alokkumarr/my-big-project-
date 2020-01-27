@@ -141,7 +141,7 @@ public class SecurityController {
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
 		logger.info("Ticket will be created..");
-		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+		logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 		Ticket ticket = new Ticket();
 		User user = null;
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
@@ -167,7 +167,7 @@ public class SecurityController {
 				}
 			} else if (isAccountLocked) {
         ticket.setValidityReason(
-            String.format("Account has been locked!!, Please try after sometime"));
+            "Account has been locked!!, Please try after sometime");
             } else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}
@@ -259,7 +259,7 @@ public class SecurityController {
 		} else {
 
 			logger.info("Ticket will be created..");
-			logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+			logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 
 			Ticket ticket = null;
 			User user = null;
@@ -303,7 +303,7 @@ public class SecurityController {
 	public LoginResponse getDefaults(@RequestBody LoginDetails loginDetails) {
 
 		logger.info("Ticket will be created..");
-		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+		logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 
 		Ticket ticket = null;
 		User user = null;
@@ -849,14 +849,13 @@ public class SecurityController {
 	@RequestMapping(value = "/auth/admin/security-groups", method = RequestMethod.GET)
 	@ResponseBody
 	public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,
-			HttpServletResponse response)
-			throws IOException {
+			HttpServletResponse response) {
 		Ticket ticket = SipCommonUtils.getTicket(request);
 		Long custId = Long.valueOf(ticket.getCustID());
 		RoleType roleType = ticket.getRoleType();
 		if (roleType != RoleType.ADMIN) {
 			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+					.setStatus(HttpStatus.UNAUTHORIZED.value());
 			return new ArrayList<>();
 		}
 		List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
@@ -963,7 +962,7 @@ public class SecurityController {
 
           if (securityGroupSysId == null) {
               responsePayload = new DskGroupPayload();
-              logger.error("Error occurred: " + dskValidity.getError());
+              logger.error("Error occurred: {}", dskValidity.getError());
               response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
               responsePayload.setValid(false);
               responsePayload.setMessage(dskValidity.getError());
@@ -1200,7 +1199,7 @@ public class SecurityController {
                     payload = dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
                     payload.setValid(true);
                 } else {
-                    logger.error("Error occurred: " + valid.getError());
+                    logger.error("Error occurred: {}", valid.getError());
                     payload = new DskGroupPayload();
 
                     payload.setValid(false);
@@ -1208,7 +1207,7 @@ public class SecurityController {
                 }
 
             } else {
-                logger.error("Error occurred: " + valid.getError());
+                logger.error("Error occurred: {}", valid.getError());
                 payload = new DskGroupPayload();
 
                 payload.setValid(false);
