@@ -25,7 +25,7 @@ module.exports = function(config) {
     colors: true,
     logLevel: config.LOG_INFO,
     browsers: ['Chrome'],
-    browserDisconnectTimeout: 12000,
+    browserDisconnectTimeout: 15000,
     browserDisconnectTolerance: 3,
     browserNoActivityTimeout: 60000,
     customLaunchers: {
