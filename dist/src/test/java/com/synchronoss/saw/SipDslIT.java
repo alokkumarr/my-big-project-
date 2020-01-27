@@ -1433,6 +1433,8 @@ public class SipDslIT extends BaseIT {
   void executeAnalysis(String analysisId) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    ObjectNode objectNode = (ObjectNode) jsonNode;
+    objectNode.put("id", analysisId);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(jsonNode)
