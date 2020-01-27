@@ -11,11 +11,8 @@ const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const SchedulePage = require('../../pages/SchedulePage');
 const dataSets = require('../../helpers/data-generation/datasets');
+const moment = require('moment');
 
-const executePage = new ExecutePage();
-const analyzePage = new AnalyzePage();
-const schedulePage = new SchedulePage();
-const reportDesignerPage = new ReportDesignerPage();
 describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
   let analysisId;
   let host;
@@ -52,36 +49,41 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
   });
 
   using(
-    testDataReader.testData['SCHEDULE-REPORT']['dlreport']['positiveTest']
-      ? testDataReader.testData['SCHEDULE-REPORT']['dlreport']['positiveTest']
+    testDataReader.testData['SCHEDULE-REPORT']['dlreport']
+      ? testDataReader.testData['SCHEDULE-REPORT']['dlreport']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         try {
+          const ReportName = `schdle ${moment().format('MMM Do h mm ss a')}`;
           const analysisType = 'table:report';
           const tables = data.tables;
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
-          const ReportName = `Schedule ${data.scheduleName}`;
           const ReportDescription = `Schedule DL Report ${new Date().toString()}`;
+          const analyzePage = new AnalyzePage();
           analyzePage.goToView('card');
 
-          //create report
+          /*create report*/
           analyzePage.clickOnAddAnalysisButton();
           analyzePage.clickOnAnalysisType(analysisType);
           analyzePage.clickOnNextButton();
           analyzePage.clickOnDataPods(dataSets.report);
           analyzePage.clickOnCreateButton();
+          const reportDesignerPage = new ReportDesignerPage();
           reportDesignerPage.clickOnReportFields(tables);
           reportDesignerPage.verifyDisplayedColumns(tables);
           reportDesignerPage.clickOnSave();
           reportDesignerPage.enterAnalysisName(ReportName);
           reportDesignerPage.enterAnalysisDescription(ReportDescription);
           reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+          const schedulePage = new SchedulePage();
           schedulePage.handleToastMessage();
 
-          //Verify Analysis Details
+          /*Verify Analysis Details*/
+          schedulePage.handleToastMessage();
           analyzePage.clickOnAnalysisLink(ReportName);
+          const executePage = new ExecutePage();
           executePage.verifyTitle(ReportName);
           analysisId = executePage.getAnalysisId();
           executePage.clickOnActionLink();
@@ -91,17 +93,17 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           executePage.closeDetails();
           schedulePage.handleToastMessage();
 
-          //Select page need to schedule report
+          /*Select page need to schedule report*/
           if(data.scheduleFrom === 'details') {
             analyzePage.clickOnAnalysisLink(ReportName);
             executePage.clickOnActionLink();
             executePage.clickSchedule();
           }else if (data.scheduleFrom === 'list'){
             analyzePage.goToView('list');
-            executePage.clickOnActionLink();
+            executePage.clickReportActionLink(ReportName);
             executePage.clickSchedule();
           }else if (data.scheduleFrom === 'card'){
-            executePage.clickOnActionLink();
+            executePage.clickReportActionLink(ReportName);
             executePage.clickSchedule();
           }
 
@@ -113,22 +115,115 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
             case 'Hourly':
               schedulePage.selectHourlyTab();
               schedulePage.clickEveryHour();
-              schedulePage.selectHours(data.scheduleHours);
+              schedulePage.selectHours(data.Hours);
               schedulePage.clickMinutes();
-              schedulePage.selectMinutes(data.scheduleMinutes);
+              schedulePage.selectMinutes(data.Minutes);
               break;
-            default:
-              console.log("There is no valid schedule Type Mentioned ");
+            case 'Daily-Everyday':
+              schedulePage.selectDailyTab();
+              schedulePage.selectEveryDayCheckbox();
+              schedulePage.clickDays();
+              schedulePage.selectDays(data.Days);
+              schedulePage.clickEveryDayHours();
+              schedulePage.selectHours(data.Hours);
+              schedulePage.clickEveryDayMinutes();
+              schedulePage.selectMinutes(data.Minutes);
+              schedulePage.clickEveryDayTimeStamp();
+              schedulePage.selectTimeStamp(data.timeStamp);
+              break;
+            case 'Daily-EveryWeekDay':
+              schedulePage.selectDailyTab();
+              schedulePage.selectEveryWeekDayCheckbox();
+              schedulePage.clickEveryWeekDayHours();
+              schedulePage.selectHours(data.Hours);
+              schedulePage.clickEveryWeekDayMinutes();
+              schedulePage.selectMinutes(data.Minutes);
+              schedulePage.clickEveryWeekDayTimeStamp();
+              schedulePage.selectTimeStamp(data.timeStamp);
+              break;
+            case 'Weekly':
+              schedulePage.selectWeeklyTab();
+              schedulePage.selectSpecificDayOfWeekCheckBox(data.dayName);
+              schedulePage.clickOnWeeklyHours();
+              schedulePage.selectHours(data.Hours);
+              schedulePage.clickOnWeeklyMinutes();
+              schedulePage.selectMinutes(data.Minutes);
+              schedulePage.clickOnWeeklyTimeStamp();
+              schedulePage.selectTimeStamp(data.timeStamp);
+              break;
+            case 'Monthly-On The Day':
+              schedulePage.selectMonthlyTab();
+              schedulePage.selectMonthlyFirstCheckbox();
+              schedulePage.clickOnMonthlyFirstRowDays();
+              schedulePage.selectMonthlyFirstRowDay(data.monthlyDay);
+              schedulePage.clickOnMonthlyFirstRowMonths();
+              schedulePage.selectMonthlyFirstRowMonth(data.monthlyMonth);
+              schedulePage.clickOnMonthlyFirstRowHours();
+              schedulePage.selectHours(data.Hours);
+              schedulePage.clickOnMonthlyFirstRowMinutes();
+              schedulePage.selectMinutes(data.Minutes);
+              schedulePage.clickOnMonthlyFirstRowTimeStamp();
+              schedulePage.selectTimeStamp(data.timeStamp);
+              break;
+            case 'Monthly-On The Weeks':
+              schedulePage.selectMonthlyTab();
+              schedulePage.selectMonthlySecondCheckbox();
+              schedulePage.clickOnMonthlySecondRowWeeks();
+              schedulePage.selectMonthlySecondRowWeeks(data.monthlyWeeks);
+              schedulePage.clickOnMonthlySecondRowDay();
+              schedulePage.selectMonthlySecondRowDay(data.monthlyDayName);
+              schedulePage.clickOnMonthlySecondRowMonth();
+              schedulePage.selectMonthlySecondRowMonth(data.everyMonth);
+              schedulePage.clickOnMonthlySecondRowHours();
+              schedulePage.selectHours(data.Hours);
+              schedulePage.clickOnMonthlySecondRowMinutes();
+              schedulePage.selectMinutes(data.Minutes);
+              schedulePage.clickOnMonthlySecondRowTimeStamp();
+              schedulePage.selectTimeStamp(data.timeStamp);
+              break;
+            case 'Yearly-Every-Month':
+              schedulePage.selectYearlyTab();
+              schedulePage.selectYearlyFirstCheckbox();
+              schedulePage.clickOnYearlyFirstRowMonth();
+              schedulePage.selectYearlyFirstRowMonth(data.yearlyMonth);
+              schedulePage.clickOnYearlyFirstRowDays();
+              schedulePage.selectYearlyFirstRowDays(data.yearlyDays);
+              schedulePage.clickOnYearlyFirstRowHours();
+              schedulePage.selectYearlyFirstRowHours(data.Hours);
+              schedulePage.clickOnYearlyFirstRowMinutes();
+              schedulePage.selectYearlyFirstRowMinutes(data.Minutes);
+              schedulePage.clickOnYearlyFirstRowTimeStamp();
+              schedulePage.selectYearlyFirstRowTimeStamp(data.timeStamp);
+              break;
+            case 'Yearly-On-Week':
+              schedulePage.selectYearlyTab();
+              schedulePage.selectYearlySecondCheckbox();
+              schedulePage.clickOnYearlySecondRowWeeks();
+              schedulePage.selectYearlySecondRowWeeks(data.yearlyWeeks);
+              schedulePage.clickOnYearlySecondRowDay();
+              schedulePage.selectYearlySecondRowDay(data.yearlyDayName);
+              schedulePage.clickOnYearlySecondRowMonth();
+              schedulePage.selectYearlySecondRowMonth(data.yearlyMonth);
+              schedulePage.clickOnYearlySecondRowHours();
+              schedulePage.selectYearlySecondRowHours(data.Hours);
+              schedulePage.clickOnYearlySecondRowMinutes();
+              schedulePage.selectYearlySecondRowMinutes(data.Minutes);
+              schedulePage.clickOnYearlySecondRowTimeStamp();
+              schedulePage.selectYearlySecondRowTimeStamp(data.timeStamp);
+              break;
           }
 
           schedulePage.setEmail(data.userEmail);
           schedulePage.scheduleReport();
 
           if(data.scheduleFrom === 'card') {
-            analyzePage.verifyScheduledTimingsInCardView(data.scheduleTimings);
+            analyzePage.goToView('card');
+            analyzePage.verifyScheduledTimingsInCardView(ReportName,data.scheduleTimings);
+            analyzePage.clickOnAnalysisLink(ReportName);
           } else if (data.scheduleFrom === 'list') {
             analyzePage.goToView('list');
-            analyzePage.verifyScheduledTimingsInListView(data.scheduleTimings);
+            analyzePage.verifyScheduledTimingsInListView(ReportName,data.scheduleTimings);
+            analyzePage.clickOnAnalysisLink(ReportName);
           } else {
             analyzePage.clickOnAnalysisLink(ReportName);
             schedulePage.handleToastMessage();
@@ -138,8 +233,8 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
             executePage.verifyScheduleDetails();
             executePage.closeActionMenu();
           }
-
-          //Delete the Report
+          /*Delete the Report*/
+          schedulePage.handleToastMessage();
           executePage.clickOnActionLink();
           executePage.clickOnDelete();
           executePage.confirmDelete();

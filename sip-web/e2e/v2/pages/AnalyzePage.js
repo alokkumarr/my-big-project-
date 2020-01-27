@@ -78,8 +78,8 @@ class AnalyzePage extends CreateAnalysisModel {
           `//a[contains(text(),'${name}')]/following::button[@e2e='action-fork-btn']`
         )
       );
-    this._scheduledTimingsInCardView = time => element(by.xpath(`//span[contains(text(),'${time}')]`));
-    this._scheduledTimingsInListView = time => element(by.xpath(`//td[contains(text(),'${time}')]`));
+    this._scheduledTimingsInListView = reportName => element(by.xpath(`//a[text()='${reportName}']/following::td[2]`));
+    this._scheduledTimingsInCardView = reportName => element(by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
   }
 
   goToView(viewName) {
@@ -194,12 +194,12 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   /*Method to verify report is scheduled*/
-  verifyScheduledTimingsInCardView(scheduledTimings) {
-    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInCardView(scheduledTimings));
+  verifyScheduledTimingsInCardView(reportName,scheduledTime) {
+    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInCardView(reportName));
     element(
-      this._scheduledTimingsInCardView(scheduledTimings).getText().then(value => {
+      this._scheduledTimingsInCardView(reportName).getText().then(value => {
         if (value) {
-          expect(value.trim()).toEqual(scheduledTimings);
+          expect(value.trim()).toEqual(scheduledTime);
         } else {
           expect(false).toBe(
             true,
@@ -211,12 +211,12 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   /*Method to verify report is scheduled*/
-  verifyScheduledTimingsInListView(scheduledTimings) {
-    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInListView(scheduledTimings));
+  verifyScheduledTimingsInListView(reportName,scheduledTime) {
+    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInListView(reportName));
     element(
-      this._scheduledTimingsInListView(scheduledTimings).getText().then(value => {
+      this._scheduledTimingsInListView(reportName).getText().then(value => {
         if (value) {
-          expect(value.trim()).toEqual(scheduledTimings);
+          expect(value.trim()).toEqual(scheduledTime);
         } else {
           expect(false).toBe(
             true,

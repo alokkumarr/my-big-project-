@@ -75,8 +75,11 @@ class ExecutePage extends ConfirmationModel {
           `(//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')])[${number}]`
         )
       );
+    this._selectReport = selectReport => element(
+        by.xpath(
+            `//a[text()="${selectReport}"]/following::button[@e2e="actions-menu-toggle"]`));
     this._navigateBackButton = element(by.css(`[fonticon="icon-arrow-left"]`));
-    this._ScheduleButton = element(by.cssContainingText('button','Schedule'));
+    this._ScheduleButton = element(by.css(`[e2e="actions-menu-selector-schedule"]`));
     this._previousversionTab = element(by.cssContainingText('span','Previous Versions'));
     this._scheduledInPreviousVersionTab = element(by.cssContainingText('td','scheduled'));
   }
@@ -100,6 +103,10 @@ class ExecutePage extends ConfirmationModel {
   clickOnActionLink() {
     commonFunctions.clickOnElement(this._actionMenuLink);
     commonFunctions.waitFor.elementToBeVisible(this._actionMenuContents);
+  }
+
+  clickReportActionLink(reportName) {
+    commonFunctions.clickOnElement(this._selectReport(reportName));
   }
   clickOnDetails() {
     commonFunctions.clickOnElement(this._actionDetailsLink);
@@ -262,6 +269,10 @@ class ExecutePage extends ConfirmationModel {
         }
       })
     );
+  }
+
+  verifyScheduleDetailsNotPresent() {
+    commonFunctions.waitFor.elementToBeNotVisible(this._scheduledInPreviousVersionTab);
   }
 
   closeDetails() {
