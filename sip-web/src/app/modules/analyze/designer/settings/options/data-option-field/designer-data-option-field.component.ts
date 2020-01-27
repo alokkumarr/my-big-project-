@@ -70,13 +70,14 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       this.analysisSubtype
     );
     this.colorPickerConfig = cloneDeep(DEFAULT_COLOR_PICKER_OPTION);
-    const presetColors = take(Default_Chart_Colors, 10);
+    const presetColors = take(Default_Chart_Colors, 12);
     set(
       this.colorPickerConfig,
       'bgColor',
       this.artifactColumn.seriesColor || '#ffffff'
     );
     set(this.colorPickerConfig, 'presetColors', presetColors);
+    set(this.colorPickerConfig, 'iscustomStyleNeeded', true);
   }
 
   onAliasChange(alias) {

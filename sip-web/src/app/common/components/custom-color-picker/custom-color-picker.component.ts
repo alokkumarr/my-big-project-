@@ -8,6 +8,8 @@ import {
   RendererStyleFlags2
 } from '@angular/core';
 
+import * as forEach from 'lodash/forEach';
+
 const OFFSET_TOP_LIMIT = 300;
 
 @Component({
@@ -39,21 +41,23 @@ export class CustomColorPickerComponent {
    * 'auto' property set in config object.
    */
   clickOnInput() {
-    if (this.elRef.nativeElement.offsetTop < OFFSET_TOP_LIMIT) {
-      const colorPickerDiv = this.elRef.nativeElement.querySelector(
-        'div.color-picker'
-      );
-      this.renderer.setStyle(
-        colorPickerDiv,
-        'top',
-        '0px',
-        RendererStyleFlags2.Important
-      );
-    }
+    if (this.config.iscustomStyleNeeded) {
+      if (this.elRef.nativeElement.offsetTop < OFFSET_TOP_LIMIT) {
+        const colorPickerDiv = this.elRef.nativeElement.querySelector(
+          'div.color-picker'
+        );
+        this.renderer.setStyle(
+          colorPickerDiv,
+          'top',
+          '0px',
+          RendererStyleFlags2.Important
+        );
+      }
 
-    this.setColorPickerStyles();
-    const div = this.elRef.nativeElement.querySelector('div.arrow');
-    this.renderer.setStyle(div, 'display', 'none');
+      this.setColorPickerStyles();
+      const div = this.elRef.nativeElement.querySelector('div.arrow');
+      this.renderer.setStyle(div, 'display', 'none');
+    }
   }
 
   setColorPickerStyles() {
@@ -61,7 +65,53 @@ export class CustomColorPickerComponent {
       'div.saturation-lightness'
     );
 
+    const presetColorDiv = this.elRef.nativeElement.querySelectorAll(
+      'div.preset-color'
+    );
+
+    forEach(presetColorDiv, div => {
+      this.renderer.setStyle(div, 'height', '12px');
+      this.renderer.setStyle(div, 'width', '12px');
+    });
+
     const typeDiv = this.elRef.nativeElement.querySelector('div.type-policy');
+    const hueDiv = this.elRef.nativeElement.querySelector('div.hue-alpha');
+    const cmykDiv = this.elRef.nativeElement.querySelector('div.cmyk-text');
+    const hslaDiv = this.elRef.nativeElement.querySelector('div.hsla-text');
+    const hexDiv = this.elRef.nativeElement.querySelector('div.hex-text');
+    const rgbaDiv = this.elRef.nativeElement.querySelector('div.rgba-text');
+
+    this.renderer.setStyle(
+      hueDiv,
+      'height',
+      '60px',
+      RendererStyleFlags2.Important
+    );
+
+    this.renderer.setStyle(
+      cmykDiv,
+      'height',
+      '55px',
+      RendererStyleFlags2.Important
+    );
+    this.renderer.setStyle(
+      hslaDiv,
+      'height',
+      '55px',
+      RendererStyleFlags2.Important
+    );
+    this.renderer.setStyle(
+      hexDiv,
+      'height',
+      '55px',
+      RendererStyleFlags2.Important
+    );
+    this.renderer.setStyle(
+      rgbaDiv,
+      'height',
+      '55px',
+      RendererStyleFlags2.Important
+    );
 
     this.renderer.setStyle(
       colorDiv,
@@ -73,7 +123,7 @@ export class CustomColorPickerComponent {
     this.renderer.setStyle(
       typeDiv,
       'top',
-      '190px',
+      '166px',
       RendererStyleFlags2.Important
     );
   }
