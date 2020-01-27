@@ -410,10 +410,24 @@ public class StorageProxyUtil {
   public static Analysis fetchAnalysisDefinition(
       String metadataAnalysisUrl, String analysisId, RestUtil restUtil) {
     String dslUrl = metadataAnalysisUrl + "/dslanalysis/" + analysisId + "?internalCall=true";
-    logger.trace("URL for request body : ", dslUrl);
+    logger.trace("URL for request body :{} ", dslUrl);
     AnalysisResponse analysisResponse =
         restUtil.restTemplate().getForObject(dslUrl, AnalysisResponse.class);
     Analysis analysis = analysisResponse.getAnalysis();
     return analysis;
+  }
+
+  /**
+   * This method will delete the Analysis with SIP-metadata-service
+   *
+   * @param metadataAnalysisUrl Sip metadata service URL
+   * @param analysisId Analysis Id
+   * @param restUtil Restful template
+   */
+  public static void deleteAnalysis(
+      String metadataAnalysisUrl, String analysisId, RestUtil restUtil) {
+    String dslUrl = metadataAnalysisUrl + "/dslanalysis/" + analysisId + "?internalCall=true";
+    logger.trace("URL for delete analysis :{} ", dslUrl);
+    restUtil.restTemplate().delete(dslUrl);
   }
 }

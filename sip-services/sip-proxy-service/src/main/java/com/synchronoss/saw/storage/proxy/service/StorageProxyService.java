@@ -53,5 +53,5 @@ public interface StorageProxyService {
 
   List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj);
 
-  Boolean updatePublishAnalysis(Analysis analysis);
+  Boolean updateAnalysis(Analysis analysis);
 }
