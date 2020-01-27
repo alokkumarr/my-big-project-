@@ -16,52 +16,52 @@ public class UserDetails {
             name = "Name",
             access = "public",
             dataType = "string")
-    public String       name;
+    private String       name;
 
     @ApiModelProperty( value = "username",
             name = "Username",
             access = "public",
             dataType = "string")
-    public String       username;
+    private String       username;
 
     @ApiModelProperty( value = "email",
             name = "Email",
             access = "public",
             dataType = "string")
-    public String       email;
+    private String       email;
 
     @ApiModelProperty( value = "organization",
             name = "Organization",
             access = "public",
             dataType = "string")
-    public String       organization;
+    private String       organization;
 
     @ApiModelProperty( value = "phone",
             name = "Phone",
             access = "public",
             dataType = "string")
-    public String       phone;
+    private String       phone;
 
     @ApiModelProperty( value = "picture",
             name = "Picture",
             notes = "URL to user picture",
             access = "public",
             dataType = "string")
-    public String       picture;
+    private String       picture;
 
     @ApiModelProperty( value = "gender",
             name = "Gender",
             access = "public",
             dataType = "string")
-    public String       gender;
+    private String       gender;
 
     @ApiModelProperty( value = "byear",
             name = "Birth Year",
             access = "public",
             dataType = "string")
-    public String       byear;
+    private String       byear;
 
-    public Map<String, String> custom;
+    private Map<String, String> custom;
 
     public UserDetails(){
 

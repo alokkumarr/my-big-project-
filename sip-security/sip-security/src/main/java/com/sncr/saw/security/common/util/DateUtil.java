@@ -20,11 +20,10 @@ import org.slf4j.LoggerFactory;
  * @date Jun 1, 2007
  */
 public class DateUtil {
-	private static Logger logger = LoggerFactory.getLogger(DateUtil.class
-			.getName());
-	public static final String PATTERN_MMDDYYYY = "MM/dd/yyyy";
-	public static final String PATTERN_YYYYMMDD = "yyyyMMdd";
-	public static final String PATTERN_DDMMYYYY_SLASH_SEPERATOR = "dd/MM/yyyy";
+
+	private static Logger logger = LoggerFactory.getLogger(DateUtil.class.getName());
+
+	private static final String PATTERN_MMDDYYYY = "MM/dd/yyyy";
 
 	public static String getDateString(Date date) {
 		return getDateString(date, PATTERN_MMDDYYYY);
@@ -92,10 +91,7 @@ public class DateUtil {
             p_No_Of_Days = (int) (p_Milli / (1000 * 60 * 60 * 24));
         }
         catch( Exception ex) {
-            logger.debug("Error getting no. of days - From Date: " + p_FROM_Date
-                            + " To Date: " + p_THRU_Date);
-
-            ex.printStackTrace();
+            logger.error("Error getting no. of days - From Date: {} To Date: {}", p_FROM_Date,  p_THRU_Date);
         }
         return p_No_Of_Days;
     }
@@ -117,9 +113,9 @@ public class DateUtil {
             pattern = PATTERN_MMDDYYYY;
         
         Date now = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(pattern);//Change your date format in here.
-        String display = sdf.format( now);
-        return display;
+        //Change your date format in here.
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        return sdf.format( now);
     }
 
 
@@ -130,19 +126,18 @@ public class DateUtil {
             date = simpleDateFormat.parse( strDate);
         }
         catch( Exception ex) {
-            ex.printStackTrace();
-            logger.debug("Unable to parse date string", ex);
+            logger.error("Unable to parse date string: {}", ex);
         }
         return date;
     }
  
     public static boolean isValidDate(String date, String pattern)
     {
-        logger.debug("Date Passed is : " + date);
+        logger.debug("Date Passed is : {}", date);
         Date newDate = getDateFromString(date,pattern);
-        logger.debug( "Date formatted to Date format: " + newDate);
+        logger.debug( "Date formatted to Date format: {}", newDate);
         String testDate = getDateString(newDate, pattern);
-        logger.debug( "Test Date : " + testDate);
+        logger.debug( "Test Date : {}", testDate);
         if(date.equals(testDate))
         {
             logger.debug( "Returning true ");
@@ -154,16 +149,4 @@ public class DateUtil {
             return false;
         }
     }
-    
-    /**
-	 * main method for dirty testing
-	 * 
-	 * @param args
-	 */
-	/*public static void main(String[] args) {
-		logger.debug("Date String: "
-				+ getDateString(new Date(), PATTERN_YYYYMMDD));
-		logger.debug("Date String: "
-				+ getDateString(new Date(), PATTERN_DDMMYYYY_SLASH_SEPERATOR));
-	}*/
 }

@@ -51,7 +51,7 @@ public class ElasticSearchQueryBuilder {
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
   private static String appenderForGTLTE = "||/M";
-  public static String[] groupByFields;
+  private static String[] groupByFields;
 
   public String buildDataQuery(SipQuery sipQuery, Integer size, SipDskAttribute dskAttribute) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
