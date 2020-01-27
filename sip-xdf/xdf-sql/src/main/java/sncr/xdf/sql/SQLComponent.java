@@ -40,7 +40,6 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
                 System.exit(r);
             }
         } catch (Exception e){
-            e.printStackTrace();
             System.exit(-1);
         }
     }

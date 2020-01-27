@@ -66,7 +66,6 @@ public class AppMonitoringInfo {
             fs.deleteOnExit(path);
         } catch(Exception e){
             logger.error(e.getMessage());
-            e.printStackTrace();
             return -1;
         }
         return 0;
@@ -83,7 +82,6 @@ public class AppMonitoringInfo {
             return fs.deleteOnExit(new Path(fullPath));
         } catch(Exception e){
             logger.error(e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }

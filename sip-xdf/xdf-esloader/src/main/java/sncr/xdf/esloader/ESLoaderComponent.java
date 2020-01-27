@@ -40,7 +40,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     private static final Logger logger = Logger.getLogger(ESLoaderComponent.class);
 
     //TODO: Remove this
-    public static String ESLOADER_DATASET;
+    private static String ESLOADER_DATASET;
 
     private Map<String, Object> esDataset;
     private String dataSetName;
@@ -61,7 +61,6 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
                 System.exit(r);
             }
         } catch (Exception e){
-            e.printStackTrace();
             System.exit(-1);
         }
     }

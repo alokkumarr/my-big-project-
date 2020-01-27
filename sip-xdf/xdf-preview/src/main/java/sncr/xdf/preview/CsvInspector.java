@@ -50,7 +50,6 @@ public class CsvInspector {
             writer.close();
         } catch(Exception e){
             System.out.println("Exception :" + e.getMessage());
-            e.printStackTrace();
         }
 
         System.out.println("Total memory : " + Runtime.getRuntime().totalMemory());

@@ -99,7 +99,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 System.exit(r);
             }
         } catch (Exception e){
-            e.printStackTrace();
             System.exit(-1);
         }
     }

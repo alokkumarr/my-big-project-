@@ -527,7 +527,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 			} 
 		} catch (Exception exception) {
 			logger.error("Exception while processing RTA message "+ exception.getMessage());
-			exception.printStackTrace();
 		}
 		return 0;
     
