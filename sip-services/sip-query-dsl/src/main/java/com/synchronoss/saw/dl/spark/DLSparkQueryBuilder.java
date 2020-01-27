@@ -132,7 +132,7 @@ public class DLSparkQueryBuilder {
 
                       String alias = field.getAlias();
                       if (!StringUtils.isBlank(alias)) {
-                        column = column + " AS " + alias;
+                        column = column + " AS `" + alias + "`";
                       }
                     }
                     selectColumns.add(column);
