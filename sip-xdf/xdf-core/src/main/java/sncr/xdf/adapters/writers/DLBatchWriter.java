@@ -83,8 +83,10 @@ public class DLBatchWriter {
             logger.debug("Clean up temp location: " + tempLocation);
             HFileOperations.deleteEnt(tempLocation);
         }
+        //TODO:: SIP-9791 Sampling is disabled then why is the dataLocation dependent on produceSample? Commenting this code & revisit this logic
 
-        String dataLocation = (produceSample)? tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR : tempLocation;
+        //String dataLocation = (produceSample)? tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR : tempLocation;
+        String dataLocation = tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR;
         logger.trace("baseWrite:dataLocation:destination :" + dataLocation);
         //TODO:: Fix BDA Meta
         String sampleLocation = tempLocation + Path.SEPARATOR + "sample";
