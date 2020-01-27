@@ -115,9 +115,9 @@ export class AggregateChooserComponent implements OnInit {
         this.analysisType
       );
     } else {
-      this.aggregates = filter(AGGREGATE_TYPES, type => {
-        return type.value === 'count' || type.value === 'distinctCount';
-      });
+      this.aggregates = filter(AGGREGATE_TYPES, type =>
+        ['count', 'distinctcount'].includes(type.value)
+      );
     }
   }
 
