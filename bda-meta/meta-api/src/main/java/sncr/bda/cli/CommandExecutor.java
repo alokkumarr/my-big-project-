@@ -1,5 +1,7 @@
 package sncr.bda.cli;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.core.file.HFileOperations;
 
 import java.io.FileNotFoundException;
@@ -9,18 +11,20 @@ import java.io.FileNotFoundException;
  */
 public class CommandExecutor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
+
     public static void main(String args[]){
         try {
             String json = args[0];
-            System.out.print("Request: " + json);
+            LOGGER.info("Request: {}", json);
             String jStr = HFileOperations.readFile(json);
             Request r = new Request(jStr);
             r.process();
-            System.out.print("Request processing completed");
+            LOGGER.info("Request processing completed");
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.error("File not found {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error occurred while processing file  {}", e.getMessage());
         }
     }
 

@@ -23,16 +23,16 @@ public class ContextMetadata implements Serializable {
 
     static final String DATE_FMT = "yyyyMMdd-HHmmss";
     static final SimpleDateFormat format = new SimpleDateFormat(DATE_FMT);
-    public String finishedTs;
-    public final String applicationID;
-    public final String transformationName = "A_transformation";
-    public String user = "A_user";
-    public String batchID;
-    public String startTs;
-    public String componentName;
-    public String transformationID;
-    public String status;
-    public String ale_id;
+    protected String finishedTs;
+    protected final String applicationID;
+    protected final String transformationName = "A_transformation";
+    protected String user = "A_user";
+    protected String batchID;
+    protected String startTs;
+    protected String componentName;
+    protected String transformationID;
+    protected String status;
+    protected String ale_id;
 
     public void setStartTs()
     {

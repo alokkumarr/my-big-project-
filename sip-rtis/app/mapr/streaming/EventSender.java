@@ -19,7 +19,7 @@ public class EventSender {
 
     private static AtomicLong msgCounter = new AtomicLong(0);
 
-    private String queue;
+    protected String queue;
     private KafkaProducer<String, Object> byteProducer;
     private KafkaProducer<String, String> stringProducer;
     private boolean isDevNullDest = false;

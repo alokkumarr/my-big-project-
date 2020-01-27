@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 import com.google.gson.JsonArray;
@@ -13,6 +12,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.ProjectStore;
@@ -24,7 +25,7 @@ import sncr.bda.services.DLMetadata;
  */
 public class ProjectAdmin extends ProjectStore{
 
-    private static final Logger logger = Logger.getLogger(ProjectAdmin.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAdmin.class);
     private final DLMetadata dlMd;
     public static final String PLP = "projectLevelParameters";
 
@@ -207,40 +208,25 @@ public class ProjectAdmin extends ProjectStore{
     public static void main(String args[]){
         try {
             if (args.length < 3 ){
-                System.err.println("prg <project name> <project desc> <prop.file>");
+                logger.error("prg <project name> <project desc> <prop.file>");
                 System.exit(1);
             }
             String root = args[0];
             String prjName = args[1];
             String prjDesc = args[2];
 
-            System.out.println(String.format("Create project with name: %s and description: %s", prjName, prjDesc));
+            logger.info("Create project with name: {} and description: {}", prjName, prjDesc);
             ProjectAdmin ps = new ProjectAdmin(root);
-/*
-            String propFile = null;
-            if (args.length == 4) propFile = args[3];
-            if (propFile == null)
-                //ps.createProject(prjName, prjDesc);
-            else{
-                String jStr = HFileOperations.readFile(propFile);
-                JsonParser jsonParser = new JsonParser();
-                JsonElement je = jsonParser.parse(jStr);
-                System.out.print("Parsed parameter file: \n\n" + je.toString() + "\n");
-                JsonObject jo = je.getAsJsonObject();
-                HashMap<String, String> hm = new HashMap<String, String>();
-                jo.entrySet().forEach( e -> hm.put(e.getKey(), e.getValue().getAsString()) );
-                ps.createProject(prjName, prjDesc, hm);
-            }
-*/
+
             JsonElement readDoc = ps.readProjectData(prjName);
-            System.out.println("Converted to document: \n\n" + readDoc.toString() + "\n");
+            logger.info("Converted to document: \n\n" + readDoc.toString() + "\n");
 
             ps.cleanupProject(prjName);
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("No file found error : {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error occurred while processing : {}", e.getMessage());
         }
     }
 
