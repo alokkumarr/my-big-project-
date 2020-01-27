@@ -12,4 +12,25 @@
     cursor: pointer;
   }
 
+  mat-error {
+    color: red;
+  }
+
+  .hint {
+    font-style: italic;
+    width: 150%;
+  }
+
+  mat-form-field {
+    margin-top: 22px;
+  }
+
+  .cust-info {
+    font-size: 15px;
+    margin-top: 18px;
+  }
+
+  .cust-label {
+    font-weight: 700;
+  }
 }
