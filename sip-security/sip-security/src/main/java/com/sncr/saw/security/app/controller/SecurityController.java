@@ -494,6 +494,7 @@ public class SecurityController {
 			rv.setValid(false);
 			rv.setValidityReason("Database error. Please contact server Administrator.");
 			rv.setError(de.getMessage());
+			logger.error("Database error. Please contact server Administrator. {}", de);
 			return rv;
 		}
 		return rv;
