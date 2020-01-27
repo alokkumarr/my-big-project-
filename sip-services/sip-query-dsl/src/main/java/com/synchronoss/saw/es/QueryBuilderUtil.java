@@ -40,12 +40,12 @@ import org.springframework.util.CollectionUtils;
 
 public class QueryBuilderUtil {
 
-  private static final String DATE_FORMAT = "yyyy-MM-dd";
-  private static final String SPACE_REGX = "\\s+";
-  private static final String EMPTY_STRING = "";
+  public static final String DATE_FORMAT = "yyyy-MM-dd";
+  public static final String SPACE_REGX = "\\s+";
+  public static final String EMPTY_STRING = "";
   private static String HITS = "hits";
   private static String _SOURCE = "_source";
-  private static Map<String, String> dateFormats = new HashMap<String, String>();
+  public static Map<String, String> dateFormats = new HashMap<String, String>();
 
   static {
     Map<String, String> formats = new HashMap<String, String>();
