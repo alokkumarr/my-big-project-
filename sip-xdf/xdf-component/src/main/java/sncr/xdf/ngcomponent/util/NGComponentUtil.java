@@ -8,7 +8,7 @@ import sncr.xdf.context.XDFReturnCodes;
 
 public class NGComponentUtil {
 
-    private static final Logger logger = Logger.getLogger(AbstractComponent.class);
+    private static final Logger logger = Logger.getLogger(NGComponentUtil.class);
 
     public static int handleErrors(AbstractComponent component, int rc, Exception e) {
         try {
