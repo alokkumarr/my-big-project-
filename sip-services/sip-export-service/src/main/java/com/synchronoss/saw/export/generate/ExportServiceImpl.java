@@ -124,6 +124,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   private static final String DEFAULT_FILE_TYPE = "csv";
+  private static final String DOUBLE_QUOTE_ESCAPE = "\"";
 
   @Override
   public ResponseEntity<DataResponse> dataToBeExportedAsync(
@@ -346,7 +347,7 @@ public class ExportServiceImpl implements ExportService {
                                               && columnHeader.get(i) != null
                                           ? columnHeader.get(i)
                                           : i;
-                                  return "\"" + colHeader + "\"";
+                                  return DOUBLE_QUOTE_ESCAPE + colHeader + DOUBLE_QUOTE_ESCAPE;
                                 })
                             .collect(Collectors.joining(",")));
                     osw.write("\n");
@@ -360,9 +361,11 @@ public class ExportServiceImpl implements ExportService {
                                 ExportUtils.convert(linkedHashMap);
 
                             if (linkedCaseInsensitiveMap.get(key) != null) {
-                                return "\"" + linkedCaseInsensitiveMap.get(key) + "\"";
+                                return DOUBLE_QUOTE_ESCAPE
+                                    + linkedCaseInsensitiveMap.get(key) + DOUBLE_QUOTE_ESCAPE;
                             } else if (linkedCaseInsensitiveMap.get(value) != null) {
-                                return "\"" + linkedCaseInsensitiveMap.get(value) + "\"";
+                                return DOUBLE_QUOTE_ESCAPE
+                                    + linkedCaseInsensitiveMap.get(value) + DOUBLE_QUOTE_ESCAPE;
                             } else {
                                 return "null";
                             }
@@ -385,9 +388,11 @@ public class ExportServiceImpl implements ExportService {
                                 ExportUtils.convert(linkedHashMap);
 
                             if (linkedCaseInsensitiveMap.get(key) != null) {
-                                return "\"" + linkedCaseInsensitiveMap.get(key) + "\"";
+                                return DOUBLE_QUOTE_ESCAPE
+                                    + linkedCaseInsensitiveMap.get(key) + DOUBLE_QUOTE_ESCAPE;
                             } else if (linkedCaseInsensitiveMap.get(value) != null) {
-                                return "\"" + linkedCaseInsensitiveMap.get(value) + "\"";
+                                return DOUBLE_QUOTE_ESCAPE
+                                    + linkedCaseInsensitiveMap.get(value) + DOUBLE_QUOTE_ESCAPE;
                             } else {
                                 return "null";
                             }
