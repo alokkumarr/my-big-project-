@@ -15,12 +15,15 @@ export class BrandingLogoComponent implements OnInit {
 
   @Input() page: any;
   public brandLogoBinary = '';
+  public displayBrandImage: boolean = false;
 
   ngOnInit() {
+    this.displayBrandImage = false;
     this._brandingService.getBrandingDetails().subscribe(data => {
       this.brandLogoBinary = isEmpty(data.brandImage)  ? '' : 'data:image/gif;base64,' + data.brandImage;
       const brandingColor = isEmpty(data.brandColor) ? DEFAULT_BRANDING_COLOR : data.brandColor;
       this._brandingService.savePrimaryColor(brandingColor);
+      this.displayBrandImage = true;
     });
   }
 }
