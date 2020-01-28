@@ -78,7 +78,7 @@ public abstract class AbstractComponent implements WithContext{
     protected boolean isRealTime = false;
     protected static boolean persistMode = true;
     protected DLBatchReader reader;
-    protected Map<Integer, String> errors = new HashMap<>();
+    private Map<Integer, String> errors = new HashMap<>();
 
     /**
      * The constructor is to be used when component is running with different services than NGContext has.
@@ -95,7 +95,6 @@ public abstract class AbstractComponent implements WithContext{
         }
     }
 
-    
     /**
      * The constructor is to be used when component is running with different services than NGContext has.
      * ngctx should not be null & Dataset cannot be null
@@ -143,6 +142,14 @@ public abstract class AbstractComponent implements WithContext{
 
     public String getError(){
         return error;
+    }
+
+    public Map<Integer, String> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(Map<Integer, String> errors) {
+        this.errors = errors;
     }
 
     /**
@@ -759,7 +766,7 @@ public abstract class AbstractComponent implements WithContext{
      * @param ret
      * @return
      */
-    protected void finalize(int ret)  {
+    public void finalize(int ret)  {
         logger.info("######## AbstractComponent() : finalize() ");
         final String status = ret == 0 ? "SUCCESS" : "FAILED";
         final AtomicInteger xdfReturnCode = new AtomicInteger(ret);
@@ -862,48 +869,6 @@ public abstract class AbstractComponent implements WithContext{
         public AuditLogService als;
 
         public TransformationService transformationMD;
-    }
-
-    public static int handleErrors(AbstractComponent component, int rc, Exception e) {
-        try {
-            logger.debug("handleErrors Arg rc :" + rc);
-            if(rc != 0 && e == null && !XDFReturnCodes.getMap().containsKey(rc)){
-                logger.error("Non XDF Return Code :" + rc);
-                e = new XDFException(XDFReturnCode.INTERNAL_ERROR);
-            }
-            if(e != null) {
-                logger.error("Exception Occurred : ", e);
-                String description = e.getMessage();
-                if (e instanceof XDFException) {
-                    rc = ((XDFException)e).getReturnCode().getCode();
-                } else {
-                    rc = XDFReturnCode.INTERNAL_ERROR.getCode();
-                }
-                if(component != null){
-                    component.errors.put(rc, description);
-                    try {
-                        component.finalize(rc);
-                    } catch (Exception ex) {
-                        if (ex instanceof XDFException) {
-                            rc = ((XDFException)ex).getReturnCode().getCode();
-                        } else {
-                            rc = XDFReturnCode.INTERNAL_ERROR.getCode();
-                        }
-                    }
-                }
-                logger.debug("Error Return Code :" + rc);
-            }else{
-                rc=0;
-            }
-        }catch (Exception ex) {
-            if (ex instanceof XDFException) {
-                rc = ((XDFException)ex).getReturnCode().getCode();
-            }else {
-                rc = XDFReturnCode.INTERNAL_ERROR.getCode();
-            }
-        }
-        logger.info("Component Return Code :" + rc);
-        return rc;
     }
 
     public void validateOutputDSCounts(long inputDSCount){

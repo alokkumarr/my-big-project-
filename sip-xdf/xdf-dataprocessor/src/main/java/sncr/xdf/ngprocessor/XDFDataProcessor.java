@@ -25,6 +25,7 @@ import sncr.xdf.parser.NGParser;
 import sncr.xdf.rtps.driver.NGRTPSComponent;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 @SuppressWarnings("rawtypes")
 public class XDFDataProcessor  extends AbstractComponent {
@@ -246,7 +247,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processRTPS() Exception is : ",ex);
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
 	}
 
@@ -351,7 +352,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
     }
 
@@ -427,7 +428,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
     }
 
@@ -510,7 +511,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
     }
 
@@ -578,7 +579,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
     }
 

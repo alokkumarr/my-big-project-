@@ -34,6 +34,7 @@ import sncr.xdf.ngcomponent.AbstractComponent;
     import java.util.List;
     import java.util.Map;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
     import static java.util.stream.Collectors.toList;
 
@@ -124,7 +125,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         System.exit(rc);
     }
 
