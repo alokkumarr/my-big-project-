@@ -43,7 +43,7 @@ public class SipBisHealthIndicator implements HealthIndicator, InitializingBean 
 
   @Override
   public Health health() {
-    log.debug("Checking health for uri :" + bisSchedulerUrl + "/actuator/health");
+    log.debug(String.format("Checking health for uri : %s/actuator/health",bisSchedulerUrl));
     String uri = bisSchedulerUrl + "/actuator/health";
     
     String error = null;
@@ -71,9 +71,7 @@ public class SipBisHealthIndicator implements HealthIndicator, InitializingBean 
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    log.info("trustStore: " + trustStore);
-    log.info("trustStorePassword: " + trustStorePassword);
-    log.info("keyStore: " + keyStore);
-    log.info("keyStorePassword: " + keyStorePassword);
+    log.info("trustStore: {}", trustStore);
+    log.info("keyStore: {}", keyStore);
   }
 }

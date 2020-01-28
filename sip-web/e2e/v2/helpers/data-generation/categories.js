@@ -31,6 +31,13 @@ const categories = {
     id: nullValue,
     type: nullValue,
     code: nullValue
+  },
+  alertDefault: {
+    name: 'Alerts',
+    description: description,
+    id: 57,
+    type: 'PARENT_SYNCHRONOSS1ALERT12',
+    code: 'SYNCHRONOSS1ALERT12'
   }
 };
 
