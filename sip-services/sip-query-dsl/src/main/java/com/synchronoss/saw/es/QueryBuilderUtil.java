@@ -44,7 +44,7 @@ public class QueryBuilderUtil {
   public static final String EMPTY_STRING = "";
   private static String HITS = "hits";
   private static String _SOURCE = "_source";
-  protected static Map<String, String> dateFormats = new HashMap<String, String>();
+  public static Map<String, String> dateFormats = new HashMap<String, String>();
 
   static {
     Map<String, String> formats = new HashMap<String, String>();
