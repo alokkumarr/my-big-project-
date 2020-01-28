@@ -97,7 +97,7 @@ public class DLBatchWriter {
         // This can be an empty collection in case FLAT partition
         // is requested or key definitions omited in configuration file
 
-        DS.show(4);
+//        DS.show(4);
 
         scala.collection.immutable.Seq<String> partitionKeysList = null;
         if (keys != null)
