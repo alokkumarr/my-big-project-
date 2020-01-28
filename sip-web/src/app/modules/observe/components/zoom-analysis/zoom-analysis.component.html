@@ -3,6 +3,7 @@
     <div
       fxLayout="row"
       fxLayoutAlign="start center"
+      fxLayoutGap="5px"
       *ngIf="(filterCount$ | async) > 0"
     >
       <div fxLayout="column">
@@ -17,7 +18,7 @@
           *ngFor="let filter of filters$ | async; let i = index"
           style="padding-bottom: 1px;padding-top: 3px;"
         >
-          {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
+          {{ getDisplayName(filter) }}
         </mat-chip>
       </mat-chip-list>
     </div>

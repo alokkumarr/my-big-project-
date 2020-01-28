@@ -1,6 +1,7 @@
 package com.synchronoss.saw.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.synchronoss.saw.constants.CommonQueryConstants;
 import com.synchronoss.saw.model.Field;
 
 import java.util.Arrays;
@@ -161,6 +162,11 @@ public class ESResponseParser {
     while (keys.hasNext()) {
       String key = keys.next();
       if (key.contains(GROUP_BY_FIELD)) {
+        return key;
+      }
+      /*added as part of ticket-5970 to support aggregation filter when
+      selecting all field as aggregate*/
+      else if (key.contains(CommonQueryConstants.ALL_MATCHING_DOCS)) {
         return key;
       }
     }
