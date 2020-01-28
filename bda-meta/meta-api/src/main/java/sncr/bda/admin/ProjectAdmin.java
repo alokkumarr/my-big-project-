@@ -25,7 +25,7 @@ import sncr.bda.services.DLMetadata;
  */
 public class ProjectAdmin extends ProjectStore{
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectAdmin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectAdmin.class);
     private final DLMetadata dlMd;
     public static final String PLP = "projectLevelParameters";
 
@@ -87,14 +87,14 @@ public class ProjectAdmin extends ProjectStore{
         String dsTablename = getRoot() + Path.SEPARATOR + METASTORE + Path.SEPARATOR + DataSetStore.TABLE_NAME;
         DataSetStore dss = new DataSetStore(getRoot());
         List<Document> datasets = searchAsList(dsTablename, qc);
-        logger.debug("Found # datasets: " + datasets.size());
+        LOGGER.debug("Found # datasets: " + datasets.size());
         datasets.forEach( d -> {
             String id = d.getIdString();
             try {
                 JsonElement dset = dss.read(id);
                 JsonObject jo = dset.getAsJsonObject();
                 JsonPrimitive pl = jo.getAsJsonObject("system").getAsJsonPrimitive("physicalLocation");
-                logger.trace("Process dataset: " + id + " DS descriptor: " + jo.toString() + " physical location = " + ((pl != null)? pl.toString():"n/a"));
+                LOGGER.trace("Process dataset: " + id + " DS descriptor: " + jo.toString() + " physical location = " + ((pl != null)? pl.toString():"n/a"));
                 if (pl != null) {
                     String normPL = pl.toString().replace("\"", "");
                     normPL = normPL.substring(0, normPL.length() - PREDEF_DATA_DIR.length());
@@ -102,7 +102,7 @@ public class ProjectAdmin extends ProjectStore{
                 }
                 dss.delete(id);
             } catch (Exception e) {
-                logger.error("Could not remove datasets from Metadata Store: " + id, e);
+                LOGGER.error("Could not remove datasets from Metadata Store: " + id, e);
             }}
         );
 
@@ -116,7 +116,7 @@ public class ProjectAdmin extends ProjectStore{
             try {
                 ts.delete(id);
             } catch (Exception e) {
-                logger.error("Could not remove transformation from Metadata Store: " + id, e);
+                LOGGER.error("Could not remove transformation from Metadata Store: " + id, e);
             }}
         );
         prj.delete(PLP);
@@ -132,7 +132,7 @@ public class ProjectAdmin extends ProjectStore{
         plpJA.forEach( el -> {
             JsonObject jo = el.getAsJsonObject();
             if (!jo.has("name") || !jo.has("value")) {
-                logger.error("Invalid parameter entry in parameter set. Skip it");
+                LOGGER.error("Invalid parameter entry in parameter set. Skip it");
             }
             else{
                 nParams.put(jo.get("name").getAsString(), jo.get("value").getAsString());
@@ -172,7 +172,7 @@ public class ProjectAdmin extends ProjectStore{
             {
                 JsonObject plpJo = plpel.getAsJsonObject();
                 if (!plpJo.has("name")){
-                  logger.error("Incorrect parameter entry, ignore it");
+                    LOGGER.error("Incorrect parameter entry, ignore it");
                 }
                 else{
                     boolean found = false;
@@ -201,32 +201,32 @@ public class ProjectAdmin extends ProjectStore{
     }
     
     public Map<String, Document> search(QueryCondition qc) throws Exception {
-      logger.trace("Search query on search " + qc.toString());
+      LOGGER.trace("Search query on search " + qc.toString());
       return searchAsMap(table, qc);
   }
 
     public static void main(String args[]){
         try {
             if (args.length < 3 ){
-                logger.error("prg <project name> <project desc> <prop.file>");
+                LOGGER.error("prg <project name> <project desc> <prop.file>");
                 System.exit(1);
             }
             String root = args[0];
             String prjName = args[1];
             String prjDesc = args[2];
 
-            logger.info("Create project with name: {} and description: {}", prjName, prjDesc);
+            LOGGER.info("Create project with name: {} and description: {}", prjName, prjDesc);
             ProjectAdmin ps = new ProjectAdmin(root);
 
             JsonElement readDoc = ps.readProjectData(prjName);
-            logger.info("Converted to document: \n\n" + readDoc.toString() + "\n");
+            LOGGER.info("Converted to document: \n\n" + readDoc.toString() + "\n");
 
             ps.cleanupProject(prjName);
 
         } catch (FileNotFoundException e) {
-            logger.error("No file found error : {}", e.getMessage());
+            LOGGER.error("No file found error : {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Error occurred while processing : {}", e.getMessage());
+            LOGGER.error("Error occurred while processing : {}", e.getMessage());
         }
     }
 

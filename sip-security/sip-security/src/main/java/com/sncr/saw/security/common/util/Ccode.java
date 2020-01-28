@@ -17,7 +17,7 @@ public class Ccode {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Ccode.class);
 
-    final static byte[] initVector = "RandomInitVector".getBytes();
+    static final byte[] initVector = "RandomInitVector".getBytes();
 
     // Random bytes
     final static byte[] key = {
