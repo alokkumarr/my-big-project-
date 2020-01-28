@@ -133,7 +133,6 @@ public class WorkbenchExecutorQueue {
 	    logger.debug("Writing data to stream " + record);
 	    producer.send(record);
 	    producer.flush();
-	    producer.close();
 	    logger.debug("######## Sent record content to kafka Queue ######" );
 	    return true;
 	  }

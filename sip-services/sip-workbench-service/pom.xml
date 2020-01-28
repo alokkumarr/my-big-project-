@@ -26,14 +26,17 @@
 		<wire.mock>2.7.1</wire.mock>
 		<jjwt.version>0.7.0</jjwt.version>
 		<spring.swagger>2.8.0</spring.swagger>
+		<spark.version>2.3.2</spark.version>
 		<guava>19.0</guava>
 		<flyway.db>5.2.0</flyway.db>
 		<mariadb>2.3.0</mariadb>
 		<snotify>1.1</snotify>
 		<common.io>2.6</common.io>
 		<mapr.core.version>6.1.0</mapr.core.version>
-		<spark-version>2.3.2</spark-version>
+		<scala.major.version>2.11</scala.major.version>
+		   <jackson.core.version>2.9.6</jackson.core.version>
 		<mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
+		 <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 	</properties>
 	<repositories>
 		<repository>
@@ -65,12 +68,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<exclusions>
-      <exclusion>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-logging</artifactId>
-      </exclusion>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
 
-   </exclusions>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -119,17 +122,6 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.mapr.streams</groupId>
-			<artifactId>mapr-streams</artifactId>
-			<version>${mapr.core.version}-mapr</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka-clients</artifactId>
-			<version>1.0.1-mapr-1803</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
@@ -188,10 +180,7 @@
 			<artifactId>xdf</artifactId>
 			<version>${revision}</version>
 			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
+
 				<!--Exclude the xdf-esloader lib to resolve conflict with hadoop-es lib. -->
 				<exclusion>
 					<groupId>com.synchronoss.bda</groupId>
@@ -207,12 +196,7 @@
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>xdf-component</artifactId>
 			<version>${revision}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
+
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
@@ -223,34 +207,80 @@
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>xdf-sql</artifactId>
 			<version>${revision}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
+
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>xdf-parser</artifactId>
 			<version>${revision}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
+
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_${scala.major.version}</artifactId>
+			<version>2.3.2.0-mapr-1901</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_2.11</artifactId>
-			<version>${spark-version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>spark-sql_${scala.major.version}</artifactId>
+			<version>2.3.2.0-mapr-1901</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mapr.hadoop</groupId>
+			<artifactId>maprfs</artifactId>
+			<version>${mapr.core.version}-mapr</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-scala_2.11</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe</groupId>
+			<artifactId>config</artifactId>
+			<version>1.3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>meta-api</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mapr.streams</groupId>
+			<artifactId>mapr-streams</artifactId>
+			<version>${mapr.core.version}-mapr</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+			<version>1.0.1-mapr-1803</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json4s</groupId>
+			<artifactId>json4s-native_${scala.major.version}</artifactId>
+			<version>${Json4s.latestVersion}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>info.faljse</groupId>
+			<artifactId>SDNotify</artifactId>
+			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -277,6 +307,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.0</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>

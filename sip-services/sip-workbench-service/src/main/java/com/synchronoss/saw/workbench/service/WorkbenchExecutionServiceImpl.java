@@ -124,7 +124,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     log.debug("XDF Configuration = " + cfg);
     
     
-    createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+    //createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
     
     
     log.info("execute name = " + name);

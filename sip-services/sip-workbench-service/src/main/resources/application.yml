@@ -58,5 +58,33 @@ workbench:
         preview-limit: 100
         livy-uri: "http://sip-mapr:8998/"
         storage-uri: ${connector}://localhost:9800
+        app-name: SIP-workbench
 metastore:
     base: "maprfs:///var/sip"
+    
+spark:
+  master: yarn
+  executor.memory: "2G"
+  cores.max: "2"
+  executor.cores: "2"
+  driver.memory: "2G"
+  hadoop.yarn.resourcemanager.hostname: "mapr-rd612.eng-sip.dev01.us-west.sncrcloud.net"
+  yarn.jars: "/opt/mapr/spark/spark-2.3.2/jars"
+  yarn.archive: "/opt/bda/sip-executor/spark.zip"
+  executor.instances: "1"
+  driver.port: 
+  driver.host: 
+  driver.bindAddress: 
+  driver.blockManager.port: 
+  sql.inMemoryColumnarStorage.compressed: true
+  sql.inMemoryColumnarStorage.batchSize: 20 
+  sql.caseSensitive: false
+  ui.enabled: false
+  
+workbench-executor: 
+  jar-location: /opt/bda/saw-workbench-service/lib
+  
+  
+  
+  
+ 

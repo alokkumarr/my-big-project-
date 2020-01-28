@@ -33,7 +33,7 @@ public class SAWWorkBenchServiceApplication {
 
   }
 
-  /*@Bean
+  @Bean
   public TomcatServletWebServerFactory tomcatEmbedded() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
       tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
@@ -42,7 +42,7 @@ public class SAWWorkBenchServiceApplication {
           }
       });
       return tomcat;
-  }*/
+  }
 
   @EventListener
   public void onApplicationEvent(ApplicationReadyEvent event) {

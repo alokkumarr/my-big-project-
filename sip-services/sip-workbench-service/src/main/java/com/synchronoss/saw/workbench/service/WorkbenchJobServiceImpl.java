@@ -35,7 +35,8 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 
 	  private static final Logger logger = LoggerFactory.getLogger(WorkbenchJobServiceImpl.class);
 	  
-	
+	  @Autowired
+		JavaSparkContext jsCtx;
 	  
 	@Override
 	public Object executeJob(String root, String cfg, String project, String component, String batchID) {
@@ -78,7 +79,8 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 			    NGContext workBenchcontext = contextServices.getNgctx();
 
 			    workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-			    JavaSparkContext jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(this.initSpark().setMaster("local") ));
+			   // JavaSparkContext jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(this.initSpark().setMaster("local") ));
+			    jsCtx.setLogLevel("DEBUG");
 			    try {
 					if (!aac.initComponent(jsCtx)) {
 					  logger.error("Could not initialize component");
@@ -113,62 +115,6 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	    }
 	  }
 	
-	public static SparkConf initSpark(){
-		
-		/*YarnLocalCluster yarnLocalCluster = new YarnLocalCluster.Builder()
-			    .setNumNodeManagers(1)
-			    .setNumLocalDirs(Integer.parseInt("1"))
-			    .setNumLogDirs(Integer.parseInt("1"))
-			    .setResourceManagerAddress("localhost:37001")
-			    .setResourceManagerHostname("localhost")
-			    .setResourceManagerSchedulerAddress("localhost:37002")
-			    .setResourceManagerResourceTrackerAddress("localhost:37003")
-			    .setResourceManagerWebappAddress("localhost:37004")
-			    .setUseInJvmContainerExecutor(false)
-			    .setConfig(new org.apache.hadoop.conf.Configuration()).build();
-			   
-			try {
-				yarnLocalCluster.start();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-		
-		SparkConf sparkConf = new SparkConf();
-		
-			   
-			    sparkConf.setAppName("sip-workbench-executor");
-			    sparkConf.set("spark.master", "local");
-			   
-			    sparkConf.set("spark.executor.memory", "4G");
-			    sparkConf.set("spark.cores.max", "2");
-			    // Added to support for Spark core setting with YARN, it will be handled later on with additional
-			    // spark parameter. Currently being handled using existing parameter configuration cores.max.
-			    sparkConf.set("spark.executor.cores", "2");
-			    sparkConf.set("driver.memory", "2G");
-			    sparkConf.set("spark.hadoop.fs.defaultFS", "maprfs:///");
-			    sparkConf.set("spark.hadoop.yarn.resourcemanager.hostname", "mapr-rd612.eng-sip.dev01.us-west.sncrcloud.net");
-			    		//"mapr-rd612.eng-sip.dev01.us-west.sncrcloud.net");
-			    /*setIfPathExists(sparkConf, "", cfg, "yarn.resourcemanager.hostname");
-			    setIfPathExists(sparkConf, "spark.yarn.jars", cfg, "yarn.spark.jars");
-			    setIfPathExists(sparkConf, "spark.yarn.archive", cfg, "yarn.spark.zips");
-			    setIfPathExists(sparkConf, "spark.executor.instances", cfg, "");
-			    setIfPathExists(sparkConf, "spark.driver.port", cfg, "driver.port");
-			    setIfPathExists(sparkConf, "spark.driver.host", cfg, "driver.host");
-			    setIfPathExists(sparkConf, "spark.driver.bindAddress", cfg, "driver.bindAddress");
-			    setIfPathExists(sparkConf, "spark.driver.blockManager.port", cfg, "driver.blockManager.port");*/
-			    
-			    sparkConf.set("spark.sql.inMemoryColumnarStorage.compressed", "true");
-			    //sparkConf.set("spark.sql.inMemoryColumnarStorage.batchSize", "");
-			    sparkConf.set("spark.sql.caseSensitive", "false");
-			    /* Disable the UI to avoid port collision with multiple executors */
-			    sparkConf.set("spark.ui.enabled", "false");
-			    
-			    return sparkConf;
-			   
-			    
-		
-	}
 
 	@Override
 	public ObjectNode createPreview(String id, String location, String previewLimit, String previewsTablePath, String project, String name) {
@@ -239,10 +185,7 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	}
 	
 	
-	public static void main(String args[]) {
-		JavaSparkContext jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(initSpark()));
-		System.out.print(jsCtx);
-	}
+	
 	
 
 }

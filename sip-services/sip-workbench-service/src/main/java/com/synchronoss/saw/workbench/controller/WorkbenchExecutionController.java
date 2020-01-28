@@ -39,7 +39,7 @@ import sncr.xdf.component.Component;
 @RestController
 @RequestMapping("/internal/workbench/projects/")
 public class WorkbenchExecutionController {
-  private final Logger log = LoggerFactory.getLogger(getClass().getName());
+  private static final Logger logger = LoggerFactory.getLogger(WorkbenchExecutionController.class);
 
   @Value("${workbench.project-root}")
   @NotNull
@@ -70,9 +70,9 @@ public class WorkbenchExecutionController {
       @RequestBody ObjectNode body,
       @RequestHeader("Authorization") String authToken)
       throws JsonProcessingException, Exception {
-    log.info("Create dataset: body = {}", body);
-    log.debug("Create dataset: project = {}", project);
-    //log.debug("Auth token = {}", authToken);
+    logger.info("Create dataset: body = {}", body);
+   logger .debug("Create dataset: project = {}", project);
+    //.debug("Auth token = {}", authToken);
     if (authToken.startsWith("Bearer")) {
        authToken = authToken.substring("Bearer ".length());
     }
@@ -83,7 +83,7 @@ public class WorkbenchExecutionController {
 
 //     Ticket ticket = TokenParser.retrieveTicket(authToken);
 
-  //  log.info(ticket.getUserFullName());
+  //  .info(ticket.getUserFullName());
 
     String component = body.path("component").asText();
     JsonNode configNode = body.path("configuration");
@@ -148,7 +148,7 @@ public class WorkbenchExecutionController {
   @ResponseStatus(HttpStatus.OK)
   public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
                           @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
-    log.debug("Create dataset preview: project = {}", project);
+   logger .debug("Create dataset preview: project = {}", project);
     /* Extract dataset name which is to be previewed */
     String name = body.path("name").asText();
     /* Start asynchronous preview creation */
@@ -169,7 +169,7 @@ public class WorkbenchExecutionController {
   public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
                             @PathVariable(name = "previewId", required = true) String previewId)
       throws JsonProcessingException, Exception {
-    log.debug("Get dataset preview: project = {}", project);
+    logger.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
     ObjectNode body = workbenchExecutionService.getPreview(previewId);
     /*
@@ -195,7 +195,7 @@ public class WorkbenchExecutionController {
   public String generatePath(@PathVariable(name = "project", required = true) String project,
                             @PathVariable(name = "name", required = true) String name, @RequestParam Map<String, String> queryMap)
       throws JsonProcessingException, Exception {
-    log.debug("Get dataset preview: project = {}", project);
+    logger.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
     String catalog = queryMap.get("catalog")!=null ? queryMap.get("catalog") : MetadataBase.DEFAULT_CATALOG ;
     String body = workbenchExecutionService.createDatasetDirectory(project, catalog, name);

@@ -5,6 +5,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Column;
@@ -567,12 +568,31 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private int parseSingleFile(Path file, Path destDir){
         logger.trace("Parsing " + file + " to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
-
-        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-                .textFile(file.toString(), 1);
-
-
-        JavaRDD<Row> parseRdd = rdd
+        JavaRDD<String> rdd = null;
+        logger.debug("##### Reading the file ..."+ file);
+        if(this.ctx.extSparkCtx) {
+        	logger.debug("##### Using existing JavaSparkContext ...");
+        	//this.ctx.javaSparkContext.setLogLevel("DEBUG");
+        	rdd = this.ctx.javaSparkContext
+                    .textFile(file.toString(), 1);
+        } else {
+        	logger.debug("##### Crating new JavaSparkContext ...");
+        	rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
+                    .textFile(file.toString(), 1);
+        }
+        
+        logger.debug("##### Reding Completed!! ...");
+        logger.debug("###RDD Size###"+ rdd.count());
+        JavaPairRDD<String, Long> lineNumbersRDD = rdd.zipWithIndex();
+        logger.debug("##### Line numbers Completed!! ...");
+        JavaPairRDD<String, Long> filtered = lineNumbersRDD.filter(new HeaderFilter(headerSize));
+        logger.debug("##### FilteringCompleted!! ...");
+        JavaRDD<String> rows = filtered.keys();
+        logger.debug("##### Line numbers removed!! ...");
+        JavaRDD<Row> parseRdd = rows.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
+                quoteEscapeChar, '\'', recCounter, errCounter));
+        logger.debug("##### Convert to rows completed!! ...");
+      /*  JavaRDD<Row> parseRdd = rdd
                 // Add line numbers
                 .zipWithIndex()
                 // Filter out header based on line number
@@ -580,9 +600,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 // Get rid of file numbers
                 .keys()
                 .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                    quoteEscapeChar, '\'', recCounter, errCounter));
+                    quoteEscapeChar, '\'', recCounter, errCounter));*/
 
-        
+        logger.debug("##### Parsed RDD!! ...");
      // Create output dataset
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
         logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
