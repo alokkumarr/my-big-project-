@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -30,4 +31,6 @@ public interface JobService<T> {
 
 	String getJobState(ScheduleKeys scheduleKeys);
 	boolean stopJob(ScheduleKeys scheduleKeys);
+
+	Analysis getAnalysis(String analysisId);
 }

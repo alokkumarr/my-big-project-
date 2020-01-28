@@ -5,6 +5,7 @@ import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -25,13 +26,14 @@ public class XlsxExporter implements IFileExporter {
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporter.class);
   private static final String DATA_SPLITER = "|||";
   private static final String GENERAL = "General";
+  private static final Long  startingRowNumber = 1l;
 
   @Override
   public Workbook getWorkBook(ExportBean exportBean, List<Object> recordRowList) {
     Workbook workBook = new XSSFWorkbook();
     String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
     XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
-    addxlsxRows(exportBean, workBook, sheet, recordRowList);
+    addxlsxRows(exportBean, workBook, sheet, recordRowList, startingRowNumber);
     return workBook;
   }
 
@@ -42,16 +44,18 @@ public class XlsxExporter implements IFileExporter {
    * @param workBook
    * @param workSheet
    * @param recordRowList
+   * @param rowCount
    */
-  private void addxlsxRows(
-      ExportBean exportBean, Workbook workBook, XSSFSheet workSheet, List<Object> recordRowList) {
+  public void addxlsxRows(
+      ExportBean exportBean, Workbook workBook, XSSFSheet workSheet, List<Object> recordRowList,
+      Long rowCount) {
     logger.debug(this.getClass().getName() + " addxlsxRows starts");
 
     // Create instance here to optimize apache POI cell style
     CellStyle cellStyle = workBook.createCellStyle();
     String[] header = null;
     for (int rowNum = 0; rowNum < recordRowList.size(); rowNum++) {
-      XSSFRow excelRow = workSheet.createRow(rowNum + 1);
+      XSSFRow excelRow = workSheet.createRow(rowCount.intValue()+rowNum);
       Object data = recordRowList.get(rowNum);
       if (data instanceof LinkedHashMap) {
         if (exportBean.getColumnHeader() == null || exportBean.getColumnHeader().length == 0) {
@@ -60,6 +64,7 @@ public class XlsxExporter implements IFileExporter {
           exportBean.setColumnHeader(header);
           addHeaderRow(exportBean, workBook, workSheet, null);
         }
+        header=exportBean.getColumnHeader();
         buildXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
       }
     }
@@ -94,8 +99,15 @@ public class XlsxExporter implements IFileExporter {
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
       cellStyle.setAlignment(HorizontalAlignment.LEFT);
-      cell.setCellStyle(cellStyle);
-      cell.setCellValue(value);
+      if(NumberUtils.isNumber(value)){
+        cell.setCellType(CellType.NUMERIC);
+        cell.setCellStyle(cellStyle);
+        Double d = new Double(value);
+        cell.setCellValue(d);
+      } else {
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(value);
+      }
     } else if (specialType != null
         && (specialType.equalsIgnoreCase(DataField.Type.FLOAT.value())
         || specialType.equalsIgnoreCase(DataField.Type.DOUBLE.value()))) {

@@ -68,9 +68,10 @@
       (change)="createUserPasswordChange($event)"
     ></password-toggle>
     <mat-error e2e="error-msg" *ngIf="passwordError" style="width: 100%" i18n>
-      <pre style="white-space: pre-line; font-family: inherit; margin: 0">
-        {{ passwordError }}
-      </pre>
+      <pre
+        style="white-space: pre-line; font-family: inherit; margin: 0"
+        [innerHtml]="passwordError"
+      ></pre>
       <br />
     </mat-error>
 

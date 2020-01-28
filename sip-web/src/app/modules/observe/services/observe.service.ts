@@ -137,6 +137,12 @@ export class ObserveService {
     });
   }
 
+  readAnalysesPrivileges(analysisIds: Array<string>): Promise<any> {
+    return this.http
+      .post(`${this.api}/dslanalysis/analysisPrivileges`, analysisIds)
+      .toPromise();
+  }
+
   getDashboard(
     entityId: string,
     options: { headers?: HttpHeaders } = {}

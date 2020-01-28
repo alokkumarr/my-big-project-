@@ -73,6 +73,7 @@ public class SchedulerJobDetail implements Serializable {
 
   private String userId;
 
+
   /**
    * Gets analysisID
    *

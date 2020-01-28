@@ -23,7 +23,7 @@
             >
               <mat-option
                 *ngFor="let subCategory of category.children"
-                [value]="subCategory.id"
+                [value]="subCategory.id.toString()"
                 >{{ subCategory.name }}</mat-option
               >
             </mat-optgroup>

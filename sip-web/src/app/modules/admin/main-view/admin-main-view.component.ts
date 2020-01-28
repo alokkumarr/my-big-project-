@@ -7,6 +7,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { UserEditDialogComponent, UserService } from '../user';
 import { RoleEditDialogComponent } from '../role';
 import { PrivilegeEditDialogComponent } from '../privilege';
+import * as findIndex from 'lodash/findIndex';
 import {
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent
@@ -14,7 +15,7 @@ import {
 import { RoleService } from '../role/role.service';
 import { CategoryService } from '../category/category.service';
 import { PrivilegeService } from '../privilege/privilege.service';
-import { UserAssignmentService } from '../datasecurity/userassignment.service';
+import { DataSecurityService } from '../datasecurity/datasecurity.service';
 import { JwtService } from '../../../common/services';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
@@ -94,7 +95,7 @@ export class AdminMainViewComponent implements OnDestroy {
     public _roleService: RoleService,
     public _jwtService: JwtService,
     public _localSearch: LocalSearchService,
-    private _userassignmentsService: UserAssignmentService,
+    private _userassignmentsService: DataSecurityService,
     public _toastMessage: ToastService,
     public _dialog: MatDialog,
     public _router: Router,
@@ -246,7 +247,14 @@ export class AdminMainViewComponent implements OnDestroy {
       case 'privilege':
         // for some reason, the backend doesn't return the new array of privileges
         // so we have to delete it manually
-        const index = this.filteredData.indexOf(row);
+        const index = findIndex(
+          this.filteredData,
+          ({ moduleName, categoryName, privilegeId, privilegeCode }) =>
+            moduleName === row.moduleName
+            && categoryName === row.categoryName
+            && privilegeId === row.privilegeId
+            && privilegeCode === row.privilegeCode
+        );
         this.filteredData.splice(index, 1);
         break;
       default:
@@ -307,15 +315,20 @@ export class AdminMainViewComponent implements OnDestroy {
 
   modifyRowForDeletion(row) {
     /* prettier-ignore */
+    const customerId = parseInt(this.ticket.custID, 10);
     switch (this.section) {
     case 'role':
-      const customerId = parseInt(this.ticket.custID, 10);
       const { masterLoginId } = this.ticket as any;
       return {
         ...row,
         roleId: row.roleSysId,
         customerId,
         masterLoginId
+      };
+    case 'privilege':
+      return {
+        ...row,
+        customerId
       };
     default:
       return row;
@@ -396,6 +409,7 @@ export class AdminMainViewComponent implements OnDestroy {
       customerId,
       masterLoginId
     };
+
     return this._dialog.open(CategoryDeleteDialogComponent, {
       width: 'auto',
       height: 'auto',

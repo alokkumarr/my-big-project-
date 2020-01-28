@@ -26,16 +26,22 @@ export class HandleErrorInterceptor implements HttpInterceptor {
     let showToast = true;
     let newReq = req;
     // send the newly created request
+    /* Don't show errors from validate token requests */
+    if (/validateToken/.test(req.url)) {
+      showToast = false;
+    }
     if (req.headers.has(CUSTOM_HEADERS.SKIP_TOAST)) {
       showToast = false;
       newReq = req.clone({
         headers: req.headers.delete(CUSTOM_HEADERS.SKIP_TOAST)
       });
     }
-    return next.handle(newReq).pipe(catchError((error, caught) => {
-      showToast && this.toast.error(this.getTitle(error), '', { error });
-      return throwError(error);
-    }) as any);
+    return next.handle(newReq).pipe(
+      catchError((error, caught) => {
+        showToast && this.toast.error(this.getTitle(error), '', { error });
+        return throwError(error);
+      }) as any
+    );
   }
 
   getTitle(error, defaultMessage = 'Error') {

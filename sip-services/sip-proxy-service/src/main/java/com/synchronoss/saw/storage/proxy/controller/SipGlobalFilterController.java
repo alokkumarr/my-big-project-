@@ -70,28 +70,16 @@ public class SipGlobalFilterController {
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     Object responseObject;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    DataSecurityKey dataSecurityKey = new DataSecurityKey();
-    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
-      // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
-      // code.
-      if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
-          DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
-          List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
-              dataSecurityKeyDef.setName(CUSTOMER_CODE);
-              dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
-              customerFilterDsks.add(dataSecurityKeyDef);
-              dataSecurityKey.getDataSecuritykey().addAll(customerFilterDsks);
-      }
+
     try {
       logger.trace(
           "Storage Proxy sync request object : {} ",
           objectMapper.writeValueAsString(globalFilters));
-      responseObject = proxyService.fetchGlobalFilter(globalFilters, dataSecurityKey);
+      responseObject = proxyService.fetchGlobalFilter(globalFilters, authTicket);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");

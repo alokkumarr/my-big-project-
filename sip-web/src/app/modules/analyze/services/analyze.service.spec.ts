@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpClient } from '@angular/common/http';
-import { AnalyzeService } from './analyze.service';
+import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
 import {
   JwtService,
   ToastService,
@@ -82,6 +82,14 @@ describe('Analyze Service', () => {
     expect(updateSpy).toHaveBeenCalled();
   });
 
+  it('should get analysis creation methods', () => {
+    const methodSpy = spyOn(service, 'getRequest').and.returnValue({
+      toPromise: () => {}
+    });
+    service.getMethods();
+    expect(methodSpy).toHaveBeenCalledWith('/api/analyze/methods');
+  });
+
   it('should get categories', () => {
     const menuPromise = Promise.resolve({});
     spy = spyOn(TestBed.get(MenuService), 'getMenu').and.returnValue(
@@ -146,16 +154,28 @@ describe('Analyze Service', () => {
     });
 
     const newSchedule = { scheduleState: 'new' };
-    service.changeSchedule({ schedule: newSchedule });
+    service.changeSchedule(newSchedule);
     expect(spy).toHaveBeenCalledWith('scheduler/schedule', newSchedule);
 
     const updateSchedule = { scheduleState: 'exist' };
-    service.changeSchedule({ schedule: updateSchedule });
+    service.changeSchedule(updateSchedule);
     expect(spy).toHaveBeenCalledWith('scheduler/update', updateSchedule);
 
     const deleteSchedule = { scheduleState: 'delete' };
-    service.changeSchedule({ schedule: deleteSchedule });
+    service.changeSchedule(deleteSchedule);
     expect(spy).toHaveBeenCalledWith('scheduler/delete', deleteSchedule);
+  });
+
+  it('should execute with preview mode on preview execution', () => {
+    const previewSpy = spyOn(service, 'applyAnalysis').and.returnValue({});
+    const model = {};
+    const options = {};
+    service.previewExecution(model, options);
+    expect(previewSpy).toHaveBeenCalledWith(
+      model,
+      EXECUTION_MODES.PREVIEW,
+      options
+    );
   });
 
   describe('calcNameMap', () => {

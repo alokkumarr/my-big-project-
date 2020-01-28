@@ -75,6 +75,7 @@
     [analysisType]="filterObj.analysisType"
     [searchTerm]="filterObj.searchTermValue"
     [cronJobs]="cronJobs"
+    [category]="subCategoryId"
   >
   </analyze-list-view>
   <analyze-card-view
@@ -84,6 +85,7 @@
       filteredAnalyses | analysesFilter: filterObj.analysisType:cronJobs
     "
     [analysisType]="filterObj.analysisType"
+    [category]="subCategoryId"
     [highlightTerm]="filterObj.searchTermValue"
     [cronJobs]="cronJobs"
   >

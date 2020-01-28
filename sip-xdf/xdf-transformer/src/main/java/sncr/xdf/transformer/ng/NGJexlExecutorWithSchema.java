@@ -13,6 +13,8 @@ import sncr.xdf.transformer.TransformWithSchema;
 
 import java.util.List;
 import java.util.Map;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.context.XDFReturnCode;
 
 
 /**
@@ -41,40 +43,36 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
                 threshold)).cache();
         return rdd;
     }
-
     public void execute(Map<String, Dataset> dsMap) throws Exception {
         Dataset ds = dsMap.get(inDataSetName);
-        prepareRefData(dsMap);
-        JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
-        Long c = transformationResult.count();
-        // Using structAccumulator do second pass to align schema
-        Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
-        //df.schema().prettyJson();
-        logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
-        createFinalDS(df.cache());
+        if(ds == null) {
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
+        }else{
+            prepareRefData(dsMap);
+            JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
+            Long c = transformationResult.count();
+            // Using structAccumulator do second pass to align schema
+            Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
+            //df.schema().prettyJson();
+            logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
+            createFinalDS(df.cache());
+        }
     }
-
     public void executeSingleProcessor(NGContext ngctx) throws Exception {
         Map<String, Dataset> dsMap = ngctx.datafileDFmap;
-
         String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
-
         Dataset ds = dsMap.get(transInKey);
-
-        prepareRefData(dsMap);
-
-        JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
-
-        Long c = transformationResult.count();
-
-        // Using structAccumulator do second pass to align schema
-        Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
-
-        //df.schema().prettyJson();
-        logger.trace("Transformation completed: " + c   + " Schema: " + df.schema().prettyJson());
-
-        createFinalDS(df.cache(),ngctx);
+        if(ds == null) {
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+        }else{
+            prepareRefData(dsMap);
+            JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
+            Long c = transformationResult.count();
+            // Using structAccumulator do second pass to align schema
+            Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
+            //df.schema().prettyJson();
+            logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
+            createFinalDS(df.cache(), ngctx);
+        }
     }
-
-
 }
