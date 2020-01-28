@@ -1,17 +1,24 @@
 package com.sncr.saw.security.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.util.Base64;
-//import org.apache.tomcat.util.codec.binary.Base64;
 /**
  * 
  * @author ssom0002
  *
  */
 public class Ccode {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Ccode.class);
+
+    final static byte[] initVector = "RandomInitVector".getBytes();
+
     // Random bytes
     final static byte[] key = {
         0x20, (byte)0x89, (byte)0xC3, 0x13,
@@ -19,7 +26,7 @@ public class Ccode {
         0x6C, 0x35, (byte)0xC2, 0x4D,
         0x0A, (byte)0xB5, 0x2C, (byte)0xD4
         };
-    final static byte[] initVector = "RandomInitVector".getBytes(); // "UTF-8");
+
     /**
      * 
      * @param password
@@ -35,14 +42,11 @@ public class Ccode {
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
 
             byte[] encrypted = cipher.doFinal(password.getBytes());
-            //return Base64.encodeBase64String(encrypted);
-            String encoded = Base64.getEncoder().encodeToString(encrypted);
-            return encoded;
+            return  Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error while encryption {}", ex.getMessage());
             return null;
         }
-        
     }
     /**
      * 
@@ -60,11 +64,10 @@ public class Ccode {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
 
-            //byte[] original = cipher.doFinal(Base64.decodeBase64(encryptedPassword));
             byte[] original = cipher.doFinal(encrypted);
             return new String(original);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error while password decryption {}", ex.getMessage());
             return null;
         }       
     }
@@ -87,7 +90,7 @@ public class Ccode {
             if( res == null ) {
                 rc = 1;
             } else {
-                System.out.print(res);
+                LOGGER.info(res);
             }
         }
         System.exit(rc);

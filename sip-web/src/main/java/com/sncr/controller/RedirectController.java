@@ -16,20 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 @ComponentScan
 @Configuration
 public class RedirectController {
-	private static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RedirectController.class);
 	
-	private final String sawLoginPage="login.html";
+	private final static String LOGIN_PAGE="login.html";
 		
 	@RequestMapping(value = {"/","/observe","/alerts","/analyze"}, method = RequestMethod.GET)
 	public void redirectToLogin(HttpServletRequest request, HttpServletResponse response){
-		logger.debug("RedirectController - RedirectController - START");
+		LOGGER.debug("RedirectController - RedirectController - START");
 	
 		try {
-			request.getRequestDispatcher(sawLoginPage).forward(request, response);
+			request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
 		} catch (Exception e2) {
-			// error 
-			e2.printStackTrace();
+			// error
+			LOGGER.error("Error while login page {}.", e2.getMessage());
 		}
 		
    }	

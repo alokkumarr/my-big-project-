@@ -5,6 +5,7 @@ import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -98,8 +99,15 @@ public class XlsxExporter implements IFileExporter {
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
       cellStyle.setAlignment(HorizontalAlignment.LEFT);
-      cell.setCellStyle(cellStyle);
-      cell.setCellValue(value);
+      if(NumberUtils.isNumber(value)){
+        cell.setCellType(CellType.NUMERIC);
+        cell.setCellStyle(cellStyle);
+        Double d = new Double(value);
+        cell.setCellValue(d);
+      } else {
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(value);
+      }
     } else if (specialType != null
         && (specialType.equalsIgnoreCase(DataField.Type.FLOAT.value())
         || specialType.equalsIgnoreCase(DataField.Type.DOUBLE.value()))) {

@@ -215,6 +215,10 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
           )
         );
       }
+      if (previousAdapter.reverseTransform) {
+        // clean up column, before moving it to a different place
+        previousAdapter.reverseTransform(column);
+      }
       this._store.dispatch(
         new DesignerAddColumnToGroupAdapter(
           cloneDeep(column),

@@ -204,7 +204,7 @@ public class TrieTree {
 
   /**
    * 
-   * @param disply
+   * @param display
    * @param tree
    * @return
    */
@@ -352,7 +352,7 @@ public class TrieTree {
 
   /**
    * 
-   * @param displayBuffer
+   * @param displyObject
    * @param tree
    * @return
    */
@@ -418,7 +418,7 @@ public class TrieTree {
 
   /**
    * 
-   * @param displayBuffer
+   * @param displyObject
    * @param tree
    * @return
    */
