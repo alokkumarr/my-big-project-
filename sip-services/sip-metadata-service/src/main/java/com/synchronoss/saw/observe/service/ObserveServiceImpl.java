@@ -238,7 +238,7 @@ public class ObserveServiceImpl implements ObserveService {
       });
 
       // validate the given analysis has valid user
-      if (!analysisId.isEmpty()) {
+      if (!analysisId.isEmpty() && analysisId.size() > 0) {
         try {
           for (String id : analysisId) {
             Analysis analysis = analysisService.getAnalysis(id, ticket);
