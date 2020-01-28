@@ -711,10 +711,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               || executionType.equals(ExecutionType.preview)
               || executionType.equals(ExecutionType.regularExecution);
       String executedBy = authTicket != null ? authTicket.getMasterLoginId() : "scheduled";
-      Analysis parentAnalysisDef = getParentAnalysis(analysis);
+      Analysis parentAnalysisDef = null;
       if (ExecutionType.publish.equals(executionType)) {
-        if (parentAnalysisDef != null) {
-          if (parentAnalysisDef.getCategory().equalsIgnoreCase(analysis.getCategory())) {
+        if (isParentAnalysisIdExists(analysis)) {
+          parentAnalysisDef =
+              StorageProxyUtil.fetchAnalysisDefinition(
+                  metaDataServiceExport, analysis.getParentAnalysisId(), restUtil);
+          if (isPublishigChildToParentCat(analysis, parentAnalysisDef)) {
             queryId = parentAnalysisDef.getId();
           }
         }
@@ -736,8 +739,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       if (ExecutionType.publish.equals(executionType)) {
         Analysis analysisDefinitionToUpdate = null;
         boolean isChildAndParentSameCatgry = false;
-        if (parentAnalysisDef != null
-            && analysis.getCategory().equalsIgnoreCase(parentAnalysisDef.getCategory())) {
+        if (isPublishigChildToParentCat(analysis, parentAnalysisDef)) {
           logger.trace("Merging the Analysis of parent with child");
           isChildAndParentSameCatgry = true;
           String childAnalysisId = analysis.getId();
@@ -780,14 +782,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
   }
 
-  private Analysis getParentAnalysis(Analysis analysis) {
-    if (StringUtils.isNotBlank(analysis.getParentAnalysisId())) {
-      Analysis parentAnalysisDef =
-          StorageProxyUtil.fetchAnalysisDefinition(
-              metaDataServiceExport, analysis.getParentAnalysisId(), restUtil);
-      return parentAnalysisDef;
+  private Boolean isParentAnalysisIdExists(Analysis analysis) {
+    return StringUtils.isNotBlank(analysis.getParentAnalysisId()) ? true : false;
+  }
+
+  private Boolean isPublishigChildToParentCat(Analysis analysis, Analysis parentAnalysis) {
+    if (analysis != null && parentAnalysis != null) {
+      return parentAnalysis.getCategory().equalsIgnoreCase(analysis.getCategory()) ? true : false;
     }
-    return null;
+    return false;
   }
 
     private void updatePublishAnalysis(Analysis analysisDefinitionToUpdate, Ticket authTicket) {

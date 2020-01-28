@@ -251,7 +251,6 @@ public class SipDslIT extends BaseIT {
     testDataForDl.addProperty("modifiedBy", "sipadmin@synchronoss.com");
     testDataForDl.addProperty("userId", 1);
     testDataForDl.addProperty("designerEdit", false);
-    testDataForDl.addProperty("category", "5");
     JsonObject artifact1 = new JsonObject();
     artifact1.addProperty("artifactsName", "SALES");
     sipQueryDl = new JsonObject();
@@ -1436,6 +1435,7 @@ public class SipDslIT extends BaseIT {
     JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
     ObjectNode objectNode = (ObjectNode) jsonNode;
     objectNode.put("id", analysisId);
+    objectNode.put("category", "5");
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(jsonNode)
