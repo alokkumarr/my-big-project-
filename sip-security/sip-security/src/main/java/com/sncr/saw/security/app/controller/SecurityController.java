@@ -241,6 +241,7 @@ public class SecurityController {
        return ssoRequestHandler.processSSORequest(token);
 	}
 
+	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
   public LoginResponse accessToken(@RequestBody String rToken, HttpServletResponse response) throws ServletException {
     Boolean validity = false;
     try {
