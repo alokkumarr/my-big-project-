@@ -8,6 +8,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -1430,6 +1431,9 @@ public class SipDslIT extends BaseIT {
   void executeAnalysis(String analysisId) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    ObjectNode objectNode = (ObjectNode) jsonNode;
+    objectNode.put("id", analysisId);
+    objectNode.put("category", "5");
     given(spec)
         .header(AUTHORIZATION, "Bearer " + token)
         .body(jsonNode)
@@ -1768,5 +1772,54 @@ public class SipDslIT extends BaseIT {
         .then()
         .assertThat()
         .statusCode(200);
+  }
+
+  @Test
+  public void testAggregatedFilter() throws IOException {
+    JsonObject dateFilter = new JsonObject();
+    dateFilter.addProperty("type", "date");
+    dateFilter.addProperty("artifactsName", "sample");
+    dateFilter.addProperty("isOptional", false);
+    dateFilter.addProperty("columnName", "date");
+    dateFilter.addProperty("isRuntimeFilter", false);
+    dateFilter.addProperty("isGlobalFilter", false);
+    JsonObject model = new JsonObject();
+    model.addProperty("preset", "LY");
+    dateFilter.add("model", model);
+    JsonArray filters = new JsonArray();
+    filters.add(dateFilter);
+    JsonObject data = testData;
+    data.get("sipQuery").getAsJsonObject().add("filters", filters);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
+    Response response1 = execute(token, jsonNode);
+    JsonNode responsedata = response1.getBody().as(ObjectNode.class).get("data");
+    Iterator<JsonNode> iterator = responsedata.elements();
+    int count = 0;
+    while (iterator.hasNext()) {
+      if (iterator.next().get("integer").asInt() > 500) {
+        count++;
+      }
+    }
+    JsonObject aggregatedFilter = new JsonObject();
+    aggregatedFilter.addProperty("type", "integer");
+    aggregatedFilter.addProperty("artifactsName", "sample");
+    aggregatedFilter.addProperty("isOptional", false);
+    aggregatedFilter.addProperty("columnName", "integer");
+    aggregatedFilter.addProperty("isRuntimeFilter", false);
+    aggregatedFilter.addProperty("isGlobalFilter", false);
+    aggregatedFilter.addProperty("aggregate", "avg");
+    aggregatedFilter.addProperty("isAggregationFilter", true);
+    JsonObject model1 = new JsonObject();
+    model1.addProperty("operator", "GTE");
+    model1.addProperty("value", 500);
+    aggregatedFilter.add("model", model1);
+    filters.add(aggregatedFilter);
+    data.get("sipQuery").getAsJsonObject().add("filters", filters);
+    JsonNode jsonNode2 = objectMapper.readTree(data.toString());
+    Response response12 = execute(token, jsonNode2);
+    Integer noOfRows = response12.getBody().as(ObjectNode.class).get("totalRows").asInt();
+    assertTrue(noOfRows == count);
   }
 }

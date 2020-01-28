@@ -1,5 +1,5 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DesignerContainerComponent } from './designer-container.component';
 import { DesignerService } from '../designer.service';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
@@ -9,17 +9,7 @@ import { JwtService } from '../../../../common/services';
 import { Store } from '@ngxs/store';
 import { MatDialog } from '@angular/material';
 import { of } from 'rxjs';
-
-@Component({
-  // tslint:disable-next-line
-  selector: 'designer-container',
-  template: 'DesignerContainer'
-})
-class DesignerStubComponent {
-  @Input() public analysisStarter;
-  @Input() public analysis;
-  @Input() public designerMode;
-}
+import { FilterService } from '../../services/filter.service';
 
 const dialogStub = {
   open: () => {}
@@ -27,6 +17,11 @@ const dialogStub = {
 
 const analysisStub = {
   type: 'pivot'
+};
+
+const storeStub = {
+  dispatch: () => {},
+  selectSnapshot: () => ({ analysis: { sipQuery: {} } })
 };
 
 describe('Designer Component', () => {
@@ -41,10 +36,11 @@ describe('Designer Component', () => {
         { provide: ChartService, useValue: {} },
         { provide: AnalyzeService, useValue: {} },
         { provide: JwtService, useValue: {} },
-        { provide: Store, useValue: { dispatch: () => {} } },
-        { provide: MatDialog, useValue: dialogStub }
+        { provide: Store, useValue: storeStub },
+        { provide: MatDialog, useValue: dialogStub },
+        { provide: FilterService, useValue: {} }
       ],
-      declarations: [DesignerContainerComponent, DesignerStubComponent],
+      declarations: [DesignerContainerComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));
@@ -171,5 +167,17 @@ describe('Designer Component', () => {
   it('should check filterSelectedFilter function ', () => {
     const filtersColumns = fixture.componentInstance.checkNodeForSorts();
     expect(filtersColumns).not.toBeNull();
+  });
+
+  it('should clean sorts', () => {
+    component.sorts = [{ columnName: 'abc', order: 'desc', type: 'double' }];
+    component.cleanSorts();
+    expect(component.sorts.length).toEqual(0);
+  });
+
+  describe('canRequestReport', () => {
+    it('should not be able to request report for default blank analysis', () => {
+      expect(component.canRequestReport(null)).toEqual(false);
+    });
   });
 });
