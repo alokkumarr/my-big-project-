@@ -1,7 +1,3 @@
-/*
- * Copyright (C) 2007 Razorsight. All Rights Reserved. The source code for this program is not published or otherwise
- * divested of its trade secrets, irrespective of what has been deposited with the U.S. Copyright Office.
- */
 package com.sncr.saw.security.common.util;
 
 import java.text.FieldPosition;
@@ -21,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DateUtil {
 
-	private static Logger logger = LoggerFactory.getLogger(DateUtil.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class.getName());
 
 	public static final String PATTERN_MMDDYYYY = "MM/dd/yyyy";
 
@@ -49,7 +45,7 @@ public class DateUtil {
 		try {
 			return sf.parse(dateString);
 		} catch (ParseException e) {
-			logger.debug("Error converting date " + dateString
+      LOGGER.debug("Error converting date " + dateString
 					+ " from String type to Date type");
 		}
 		return null;
@@ -70,7 +66,7 @@ public class DateUtil {
 			dateString = sf1.format(date);
 			date = sf1.parse(dateString);
 		} catch (ParseException e) {
-			logger.debug("Error converting date " + dateString
+      LOGGER.debug("Error converting date " + dateString
 					+ " from format: " + fromFormat + ", to format: "
 					+ toFormat);
 		}
@@ -91,7 +87,7 @@ public class DateUtil {
             p_No_Of_Days = (int) (p_Milli / (1000 * 60 * 60 * 24));
         }
         catch( Exception ex) {
-            logger.error("Error getting no. of days - From Date: {} To Date: {}", p_FROM_Date,  p_THRU_Date);
+          LOGGER.error("Error getting no. of days - From Date: {} To Date: {}", p_FROM_Date,  p_THRU_Date);
         }
         return p_No_Of_Days;
     }
@@ -126,26 +122,26 @@ public class DateUtil {
             date = simpleDateFormat.parse( strDate);
         }
         catch( Exception ex) {
-            logger.error("Unable to parse date string: {}", ex);
+          LOGGER.error("Unable to parse date string: {}", ex);
         }
         return date;
     }
  
     public static boolean isValidDate(String date, String pattern)
     {
-        logger.debug("Date Passed is : {}", date);
+        LOGGER.debug("Date Passed is : {}", date);
         Date newDate = getDateFromString(date,pattern);
-        logger.debug( "Date formatted to Date format: {}", newDate);
+        LOGGER.debug( "Date formatted to Date format: {}", newDate);
         String testDate = getDateString(newDate, pattern);
-        logger.debug( "Test Date : {}", testDate);
+        LOGGER.debug( "Test Date : {}", testDate);
         if(date.equals(testDate))
         {
-            logger.debug( "Returning true ");
+            LOGGER.debug( "Returning true ");
             return true;
         }
         else
         {
-            logger.debug( "Returning false ");
+            LOGGER.debug( "Returning false ");
             return false;
         }
     }

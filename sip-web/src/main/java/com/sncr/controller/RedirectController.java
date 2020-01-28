@@ -19,7 +19,7 @@ public class RedirectController {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RedirectController.class);
 	
-	private final static String LOGIN_PAGE="login.html";
+	private static final String LOGIN_PAGE="login.html";
 		
 	@RequestMapping(value = {"/","/observe","/alerts","/analyze"}, method = RequestMethod.GET)
 	public void redirectToLogin(HttpServletRequest request, HttpServletResponse response){

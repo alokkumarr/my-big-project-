@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
 
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -45,7 +44,7 @@ public class QueryBuilderUtil {
   public static final String EMPTY_STRING = "";
   private static String HITS = "hits";
   private static String _SOURCE = "_source";
-  public static Map<String, String> dateFormats = new HashMap<String, String>();
+  protected static Map<String, String> dateFormats = new HashMap<String, String>();
 
   static {
     Map<String, String> formats = new HashMap<String, String>();
