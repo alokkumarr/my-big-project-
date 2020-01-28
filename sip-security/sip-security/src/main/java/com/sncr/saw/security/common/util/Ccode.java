@@ -1,8 +1,5 @@
 package com.sncr.saw.security.common.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -14,8 +11,6 @@ import java.util.Base64;
  *
  */
 public class Ccode {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Ccode.class);
 
     static final byte[] initVector = "RandomInitVector".getBytes();
 
@@ -44,7 +39,7 @@ public class Ccode {
             byte[] encrypted = cipher.doFinal(password.getBytes());
             return  Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception ex) {
-            LOGGER.error("Error while encryption {}", ex.getMessage());
+            ex.printStackTrace();
             return null;
         }
     }
@@ -67,7 +62,7 @@ public class Ccode {
             byte[] original = cipher.doFinal(encrypted);
             return new String(original);
         } catch (Exception ex) {
-            LOGGER.error("Error while password decryption {}", ex.getMessage());
+            ex.printStackTrace();
             return null;
         }       
     }
@@ -90,7 +85,7 @@ public class Ccode {
             if( res == null ) {
                 rc = 1;
             } else {
-                LOGGER.info(res);
+                System.out.print(res);
             }
         }
         System.exit(rc);
