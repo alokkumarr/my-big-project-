@@ -93,6 +93,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -362,26 +363,31 @@ public class SecurityController {
 		}
 	}
 
-    /**
-     *
-     * @return
-     */
-    @RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
-    public String logout(@RequestHeader("Authorization") String token) {
-        token = token.replaceAll("Bearer", "").trim();
-        Ticket ticket = null;
-        try {
-             ticket = TokenParser.retrieveTicket(token);
-        } catch (IOException e) {
-            logger.error("Error occurred while parsing the Token");
-        }
-        try {
-            return tHelper.logout(ticket.getTicketId());
-        } catch (DataAccessException de) {
-            return de.getMessage();
-        }
-    }
-
+	/**
+	 *
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
+	public String logout(@RequestHeader("Authorization") String token, HttpServletRequest request,
+			HttpServletResponse response) {
+		if(StringUtils.isEmpty(token) || request == null) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return  "Invalid Token";
+		}
+		Ticket ticket = SipCommonUtils.getTicket(request);
+		Boolean validity =
+				ticket != null && ticket.getValidUpto() != null ? ticket.getValidUpto() > (new Date()
+						.getTime()) : false;
+		if (!validity) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return  "Token has expired. Please re-login";
+		}
+		try {
+			return tHelper.logout(ticket.getTicketId());
+		} catch (DataAccessException de) {
+			return de.getMessage();
+		}
+	}
 	/**
 	 *
 	 * @param changePasswordDetails
