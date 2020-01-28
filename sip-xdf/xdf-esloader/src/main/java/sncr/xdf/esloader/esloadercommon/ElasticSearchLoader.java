@@ -78,8 +78,6 @@ public class ElasticSearchLoader {
             this.esConfig.put(ES_MAPPING_ID, esLoader.getDocumentIDField());
         }
 
-        logger.debug("ES Config = " + this.esConfig);
-
 
         this.esClient = new ESHttpClient(config);
 
@@ -230,8 +228,6 @@ public class ElasticSearchLoader {
                 finalFrame = filterData(originalFrame, filterString).select(scala.collection.JavaConversions.asScalaBuffer(lst).readOnly())
                         .persist(StorageLevel.MEMORY_AND_DISK_SER());
             }
-
-            logger.debug("Data = " + finalFrame + ", Destination Index = " + destinationIdx + ", Config = " + esConfig);
 
             JavaEsSparkSQL.saveToEs(finalFrame, destinationIdx, esConfig);
 

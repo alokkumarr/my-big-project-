@@ -34,7 +34,6 @@ public class SFTPUploader {
             File file = new File(localFileFullName);
             // URL preparation
             sftpURL = sftpURL + "/" + hostDir.trim() + "/" + fileName.trim();
-            logger.debug("sftpURL: " + sftpURL);
             manager.init();
 
             // Filesystem Options
