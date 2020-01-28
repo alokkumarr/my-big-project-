@@ -182,7 +182,7 @@ export function wrapFieldValues(data) {
   return fpPipe(
     fpMap(
       fpMapValues(value => {
-        return value === null ? null : `"${value}"`;
+        return value === null ? null : value;
       })
     )
   )(data);
