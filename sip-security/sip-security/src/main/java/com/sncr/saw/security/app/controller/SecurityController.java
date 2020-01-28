@@ -2272,7 +2272,7 @@ public class SecurityController {
       brandResponse.setBrandImage(brandLogo);
       // build final response for the user
       if (valid.getValid()) {
-        brandResponse.setMessage("Brand details are upserted.");
+        brandResponse.setMessage("Brand details are updated successfully.");
       } else {
         brandResponse.setMessage("Operation failed for brand upsert.");
 				response.setStatus(HttpStatus.FORBIDDEN.value());
