@@ -48,6 +48,7 @@ import java.util.Optional;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -1007,7 +1008,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         System.exit(rc);
     }
     

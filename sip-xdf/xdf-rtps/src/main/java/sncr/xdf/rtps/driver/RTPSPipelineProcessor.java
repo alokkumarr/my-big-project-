@@ -25,6 +25,7 @@ import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class RTPSPipelineProcessor {
 
@@ -204,7 +205,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        rc = AbstractComponent.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
 	}
 
@@ -280,7 +281,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        rc = AbstractComponent.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
 	}
 
@@ -358,7 +359,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        rc = AbstractComponent.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
 	}
 
@@ -423,7 +424,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        rc = AbstractComponent.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         return rc;
 	}
 }

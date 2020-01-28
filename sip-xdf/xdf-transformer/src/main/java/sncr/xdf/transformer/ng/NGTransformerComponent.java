@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 /**
  * Created by srya0001 on 12/19/2017.
@@ -334,7 +335,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         System.exit(rc);
     }
 }

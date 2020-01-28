@@ -32,6 +32,7 @@ import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.rtps.driver.EventProcessingApplicationDriver;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 
 public class NGRTPSComponent extends AbstractComponent
@@ -167,7 +168,7 @@ public class NGRTPSComponent extends AbstractComponent
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         System.exit(rc);
 	}
 
