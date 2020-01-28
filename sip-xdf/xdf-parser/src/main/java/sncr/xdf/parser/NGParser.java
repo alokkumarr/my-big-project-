@@ -582,7 +582,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
         
         logger.debug("##### Reding Completed!! ...");
-        logger.debug("###RDD Size###"+ rdd.count());
+       // logger.debug("###RDD Size###"+ rdd.count());
         JavaPairRDD<String, Long> lineNumbersRDD = rdd.zipWithIndex();
         logger.debug("##### Line numbers Completed!! ...");
         JavaPairRDD<String, Long> filtered = lineNumbersRDD.filter(new HeaderFilter(headerSize));
@@ -605,7 +605,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("##### Parsed RDD!! ...");
      // Create output dataset
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
-        logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
+       // logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         int rc = 0;
         scala.collection.Seq<Column> outputColumns = null;

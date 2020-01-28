@@ -32,7 +32,11 @@ import sncr.xdf.transformer.ng.NGTransformerComponent;
 
 @Service
 public class WorkbenchJobServiceImpl implements WorkbenchJobService {
-
+	
+	
+	private static final long serialVersionUID = 1113799434508676066L;
+	
+	
 	  private static final Logger logger = LoggerFactory.getLogger(WorkbenchJobServiceImpl.class);
 	  
 	  @Autowired

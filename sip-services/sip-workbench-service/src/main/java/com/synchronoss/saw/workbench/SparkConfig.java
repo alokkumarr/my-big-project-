@@ -15,6 +15,7 @@ public class SparkConfig {
 	 
 	private static final Logger logger = LoggerFactory.getLogger(SparkConfig.class);
 	
+	
 	@Value("${workbench.app-name}")
 	private String appName;
 	
@@ -38,10 +39,10 @@ public class SparkConfig {
 	@Value("${spark.hadoop.yarn.resourcemanager.hostname}")
 	private String hadoopRMHostName;
 	
-	@Value("${spark.yarn.jars:\"\"}")
+	@Value("${spark.yarn.jars:@null}")
 	private String sparkYarnJars ;
 	
-	@Value("${spark.yarn.archive:\"\"}")
+	@Value("${spark.yarn.archive:@null}")
 	private String sparkyarnJarsArchive;
 	
 	@Value("${spark.executor.instances}")
