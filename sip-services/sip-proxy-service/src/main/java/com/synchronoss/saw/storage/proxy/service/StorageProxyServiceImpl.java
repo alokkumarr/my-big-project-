@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.deleteAnalysis;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.isDskColumnNotPresent;
@@ -710,7 +711,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               || executionType.equals(ExecutionType.preview)
               || executionType.equals(ExecutionType.regularExecution);
       String executedBy = authTicket != null ? authTicket.getMasterLoginId() : "scheduled";
-
+      Analysis parentAnalysisDef = null;
+      if (ExecutionType.publish.equals(executionType)) {
+        if (isParentAnalysisIdExists(analysis)) {
+          parentAnalysisDef =
+              StorageProxyUtil.fetchAnalysisDefinition(
+                  metaDataServiceExport, analysis.getParentAnalysisId(), restUtil);
+          if (isPublishigChildToParentCat(analysis, parentAnalysisDef)) {
+            queryId = parentAnalysisDef.getId();
+          }
+        }
+      }
       if (validExecutionType) {
         ExecutionResult executionResult =
             buildExecutionResult(
@@ -723,20 +734,33 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                 dskAttribute,
                 (List<Object>) executeResponse.getData());
         saveDslExecutionResult(executionResult);
-        // For published analysis, update analysis metadata table with the category information.
-        analysis = executionResult.getAnalysis();
-        Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
-        analysis.setUserId(uid);
-        analysis.setCreatedTime(
-            analysis.getCreatedTime() == null
-                ? Instant.now().toEpochMilli()
-                : analysis.getCreatedTime());
-        analysis.setModifiedTime(Instant.now().toEpochMilli());
-        analysis.setModifiedBy(
-            authTicket != null && !authTicket.getUserFullName().isEmpty()
-                ? authTicket.getUserFullName()
-                : analysis.getModifiedBy());
-        updateAnalysis(analysis);
+      }
+      // For published analysis, update analysis metadata table with the category information.
+      if (ExecutionType.publish.equals(executionType)) {
+        Analysis analysisDefinitionToUpdate = null;
+        boolean isChildAndParentSameCatgry = false;
+        if (isPublishigChildToParentCat(analysis, parentAnalysisDef)) {
+          logger.trace("Merging the Analysis of parent with child");
+          isChildAndParentSameCatgry = true;
+          String childAnalysisId = analysis.getId();
+          analysisDefinitionToUpdate =
+              StorageProxyUtil.fetchAnalysisDefinition(
+                  metaDataServiceExport, childAnalysisId, restUtil);
+          analysisDefinitionToUpdate.setParentAnalysisId(null);
+          analysisDefinitionToUpdate.setId(parentAnalysisDef.getId());
+          // Update the new category Id for publish feature
+          analysisDefinitionToUpdate.setCategory(analysis.getCategory());
+          updatePublishAnalysis(analysisDefinitionToUpdate, authTicket);
+          deleteAnalysis(metaDataServiceExport, childAnalysisId, restUtil);
+        }
+        if (!isChildAndParentSameCatgry) {
+          analysisDefinitionToUpdate =
+              StorageProxyUtil.fetchAnalysisDefinition(
+                  metaDataServiceExport, analysis.getId(), restUtil);
+          // Update the new category Id for publish feature
+          analysisDefinitionToUpdate.setCategory(analysis.getCategory());
+          updatePublishAnalysis(analysisDefinitionToUpdate, authTicket);
+        }
       }
 
       if (!analysis.getType().equalsIgnoreCase("report")) {
@@ -756,6 +780,33 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         }
       }
     }
+  }
+
+  private Boolean isParentAnalysisIdExists(Analysis analysis) {
+    return StringUtils.isNotBlank(analysis.getParentAnalysisId()) ? true : false;
+  }
+
+  private Boolean isPublishigChildToParentCat(Analysis analysis, Analysis parentAnalysis) {
+    if (analysis != null && parentAnalysis != null) {
+      return parentAnalysis.getCategory().equalsIgnoreCase(analysis.getCategory()) ? true : false;
+    }
+    return false;
+  }
+
+    private void updatePublishAnalysis(Analysis analysisDefinitionToUpdate, Ticket authTicket) {
+    if (analysisDefinitionToUpdate.getUserId() == null
+        && authTicket != null
+        && authTicket.getUserId() != null) {
+      analysisDefinitionToUpdate.setUserId(authTicket.getUserId());
+    }
+    if (analysisDefinitionToUpdate.getCreatedTime() == null) {
+      analysisDefinitionToUpdate.setCreatedTime(Instant.now().toEpochMilli());
+    }
+    analysisDefinitionToUpdate.setModifiedTime(Instant.now().toEpochMilli());
+    if (authTicket != null && !authTicket.getUserFullName().isEmpty()) {
+      analysisDefinitionToUpdate.setModifiedBy(authTicket.getUserFullName());
+    }
+    updateAnalysis(analysisDefinitionToUpdate);
   }
 
   /**
@@ -1267,10 +1318,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public Boolean updateAnalysis(Analysis analysis) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
+      // TODO:  this method needs to be coverted to rest call to SIP-metadata-service
+      // TODO: instead of directly using MaprDB operation to update publish analysis.
       ExecutionResultStore executionResultStore =
           new ExecutionResultStore(analysisMetadataTable, basePath);
-      executionResultStore.update(
-          analysis.getId(), objectMapper.writeValueAsString(analysis));
+      executionResultStore.update(analysis.getId(), objectMapper.writeValueAsString(analysis));
       logger.info(
           String.format("Updated Analysis id : %s with body : %s ", analysis.getId(), analysis));
       return true;

@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export.util;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.model.Artifact;
@@ -35,7 +36,6 @@ public class ExportUtils {
   private static final Logger logger = LoggerFactory.getLogger(ExportUtils.class);
 
   private static final String HOST = "Host";
-  private static final String NAME = "name";
   private static final String AUTHORIZATION = "Authorization";
   private static final String FILE_TYPE = "fileType";
   private static final String DESCRIPTION = "description";
@@ -46,7 +46,7 @@ public class ExportUtils {
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
   private static final String DEFAULT_FILE_TYPE = "csv";
 
-
+  private ExportUtils() {}
   /**
    * Create Request header with common properties
    *
@@ -65,22 +65,25 @@ public class ExportUtils {
   /**
    * Method to provide column header exact GUI sequence
    *
-   * @param sipQuery query of field from sip query
+   * @param analysis query of field from sip query
    * @return
    */
-  public static Map<String, String> buildColumnHeaderMap(SipQuery sipQuery) {
+  public static Map<String, String> buildColumnHeaderMap(Analysis analysis) {
+    SipQuery sipQuery = analysis.getSipQuery();
     boolean haveDLQuery = sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty();
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
-    for (Artifact artifact : sipQuery.getArtifacts()) {
-      String artifactName = artifact.getArtifactsName();
-      artifact.getFields().forEach(field -> {
-        // This is added to fix SIP-8811 customer Code column issue on DL report
-        if (haveDLQuery && artifactName != null && CUSTOMER_CODE.matches(field.getColumnName())) {
-          field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
-        }
-        fields.add(field);
-      });
+    if (analysis.getDesignerEdit() != null && !analysis.getDesignerEdit()) {
+      for (Artifact artifact : sipQuery.getArtifacts()) {
+        String artifactName = artifact.getArtifactsName();
+        artifact.getFields().forEach(field -> {
+          // This is added to fix SIP-8811 customer Code column issue on DL report
+          if (haveDLQuery && artifactName != null && CUSTOMER_CODE.matches(field.getColumnName())) {
+            field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
+          }
+          fields.add(field);
+        });
+      }
     }
 
 
@@ -148,9 +151,9 @@ public class ExportUtils {
         zos.write(readBuffer, 0, amountRead);
         written += amountRead;
       }
-      logger.info("Written " + written + " bytes to " + zipFileName);
+      logger.info(String.format("Written %s, bytes to %s ", written, zipFileName));
     } catch (Exception e) {
-      logger.error("Error while writing to zip: " + e.getMessage());
+      logger.error("Error while writing to zip: {}", e.getMessage());
     } finally {
       zos.closeEntry();
       zos.close();
@@ -171,7 +174,7 @@ public class ExportUtils {
       serviceUtils.deleteFile(sourceFile, true);
       return true;
     } catch (IOException e) {
-      logger.error("Error deleting File : " + sourceFile);
+      logger.error("Error deleting File : {}", sourceFile);
       logger.error(e.getMessage());
       return false;
     }

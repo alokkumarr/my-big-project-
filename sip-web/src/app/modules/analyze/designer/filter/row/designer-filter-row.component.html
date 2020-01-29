@@ -28,7 +28,7 @@
         "
       >
         <mat-option
-          *ngFor="let artifactColumn of (filteredColumns | async)"
+          *ngFor="let artifactColumn of filteredColumns | async"
           [value]="artifactColumn"
         >
           {{ artifactColumn.displayName }}
@@ -36,34 +36,80 @@
       </mat-autocomplete>
     </mat-form-field>
 
-    <div
+    <mat-form-field
       *ngIf="
-        isInRuntimeMode
+        filter.isAggregationFilter &&
+        (isInRuntimeMode
           ? filter.isRuntimeFilter
-          : !filter.isRuntimeFilter && !filter.isGlobalFilter
+          : !filter.isRuntimeFilter && !filter.isGlobalFilter)
       "
-      style="margin-left: 10px;"
-      [ngSwitch]="TYPE_MAP[filter.type]"
+      class="select-form-field"
+      style="max-width: 145px; margin-left: 10px"
+      appearance="outline"
     >
-      <designer-string-filter
-        *ngSwitchCase="'string'"
-        (filterModelChange)="onFilterModelChange($event)"
-        [filterModel]="filter.model"
+      <mat-label>Aggregate</mat-label>
+      <mat-select
+        e2e="filter-aggregate-select"
+        (selectionChange)="onAggregateSelected($event.value)"
+        [value]="filter.aggregate"
       >
-      </designer-string-filter>
-      <designer-date-filter
-        *ngSwitchCase="'date'"
-        (filterModelChange)="onFilterModelChange($event)"
-        [filterModel]="filter.model"
+        <mat-option
+          *ngFor="let aggregate of supportedAggregates"
+          [value]="aggregate.value"
+          [attr.e2e]="'filter-aggregate-option-' + aggregate.label"
+        >
+          {{ aggregate.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <ng-container *ngIf="!filter.isAggregationFilter; else aggregationFields">
+      <div
+        *ngIf="
+          isInRuntimeMode
+            ? filter.isRuntimeFilter
+            : !filter.isRuntimeFilter && !filter.isGlobalFilter
+        "
+        style="margin-left: 10px;"
+        [ngSwitch]="TYPE_MAP[filter.type]"
       >
-      </designer-date-filter>
-      <designer-number-filter
-        *ngSwitchCase="'number'"
-        (filterModelChange)="onFilterModelChange($event)"
-        [filterModel]="filter.model"
+        <designer-string-filter
+          *ngSwitchCase="'string'"
+          (filterModelChange)="onFilterModelChange($event)"
+          [filterModel]="filter.model"
+        >
+        </designer-string-filter>
+        <designer-date-filter
+          *ngSwitchCase="'date'"
+          (filterModelChange)="onFilterModelChange($event)"
+          [filterModel]="filter.model"
+        >
+        </designer-date-filter>
+        <designer-number-filter
+          *ngSwitchCase="'number'"
+          (filterModelChange)="onFilterModelChange($event)"
+          [filterModel]="filter.model"
+        >
+        </designer-number-filter>
+      </div>
+    </ng-container>
+
+    <ng-template #aggregationFields>
+      <div
+        *ngIf="
+          isInRuntimeMode
+            ? filter.isRuntimeFilter
+            : !filter.isRuntimeFilter && !filter.isGlobalFilter
+        "
+        style="margin-left: 10px;"
       >
-      </designer-number-filter>
-    </div>
+        <designer-number-filter
+          (filterModelChange)="onFilterModelChange($event)"
+          [filterModel]="filter.model"
+        >
+        </designer-number-filter>
+      </div>
+    </ng-template>
   </div>
 
   <div
