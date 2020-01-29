@@ -7,7 +7,7 @@ import { BaseDialogComponent } from '../../../../common/base-dialog';
 import { validatePassword } from 'src/app/common/validators/password-policy.validator';
 
 const namePattern = /^[a-zA-Z0-9]*$/;
-const loginIdPattern = /^[A-z\d_@.#$=!%^)(\]:\*;\?\/\,}{'\|<>\[&\+-`~]*$/;
+const loginIdPattern = /^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*$/;
 const dummyPassword = '*********';
 
 @Component({
@@ -108,6 +108,12 @@ export class UserEditDialogComponent extends BaseDialogComponent {
       Validators.required,
       Validators.pattern(namePattern)
     ]);
+
+    const middleNameControl = this._fb.control(middleName, [
+      Validators.required,
+      Validators.pattern(namePattern)
+    ]);
+
     const lastNameControl = this._fb.control(lastName, [
       Validators.required,
       Validators.pattern(namePattern)
@@ -121,7 +127,7 @@ export class UserEditDialogComponent extends BaseDialogComponent {
 
     this.formGroup = this._fb.group({
       roleId: [roleId, Validators.required],
-      middleName: middleName,
+      middleName: middleNameControl,
       firstName: firstNameControl,
       lastName: lastNameControl,
       masterLoginId: [
