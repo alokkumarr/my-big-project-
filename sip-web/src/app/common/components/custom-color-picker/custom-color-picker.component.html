@@ -28,8 +28,6 @@
     [cpAlphaChannel]="config.alphaChannel"
     [cpPositionRelativeToArrow]="config.relativeToArrow"
     (click)="clickOnInput()"
-    (colorPickerSelect)="chooseColor($event)"
-    (cpSliderDragEnd)="chooseColor($event)"
-    (cpInputChange)="chooseColor($event)"
+    (colorPickerChange)="colorEvent$.next($event)"
   />
 </div>

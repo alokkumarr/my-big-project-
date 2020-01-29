@@ -5,10 +5,13 @@ import {
   Input,
   ElementRef,
   Renderer2,
-  RendererStyleFlags2
+  RendererStyleFlags2,
+  OnInit
 } from '@angular/core';
 
 import * as forEach from 'lodash/forEach';
+import { BehaviorSubject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 const OFFSET_TOP_LIMIT = 300;
 
@@ -17,9 +20,10 @@ const OFFSET_TOP_LIMIT = 300;
   templateUrl: './custom-color-picker.component.html',
   styleUrls: ['./custom-color-picker.component.scss']
 })
-export class CustomColorPickerComponent {
+export class CustomColorPickerComponent implements OnInit {
   public config;
   @Output() public change: EventEmitter<any> = new EventEmitter();
+  colorEvent$: BehaviorSubject<any> = new BehaviorSubject('');
 
   @Input('config') set setConfig(data) {
     this.config = data;
@@ -27,13 +31,20 @@ export class CustomColorPickerComponent {
 
   constructor(private elRef: ElementRef, private renderer: Renderer2) {}
 
-  chooseColor(event) {
-    setTimeout(() => {
-      this.change.emit({
-        name: 'colorPicker',
-        data: event.color ? event.color : event
+  ngOnInit() {
+    this.colorEvent$
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged()
+      )
+      .subscribe(res => {
+        if (res) {
+          this.change.emit({
+            name: 'colorPicker',
+            data: res
+          });
+        }
       });
-    }, 500);
   }
 
   /**
