@@ -1,6 +1,5 @@
 package com.synchronoss.saw;
 
-import static io.restassured.RestAssured.enableLoggingOfRequestAndResponseIfValidationFails;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertTrue;
@@ -51,6 +50,7 @@ public class SipDslIT extends BaseIT {
   private static final String TENANT_B = "TenantB";
   private static final String TENANT_C = "TenantC";
   private static final String CUSTOMER_CODE = "customerCode";
+  private static final String AUTHORIZATION = "Authorization";
   private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
   @Before
@@ -383,7 +383,7 @@ public class SipDslIT extends BaseIT {
     JsonNode jsonNode = objectMapper.readTree(testData.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post(
@@ -406,7 +406,7 @@ public class SipDslIT extends BaseIT {
     String testStringFilter = "string 1";
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -503,7 +503,7 @@ public class SipDslIT extends BaseIT {
     secGroup.put("securityGroupName", "TestGroup5");
     Response secGroupRes =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .contentType(ContentType.JSON)
             .body(secGroup)
             .when()
@@ -532,7 +532,7 @@ public class SipDslIT extends BaseIT {
     dskAttValues.put("booleanQuery",booleanQuery);
 
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
+        .header(AUTHORIZATION, "Bearer " + customToken)
         .contentType(ContentType.JSON)
         .body(dskAttValues)
         .when()
@@ -542,7 +542,7 @@ public class SipDslIT extends BaseIT {
         .statusCode(200)
         .body("valid", equalTo(true));
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
+        .header(AUTHORIZATION, "Bearer " + customToken)
         .body("TestGroup5")
         .when()
         .put("/security/auth/admin/users/" + 5 + "/security-group")
@@ -586,9 +586,8 @@ public class SipDslIT extends BaseIT {
     String validateCustCode = TENANT_A;
     Assert.assertEquals(data.get(0).get(CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
-    given(authSpec)
-        .body("TestGroup5")
-        .when()
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + customTok)
         .delete("/security/auth/admin/security-groups/" + groupSysId)
         .then()
         .assertThat()
@@ -602,7 +601,7 @@ public class SipDslIT extends BaseIT {
     String testStringFilter = "string 247";
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -668,7 +667,7 @@ public class SipDslIT extends BaseIT {
     JsonNode sipDslQuery = objectMapper.readTree(sipDsl.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .body(sipDslQuery)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -695,7 +694,7 @@ public class SipDslIT extends BaseIT {
 
     Response syncResponse =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(sipDslQuery)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -793,7 +792,7 @@ public class SipDslIT extends BaseIT {
     secGroup.put("securityGroupName", "TestGroup2");
     Response secGroupRes =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .contentType(ContentType.JSON)
             .body(secGroup)
             .when()
@@ -821,7 +820,7 @@ public class SipDslIT extends BaseIT {
     booleanQuery.add(dskValues);
     dskAttValues.put("booleanQuery",booleanQuery);
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
+        .header(AUTHORIZATION, "Bearer " + customToken)
         .contentType(ContentType.JSON)
         .body(dskAttValues)
         .when()
@@ -832,7 +831,7 @@ public class SipDslIT extends BaseIT {
         .body("valid", equalTo(true));
 
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
+        .header(AUTHORIZATION, "Bearer " + customToken)
         .body("TestGroup2")
         .when()
         .put("/security/auth/admin/users/" + 5 + "/security-group")
@@ -855,9 +854,8 @@ public class SipDslIT extends BaseIT {
     Assert.assertEquals(data.get(0).get("SALES_" + CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
 
-    given(authSpec)
-        .body("TestGroup2")
-        .when()
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + customTok)
         .delete("/security/auth/admin/security-groups/" + groupSysId)
         .then()
         .assertThat()
@@ -886,7 +884,7 @@ public class SipDslIT extends BaseIT {
 
     Response executionResultForScheduled =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .get("/sip/services/internal/proxy/storage/" + analysisId + "/lastExecutions/data")
             .then()
             .assertThat()
@@ -912,7 +910,7 @@ public class SipDslIT extends BaseIT {
     data.addProperty("category", "5");
     JsonNode jsonNode = objectMapper.readTree(data.toString());
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .body(jsonNode)
         .when()
         .put("/sip/services/dslanalysis/" + analysisId)
@@ -921,7 +919,7 @@ public class SipDslIT extends BaseIT {
         .statusCode(200);
 
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -934,7 +932,7 @@ public class SipDslIT extends BaseIT {
     data.addProperty("category", "5");
     analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -948,7 +946,7 @@ public class SipDslIT extends BaseIT {
     data.addProperty("category", "5");
     analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId + "?category=5")
         .then()
         .assertThat()
@@ -962,7 +960,7 @@ public class SipDslIT extends BaseIT {
     data.addProperty("category", "5");
     analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -975,7 +973,7 @@ public class SipDslIT extends BaseIT {
     data.addProperty("category", "5");
     analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/internal/proxy/storage/" + analysisId + "/executions")
         .then()
         .assertThat()
@@ -989,7 +987,7 @@ public class SipDslIT extends BaseIT {
     data.addProperty("category", "5");
     analysisId = createAnalysis(token, testData);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/internal/proxy/storage/" + analysisId + "/lastExecutions/data")
         .then()
         .assertThat()
@@ -1008,7 +1006,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1038,7 +1036,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1068,7 +1066,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1102,7 +1100,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1139,7 +1137,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1195,7 +1193,7 @@ public class SipDslIT extends BaseIT {
     JsonNode payload = preparePayloadForGroupInterval(groupInterval);
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payload)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1288,7 +1286,7 @@ public class SipDslIT extends BaseIT {
     List<Map<String, String>> data = getLastExecutionsData(analysisId);
 
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -1348,7 +1346,7 @@ public class SipDslIT extends BaseIT {
     JsonNode jsonNode = objectMapper.readTree(data.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/dslanalysis/")
@@ -1369,7 +1367,7 @@ public class SipDslIT extends BaseIT {
    */
   public List<Map<String, String>> getLastExecutionsData(String analysisId) throws IOException {
     return given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get(
             "/sip/services/internal/proxy/storage/"
                 + analysisId
@@ -1385,7 +1383,7 @@ public class SipDslIT extends BaseIT {
   private void createSchedule(String json, String token) {
     given(spec)
         .filter(document("create-schedule", preprocessResponse(prettyPrint())))
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .body(json)
         .when()
         .post("/sip/services/scheduler/schedule")
@@ -1437,7 +1435,7 @@ public class SipDslIT extends BaseIT {
     objectNode.put("id", analysisId);
     objectNode.put("category", "5");
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .body(jsonNode)
         .when()
         .post("/sip/services/internal/proxy/storage/execute?executionType=publish&id=" + analysisId)
@@ -1557,7 +1555,7 @@ public class SipDslIT extends BaseIT {
       ((ObjectNode) body).remove("category");
     }
     return given(spec)
-        .header("Authorization", "Bearer " + custToken)
+        .header(AUTHORIZATION, "Bearer " + custToken)
         .body(body)
         .when()
         .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -1580,7 +1578,7 @@ public class SipDslIT extends BaseIT {
     JsonNode jsonNode = objectMapper.readTree(data.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/dslanalysis/")
@@ -1603,7 +1601,7 @@ public class SipDslIT extends BaseIT {
    */
   public void deleteAnalysis(String analysisId, String token) {
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -1618,7 +1616,7 @@ public class SipDslIT extends BaseIT {
     data.addProperty("semanticId", "workbench::sample-elasticsearch");
     JsonNode jsonNode = objectMapper.readTree(data.toString());
     given(spec)
-        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
         .body(jsonNode)
         .when()
         .post("/sip/services/dslanalysis/")
@@ -1637,7 +1635,7 @@ public class SipDslIT extends BaseIT {
 
     jsonNode = objectMapper.readTree(data.toString());
     given(spec)
-        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
         .body(jsonNode)
         .when()
         .put("/sip/services/dslanalysis/" + analysisId)
@@ -1649,7 +1647,7 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testDeleteAnalysisForUnauthorizedPermissions() {
     given(spec)
-        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -1698,7 +1696,7 @@ public class SipDslIT extends BaseIT {
     JsonNode body = mapper.readTree(sipDsl.toString());
 
     given(spec)
-        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
         .body(body)
         .when()
         .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -1767,7 +1765,7 @@ public class SipDslIT extends BaseIT {
   public void modifyPrivilege(ObjectNode body) {
     given(spec)
         .contentType(ContentType.JSON)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .body(body)
         .when()
         .post("/sip/security/auth/admin/cust/manage/privileges/upsert")
