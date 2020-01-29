@@ -108,110 +108,110 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           }
 
           const ScheduleType = data.scheduleType;
-          switch (ScheduleType) {
-            case 'Immediate':
-              schedulePage.ScheduleImmediately();
-              break;
-            case 'Hourly':
-              schedulePage.selectHourlyTab();
-              schedulePage.clickEveryHour();
-              schedulePage.selectHours(data.Hours);
-              schedulePage.clickMinutes();
-              schedulePage.selectMinutes(data.Minutes);
-              break;
-            case 'Daily-Everyday':
-              schedulePage.selectDailyTab();
-              schedulePage.selectEveryDayCheckbox();
-              schedulePage.clickDays();
-              schedulePage.selectDays(data.Days);
-              schedulePage.clickEveryDayHours();
-              schedulePage.selectHours(data.Hours);
-              schedulePage.clickEveryDayMinutes();
-              schedulePage.selectMinutes(data.Minutes);
-              schedulePage.clickEveryDayTimeStamp();
-              schedulePage.selectTimeStamp(data.timeStamp);
-              break;
-            case 'Daily-EveryWeekDay':
-              schedulePage.selectDailyTab();
-              schedulePage.selectEveryWeekDayCheckbox();
-              schedulePage.clickEveryWeekDayHours();
-              schedulePage.selectHours(data.Hours);
-              schedulePage.clickEveryWeekDayMinutes();
-              schedulePage.selectMinutes(data.Minutes);
-              schedulePage.clickEveryWeekDayTimeStamp();
-              schedulePage.selectTimeStamp(data.timeStamp);
-              break;
-            case 'Weekly':
-              schedulePage.selectWeeklyTab();
-              schedulePage.selectSpecificDayOfWeekCheckBox(data.dayName);
-              schedulePage.clickOnWeeklyHours();
-              schedulePage.selectHours(data.Hours);
-              schedulePage.clickOnWeeklyMinutes();
-              schedulePage.selectMinutes(data.Minutes);
-              schedulePage.clickOnWeeklyTimeStamp();
-              schedulePage.selectTimeStamp(data.timeStamp);
-              break;
-            case 'Monthly-On The Day':
-              schedulePage.selectMonthlyTab();
-              schedulePage.selectMonthlyFirstCheckbox();
-              schedulePage.clickOnMonthlyFirstRowDays();
-              schedulePage.selectMonthlyFirstRowDay(data.monthlyDay);
-              schedulePage.clickOnMonthlyFirstRowMonths();
-              schedulePage.selectMonthlyFirstRowMonth(data.monthlyMonth);
-              schedulePage.clickOnMonthlyFirstRowHours();
-              schedulePage.selectHours(data.Hours);
-              schedulePage.clickOnMonthlyFirstRowMinutes();
-              schedulePage.selectMinutes(data.Minutes);
-              schedulePage.clickOnMonthlyFirstRowTimeStamp();
-              schedulePage.selectTimeStamp(data.timeStamp);
-              break;
-            case 'Monthly-On The Weeks':
-              schedulePage.selectMonthlyTab();
-              schedulePage.selectMonthlySecondCheckbox();
-              schedulePage.clickOnMonthlySecondRowWeeks();
-              schedulePage.selectMonthlySecondRowWeeks(data.monthlyWeeks);
-              schedulePage.clickOnMonthlySecondRowDay();
-              schedulePage.selectMonthlySecondRowDay(data.monthlyDayName);
-              schedulePage.clickOnMonthlySecondRowMonth();
-              schedulePage.selectMonthlySecondRowMonth(data.everyMonth);
-              schedulePage.clickOnMonthlySecondRowHours();
-              schedulePage.selectHours(data.Hours);
-              schedulePage.clickOnMonthlySecondRowMinutes();
-              schedulePage.selectMinutes(data.Minutes);
-              schedulePage.clickOnMonthlySecondRowTimeStamp();
-              schedulePage.selectTimeStamp(data.timeStamp);
-              break;
-            case 'Yearly-Every-Month':
-              schedulePage.selectYearlyTab();
-              schedulePage.selectYearlyFirstCheckbox();
-              schedulePage.clickOnYearlyFirstRowMonth();
-              schedulePage.selectYearlyFirstRowMonth(data.yearlyMonth);
-              schedulePage.clickOnYearlyFirstRowDays();
-              schedulePage.selectYearlyFirstRowDays(data.yearlyDays);
-              schedulePage.clickOnYearlyFirstRowHours();
-              schedulePage.selectYearlyFirstRowHours(data.Hours);
-              schedulePage.clickOnYearlyFirstRowMinutes();
-              schedulePage.selectYearlyFirstRowMinutes(data.Minutes);
-              schedulePage.clickOnYearlyFirstRowTimeStamp();
-              schedulePage.selectYearlyFirstRowTimeStamp(data.timeStamp);
-              break;
-            case 'Yearly-On-Week':
-              schedulePage.selectYearlyTab();
-              schedulePage.selectYearlySecondCheckbox();
-              schedulePage.clickOnYearlySecondRowWeeks();
-              schedulePage.selectYearlySecondRowWeeks(data.yearlyWeeks);
-              schedulePage.clickOnYearlySecondRowDay();
-              schedulePage.selectYearlySecondRowDay(data.yearlyDayName);
-              schedulePage.clickOnYearlySecondRowMonth();
-              schedulePage.selectYearlySecondRowMonth(data.yearlyMonth);
-              schedulePage.clickOnYearlySecondRowHours();
-              schedulePage.selectYearlySecondRowHours(data.Hours);
-              schedulePage.clickOnYearlySecondRowMinutes();
-              schedulePage.selectYearlySecondRowMinutes(data.Minutes);
-              schedulePage.clickOnYearlySecondRowTimeStamp();
-              schedulePage.selectYearlySecondRowTimeStamp(data.timeStamp);
-              break;
-          }
+            switch (ScheduleType) {
+              case 'Immediate':
+                schedulePage.ScheduleImmediately();
+                break;
+              case 'Hourly':
+                schedulePage.selectHourlyTab();
+                schedulePage.clickEveryHour();
+                schedulePage.selectHours(data.Hours);
+                schedulePage.clickMinutes();
+                schedulePage.selectMinutes(data.Minutes);
+                break;
+              case 'Daily-Everyday':
+                schedulePage.selectDailyTab();
+                schedulePage.selectEveryDayCheckbox();
+                schedulePage.clickDays();
+                schedulePage.selectDays(data.Days);
+                schedulePage.clickEveryDayHours();
+                schedulePage.selectHours(data.Hours);
+                schedulePage.clickEveryDayMinutes();
+                schedulePage.selectMinutes(data.Minutes);
+                schedulePage.clickEveryDayTimeStamp();
+                schedulePage.selectTimeStamp(data.timeStamp);
+                break;
+              case 'Daily-EveryWeekDay':
+                schedulePage.selectDailyTab();
+                schedulePage.selectEveryWeekDayCheckbox();
+                schedulePage.clickEveryWeekDayHours();
+                schedulePage.selectHours(data.Hours);
+                schedulePage.clickEveryWeekDayMinutes();
+                schedulePage.selectMinutes(data.Minutes);
+                schedulePage.clickEveryWeekDayTimeStamp();
+                schedulePage.selectTimeStamp(data.timeStamp);
+                break;
+              case 'Weekly':
+                schedulePage.selectWeeklyTab();
+                schedulePage.selectSpecificDayOfWeekCheckBox(data.dayName);
+                schedulePage.clickOnWeeklyHours();
+                schedulePage.selectHours(data.Hours);
+                schedulePage.clickOnWeeklyMinutes();
+                schedulePage.selectMinutes(data.Minutes);
+                schedulePage.clickOnWeeklyTimeStamp();
+                schedulePage.selectTimeStamp(data.timeStamp);
+                break;
+              case 'Monthly-On The Day':
+                schedulePage.selectMonthlyTab();
+                schedulePage.selectMonthlyFirstCheckbox();
+                schedulePage.clickOnMonthlyFirstRowDays();
+                schedulePage.selectMonthlyFirstRowDay(data.monthlyDay);
+                schedulePage.clickOnMonthlyFirstRowMonths();
+                schedulePage.selectMonthlyFirstRowMonth(data.monthlyMonth);
+                schedulePage.clickOnMonthlyFirstRowHours();
+                schedulePage.selectHours(data.Hours);
+                schedulePage.clickOnMonthlyFirstRowMinutes();
+                schedulePage.selectMinutes(data.Minutes);
+                schedulePage.clickOnMonthlyFirstRowTimeStamp();
+                schedulePage.selectTimeStamp(data.timeStamp);
+                break;
+              case 'Monthly-On The Weeks':
+                schedulePage.selectMonthlyTab();
+                schedulePage.selectMonthlySecondCheckbox();
+                schedulePage.clickOnMonthlySecondRowWeeks();
+                schedulePage.selectMonthlySecondRowWeeks(data.monthlyWeeks);
+                schedulePage.clickOnMonthlySecondRowDay();
+                schedulePage.selectMonthlySecondRowDay(data.monthlyDayName);
+                schedulePage.clickOnMonthlySecondRowMonth();
+                schedulePage.selectMonthlySecondRowMonth(data.everyMonth);
+                schedulePage.clickOnMonthlySecondRowHours();
+                schedulePage.selectHours(data.Hours);
+                schedulePage.clickOnMonthlySecondRowMinutes();
+                schedulePage.selectMinutes(data.Minutes);
+                schedulePage.clickOnMonthlySecondRowTimeStamp();
+                schedulePage.selectTimeStamp(data.timeStamp);
+                break;
+              case 'Yearly-Every-Month':
+                schedulePage.selectYearlyTab();
+                schedulePage.selectYearlyFirstCheckbox();
+                schedulePage.clickOnYearlyFirstRowMonth();
+                schedulePage.selectYearlyFirstRowMonth(data.yearlyMonth);
+                schedulePage.clickOnYearlyFirstRowDays();
+                schedulePage.selectYearlyFirstRowDays(data.yearlyDays);
+                schedulePage.clickOnYearlyFirstRowHours();
+                schedulePage.selectYearlyFirstRowHours(data.Hours);
+                schedulePage.clickOnYearlyFirstRowMinutes();
+                schedulePage.selectYearlyFirstRowMinutes(data.Minutes);
+                schedulePage.clickOnYearlyFirstRowTimeStamp();
+                schedulePage.selectYearlyFirstRowTimeStamp(data.timeStamp);
+                break;
+              case 'Yearly-On-Week':
+                schedulePage.selectYearlyTab();
+                schedulePage.selectYearlySecondCheckbox();
+                schedulePage.clickOnYearlySecondRowWeeks();
+                schedulePage.selectYearlySecondRowWeeks(data.yearlyWeeks);
+                schedulePage.clickOnYearlySecondRowDay();
+                schedulePage.selectYearlySecondRowDay(data.yearlyDayName);
+                schedulePage.clickOnYearlySecondRowMonth();
+                schedulePage.selectYearlySecondRowMonth(data.yearlyMonth);
+                schedulePage.clickOnYearlySecondRowHours();
+                schedulePage.selectYearlySecondRowHours(data.Hours);
+                schedulePage.clickOnYearlySecondRowMinutes();
+                schedulePage.selectYearlySecondRowMinutes(data.Minutes);
+                schedulePage.clickOnYearlySecondRowTimeStamp();
+                schedulePage.selectYearlySecondRowTimeStamp(data.timeStamp);
+                break;
+            }
 
           schedulePage.setEmail(data.userEmail);
           schedulePage.scheduleReport();

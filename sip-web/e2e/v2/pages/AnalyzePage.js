@@ -78,8 +78,12 @@ class AnalyzePage extends CreateAnalysisModel {
           `//a[contains(text(),'${name}')]/following::button[@e2e='action-fork-btn']`
         )
       );
-    this._scheduledTimingsInListView = reportName => element(by.xpath(`//a[text()='${reportName}']/following::td[2]`));
-    this._scheduledTimingsInCardView = reportName => element(by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
+    this._scheduledTimingsInListView = reportName =>
+      element(
+      by.xpath(`//a[text()='${reportName}']/following::td[2]`));
+    this._scheduledTimingsInCardView = reportName =>
+      element(
+      by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
   }
 
   goToView(viewName) {

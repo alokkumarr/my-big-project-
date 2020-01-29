@@ -1,7 +1,6 @@
 'use strict';
 const logger = require('../conf/logger')(__filename);
 const commonFunctions = require('./utils/commonFunctions');
-const ConfirmationModel = require('./components/ConfirmationModel');
 
 class SchedulePage {
   constructor() {
