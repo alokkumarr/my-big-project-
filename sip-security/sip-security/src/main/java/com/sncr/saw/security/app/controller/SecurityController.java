@@ -2368,7 +2368,7 @@ public class SecurityController {
     Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
     if (customerId == 0) {
       response.setStatus(HttpStatus.BAD_REQUEST.value());
-      brandResponse.setMessage("No Customer exit for branding.");
+      brandResponse.setMessage("No Customer exist for branding.");
       return brandResponse;
     }
 
