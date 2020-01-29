@@ -8,8 +8,6 @@ import org.apache.spark.sql.types.*;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import org.apache.spark.sql.functions;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class NGJsonFileParser implements FileParser {
     private InternalContext iCtx;
@@ -35,14 +33,13 @@ public class NGJsonFileParser implements FileParser {
         return outputDS;
     }
 
-    private Dataset<Row> processNestedJsonDS(final Dataset<Row> dataset){
+    private Dataset<Row> processNestedJsonDS(Dataset<Row> dataset){
         StructType dsSchema = dataset.schema();
-        logger.debug("Root DS Schema : "+ dsSchema);
+        logger.debug("DS Schema : "+ dsSchema);
         StructField[] dsFields = dsSchema.fields();
-        logger.debug("Root DS Fields : "+ Arrays.toString(dsFields));
-        AtomicBoolean isNested = new AtomicBoolean(false);
-        AtomicReference<Dataset<Row>> outputDataset =  new AtomicReference<>();
-        Arrays.stream(dsFields).forEach(field -> {
+        logger.debug("DS Fields : "+ Arrays.toString(dsFields));
+        boolean isNested = false;
+        for(StructField field : dsFields){
             String name = field.name();
             logger.debug("Field Name : "+ name);
             DataType datatype = field.dataType();
@@ -50,28 +47,29 @@ public class NGJsonFileParser implements FileParser {
             logger.debug("Field Nullable : "+ field.nullable());
             if(datatype instanceof StructType){
                 //StructType
-                isNested.set(true);
-                outputDataset.set(processStructType(dataset, field));
+                isNested=true;
+                dataset = processStructType(dataset, field);
+                break;
             }else if(datatype instanceof ArrayType){
                 //ArrayType
-                isNested.set(true);
-                outputDataset.set(processArrayType(dataset, field));
+                isNested=true;
+                dataset = processArrayType(dataset, field);
+                break;
             }
-        });
-        if(isNested.get()){
-            outputDataset.set(processNestedJsonDS(dataset));
         }
-        return outputDataset.get();
+        if(isNested){
+            dataset = processNestedJsonDS(dataset);
+        }
+        return dataset;
     }
 
-    private Dataset<Row> processStructType(final Dataset<Row> dataset, StructField structTypeField){
+    private Dataset<Row> processStructType(Dataset<Row> dataset, StructField structTypeField){
         logger.debug("Processing StructType Field");
-        final String parentColName = structTypeField.name();
+        String parentColName = structTypeField.name();
         logger.debug("Parent Column Name : "+ parentColName);
-        StructField[] dsFields = ((StructType)structTypeField.dataType()).fields();
-        logger.debug("DS Fields : "+ Arrays.toString(dsFields));
-        AtomicReference<Dataset<Row>> outputDataset =  new AtomicReference<>();
-        Arrays.stream(dsFields).forEach(field -> {
+        StructField[] subFields = ((StructType)structTypeField.dataType()).fields();
+        logger.debug("Sub Fields : "+ Arrays.toString(subFields));
+        for(StructField field : subFields){
             String name = field.name();
             logger.debug("Sub Field Name : "+ name);
             DataType datatype = field.dataType();
@@ -83,31 +81,29 @@ public class NGJsonFileParser implements FileParser {
             String newColName = colName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
             logger.debug("New Column Name : "+ newColName);
 
-            outputDataset.set(dataset.withColumn(newColName, dataset.col(colName)));
-        });
-        return outputDataset.get().drop(parentColName);
+            dataset = dataset.withColumn(newColName, dataset.col(colName));
+        }
+        return dataset.drop(parentColName);
     }
 
-    private Dataset<Row> processArrayType(final Dataset<Row> dataset, StructField arrayTypeField){
+    private Dataset<Row> processArrayType(Dataset<Row> dataset, StructField arrayTypeField){
         logger.debug("Processing ArrayType Field");
-        final String parentColName = arrayTypeField.name();
+        String parentColName = arrayTypeField.name();
         logger.debug("Parent Column Name : "+ parentColName);
         int arrSize = getArrayFieldMaxSize(dataset, parentColName);
-        AtomicReference<Dataset<Row>> outputDataset =  new AtomicReference<>();
-        IntStream.range(0, arrSize).forEach(index -> {
+        for(int index = 0; index < arrSize; index++) {
             String newColName = parentColName +  NEW_COLUMN_NAME_DELIMITER + index;
             logger.debug("New Column Name : "+ newColName);
-            outputDataset.set(dataset.withColumn(newColName, dataset.col(parentColName).getItem(index)));
-        });
-        return outputDataset.get().drop(parentColName);
+            dataset = dataset.withColumn(newColName, dataset.col(parentColName).getItem(index));
+        }
+        return dataset.drop(parentColName);
     }
 
     private int getArrayFieldMaxSize(Dataset<Row> dataset, String arrayColName){
-        String newSizeColumn = "arrSize";
-        int arrSize = dataset.withColumn(newSizeColumn,functions.size(dataset.col(arrayColName)))
-            .agg(functions.max(dataset.col(newSizeColumn))).head().getInt(0);
+        String newSizeColumn = arrayColName + NEW_COLUMN_NAME_DELIMITER + "arrSize";
+        Dataset<Row> arraySizeDS = dataset.withColumn(newSizeColumn,functions.size(dataset.col(arrayColName)));
+        int arrSize = arraySizeDS.agg(functions.max(arraySizeDS.col(newSizeColumn))).head().getInt(0);
         logger.debug(arrayColName+" Array Column Max Length : "+ arrSize);
-        dataset = dataset.drop(newSizeColumn);
         return arrSize;
     }
 }
