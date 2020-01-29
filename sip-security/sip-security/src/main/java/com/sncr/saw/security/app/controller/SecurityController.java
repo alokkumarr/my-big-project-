@@ -364,30 +364,33 @@ public class SecurityController {
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
 	public String logout(@RequestHeader("Authorization") String token, HttpServletRequest request,
 			HttpServletResponse response) {
-		if(StringUtils.isEmpty(token) || request == null) {
+		Gson gson = new Gson();
+		if (StringUtils.isEmpty(token) || request == null) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			return  "Invalid Token";
+			return gson.toJson("Invalid Token");
 		}
+
 		Ticket ticket = SipCommonUtils.getTicket(request);
 		Boolean validity =
 				ticket != null && ticket.getValidUpto() != null ? ticket.getValidUpto() > (new Date()
 						.getTime()) : false;
 		if (!validity) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			return  "Token has expired. Please re-login";
+			return gson.toJson("Token has expired. Please re-login");
 		}
+
 		try {
-			return tHelper.logout(ticket.getTicketId());
+			return gson.toJson(tHelper.logout(ticket.getTicketId()));
 		} catch (DataAccessException de) {
-			return de.getMessage();
+			return gson.toJson(de.getMessage());
 		}
 	}
+
 	/**
 	 *
 	 * @param changePasswordDetails
