@@ -21,6 +21,7 @@ import com.sncr.saw.security.common.bean.repo.admin.privilege.SubCategoriesPrivi
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.PasswordValidation;
+import com.sncr.saw.security.common.util.SecurityUtils;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.sip.utils.PrivilegeUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -62,12 +63,6 @@ public class ExternalSecurityService {
 
   private boolean haveCategoryCheck = false;
   private boolean haveSubCategoryFlag = false;
-
-  private static final String namePattern = "^[a-zA-Z]*$";
-  private static final String loginIdPattern =
-      "^[A-z\\d_@.#$=!%^)(\\]:\\*;\\?\\/\\,}{'\\|<>\\[&\\+-`~]*$";
-  private static final String emailPattern =
-      "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
 
   /**
    * Create Role , Category, Subcategory and Privilege
@@ -754,14 +749,16 @@ public class ExternalSecurityService {
     logger.trace("User details body :{}", userDetails);
     validateUserDetails(userDetails);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
-    if (!userDetails.getFirstName().matches(namePattern)) {
+    if (!SecurityUtils.isValidName(userDetails.getFirstName())) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.invalidMessage, "FirstName"));
       logger.debug(String.format(ErrorMessages.invalidMessage, "FirstName"));
       return userDetailsResponse;
     }
-    if (!userDetails.getLastName().matches(namePattern)) {
+    if (!SecurityUtils.isValidName(userDetails.getLastName())) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.invalidMessage, "LastName"));
@@ -770,7 +767,8 @@ public class ExternalSecurityService {
     }
     String middleName = userDetails.getMiddleName();
     if (middleName != null) {
-      if (!middleName.matches(namePattern)) {
+      if (!SecurityUtils.isValidName(middleName)) {
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
         userDetailsResponse.setValid(false);
         userDetailsResponse.setValidityMessage(
             String.format(ErrorMessages.invalidMessage, "MiddleName"));
@@ -778,7 +776,8 @@ public class ExternalSecurityService {
         return userDetailsResponse;
       }
     }
-    if (!userDetails.getMasterLoginId().matches(loginIdPattern)) {
+    if (!SecurityUtils.isValidMasterLoginId(userDetails.getMasterLoginId())) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
@@ -786,7 +785,8 @@ public class ExternalSecurityService {
       return userDetailsResponse;
     }
 
-    if (!userDetails.getEmail().matches(emailPattern)) {
+    if (!SecurityUtils.isEmailValid(userDetails.getEmail())) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(String.format(ErrorMessages.invalidMessage, "Email"));
       logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));

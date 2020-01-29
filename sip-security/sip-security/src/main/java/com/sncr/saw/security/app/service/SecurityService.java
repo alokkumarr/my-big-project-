@@ -2,22 +2,16 @@ package com.sncr.saw.security.app.service;
 
 import com.google.common.base.Preconditions;
 import com.sncr.saw.security.app.repository.UserRepository;
-import com.sncr.saw.security.common.bean.UserDetails;
-import com.sncr.saw.security.common.bean.Valid;
-import com.sncr.saw.security.common.bean.repo.admin.UserDetailsResponse;
-import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
+import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.constants.ErrorMessages;
-import com.sncr.saw.security.common.util.PasswordValidation;
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-
+import com.sncr.saw.security.common.util.SecurityUtils;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import org.apache.commons.lang.RandomStringUtils;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +19,6 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
   private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
-
 
   @Autowired private UserRepository userRepository;
 
@@ -38,5 +31,79 @@ public class SecurityService {
    */
   public boolean haveValidCustomerId(Ticket ticket, Long customerId) {
     return !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId);
+  }
+
+  public UsersList validateUserDetails(User userDetails, HttpServletResponse httpServletResponse) {
+    validateUser(userDetails);
+
+    UsersList userDetailsResponse = new UsersList();
+    if (!SecurityUtils.isValidName(userDetails.getFirstName())) {
+      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "FirstName"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "FirstName"));
+      return userDetailsResponse;
+    }
+    if (!SecurityUtils.isValidName(userDetails.getLastName())) {
+      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "LastName"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "LastName"));
+      return userDetailsResponse;
+    }
+    String middleName = userDetails.getMiddleName();
+    if (middleName != null) {
+      if (!SecurityUtils.isValidName(middleName)) {
+        httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        userDetailsResponse.setValid(false);
+        userDetailsResponse.setValidityMessage(
+            String.format(ErrorMessages.invalidMessage, "MiddleName"));
+        logger.debug(String.format(ErrorMessages.invalidMessage, "MiddleName"));
+        return userDetailsResponse;
+      }
+    }
+    if (!SecurityUtils.isValidMasterLoginId(userDetails.getMasterLoginId())) {
+      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
+      return userDetailsResponse;
+    }
+
+    if (!!SecurityUtils.isEmailValid(userDetails.getEmail())) {
+      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(String.format(ErrorMessages.invalidMessage, "Email"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));
+      return userDetailsResponse;
+    }
+    return userDetailsResponse;
+  }
+
+  private void validateUser(User userDetails) {
+
+    Preconditions.checkNotNull(
+        userDetails, String.format(ErrorMessages.nullErrorMessage, "Request Body"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getMasterLoginId()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "masterLoginId"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getEmail()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getFirstName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "firstName"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getLastName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getRoleName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleName"));
+    Preconditions.checkNotNull(
+        userDetails.getActiveStatusInd(),
+        String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
   }
 }

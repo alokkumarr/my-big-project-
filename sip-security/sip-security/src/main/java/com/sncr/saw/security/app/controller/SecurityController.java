@@ -1480,6 +1480,7 @@ public class SecurityController {
       response = UsersList.class)
   @RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
   public UsersList addUser(HttpServletRequest request,
+      HttpServletResponse httpServletResponse,
       @ApiParam(value = "Authorization token") @RequestHeader("Authorization") String authToken,
       @ApiParam(value = "User details to store", required = true) @RequestBody User user) {
     String[] valuesFromToken =
@@ -1491,6 +1492,11 @@ public class SecurityController {
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
+        userList= securityService.validateUserDetails(user,httpServletResponse);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            return userList;
+        }
+
         Valid validity = PasswordValidation.validatePassword(user.getPassword(), user.getMasterLoginId());
         userList.setValid(validity.getValid());
         userList.setValidityMessage(validity.getValidityMessage());
@@ -1525,7 +1531,7 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
-	public UsersList updateUser(HttpServletRequest request, @RequestBody User user) {
+	public UsersList updateUser(HttpServletRequest request,HttpServletResponse servletResponse,@RequestBody User user) {
 		UsersList userList = new UsersList();
 		Valid valid = null;
 		try {
@@ -1537,6 +1543,10 @@ public class SecurityController {
 					userList.setValid(validity.getValid());
 					userList.setValidityMessage(validity.getValidityMessage());
 				}
+                userList = securityService.validateUserDetails(user, servletResponse);
+                if (userList != null && userList.getValid() != null && !userList.getValid()) {
+                    return userList;
+                 }
 
 				if (userList.getValid()) {
 					valid = userRepository.updateUser(user);
