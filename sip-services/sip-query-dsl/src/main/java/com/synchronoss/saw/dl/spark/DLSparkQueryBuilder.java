@@ -94,6 +94,7 @@ public class DLSparkQueryBuilder {
                     Aggregate aggregate = field.getAggregate();
                     String artifactName = artifact.getArtifactsName();
                     String columnName = field.getColumnName();
+                    String aliasName = field.getAlias();
                     if (aggregate != null && !aggregate.value().isEmpty()) {
                       aggCount.getAndIncrement();
                       if (aggregate == Aggregate.DISTINCTCOUNT) {
@@ -102,21 +103,6 @@ public class DLSparkQueryBuilder {
                         column = buildForPercentage(artifactName, field);
                         groupByColumns.add(artifactName + "." + columnName);
                       } else {
-                        if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
-                          column =
-                              aggregate.value()
-                                  + "("
-                                  + artifactName
-                                  + "."
-                                  + columnName.replace(".keyword", "")
-                                  + ") as `"
-                                  + aggregate.value()
-                                  + "("
-                                  + artifactName
-                                  + "_"
-                                  + columnName
-                                  + ")` ";
-                        } else {
                           column =
                               aggregate.value()
                                   + "("
@@ -124,7 +110,9 @@ public class DLSparkQueryBuilder {
                                   + "."
                                   + columnName.replace(".keyword", "")
                                   + ")";
-                        }
+                          if (!StringUtils.isBlank(aliasName)) {
+                            column += " AS `" + aliasName + "`";
+                          }
                       }
                     } else {
                       column = artifactName + "." + columnName.replace(".keyword", "");
@@ -566,27 +554,27 @@ public class DLSparkQueryBuilder {
   private String buildDistinctCount(String artifactName, Field field) {
     String columnName = field.getColumnName().replace(".keyword", "");
     String column = null;
-    if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
-      column =
-          "count(distinct "
-              + artifactName
-              + "."
-              + columnName
-              + ") as `distinctCount("
-              + artifactName
-              + "_"
-              + columnName
-              + ")`";
+
+    String aliasName = field.getAlias();
+    column =
+        "count(distinct "
+            + artifactName
+            + "."
+            + field.getColumnName().replace(".keyword", "")
+            + ") as ";
+
+    StringBuilder aliasBuilder = new StringBuilder();
+    aliasBuilder.append("`");
+
+    if (StringUtils.isBlank(aliasName)) {
+      aliasBuilder.append("distinctCount(").append(field.getColumnName()).append(")");
     } else {
-      column =
-          "count(distinct "
-              + artifactName
-              + "."
-              + field.getColumnName().replace(".keyword", "")
-              + ") as `distinctCount("
-              + field.getColumnName()
-              + ")`";
+      aliasBuilder.append(aliasName);
     }
+
+    aliasBuilder.append("`");
+
+    column += aliasBuilder.toString();
     return column;
   }
 
@@ -623,6 +611,7 @@ public class DLSparkQueryBuilder {
   private String buildForPercentage(String artifactName, Field field) {
     String buildPercentage = "";
     String columnName = field.getColumnName();
+    String aliasName = field.getAlias();
     if (artifactName != null && !artifactName.trim().isEmpty() && columnName != null) {
       buildPercentage =
           buildPercentage.concat(
@@ -636,9 +625,22 @@ public class DLSparkQueryBuilder {
                   + columnName
                   + ") FROM "
                   + artifactName
-                  + ") as `percentage("
-                  + columnName
-                  + ")`");
+                  + ") as ");
+
+      StringBuilder aliasBuilder = new StringBuilder();
+      if (StringUtils.isBlank(aliasName)) {
+        aliasBuilder
+            .append("`")
+            .append("percentage")
+            .append("(")
+            .append(columnName)
+            .append(")")
+            .append("`");
+      } else {
+        aliasBuilder.append("`").append(aliasName).append("`");
+      }
+
+      buildPercentage += aliasBuilder.toString();
     }
 
     return buildPercentage;

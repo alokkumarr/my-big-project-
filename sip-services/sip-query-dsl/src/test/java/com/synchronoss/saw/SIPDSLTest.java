@@ -235,6 +235,70 @@ public class SIPDSLTest {
   }
 
   @Test
+  public void testPercentageWithAlias() {
+    SIPDSL sipdsl = testUtil();
+    DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+
+    List<Field> fieldList = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+
+    Field field = new Field();
+    field.setColumnName("double");
+    field.setType(Type.DOUBLE);
+    field.setAggregate(Aggregate.SUM);
+    field.setDataField("double");
+    field.setAggregate(Aggregate.PERCENTAGE);
+    field.setAlias("DOUBLE_PERCENTAGE");
+    fieldList.add(field);
+
+    sipdsl.getSipQuery().getArtifacts().get(0).setFields(fieldList);
+    String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+    String percentQuery =
+        "SELECT SALES.string, SALES.integer, (SALES.double*100)/(Select sum(SALES.double) FROM SALES) as `DOUBLE_PERCENTAGE` FROM SALES GROUP BY SALES.string, SALES.integer, SALES.double";
+    Assert.assertEquals(percentQuery, assertForAggSort);
+  }
+
+  @Test
+  public void testDistinctCount() {
+    SIPDSL sipdsl = testUtil();
+    DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+
+    List<Field> fieldList = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+
+    Field field = new Field();
+    field.setColumnName("double");
+    field.setType(Type.DOUBLE);
+    field.setAggregate(Aggregate.DISTINCTCOUNT);
+    fieldList.add(field);
+
+    sipdsl.getSipQuery().getArtifacts().get(0).setFields(fieldList);
+    String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+    String percentQuery =
+        "SELECT SALES.string, SALES.integer, count(distinct SALES.double) as `distinctCount(double)` FROM SALES GROUP BY SALES.string, SALES.integer";
+    Assert.assertEquals(percentQuery, assertForAggSort);
+  }
+
+    @Test
+    public void testDistinctCountWithAlias() {
+        SIPDSL sipdsl = testUtil();
+        DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+
+        List<Field> fieldList = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+
+        Field field = new Field();
+        field.setColumnName("double");
+        field.setType(Type.DOUBLE);
+        field.setAggregate(Aggregate.DISTINCTCOUNT);
+        field.setAlias("DISTINCT_COUNT_DOUBLE");
+        fieldList.add(field);
+
+        sipdsl.getSipQuery().getArtifacts().get(0).setFields(fieldList);
+        String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+        String percentQuery =
+            "SELECT SALES.string, SALES.integer, count(distinct SALES.double) as `DISTINCT_COUNT_DOUBLE` FROM SALES GROUP BY SALES.string, SALES.integer";
+        Assert.assertEquals(percentQuery, assertForAggSort);
+    }
+
+  @Test
   public void testFilter() {
     SIPDSL sipdsl = testUtil();
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
