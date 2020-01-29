@@ -6,7 +6,7 @@ import { UserService } from '../user.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 import { validatePassword } from 'src/app/common/validators/password-policy.validator';
 
-const namePattern = /^[a-zA-Z]*$/;
+const namePattern = /^[a-zA-Z0-9]*$/;
 const loginIdPattern = /^[A-z\d_@.#$=!%^)(\]:\*;\?\/\,}{'\|<>\[&\+-`~]*$/;
 const dummyPassword = '*********';
 
