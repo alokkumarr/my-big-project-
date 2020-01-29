@@ -3,7 +3,7 @@ export const DEFAULT_COLOR_PICKER_OPTION = {
   bgColor: '',
   position: 'top-right',
   width: '180px',
-  height: 'auto',
+  height: '300px',
   display: 'popup',
   mode: 'color',
   labelText: 'Color :',
@@ -19,7 +19,6 @@ export const DEFAULT_COLOR_PICKER_OPTION = {
   presetColors: [],
   positionOffset: '10%',
   positionRelativeToArrow: true,
-  toggle: false,
   saveOnClickOutside: true,
   relativeToArrow: true
 };

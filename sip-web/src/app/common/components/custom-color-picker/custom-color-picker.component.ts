@@ -14,16 +14,17 @@ import { BehaviorSubject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 const OFFSET_TOP_LIMIT = 300;
-
 @Component({
   selector: 'custom-color-picker',
   templateUrl: './custom-color-picker.component.html',
   styleUrls: ['./custom-color-picker.component.scss']
 })
 export class CustomColorPickerComponent implements OnInit {
-  public config;
   @Output() public change: EventEmitter<any> = new EventEmitter();
-  colorEvent$: BehaviorSubject<any> = new BehaviorSubject('');
+
+  public config;
+  public colorEvent$: BehaviorSubject<any> = new BehaviorSubject('');
+  public toggleEvent$: BehaviorSubject<any> = new BehaviorSubject('');
 
   @Input('config') set setConfig(data) {
     this.config = data;
@@ -45,30 +46,30 @@ export class CustomColorPickerComponent implements OnInit {
           });
         }
       });
-  }
 
-  /**
-   * Here setting the position of color picker because for first metric the color picker height is reduced due to
-   * 'auto' property set in config object.
-   */
-  clickOnInput() {
-    if (this.config.iscustomStyleNeeded) {
-      if (this.elRef.nativeElement.offsetTop < OFFSET_TOP_LIMIT) {
-        const colorPickerDiv = this.elRef.nativeElement.querySelector(
-          'div.color-picker'
-        );
-        this.renderer.setStyle(
-          colorPickerDiv,
-          'top',
-          '0px',
-          RendererStyleFlags2.Important
-        );
+    /**
+     * Here setting the position of color picker because for first metric the color picker height is reduced due to
+     * 'auto' property set in config object.
+     * Delaying the subscription to make the color picker elems available for styling.
+     */
+    this.toggleEvent$.pipe(debounceTime(0)).subscribe(result => {
+      if (result && this.config.iscustomStyleNeeded) {
+        if (this.elRef.nativeElement.offsetTop < OFFSET_TOP_LIMIT) {
+          const colorPickerDiv = this.elRef.nativeElement.querySelector(
+            'div.color-picker'
+          );
+          this.renderer.setStyle(
+            colorPickerDiv,
+            'top',
+            '0px',
+            RendererStyleFlags2.Important
+          );
+        }
+        this.setColorPickerStyles();
+        const div = this.elRef.nativeElement.querySelector('div.arrow');
+        this.renderer.setStyle(div, 'display', 'none');
       }
-
-      this.setColorPickerStyles();
-      const div = this.elRef.nativeElement.querySelector('div.arrow');
-      this.renderer.setStyle(div, 'display', 'none');
-    }
+    });
   }
 
   setColorPickerStyles() {

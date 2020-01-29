@@ -18,7 +18,6 @@
     [cpCancelButton]="config.cancelButton"
     [cpCancelButtonClass]="config.cancelButtonClass"
     [cpCancelButtonText]="config.cancelButtonText"
-    [cpToggle]="config.toggle"
     [cpIgnoredElements]="config.ignoreHTMLElements"
     [cpPositionOffset]="config.positionOffset"
     [cpPositionRelativeToArrow]="config.positionRelativeToArrow"
@@ -27,7 +26,7 @@
     [cpPresetColors]="config.presetColors"
     [cpAlphaChannel]="config.alphaChannel"
     [cpPositionRelativeToArrow]="config.relativeToArrow"
-    (click)="clickOnInput()"
     (colorPickerChange)="colorEvent$.next($event)"
+    (cpToggleChange)="toggleEvent$.next($event)"
   />
 </div>
