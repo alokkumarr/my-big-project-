@@ -1492,8 +1492,9 @@ public class SecurityController {
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
-        userList= securityService.validateUserDetails(user,httpServletResponse);
+        userList= securityService.validateUserDetails(user);
         if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return userList;
         }
 
@@ -1543,8 +1544,9 @@ public class SecurityController {
 					userList.setValid(validity.getValid());
 					userList.setValidityMessage(validity.getValidityMessage());
 				}
-                userList = securityService.validateUserDetails(user, servletResponse);
+                userList = securityService.validateUserDetails(user);
                 if (userList != null && userList.getValid() != null && !userList.getValid()) {
+                    servletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
                     return userList;
                  }
 

@@ -33,12 +33,11 @@ public class SecurityService {
     return !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId);
   }
 
-  public UsersList validateUserDetails(User userDetails, HttpServletResponse httpServletResponse) {
+  public UsersList validateUserDetails(User userDetails) {
     validateUser(userDetails);
 
     UsersList userDetailsResponse = new UsersList();
     if (!SecurityUtils.isValidName(userDetails.getFirstName())) {
-      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.invalidMessage, "FirstName"));
@@ -46,7 +45,6 @@ public class SecurityService {
       return userDetailsResponse;
     }
     if (!SecurityUtils.isValidName(userDetails.getLastName())) {
-      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.invalidMessage, "LastName"));
@@ -56,7 +54,6 @@ public class SecurityService {
     String middleName = userDetails.getMiddleName();
     if (middleName != null) {
       if (!SecurityUtils.isValidName(middleName)) {
-        httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         userDetailsResponse.setValid(false);
         userDetailsResponse.setValidityMessage(
             String.format(ErrorMessages.invalidMessage, "MiddleName"));
@@ -65,7 +62,6 @@ public class SecurityService {
       }
     }
     if (!SecurityUtils.isValidMasterLoginId(userDetails.getMasterLoginId())) {
-      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
@@ -74,7 +70,6 @@ public class SecurityService {
     }
 
     if (!!SecurityUtils.isEmailValid(userDetails.getEmail())) {
-      httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(String.format(ErrorMessages.invalidMessage, "Email"));
       logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));
