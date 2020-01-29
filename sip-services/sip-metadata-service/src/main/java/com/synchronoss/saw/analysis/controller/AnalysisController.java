@@ -196,28 +196,37 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id,
-      @RequestHeader("Authorization") String authToken) throws IOException {
+      @RequestHeader(name = "Authorization", required = false) String authToken,
+      @ApiParam(value = "internalCall", required = false)
+          @RequestParam(name = "internalCall", required = false)
+          String internalCall)
+      throws IOException {
+    boolean isInternalCall = Boolean.parseBoolean(internalCall);
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    if (!authValidation(authToken)) {
+    if (!isInternalCall && !authValidation(authToken)) {
       setUnAuthResponse(response);
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
-    Ticket authTicket = getTicket(request);
+    Ticket authTicket = isInternalCall ? null : getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
     if (analysis == null) {
-      response.sendError(HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.getReasonPhrase());
+      response.sendError(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase());
       analysisResponse.setMessage(HttpStatus.NOT_FOUND.getReasonPhrase());
       return analysisResponse;
     }
-    response = validateTicket(authTicket, PrivilegeNames.DELETE, analysis, response);
+    response =
+        isInternalCall
+            ? null
+            : validateTicket(authTicket, PrivilegeNames.DELETE, analysis, response);
     if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
 
     Long categoryId = analysis.getCategory() != null ? Long.valueOf(analysis.getCategory()) : 0L;
-    if (response != null && response.getStatus() != HttpStatus.UNAUTHORIZED.value()
+    if (response != null
+        && response.getStatus() != HttpStatus.UNAUTHORIZED.value()
         && SipCommonUtils.haveSystemCategory(authTicket.getProducts(), categoryId)) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
