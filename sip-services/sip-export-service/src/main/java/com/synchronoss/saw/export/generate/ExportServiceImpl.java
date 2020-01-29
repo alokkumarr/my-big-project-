@@ -118,18 +118,17 @@ public class ExportServiceImpl implements ExportService {
   private RestTemplate restTemplate = null;
 
   private static final String PIVOT_ANALYSIS_TYPE = "pivot";
+  private static final String DEFAULT_FILE_TYPE = "csv";
+  private static final String INTERNAL_PROXY_STOR_URL = "/internal/proxy/storage/";
+  private static final String INTERNAL_CALL = "internalCall=true";
+  private static final String JOBGROUP = "jobGroup";
+  private static final String EMAIL_LIST = "emailList";
+  private static final String DELETE_EXPORT_FILE_CONST = "Deleting exported file.";
 
   @PostConstruct
   public void init() {
     restTemplate = restUtil.restTemplate();
   }
-
-  private static final String DEFAULT_FILE_TYPE = "csv";
-  private static final String INTERNAL_PROXY_STOR_URL = "/internal/proxy/storage/";
-  private static final String INTERNAL_CALL = "&internalCall=true";
-  private static final String JOBGROUP = "jobGroup";
-  private static final String EMAIL_LIST = "emailList";
-  private static final String DELETE_EXPORT_FILE_CONST = "Deleting exported file.";
 
   @Override
   public ResponseEntity<DataResponse> dataToBeExportedAsync(
@@ -155,7 +154,7 @@ public class ExportServiceImpl implements ExportService {
               + analysisType
               + "&executionType="
               + executionType
-              + INTERNAL_CALL;
+              + "&" + INTERNAL_CALL;
 
     } else if (executionId == null) {
       url =
@@ -166,7 +165,7 @@ public class ExportServiceImpl implements ExportService {
               + sizOfExport
               + "&analysisType="
               + analysisType
-              + INTERNAL_CALL;
+              + "&" + INTERNAL_CALL;
     } else {
       url =
           storageProxyUrl
@@ -176,7 +175,7 @@ public class ExportServiceImpl implements ExportService {
               + sizOfExport
               + "&analysisType="
               + analysisType
-              + INTERNAL_CALL;
+              + "&" + INTERNAL_CALL;
     }
     HttpEntity<?> requestEntity = new HttpEntity<>(ExportUtils.setRequestHeader(request));
     /**
@@ -690,9 +689,9 @@ public class ExportServiceImpl implements ExportService {
         S3Customer s3Customer = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
         for (S3Details alias : s3Customer.getS3List()) {
           if (alias.getCustomerCode().equals(finalJobGroup) && aliasTemp.equals(alias.getAlias())) {
-            logger.trace(String
-                .format("BucketName : %s, Region : %s, Output Location : %s", alias.getBucketName(),
-                    alias.getRegion(), alias.getOutputLocation()));
+            logger
+                .trace("BucketName : {}, Region : {}, Output Location : {}", alias.getBucketName(),
+                    alias.getRegion(), alias.getOutputLocation());
             S3Config s3Config =
                 new S3Config(
                     alias.getBucketName(),

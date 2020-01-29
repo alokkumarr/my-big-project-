@@ -8,7 +8,6 @@ public class ExportBean {
 
 	private String fileName;
 	private String [] columnHeader = new String []{};
-	private String serverPathLocation;
 	private DataField.Type[] columnDataType;
 	private String reportName;
 	private String reportDesc;
@@ -84,11 +83,6 @@ public class ExportBean {
 		this.publishDate = publishDate;
 	}
 
-
-	public ExportBean() {
-		this.serverPathLocation = System.getProperty("custom.pubReports.root");
-	}
-
 	/**
 	 *
 	 * @return
@@ -103,21 +97,6 @@ public class ExportBean {
 	 */
 	public void setColumnDataType(DataField.Type[] columnDataType) {
 		this.columnDataType = columnDataType;
-	}
-
-
-	/**
-	 * @return the serverPathLocation
-	 */
-	public String getServerPathLocation() {
-		return serverPathLocation;
-	}
-
-	/**
-	 * @param serverPathLocation the serverPathLocation to set
-	 */
-	public void setServerPathLocation(String serverPathLocation) {
-		this.serverPathLocation = serverPathLocation;
 	}
 
 	/**
