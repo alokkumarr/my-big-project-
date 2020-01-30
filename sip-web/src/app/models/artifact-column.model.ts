@@ -29,6 +29,7 @@ export interface ArtifactColumn {
   name?: string;
   geoType?: string;
   seriesColor?: string;
+  colorSetFromPicker?: boolean;
 }
 
 export interface ArtifactColumnChart extends ArtifactColumn {

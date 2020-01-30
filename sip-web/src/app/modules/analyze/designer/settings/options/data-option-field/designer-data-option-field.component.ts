@@ -22,6 +22,7 @@ import { getArtifactColumnTypeIcon } from '../../../utils';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 import { DEFAULT_COLOR_PICKER_OPTION } from '../../../../../../common/components/custom-color-picker/default-color-picker-options';
 import { CHART_COLORS } from 'src/app/common/consts';
+import { DATA_AXIS } from '../../../consts';
 
 const ALIAS_CHANGE_DELAY = 500;
 const Default_Chart_Colors = cloneDeep(CHART_COLORS);
@@ -44,7 +45,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     )(sipQuery.artifacts);
     this.fieldCount = fields.length;
   }
-
   public typeIcon: string;
   public fieldCount: number;
   public sipQuery: QueryDSL;
@@ -60,7 +60,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   ngOnInit() {
     const type = this.artifactColumn.type;
     this.hasDateInterval = DATE_TYPES.includes(type);
-    this.isDataField = ['y', 'z', 'data'].includes(
+    this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
     );
 
@@ -71,11 +71,9 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     );
     this.colorPickerConfig = cloneDeep(DEFAULT_COLOR_PICKER_OPTION);
     const presetColors = take(Default_Chart_Colors, 12);
-    set(
-      this.colorPickerConfig,
-      'bgColor',
-      this.artifactColumn.seriesColor || '#ffffff'
-    );
+    if (this.isDataField) {
+      set(this.colorPickerConfig, 'bgColor', this.artifactColumn.seriesColor);
+    }
     set(this.colorPickerConfig, 'presetColors', presetColors);
     set(this.colorPickerConfig, 'iscustomStyleNeeded', true);
   }
@@ -143,6 +141,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   selectedColor(event) {
     if (event.data) {
       set(this.artifactColumn, 'seriesColor', event.data);
+      set(this.artifactColumn, 'colorSetFromPicker', true);
       this.change.emit({
         subject: 'seriesColorChange',
         data: { artifact: this.artifactColumn }
