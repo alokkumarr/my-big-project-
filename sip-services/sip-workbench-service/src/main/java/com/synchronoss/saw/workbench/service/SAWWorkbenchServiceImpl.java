@@ -376,27 +376,24 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
           DSSearchParams dsSearchParams = optionalSearchParams.get();
           logger.info("DSSearchParams: "+dsSearchParams);
           if(dsSearchParams != null){
-              if(dsSearchParams.getCategory() != null && dsSearchParams.getCategory().length != 0){
-                  searchParams.put(DataSetProperties.Category, dsSearchParams.getCategory());
-              }
-              if(dsSearchParams.getSubCategory() != null && dsSearchParams.getSubCategory().length != 0){
-                  searchParams.put(DataSetProperties.SubCategory, dsSearchParams.getSubCategory());
-              }
-              if(dsSearchParams.getCatalog() != null && dsSearchParams.getCatalog().length != 0){
-                  searchParams.put(DataSetProperties.Catalog, dsSearchParams.getCatalog());
-              }
-              if(dsSearchParams.getDataSource() != null && dsSearchParams.getDataSource().length != 0){
-                  searchParams.put(DataSetProperties.DataSource, dsSearchParams.getDataSource());
-              }
-              if(dsSearchParams.getDstype() != null && dsSearchParams.getDstype().length != 0){
-                  searchParams.put(DataSetProperties.Type, dsSearchParams.getDstype());
-              }
+              addSearchParamToMap(searchParams, DataSetProperties.Category, dsSearchParams.getCategory());
+              addSearchParamToMap(searchParams, DataSetProperties.SubCategory, dsSearchParams.getSubCategory());
+              addSearchParamToMap(searchParams, DataSetProperties.Catalog, dsSearchParams.getCatalog());
+              addSearchParamToMap(searchParams, DataSetProperties.DataSource, dsSearchParams.getDataSource());
+              addSearchParamToMap(searchParams, DataSetProperties.Type, dsSearchParams.getDstype());
           }
           return searchParams;
       }else{
           return null;
       }
   }
+
+  public void addSearchParamToMap(Map<DataSetProperties, String[]> searchParams, DataSetProperties property, String[] value){
+      if(value != null && value.length != 0){
+          searchParams.put(property, value);
+      }
+  }
+
   /**
    * This method generates the structure aligned to meta data store structure
    * @param project
