@@ -12,6 +12,8 @@ import sncr.bda.core.file.HFileOperations;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.Optional;
+import sncr.bda.datasets.conf.DataSetProperties;
+import org.apache.log4j.Logger;
 
 /**
  * Created by srya0001 on 10/30/2017.
@@ -21,7 +23,7 @@ import java.util.Optional;
  *
  */
 public class DataSetStore extends MetadataStore implements WithSearchInMetastore {
-
+    private static final Logger logger = Logger.getLogger(DataSetStore.class);
     public static String TABLE_NAME = "datasets";
     public final String STATUS_SECTION = "asOfNow";
     public final String USER_DATA = "userData";
@@ -95,7 +97,6 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         newList.forEach( tid -> ja.add( new JsonPrimitive(tid)));
         _updatePath(id, "transformations", "asInput", ja);
     }
-
     /**
      * The method queries Data Set Meta store to get all datasets as List of serialized JSON by
      * - project AND
@@ -106,34 +107,52 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @return  - List of serialized JSON documents
      * @throws Exception
      */
-    public List<String> getListOfDS(
-            String project,
-            String dataSource,
-            String catalog,
-            String category,
-            String subCategory
-    ) throws Exception {
-        if (project.isEmpty()) {
+    public List<String> getListOfDS(String project, Map<DataSetProperties, String[]> searchParams) throws Exception
+    {
+        if (project == null || project.trim().isEmpty()) {
             throw new Exception("ProjectService is empty");
         }
         QueryCondition cond = MapRDB.newCondition();
         cond.and();
-        
         // The below has been commented for the JIRA-ID SIP-5727 & it will be activated when workbench module
         // will start using project metadata store & dynamically retrieve the project store
         //cond.is("system.project", QueryCondition.Op.EQUAL, project);
         
         // The below code is to skip filters irrespective of any project
         cond.like("system.project", "%");
-        if ( category != null && !category.isEmpty()) cond = addEqOrLikeClause(cond, "userData.category", category);
-
-        if ( subCategory != null && !subCategory.isEmpty()
-             && category != null && !category.isEmpty())
-            cond = addEqOrLikeClause(cond, "userData.subCategory", subCategory);
-
-        if ( catalog != null && !catalog.isEmpty()) cond = addEqOrLikeClause(cond, "system.catalog", catalog);
-        if ( dataSource != null && !dataSource.isEmpty()) cond = addEqOrLikeClause(cond, "userData.type", dataSource);
-
+        if(searchParams != null && !searchParams.isEmpty()) {
+            for(Map.Entry<DataSetProperties, String[]> entry : searchParams.entrySet()){
+                DataSetProperties searchParam = entry.getKey();
+                String[] values  =  entry.getValue();
+                if ( values != null && values.length != 0){
+                    for(String value : values){
+                        if(value != null && !value.trim().isEmpty()){
+                            logger.debug("searchParam: "+searchParam+" - value: "+ value);
+                            switch (searchParam) {
+                                case Category:
+                                    cond = addEqOrLikeClause(cond, "userData.category", value.trim());
+                                    break;
+                                case SubCategory:
+                                    if (searchParams.get(DataSetProperties.Category) != null
+                                        && searchParams.get(DataSetProperties.Category).length != 0) {
+                                        cond = addEqOrLikeClause(cond, "userData.subCategory", value.trim());
+                                    }
+                                    break;
+                                case Catalog:
+                                    cond = addEqOrLikeClause(cond, "system.catalog", value.trim());
+                                    break;
+                                case DataSource:
+                                    cond = addEqOrLikeClause(cond, "userData.type", value.trim());
+                                    break;
+                                case Type:
+                                    cond = addEqOrLikeClause(cond, "system.dstype", value.trim());
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         cond.close();
         cond.build();
         return convertToString(searchAsList(table, cond));
