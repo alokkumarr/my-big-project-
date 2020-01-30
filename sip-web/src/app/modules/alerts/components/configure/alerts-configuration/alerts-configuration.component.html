@@ -158,7 +158,7 @@
             mat-icon-button
             i18n-matTooltip
             color="primary"
-            e2e="edit-alert"
+            [attr.e2e]="'edit-alert-' + data.data.alertRuleName"
             class="conf-container-content__body__gridBtn"
             matTooltip="Edit"
             (click)="editAlert(data.data)"
@@ -203,7 +203,7 @@
             mat-icon-button
             i18n-matTooltip
             color="warn"
-            e2e="delete-alert"
+            [attr.e2e]="'delete-alert-' + data.data.alertRuleName"
             class="conf-container-content__body__gridBtn"
             matTooltip="Delete"
             (click)="deleteAlert(data.data)"

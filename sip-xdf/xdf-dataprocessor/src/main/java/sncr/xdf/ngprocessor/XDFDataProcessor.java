@@ -25,6 +25,7 @@ import sncr.xdf.parser.NGParser;
 import sncr.xdf.rtps.driver.NGRTPSComponent;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 @SuppressWarnings("rawtypes")
 public class XDFDataProcessor  extends AbstractComponent {
@@ -246,7 +247,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processRTPS() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        return rc;
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception
@@ -350,7 +352,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        return rc;
     }
 
     public int processTransformer(Map<String, Object> parameters, String configPath,boolean persistFlag)
@@ -425,7 +428,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        return rc;
     }
 
 
@@ -507,7 +511,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        return rc;
     }
 
     public int processESLoader(Map<String, Object> parameters, String configPath,boolean persistFlag)
@@ -574,7 +579,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        return rc;
     }
 
 
