@@ -144,7 +144,7 @@ public class SecurityController {
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
 		logger.info("Ticket will be created..");
-		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+		logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 		Ticket ticket = new Ticket();
 		User user = null;
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
@@ -170,7 +170,7 @@ public class SecurityController {
 				}
 			} else if (isAccountLocked) {
         ticket.setValidityReason(
-            String.format("Account has been locked!!, Please try after sometime"));
+            "Account has been locked!!, Please try after sometime");
             } else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}
@@ -197,7 +197,7 @@ public class SecurityController {
 	}
 
 	   @RequestMapping(value = "/auth/customer/details", method = RequestMethod.POST)
-	    public UserCustomerMetaData getCustomerDetailsbyUser(@RequestHeader("Authorization") String token) {
+	    public UserCustomerMetaData getCustomerDetailsbyUser(HttpServletResponse response, @RequestHeader("Authorization") String token) {
 	        logger.info("Authenticating & getting the customerDetails starts here");
 	        token = token.replaceAll("Bearer", "").trim();
 	        UserCustomerMetaData userRelatedMetaData = new UserCustomerMetaData();
@@ -221,9 +221,11 @@ public class SecurityController {
 	        } catch (DataAccessException de) {
 	            logger.error("Exception occured creating ticket ", de, null);
 	            userRelatedMetaData.setValid(false);
+	            setUnauthorized(response);
 	        } catch (Exception e) {
 	            logger.error("Exception occured creating ticket ", e);
 	            userRelatedMetaData.setValid(false);
+              setUnauthorized(response);
 	        }
 	        logger.info("Authenticating & getting the customerDetails ends here");
 	        return userRelatedMetaData;
@@ -239,74 +241,81 @@ public class SecurityController {
        return ssoRequestHandler.processSSORequest(token);
 	}
 
-	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
-	public LoginResponse accessToken(@RequestBody String rToken) throws ServletException {
+  @RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
+  public LoginResponse accessToken(@RequestBody String rToken, HttpServletResponse response) throws ServletException {
+    Boolean validity = false;
+    try {
+      Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
+      // Check if the refresh Token is valid
+      Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
+      String masterLoginId = null;
+      while (it.hasNext()) {
+        Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+        if (pair.getKey().equals("validUpto")) {
+          validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
+        }
+        if (pair.getKey().equals("masterLoginId")) {
+          masterLoginId = pair.getValue().toString();
+        }
+        it.remove();
+      }
+      if (!validity) {
+        return new LoginResponse(validity, "Token has expired. Please re-login");
+      } else {
 
-		Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
-		// Check if the refresh Token is valid
-		Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
-		Boolean validity = false;
-		String masterLoginId = null;
-		while (it.hasNext()) {
-			Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
-			if ("validUpto".equals(pair.getKey())) {
-				validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
-			}
-			if ("masterLoginId".equals(pair.getKey())) {
-				masterLoginId = pair.getValue().toString();
-			}
-			it.remove();
-		}
-		if (!validity) {
-			return new LoginResponse(validity, "Token has expired. Please re-login");
-		} else {
+        logger.info("Ticket will be created..");
+        logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 
-			logger.info("Ticket will be created..");
-			logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+        Ticket ticket = null;
+        User user = null;
+        ticket = new Ticket();
+        ticket.setMasterLoginId(masterLoginId);
+        RefreshToken newRToken = null;
+        try {
+          user = new User();
+          user.setMasterLoginId(masterLoginId);
+          user.setValidMins((nSSOProperties.getValidityMins() != null
+              ? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
+          ticket = tHelper.createTicket(user, false);
+          newRToken = new RefreshToken();
+          newRToken.setValid(true);
+          newRToken.setMasterLoginId(masterLoginId);
+          newRToken
+              .setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
+                  ? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
+        } catch (DataAccessException de) {
+          logger.error("Exception occured creating ticket ", de, null);
+          ticket.setValidityReason("Database error. Please contact server Administrator.");
+          ticket.setValid(false);
+          ticket.setError(de.getMessage());
+          return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
+              .setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+        } catch (Exception e) {
+          logger.error("Exception occured creating ticket ", e, null);
+          return null;
+        }
 
-			Ticket ticket = null;
-			User user = null;
-			ticket = new Ticket();
-			ticket.setMasterLoginId(masterLoginId);
-			RefreshToken newRToken = null;
-			try {
-				user = new User();
-				user.setMasterLoginId(masterLoginId);
-				user.setValidMins((nSSOProperties.getValidityMins() != null
-						? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
-				ticket = tHelper.createTicket(user, false);
-				newRToken = new RefreshToken();
-				newRToken.setValid(true);
-				newRToken.setMasterLoginId(masterLoginId);
-				newRToken
-						.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
-								? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
-			} catch (DataAccessException de) {
-				logger.error("Exception occured creating ticket ", de, null);
-				ticket.setValidityReason("Database error. Please contact server Administrator.");
-				ticket.setValid(false);
-				ticket.setError(de.getMessage());
-				return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-						.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
-			} catch (Exception e) {
-				logger.error("Exception occured creating ticket ", e, null);
-				return null;
-			}
+        ticket.setValid(true);
+        return new LoginResponse(
+            Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
+                .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
+            Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
+                .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+      }
 
-			ticket.setValid(true);
-			return new LoginResponse(
-					Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
-							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
-					Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
-							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
-		}
-	}
+    }catch (Exception ex) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      logger.error("Error occurred while validating the ticket : {}", ex.getMessage());
+      return new LoginResponse(validity, UNAUTHORIZED_USER);
+    }
+  }
 
-	@RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
+
+  @RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
 	public LoginResponse getDefaults(@RequestBody LoginDetails loginDetails) {
 
 		logger.info("Ticket will be created..");
-		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+		logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 
 		Ticket ticket = null;
 		User user = null;
@@ -840,18 +849,26 @@ public class SecurityController {
 		return userList;
 	}
 
-    /**
-     * Fetches all the security Group Names
-     * @return List of group names
-     */
-	@RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.GET)
-        public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,HttpServletResponse response) {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
-        Long custId = Long.valueOf(extractValuesFromToken[1]);
-	    List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
-	    return groupNames;
-    }
+	/**
+	 * Fetches all the security Group Names
+	 *
+	 * @return List of group names
+	 */
+	@RequestMapping(value = "/auth/admin/security-groups", method = RequestMethod.GET)
+	@ResponseBody
+	public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,
+			HttpServletResponse response) {
+		Ticket ticket = SipCommonUtils.getTicket(request);
+		Long custId = Long.valueOf(ticket.getCustID());
+		RoleType roleType = ticket.getRoleType();
+		if (roleType != RoleType.ADMIN) {
+			response
+					.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return new ArrayList<>();
+		}
+		List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
+		return groupNames;
+	}
 
     /**
      * Adding newly security Group Name to SEC_GROUP.
@@ -859,6 +876,7 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.POST)
+		@ResponseBody
     public Object addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
@@ -892,6 +910,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
     @ApiOperation(value="Add DSK security group")
+		@ResponseBody
     public DskGroupPayload addDskGroup(HttpServletRequest request, HttpServletResponse response,
         @ApiParam(value="DSK group details")
         @RequestBody
@@ -951,7 +970,7 @@ public class SecurityController {
 
           if (securityGroupSysId == null) {
               responsePayload = new DskGroupPayload();
-              logger.error("Error occurred: " + dskValidity.getError());
+              logger.error("Error occurred: {}", dskValidity.getError());
               response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
               responsePayload.setValid(false);
               responsePayload.setMessage(dskValidity.getError());
@@ -999,6 +1018,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.GET)
     @ApiOperation(value="Fetch security group details for a customer")
+		@ResponseBody
     public Object getAllSecGroupDetailsForCustomer(
         HttpServletRequest request,
         HttpServletResponse response
@@ -1038,6 +1058,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.GET)
     @ApiOperation(value="Fetch security group details for a given security group id")
+		@ResponseBody
     public DskGroupPayload getSecurityGroupDetails (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -1054,7 +1075,6 @@ public class SecurityController {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             payload.setValid(false);
             payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-
             return payload;
         }
 
@@ -1077,6 +1097,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete security group attributes")
+		@ResponseBody
     public Valid deleteSecurityGroupAttributeModel (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -1119,6 +1140,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
     @ApiOperation(value="Update security group attributes")
+		@ResponseBody
     public DskGroupPayload updateSecurityGroupAttributeModel (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -1185,7 +1207,7 @@ public class SecurityController {
                     payload = dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
                     payload.setValid(true);
                 } else {
-                    logger.error("Error occurred: " + valid.getError());
+                    logger.error("Error occurred: {}", valid.getError());
                     payload = new DskGroupPayload();
 
                     payload.setValid(false);
@@ -1193,7 +1215,7 @@ public class SecurityController {
                 }
 
             } else {
-                logger.error("Error occurred: " + valid.getError());
+                logger.error("Error occurred: {}", valid.getError());
                 payload = new DskGroupPayload();
 
                 payload.setValid(false);
@@ -1218,30 +1240,43 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
+		@ResponseBody
     public Object updateSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        Long custId = Long.valueOf(extractValuesFromToken[1]);
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            Valid valid = new Valid();
-            response.setStatus(400);
+			Ticket ticket = SipCommonUtils.getTicket(request);
+			Long custId = Long.valueOf(ticket.getCustID());
+			RoleType roleType = ticket.getRoleType();
+			Valid valid;
+
+        if (roleType != RoleType.ADMIN) {
+            valid = new Valid();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
             return valid;
         }
+			valid = dataSecurityKeyRepository
+					.validateCustomerForSecGroup(securityGroupId, custId);
+			if (!valid.getValid()) {
+				valid = new Valid();
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				valid.setValid(false);
+				valid.setValidityMessage(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				valid.setError(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				return valid;
+			}
+
         DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups,custId);
         if (dskValidity.getValid().booleanValue())  {
             return dskValidity;
         }
         else {
-            Valid valid = new Valid();
-            response.setStatus(400);
-            valid.setValid(false);
-            valid.setValidityMessage(dskValidity.getValidityMessage());
-            valid.setError(dskValidity.getError());
-            return valid;
+					valid = new Valid();
+					response.setStatus(HttpStatus.BAD_REQUEST.value());
+					valid.setValid(false);
+					valid.setValidityMessage(dskValidity.getValidityMessage());
+					valid.setError(dskValidity.getError());
+					return valid;
         }
     }
 
@@ -1251,24 +1286,36 @@ public class SecurityController {
      * @return Valid obj containing Boolean and success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}",method = RequestMethod.DELETE)
+		@ResponseBody
     public Valid deleteSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            Valid valid = new Valid();
-            response.setStatus(400);
+			Ticket ticket = SipCommonUtils.getTicket(request);
+			Long custId = Long.valueOf(ticket.getCustID());
+			RoleType roleType = ticket.getRoleType();
+			Valid valid;
+        if (roleType != RoleType.ADMIN) {
+            valid = new Valid();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
             return valid;
         }
+			valid = dataSecurityKeyRepository
+					.validateCustomerForSecGroup(securityGroupId, custId);
+			if (!valid.getValid()) {
+				valid = new Valid();
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				valid.setValid(false);
+				valid.setValidityMessage(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				valid.setError(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				return valid;
+			}
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId);
         if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
-            response.setStatus(400);
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return dskValidity;
         }
     }
@@ -2256,4 +2303,14 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
+
+  private void setUnauthorized(HttpServletResponse response) {
+    try {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, UNAUTHORIZED_USER);
+    } catch (IOException ex) {
+      logger.error("Error while validating user.");
+    }
+  }
+
 }
