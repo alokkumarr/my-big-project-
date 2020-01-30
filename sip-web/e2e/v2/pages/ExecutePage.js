@@ -256,7 +256,6 @@ class ExecutePage extends ConfirmationModel {
   }
   /*Method to verify report is scheduled*/
   verifyScheduleDetails() {
-    commonFunctions.waitFor.elementToBeVisible(this._scheduledInPreviousVersionTab);
     element(
       this._scheduledInPreviousVersionTab.getText().then(value => {
         if (value) {

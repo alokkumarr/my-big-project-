@@ -459,5 +459,112 @@ class SchedulePage {
   closeSchedule() {
     commonFunctions.clickOnElement(this._closeOption);
   }
+
+  hourlySchedule(hours,minutes) {
+    this.selectHourlyTab();
+    this.clickEveryHour();
+    this.selectHours(hours);
+    this.clickMinutes();
+    this.selectMinutes(minutes);
+  }
+
+  dailyEverydaySchedule(days,hours,minutes,timeStamp){
+    this.selectDailyTab();
+    this.selectEveryDayCheckbox();
+    this.clickDays();
+    this.selectDays(days);
+    this.clickEveryDayHours();
+    this.selectHours(hours);
+    this.clickEveryDayMinutes();
+    this.selectMinutes(minutes);
+    this.clickEveryDayTimeStamp();
+    this.selectTimeStamp(timeStamp);
+  }
+
+  dailyEveryWeekDaySchedule(hours,minutes,timeStamp) {
+    this.selectDailyTab();
+    this.selectEveryWeekDayCheckbox();
+    this.clickEveryWeekDayHours();
+    this.selectHours(hours);
+    this.clickEveryWeekDayMinutes();
+    this.selectMinutes(minutes);
+    this.clickEveryWeekDayTimeStamp();
+    this.selectTimeStamp(timeStamp);
+  }
+
+  weeklySchedule(dayname,hours,minutes,timeStamp) {
+    this.selectWeeklyTab();
+    this.selectSpecificDayOfWeekCheckBox(dayname);
+    this.clickOnWeeklyHours();
+    this.selectHours(hours);
+    this.clickOnWeeklyMinutes();
+    this.selectMinutes(minutes);
+    this.clickOnWeeklyTimeStamp();
+    this.selectTimeStamp(timeStamp);
+  }
+
+  monthlyOnTheDaySchedule(day,month,hours,minutes,timeStamp) {
+    this.selectMonthlyTab();
+    this.selectMonthlyFirstCheckbox();
+    this.clickOnMonthlyFirstRowDays();
+    this.selectMonthlyFirstRowDay(day);
+    this.clickOnMonthlyFirstRowMonths();
+    this.selectMonthlyFirstRowMonth(month);
+    this.clickOnMonthlyFirstRowHours();
+    this.selectHours(hours);
+    this.clickOnMonthlyFirstRowMinutes();
+    this.selectMinutes(minutes);
+    this.clickOnMonthlyFirstRowTimeStamp();
+    this.selectTimeStamp(timeStamp);
+  }
+
+  monthlyOnTheWeeksSchedule(week,day,month,hours,minutes,timeStamp){
+    this.selectMonthlyTab();
+    this.selectMonthlySecondCheckbox();
+    this.clickOnMonthlySecondRowWeeks();
+    this.selectMonthlySecondRowWeeks(week);
+    this.clickOnMonthlySecondRowDay();
+    this.selectMonthlySecondRowDay(day);
+    this.clickOnMonthlySecondRowMonth();
+    this.selectMonthlySecondRowMonth(month);
+    this.clickOnMonthlySecondRowHours();
+    this.selectHours(hours);
+    this.clickOnMonthlySecondRowMinutes();
+    this.selectMinutes(minutes);
+    this.clickOnMonthlySecondRowTimeStamp();
+    this.selectTimeStamp(timeStamp);
+  }
+
+  yearlyEveryMonthSchedule(month,days,hours,minutes,timeStamp) {
+    this.selectYearlyTab();
+    this.selectYearlyFirstCheckbox();
+    this.clickOnYearlyFirstRowMonth();
+    this.selectYearlyFirstRowMonth(month);
+    this.clickOnYearlyFirstRowDays();
+    this.selectYearlyFirstRowDays(days);
+    this.clickOnYearlyFirstRowHours();
+    this.selectYearlyFirstRowHours(hours);
+    this.clickOnYearlyFirstRowMinutes();
+    this.selectYearlyFirstRowMinutes(minutes);
+    this.clickOnYearlyFirstRowTimeStamp();
+    this.selectYearlyFirstRowTimeStamp(timeStamp);
+  }
+
+  yearlyOnWeekSchedule(weeks,day,month,hours,minutes,timeStamp) {
+    this.selectYearlyTab();
+    this.selectYearlySecondCheckbox();
+    this.clickOnYearlySecondRowWeeks();
+    this.selectYearlySecondRowWeeks(weeks);
+    this.clickOnYearlySecondRowDay();
+    this.selectYearlySecondRowDay(day);
+    this.clickOnYearlySecondRowMonth();
+    this.selectYearlySecondRowMonth(month);
+    this.clickOnYearlySecondRowHours();
+    this.selectYearlySecondRowHours(hours);
+    this.clickOnYearlySecondRowMinutes();
+    this.selectYearlySecondRowMinutes(minutes);
+    this.clickOnYearlySecondRowTimeStamp();
+    this.selectYearlySecondRowTimeStamp(timeStamp);
+  }
 }
 module.exports = SchedulePage;
