@@ -66,6 +66,7 @@ public class SipLogging {
       bisLog.setTransferEndTime(entity.getFileTransferEndTime());
       bisLog.setTransferStartTime(entity.getFileTransferStartTime());
       bisLog.setSource(entity.getSource());
+      bisLog.setRecdFileName(entity.getDestinationPath());
       bisLog.getJob().setJobId(entity.getJobId());
       bisFileLogsRepository.save(bisLog);
     } else {
@@ -76,6 +77,7 @@ public class SipLogging {
       bisLog.setRouteSysId(Long.valueOf(entity.getRouteId()));
       bisLog.setFilePattern(entity.getFilePattern());
       bisLog.setFileName(entity.getActualDataName());
+      bisLog.setRecdFileName(entity.getDestinationPath());
       bisLog.setRecdFileSize(entity.getDataSizeInBytes());
       bisLog.setRecdFileName(entity.getReceivedDataName());
       bisLog.setBisChannelType(entity.getChannelType().value());

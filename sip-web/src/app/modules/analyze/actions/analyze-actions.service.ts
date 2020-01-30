@@ -14,7 +14,6 @@ import { CUSTOM_HEADERS } from '../../../common/consts';
 import { Store } from '@ngxs/store';
 
 import * as clone from 'lodash/clone';
-import * as omit from 'lodash/omit';
 
 import {
   EXECUTION_MODES,
@@ -93,22 +92,6 @@ export class AnalyzeActionsService {
     }
   }
 
-  overwrite(
-    parentAnalysis: AnalysisDSL,
-    childAnalysis: AnalysisDSL
-  ): AnalysisDSL {
-    const preserveFields = [
-      'id',
-      'createdBy',
-      'userFullName',
-      'createdTimestamp',
-      'parentAnalysisId',
-      'parentCategoryId',
-      'parentLastModfied'
-    ];
-    return { ...parentAnalysis, ...omit(childAnalysis, preserveFields) };
-  }
-
   showPublishOverwriteConfirmation(): MatDialogRef<
     ConfirmDialogComponent,
     any
@@ -127,16 +110,6 @@ export class AnalyzeActionsService {
   publishAnalysis(analysis: AnalysisDSL, lastCategoryId: number | string) {
     const publish = (a = analysis) =>
       this._publishService.publishAnalysis(a, lastCategoryId);
-
-    const overwriteParent = (parent, child) => {
-      /* Update parent analysis with child's changes, then delete child. */
-      const modifiedParent = this.overwrite(parent, child);
-      return publish(modifiedParent)
-        .then(() => {
-          return this._analyzeService.deleteAnalysis(child);
-        })
-        .then(() => modifiedParent);
-    };
 
     /* This is not a fork-to-edit analysis. Publish this normally */
     if (!analysis.parentAnalysisId) {
@@ -164,19 +137,19 @@ export class AnalyzeActionsService {
 
           /* If the parent has been modified since fork/editing, allow user to choose whether
            they want to overwrite the parent analysis */
-          if (analysis.updatedTimestamp < parentAnalysis.updatedTimestamp) {
+          if (analysis.parentLastModified < +parentAnalysis.modifiedTime) {
             return this.showPublishOverwriteConfirmation()
               .afterClosed()
               .toPromise()
               .then(shouldPublish => {
                 if (shouldPublish) {
-                  return overwriteParent(parentAnalysis, analysis);
+                  return publish();
                 } else {
                   return null;
                 }
               });
           }
-          return overwriteParent(parentAnalysis, analysis);
+          return publish();
         },
         err => {
           delete analysis.parentAnalysisId;

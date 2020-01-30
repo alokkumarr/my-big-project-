@@ -1,0 +1,45 @@
+{
+  "groupName": "secgroup2",
+  "groupDescription": "sample sec group",
+  "dskAttributes": {
+    "booleanCriteria": "AND",
+    "booleanQuery": [
+      {
+        "columnName": "Field1",
+        "model": {
+          "operator": "ISIN",
+          "values": [
+            "abc",
+            "123"
+          ]
+        }
+      },
+      {
+        "columnName": "Field2",
+        "model": {
+          "operator": "ISIN",
+          "values": ["pqr"]
+        }
+      },
+      {
+        "booleanCriteria": "OR",
+        "booleanQuery": [
+          {
+            "columnName": "Field3",
+            "model": {
+              "operator": "ISIN",
+              "values": ["456"]
+            }
+          },
+          {
+            "columnName": "Field4",
+            "model": {
+              "operator": "ISIN",
+              "values": ["123"]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -124,3 +124,5 @@ export const KPI_BG_COLORS = [
   { label: 'black', value: '#2c2e2f' },
   { label: 'maroon', value: '#cc3f44' }
 ];
+
+export const defaultRefreshInterval = 60;
