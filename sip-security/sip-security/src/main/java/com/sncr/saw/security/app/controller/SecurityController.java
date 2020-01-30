@@ -1533,8 +1533,13 @@ public class SecurityController {
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
 	public UsersList updateUser(HttpServletRequest request,HttpServletResponse servletResponse,@RequestBody User user) {
-		UsersList userList = new UsersList();
-		Valid valid = null;
+		UsersList userList = null;
+        userList = securityService.validateUserDetails(user);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            servletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return userList;
+        }
+        Valid valid = null;
 		try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
@@ -1544,11 +1549,6 @@ public class SecurityController {
 					userList.setValid(validity.getValid());
 					userList.setValidityMessage(validity.getValidityMessage());
 				}
-                userList = securityService.validateUserDetails(user);
-                if (userList != null && userList.getValid() != null && !userList.getValid()) {
-                    servletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-                    return userList;
-                 }
 
 				if (userList.getValid()) {
 					valid = userRepository.updateUser(user);
