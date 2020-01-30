@@ -17,6 +17,10 @@
     min-height: 45px !important;
   }
 
+  ::ng-deep .mat-chip-list > .mat-chip-list-wrapper {
+    justify-content: center;
+  }
+
   .mat-chip.mat-standard-chip {
     border-radius: 10px;
     height: 24px;

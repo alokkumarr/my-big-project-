@@ -33,6 +33,7 @@
     <mat-divider *ngIf="!isLastDetailGroup" [vertical]="true"></mat-divider>
   </ng-container>
 </div>
+pading: {{ pagingEnabled }}
 
 <dx-data-grid
   class="mat-elevation-z3 job-logs__data-grid"
@@ -46,7 +47,7 @@
   [showColumnLines]="false"
   [paging]="paging"
   [remoteOperations]="remoteOperations"
-  [height]="'calc(100% - 40px)'"
+  [height]="'calc(100% - 150px)'"
   [rowAlternationEnabled]="true"
   rowTemplate="logTableRowTemplate"
   e2e="job-logs-container"
