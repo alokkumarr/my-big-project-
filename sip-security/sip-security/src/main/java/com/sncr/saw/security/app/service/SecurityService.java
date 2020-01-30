@@ -60,18 +60,6 @@ public class SecurityService {
     if (userDetails.getRoleId() == null) {
       return buildInvalidResponse(String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleId"));
     }
-    if (!SecurityUtils.isValidName(userDetails.getFirstName())) {
-      return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "FirstName"));
-    }
-    if (!SecurityUtils.isValidName(userDetails.getLastName())) {
-      return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "LastName"));
-    }
-    String middleName = userDetails.getMiddleName();
-    if (middleName != null) {
-      if (!SecurityUtils.isValidName(middleName)) {
-        return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "MiddleName"));
-      }
-    }
     if (!SecurityUtils.isValidMasterLoginId(userDetails.getMasterLoginId())) {
       return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
     }
