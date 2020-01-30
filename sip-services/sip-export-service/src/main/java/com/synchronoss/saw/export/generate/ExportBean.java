@@ -1,14 +1,13 @@
 package com.synchronoss.saw.export.generate;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.SipQuery;
 
 public class ExportBean {
 
 	private String fileName;
 	private String [] columnHeader = new String []{};
-	private String serverPathLocation;
 	private DataField.Type[] columnDataType;
 	private String reportName;
 	private String reportDesc;
@@ -16,7 +15,7 @@ public class ExportBean {
 	private String createdBy;
 	private String fileType;
   private Field.Type[] columnFieldDataType;
-  private SipQuery sipQuery;
+  private Analysis analysis;
   private Integer pageNo;
   private Long lastExportedSize;
   private Long lastExportLimit;
@@ -84,11 +83,6 @@ public class ExportBean {
 		this.publishDate = publishDate;
 	}
 
-
-	public ExportBean() {
-		this.serverPathLocation = System.getProperty("custom.pubReports.root");;
-	}
-
 	/**
 	 *
 	 * @return
@@ -103,21 +97,6 @@ public class ExportBean {
 	 */
 	public void setColumnDataType(DataField.Type[] columnDataType) {
 		this.columnDataType = columnDataType;
-	}
-
-
-	/**
-	 * @return the serverPathLocation
-	 */
-	public String getServerPathLocation() {
-		return serverPathLocation;
-	}
-
-	/**
-	 * @param serverPathLocation the serverPathLocation to set
-	 */
-	public void setServerPathLocation(String serverPathLocation) {
-		this.serverPathLocation = serverPathLocation;
 	}
 
 	/**
@@ -178,15 +157,15 @@ public class ExportBean {
     /**
      * @return the sipQuery
      */
-    public SipQuery getSipQuery() {
-        return sipQuery;
+    public Analysis getAnalysis() {
+        return analysis;
     }
 
     /**
-     * @param sipQuery  to set
+     * @param analysis  to set
      */
-    public void setSipQuery(SipQuery sipQuery) {
-        this.sipQuery = sipQuery;
+    public void setAnalysis(Analysis analysis) {
+        this.analysis = analysis;
     }
 
 

@@ -1,0 +1,28 @@
+{
+  "contents": {
+    "observe": [
+      {
+        "entityId": null,
+        "categoryId": "12",
+        "autoRefreshEnabled": false,
+        "name": "Test Board",
+        "description": "",
+        "createdBy": "1",
+        "createdByName": "system sncr admin",
+        "createdAt": "",
+        "updatedBy": "",
+        "updatedByName": "",
+        "updatedAt": "",
+        "tiles": [
+
+        ],
+        "filters": [],
+        "options": [
+          {
+            "minCols": 64
+          }
+        ]
+      }
+    ]
+  }
+}
