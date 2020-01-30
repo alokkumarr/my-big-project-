@@ -6,8 +6,7 @@ import { UserService } from '../user.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 import { validatePassword } from 'src/app/common/validators/password-policy.validator';
 
-const namePattern = /^[a-zA-Z0-9]*$/;
-const loginIdPattern = /^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*$/;
+const loginIdPattern = "^[A-z\\d_@.#$=!%^)(\\]:\\*;\\?\\/\\,}{'\\|<>\\[&\\+-`~]*$";
 const dummyPassword = '*********';
 
 @Component({
@@ -105,18 +104,13 @@ export class UserEditDialogComponent extends BaseDialogComponent {
     } = model;
 
     const firstNameControl = this._fb.control(firstName, [
-      Validators.required,
-      Validators.pattern(namePattern)
+      Validators.required
     ]);
 
-    const middleNameControl = this._fb.control(middleName, [
-      Validators.required,
-      Validators.pattern(namePattern)
-    ]);
+    const middleNameControl = this._fb.control(middleName, []);
 
     const lastNameControl = this._fb.control(lastName, [
-      Validators.required,
-      Validators.pattern(namePattern)
+      Validators.required
     ]);
 
     const passwordValue = mode === 'edit' ? dummyPassword : '';
