@@ -3,7 +3,12 @@ import { DesignerService } from '../designer.module';
 import { AnalyzeService } from '../../services/analyze.service';
 import { NgxsModule, Store } from '@ngxs/store';
 import { DesignerState, defaultDesignerState } from './designer.state';
-import { DesignerSetData, DesignerLoadMetric } from '../actions/designer.actions';
+import {
+  DesignerSetData,
+  DesignerLoadMetric,
+  DesignerUpdateAnalysisMetadata,
+  DesignerCheckAggregateFilterSupport
+} from '../actions/designer.actions';
 import { tap } from 'rxjs/operators';
 
 describe('Designer State', () => {
@@ -23,22 +28,20 @@ describe('Designer State', () => {
       ]
     }).compileComponents();
     store = TestBed.get(Store);
-    store.reset(defaultDesignerState);
+    store.reset({ designerState: defaultDesignerState });
   }));
 
   it('should initialise designer state', () => {
-    store
-      .selectOnce(state => state)
-      .subscribe(s => {
-        expect(Array.isArray(s.groupAdapters)).toEqual(true);
-        expect(s.hasOwnProperty('metric')).toEqual(true);
-      });
+    store.selectOnce(DesignerState).subscribe(s => {
+      expect(Array.isArray(s.groupAdapters)).toEqual(true);
+      expect(s.hasOwnProperty('metric')).toEqual(true);
+    });
   });
 
   it('should allow setting data to state', async () => {
     await store.dispatch(new DesignerSetData([1])).toPromise();
     store
-      .selectOnce(s => s.data)
+      .selectOnce(s => s.designerState.data)
       .subscribe(data => {
         expect(data.length).toEqual(1);
         expect(data[0]).toEqual(1);
@@ -61,4 +64,97 @@ describe('Designer State', () => {
       )
       .subscribe();
   }));
+
+  it('should remove aggregation filters if they are not supported', async () => {
+    await store
+      .dispatch(
+        new DesignerUpdateAnalysisMetadata({
+          type: 'esReport',
+          sipQuery: {
+            artifacts: [],
+            booleanCriteria: 'AND',
+            filters: [
+              {
+                isAggregationFilter: true,
+                isRuntimeFilter: false,
+                isOptional: false,
+                tableName: 'abc',
+                columnName: 'def',
+                type: 'double'
+              }
+            ],
+            joins: [],
+            sorts: [],
+            store: { dataStore: '123', storageType: '123' },
+            semanticId: '123'
+          }
+        })
+      )
+      .toPromise();
+
+    expect(store.selectSnapshot(DesignerState.analysisFilters).length).toEqual(
+      1
+    );
+
+    await store.dispatch(new DesignerCheckAggregateFilterSupport()).toPromise();
+
+    expect(store.selectSnapshot(DesignerState.analysisFilters).length).toEqual(
+      0
+    );
+  });
+
+  it('should not remove aggregation filters if they can be supported', async () => {
+    await store
+      .dispatch(
+        new DesignerUpdateAnalysisMetadata({
+          type: 'esReport',
+          sipQuery: {
+            artifacts: [
+              {
+                artifactsName: 'table',
+                fields: [
+                  {
+                    columnName: 'abc',
+                    displayName: 'def',
+                    aggregate: 'sum',
+                    alias: '',
+                    area: '',
+                    groupInterval: null,
+                    name: 'abc',
+                    type: 'double',
+                    table: 'table'
+                  }
+                ]
+              }
+            ],
+            booleanCriteria: 'AND',
+            filters: [
+              {
+                isAggregationFilter: true,
+                isRuntimeFilter: false,
+                isOptional: false,
+                tableName: 'abc',
+                columnName: 'def',
+                type: 'double'
+              }
+            ],
+            joins: [],
+            sorts: [],
+            store: { dataStore: '123', storageType: '123' },
+            semanticId: '123'
+          }
+        })
+      )
+      .toPromise();
+
+    expect(store.selectSnapshot(DesignerState.analysisFilters).length).toEqual(
+      1
+    );
+
+    await store.dispatch(new DesignerCheckAggregateFilterSupport()).toPromise();
+
+    expect(store.selectSnapshot(DesignerState.analysisFilters).length).toEqual(
+      1
+    );
+  });
 });

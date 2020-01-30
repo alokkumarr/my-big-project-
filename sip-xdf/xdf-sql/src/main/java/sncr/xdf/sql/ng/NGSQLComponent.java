@@ -24,6 +24,7 @@ import sncr.xdf.sql.SQLDescriptor;
 import java.util.List;
 import java.util.Map;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 /**
  * Created by asor0002 on 9/11/2017.
@@ -221,6 +222,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(handleErrorIfAny(component, rc, exception));
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        System.exit(rc);
     }
 }

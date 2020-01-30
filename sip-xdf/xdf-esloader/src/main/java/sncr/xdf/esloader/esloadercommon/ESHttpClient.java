@@ -210,7 +210,6 @@ public class ESHttpClient {
       parameters.add("truststorePath", url.getPath());
       parameters.add("truststorePassword", esConfig.getStorePassword());
       parameters.add("truststoreType", "JKS");
-      logger.debug("Parameter List: " + parameters.toString());
       cr = new ClientResource(fullUrl);
       cr.setNext(client);
       if (authentication != null) cr.setChallengeResponse(authentication);

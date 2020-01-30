@@ -230,6 +230,7 @@ export class DesignerPageComponent implements OnInit {
         ...analysis,
         category: userAnalysisCategoryId,
         parentAnalysisId: analysis.id,
+        parentLastModified: analysis.modifiedTime,
         parentCategoryId: analysisCategoryId
       };
     }
