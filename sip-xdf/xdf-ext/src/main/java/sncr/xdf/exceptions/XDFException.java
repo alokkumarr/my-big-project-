@@ -10,26 +10,26 @@ public class XDFException extends RuntimeException {
 
     public XDFException(XDFReturnCode rc) {
         this.rc=rc;
-        this.msg = String.format(rc.toString(),"");
+        this.msg = String.format(rc.getDescription(),"");
         logger.error(this.msg);
     }
 
     public XDFException(XDFReturnCode rc, Object... args) {
         this.rc=rc;
-        msg = String.format(rc.toString(), args);
+        msg = String.format(rc.getDescription(), args);
         logger.error(this.msg);
     }
 
     public XDFException(XDFReturnCode rc, Exception e) {
         this.rc=rc;
-        this.msg = String.format(rc.toString(),"")+ ", Embedded exception: " + e.getMessage();
+        this.msg = String.format(rc.getDescription(),"")+ ", Embedded exception: " + e.getMessage();
         e.printStackTrace();
         logger.error(this.msg);
     }
 
     public XDFException(XDFReturnCode rc, Exception e, Object... args) {
         this.rc=rc;
-        this.msg = String.format(rc.toString(), args) + ", Embedded exception: " + e.getMessage();
+        this.msg = String.format(rc.getDescription(), args) + ", Embedded exception: " + e.getMessage();
         e.printStackTrace();
         logger.error(this.msg);
     }
