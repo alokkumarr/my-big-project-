@@ -17,7 +17,10 @@ import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { wrapFieldValues } from './../../../common/utils/dataFlattener';
+import {
+  wrapFieldValues,
+  flattenReportData
+} from './../../../common/utils/dataFlattener';
 import { alterDateInData } from './../../../common/utils/dataFlattener';
 import { isDSLAnalysis } from '../designer/types';
 
@@ -62,7 +65,9 @@ export class AnalyzeExportService {
           : exportData;
 
         json2csv(
-          exportData,
+          ['report', 'esReport'].includes(analysisType)
+            ? flattenReportData(exportData, analysis)
+            : exportData,
           (err, csv) => {
             if (err) {
               this._toastMessage.error(
