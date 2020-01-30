@@ -6,6 +6,7 @@ import {
   UserService,
   ConfigService
 } from '../../../common/services';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'login-form',
@@ -20,6 +21,7 @@ export class LoginComponent implements OnInit {
     public _configService: ConfigService,
     public _router: Router,
     public _route: ActivatedRoute,
+    public dialog: MatDialog,
     public element: ElementRef<HTMLElement>
   ) {}
 
@@ -35,6 +37,7 @@ export class LoginComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.dialog.closeAll();
     this.states.error = '';
     this.state = true;
     this._route.queryParams.subscribe(({ changePassMsg }) => {
