@@ -286,7 +286,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
 
                         ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-                        logger.debug("####### end of parser after caching "+ outputDS.count());
+                        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+                        //TODO: This is a crude way of checking. This need to be revisited.
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("####### end of parser after caching " + outputDS.count());
+                        }
                     }
                     else {
                         outputColumns =
@@ -330,7 +334,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
                 retval =  -1;
             }
-            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+
+             //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+             //TODO: This is a crude way of checking. This need to be revisited.
+            if(logger.isDebugEnabled()) {
+                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+            }
 
             logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
@@ -585,7 +594,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         
      // Create output dataset
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
-        logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
+
+         //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+         //TODO: This is a crude way of checking. This need to be revisited.
+        if(logger.isDebugEnabled()) {
+            logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
+        }
+
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         int rc = 0;
         scala.collection.Seq<Column> outputColumns = null;
@@ -705,9 +720,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             } else {
                 acceptedDataCollector = acceptedDataCollector.union(acceptedRdd);
             }
-            
-            
-            logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
+
+
+             //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+             //TODO: This is a crude way of checking. This need to be revisited.
+            if(logger.isDebugEnabled()) {
+                logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
+            }
 
         } catch (Exception exception) {
             logger.error(exception);
