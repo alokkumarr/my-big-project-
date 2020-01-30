@@ -34,9 +34,46 @@ public class SecurityService {
   }
 
   public UsersList validateUserDetails(User userDetails) {
-    validateUser(userDetails);
 
     UsersList userDetailsResponse = new UsersList();
+
+    if (userDetails == null) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.nullErrorMessage, "Request Body"));
+      return userDetailsResponse;
+    }
+    if (StringUtils.isBlank(userDetails.getMasterLoginId())) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.nullOrEmptyErrorMessage, "masterLoginId"));
+      return userDetailsResponse;
+    }
+    if (StringUtils.isBlank(userDetails.getEmail())) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
+      return userDetailsResponse;
+    }
+    if (StringUtils.isBlank(userDetails.getFirstName())) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.nullOrEmptyErrorMessage, "firstName"));
+      return userDetailsResponse;
+    }
+    if (StringUtils.isBlank(userDetails.getLastName())) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
+      return userDetailsResponse;
+    }
+    if (userDetails.getActiveStatusInd() == null) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
+      return userDetailsResponse;
+    }
+
     if (!SecurityUtils.isValidName(userDetails.getFirstName())) {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
@@ -69,36 +106,12 @@ public class SecurityService {
       return userDetailsResponse;
     }
 
-    if (!!SecurityUtils.isEmailValid(userDetails.getEmail())) {
+    if (!SecurityUtils.isEmailValid(userDetails.getEmail())) {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(String.format(ErrorMessages.invalidMessage, "Email"));
       logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));
       return userDetailsResponse;
     }
     return userDetailsResponse;
-  }
-
-  private void validateUser(User userDetails) {
-
-    Preconditions.checkNotNull(
-        userDetails, String.format(ErrorMessages.nullErrorMessage, "Request Body"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getMasterLoginId()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "masterLoginId"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getEmail()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getFirstName()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "firstName"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getLastName()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getRoleName()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleName"));
-    Preconditions.checkNotNull(
-        userDetails.getActiveStatusInd(),
-        String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
   }
 }
