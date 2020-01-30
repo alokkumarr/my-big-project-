@@ -588,10 +588,10 @@ public class SecurityController {
 	@SuppressWarnings("unused")
 	private static class LoginResponse {
 
-		private String aToken;
-		private String rToken;
-		private boolean validity;
-		private String message;
+		public String aToken;
+		public String rToken;
+		public boolean validity;
+		public String message;
 
 		public LoginResponse(final String aToken) {
 			this.aToken = aToken;
@@ -618,8 +618,8 @@ public class SecurityController {
 
 	@SuppressWarnings("unused")
 	private static class UserLogin {
-		private String masterLoginId;
-		private String password;
+		public String masterLoginId;
+		public String password;
 	}
 
 	final String reqChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz._";
