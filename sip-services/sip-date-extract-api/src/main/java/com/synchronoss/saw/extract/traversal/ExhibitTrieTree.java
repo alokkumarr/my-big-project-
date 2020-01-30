@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class ExhibitTrieTree {
 
-  public static final List<TrieTreeSymbols> displayBuffer = new ArrayList<TrieTreeSymbols>();
+  protected List<TrieTreeSymbols> displayBuffer = new ArrayList<TrieTreeSymbols>();
   
   public int height;
   
