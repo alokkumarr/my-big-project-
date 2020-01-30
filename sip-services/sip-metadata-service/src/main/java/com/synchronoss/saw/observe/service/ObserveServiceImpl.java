@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import sncr.bda.cli.Request;
 import sncr.bda.metastore.PortalDataSetStore;
 
@@ -238,21 +239,23 @@ public class ObserveServiceImpl implements ObserveService {
       });
 
       // validate the given analysis has valid user
-      if (!analysisId.isEmpty()) {
+      if (!analysisId.isEmpty() && analysisId.size() > 0) {
         try {
           for (String id : analysisId) {
-            Analysis analysis = analysisService.getAnalysis(id, ticket);
-            Long privateCatForTicket = checkForPrivateCategory(ticket);
-            privateCatForTicket = privateCatForTicket == null ? 0L : privateCatForTicket;
-            logger.trace("Print the analysis {}", analysis);
-            if (!(ticket.getCustCode() != null && analysis != null
-                && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))) {
-              return false;
-            }
-            Long userId = analysis != null ? analysis.getUserId() : 0L;
-            if (privateCatForTicket == Long.valueOf(analysis.getCategory())
-                && !(ticket.getUserId().equals(userId))) {
-              return false;
+            if (!StringUtils.isEmpty(id)) {
+              Analysis analysis = analysisService.getAnalysis(id, ticket);
+              Long privateCatForTicket = checkForPrivateCategory(ticket);
+              privateCatForTicket = privateCatForTicket == null ? 0L : privateCatForTicket;
+              logger.trace("Print the analysis {}", analysis);
+              if (!(ticket.getCustCode() != null && analysis != null
+                  && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))) {
+                return false;
+              }
+              Long userId = analysis != null ? analysis.getUserId() : 0L;
+              if (privateCatForTicket == Long.valueOf(analysis.getCategory())
+                  && !(ticket.getUserId().equals(userId))) {
+                return false;
+              }
             }
           }
         } catch (Exception ex) {

@@ -264,7 +264,7 @@ public class SecurityController {
       } else {
 
         logger.info("Ticket will be created..");
-        logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
+        logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
 
         Ticket ticket = null;
         User user = null;
@@ -311,7 +311,7 @@ public class SecurityController {
   }
 
 
-  @RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
+	@RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
 	public LoginResponse getDefaults(@RequestBody LoginDetails loginDetails) {
 
 		logger.info("Ticket will be created..");
@@ -503,6 +503,7 @@ public class SecurityController {
 			rv.setValid(false);
 			rv.setValidityReason("Database error. Please contact server Administrator.");
 			rv.setError(de.getMessage());
+			logger.error("Database error. Please contact server Administrator. {}", de);
 			return rv;
 		}
 		return rv;
