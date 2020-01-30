@@ -38,7 +38,7 @@
     [data]="data"
     [dataCount]="dataCount"
     [sorts]="sorts"
-    [filters]="filters"
+    [filters]="dslFilters$ | async"
     [designerState]="designerState"
   >
   </multi-table-designer-layout>

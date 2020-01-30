@@ -106,6 +106,16 @@ const createSubCategories = {
     name: 'AT workbench SubCat' + globalVariables.e2eId,
     description: description,
     id: nullValue
+  },
+  alertView: {
+    name: 'View Alerts',
+    description: description,
+    id: 59
+  },
+  alertCreate: {
+    name: 'Configure Alerts',
+    description: description,
+    id: 61
   }
 };
 

@@ -58,7 +58,8 @@ import {
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
-  DesignerUpdateAggregateInSorts
+  DesignerUpdateAggregateInSorts,
+  DesignerCheckAggregateFilterSupport
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -167,6 +168,11 @@ export class DesignerState {
   @Selector()
   static analysis(state: DesignerStateModel) {
     return state.analysis;
+  }
+
+  @Selector()
+  static analysisFilters(state: DesignerStateModel) {
+    return get(state.analysis, 'sipQuery.filters', []);
   }
 
   @Selector()
@@ -384,6 +390,42 @@ export class DesignerState {
       },
       groupAdapters: [...groupAdapters]
     });
+  }
+
+  @Action(DesignerCheckAggregateFilterSupport)
+  checkAggregateFilterSupport({
+    getState,
+    dispatch
+  }: StateContext<DesignerStateModel>) {
+    const { analysis } = getState();
+    const isReport = ['report', 'esReport'].includes(analysis.type);
+    if (!isReport) {
+      return;
+    }
+
+    const allFields: ArtifactColumnDSL[] = fpFlatMap(
+      artifact => artifact.fields || [],
+      get(analysis, 'sipQuery.artifacts', [])
+    );
+
+    /* If selected artifacts has an aggregated field, no need to do anything. */
+    if (allFields.some(field => !!field.aggregate)) {
+      return;
+    }
+
+    /* Otherwise, remove aggregation filters. We don't support aggregation
+       filters in reports if no aggregated field is present */
+    const analysisFilters = get(analysis, 'sipQuery.filters', []);
+    const hasAggregationFilters = analysisFilters.find(
+      f => f.isAggregationFilter
+    );
+    if (hasAggregationFilters) {
+      return dispatch(
+        new DesignerUpdateFilters(
+          analysisFilters.filter(f => !f.isAggregationFilter)
+        )
+      );
+    }
   }
 
   @Action(DesignerApplyChangesToArtifactColumns)
@@ -866,17 +908,17 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    filters.forEach(filter => {
-      filter.artifactsName = filter.tableName;
+    filters.forEach(filt => {
+      filt.artifactsName = filt.tableName || filt.artifactsName;
       if (
-        filter.type === 'date' &&
-        !filter.isRuntimeFilter &&
-        !filter.isGlobalFilter &&
-        filter.model.preset === CUSTOM_DATE_PRESET_VALUE
+        filt.type === 'date' &&
+        !filt.isRuntimeFilter &&
+        !filt.isGlobalFilter &&
+        filt.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
-        filter.model = {
-          gte: filter.model.gte,
-          lte: filter.model.lte,
+        filt.model = {
+          gte: filt.model.gte,
+          lte: filt.model.lte,
           format: 'yyyy-MM-dd HH:mm:ss',
           preset: CUSTOM_DATE_PRESET_VALUE
         };

@@ -181,10 +181,10 @@ public abstract class MetadataStore extends MetadataBase implements DocumentConv
       src.add("aleId", new JsonPrimitive(aleId));
       src.add("batchId", new JsonPrimitive(batchSessionId));
       if(returnCode.isPresent()){
-          src.add("returnCode", new JsonPrimitive(returnCode.get()));
+          src.add("xdfReturnCode", new JsonPrimitive(returnCode.get()));
       }
       if(errorDesc.isPresent()){
-          src.add("error", new JsonPrimitive(errorDesc.get()));
+          src.add("errorDescription", new JsonPrimitive(errorDesc.get()));
       }
       logger.debug("Status Session Json : " + src.toString());
       return src;

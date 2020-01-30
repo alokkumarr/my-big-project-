@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   display: block;
@@ -21,8 +21,14 @@
 
   .filter-container {
     width: 800px;
-    min-height: 300px;
+    min-height: 200px;
     display: block;
+
+    &__aggregated {
+      ::ng-deep .filter__number-field {
+        max-width: 60px;
+      }
+    }
 
     .filter__table-name {
       color: $primary-blue-b2;
