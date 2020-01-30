@@ -49,12 +49,10 @@ public class NGJsonFileParser implements FileParser {
                 //StructType
                 isNested=true;
                 dataset = processStructType(dataset, field);
-                break;
             }else if(datatype instanceof ArrayType){
                 //ArrayType
                 isNested=true;
                 dataset = processArrayType(dataset, field);
-                break;
             }
         }
         if(isNested){
