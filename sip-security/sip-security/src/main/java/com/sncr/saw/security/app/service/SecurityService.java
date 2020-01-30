@@ -38,80 +38,55 @@ public class SecurityService {
     UsersList userDetailsResponse = new UsersList();
 
     if (userDetails == null) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.nullErrorMessage, "Request Body"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.nullErrorMessage, "Request Body"));
     }
     if (StringUtils.isBlank(userDetails.getMasterLoginId())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
+      return buildInvalidResponse(
           String.format(ErrorMessages.nullOrEmptyErrorMessage, "masterLoginId"));
-      return userDetailsResponse;
     }
     if (StringUtils.isBlank(userDetails.getEmail())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
     }
     if (StringUtils.isBlank(userDetails.getFirstName())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
+      return buildInvalidResponse(
           String.format(ErrorMessages.nullOrEmptyErrorMessage, "firstName"));
-      return userDetailsResponse;
     }
     if (StringUtils.isBlank(userDetails.getLastName())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
     }
     if (userDetails.getActiveStatusInd() == null) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
     }
-
+    if (userDetails.getRoleId() == null) {
+      return buildInvalidResponse(String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleId"));
+    }
     if (!SecurityUtils.isValidName(userDetails.getFirstName())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.invalidMessage, "FirstName"));
-      logger.debug(String.format(ErrorMessages.invalidMessage, "FirstName"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "FirstName"));
     }
     if (!SecurityUtils.isValidName(userDetails.getLastName())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.invalidMessage, "LastName"));
-      logger.debug(String.format(ErrorMessages.invalidMessage, "LastName"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "LastName"));
     }
     String middleName = userDetails.getMiddleName();
     if (middleName != null) {
       if (!SecurityUtils.isValidName(middleName)) {
-        userDetailsResponse.setValid(false);
-        userDetailsResponse.setValidityMessage(
-            String.format(ErrorMessages.invalidMessage, "MiddleName"));
-        logger.debug(String.format(ErrorMessages.invalidMessage, "MiddleName"));
-        return userDetailsResponse;
+        return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "MiddleName"));
       }
     }
     if (!SecurityUtils.isValidMasterLoginId(userDetails.getMasterLoginId())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
-      logger.debug(String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
     }
 
     if (!SecurityUtils.isEmailValid(userDetails.getEmail())) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(String.format(ErrorMessages.invalidMessage, "Email"));
-      logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));
-      return userDetailsResponse;
+      return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "Email"));
     }
+    return userDetailsResponse;
+  }
+
+  private UsersList buildInvalidResponse(String message) {
+    UsersList userDetailsResponse = new UsersList();
+    userDetailsResponse.setValid(false);
+    userDetailsResponse.setValidityMessage(message);
+    logger.error("Invalid User input:{}", message);
     return userDetailsResponse;
   }
 }
