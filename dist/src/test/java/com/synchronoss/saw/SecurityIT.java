@@ -839,4 +839,24 @@ public class SecurityIT extends BaseIT {
         .statusCode(200)
         .body("valid", equalTo(true));
   }
+
+  @Test
+  public void testGetBrandDetails() throws Exception {
+    given(authSpec)
+        .when()
+        .get("/security/auth/user/cust/brand")
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testDeleteBrandDetails() {
+    given(authSpec)
+        .when()
+        .delete("/security/auth/admin/cust/brand")
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
 }
