@@ -58,7 +58,10 @@ public class SecurityService {
       return buildInvalidResponse(String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
     }
     if (userDetails.getRoleId() == null) {
-      return buildInvalidResponse(String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleId"));
+      return buildInvalidResponse(String.format(ErrorMessages.nullErrorMessage, "roleId"));
+    }
+    if (userDetails.getCustomerId() == null) {
+      return buildInvalidResponse(String.format(ErrorMessages.nullErrorMessage, "customerId"));
     }
     if (!SecurityUtils.isValidMasterLoginId(userDetails.getMasterLoginId())) {
       return buildInvalidResponse(String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
