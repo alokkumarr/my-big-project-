@@ -70,32 +70,46 @@ public class ExportUtils {
    * @return
    */
   public static Map<String, String> buildColumnHeaderMap(Analysis analysis) {
+    logger.trace("Building column header map for analysis " + analysis);
     SipQuery sipQuery = analysis.getSipQuery();
     boolean haveDLQuery = sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty();
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
-    if (analysis.getDesignerEdit() != null && !analysis.getDesignerEdit()) {
+    if (analysis.getType() == "report") {
+      if (analysis.getDesignerEdit() != null && !analysis.getDesignerEdit()) {
+        for (Artifact artifact : sipQuery.getArtifacts()) {
+          String artifactName = artifact.getArtifactsName();
+          artifact
+              .getFields()
+              .forEach(
+                  field -> {
+                    // This is added to fix SIP-8811 customer Code column issue on DL report
+                    if (haveDLQuery
+                        && artifactName != null
+                        && CUSTOMER_CODE.matches(field.getColumnName())) {
+                      field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
+                    }
+                    fields.add(field);
+                  });
+        }
+      }
+    } else {
       for (Artifact artifact : sipQuery.getArtifacts()) {
-        String artifactName = artifact.getArtifactsName();
-        artifact.getFields().forEach(field -> {
-          // This is added to fix SIP-8811 customer Code column issue on DL report
-          if (haveDLQuery && artifactName != null && CUSTOMER_CODE.matches(field.getColumnName())) {
-            field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
-          }
-          fields.add(field);
-        });
+        fields.addAll(artifact.getFields());
       }
     }
 
-
+    logger.trace("Fields length = " + fields.size() + ", fields = " + fields);
     Map<String, String> header = new LinkedHashMap();
     if (!fields.isEmpty()) {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
           String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
+
           if (aliasName == null && !StringUtils.isEmpty(field.getDisplayName())) {
             aliasName = field.getDisplayName().trim();
           }
+          logger.trace("Alias name=" + aliasName);
           // look for DL report
           if (haveDLQuery) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
@@ -128,6 +142,8 @@ public class ExportUtils {
         }
       }
     }
+
+    logger.trace("Header = " + header);
     return header;
   }
 
