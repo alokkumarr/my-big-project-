@@ -355,26 +355,46 @@ public class ExportServiceImpl implements ExportService {
                                 })
                             .collect(Collectors.joining(",")));
                     osw.write("\n");
-                    osw.write(
-                        columnHeader.entrySet().stream().map(entry -> {
-                            String key = entry.getKey();
-                            String value = entry.getValue();
 
-                            LinkedHashMap<String, Object> linkedHashMap = (LinkedHashMap) line;
-                            LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
-                                ExportUtils.convert(linkedHashMap);
+                    if (columnHeader == null || columnHeader.isEmpty()) {
+                      osw.write(
+                          Arrays.stream(exportBean.getColumnHeader())
+                              .map(
+                                  val -> {
+                                    if (((LinkedHashMap) line).get(val) == null) {
+                                      return "null";
+                                    }
+                                    return "\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                  })
+                              .collect(Collectors.joining(",")));
+                    } else {
+                      osw.write(
+                          columnHeader.entrySet().stream()
+                              .map(
+                                  entry -> {
+                                    String key = entry.getKey();
+                                    String value = entry.getValue();
 
-                            if (linkedCaseInsensitiveMap.get(key) != null) {
-                                return DOUBLE_QUOTE_ESCAPE
-                                    + linkedCaseInsensitiveMap.get(key) + DOUBLE_QUOTE_ESCAPE;
-                            } else if (linkedCaseInsensitiveMap.get(value) != null) {
-                                return DOUBLE_QUOTE_ESCAPE
-                                    + linkedCaseInsensitiveMap.get(value) + DOUBLE_QUOTE_ESCAPE;
-                            } else {
-                                return "null";
-                            }
-                        })
-                            .collect(Collectors.joining(",")));
+                                    LinkedHashMap<String, Object> linkedHashMap =
+                                        (LinkedHashMap) line;
+                                    LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
+                                        ExportUtils.convert(linkedHashMap);
+
+                                    if (linkedCaseInsensitiveMap.get(key) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(key)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else if (linkedCaseInsensitiveMap.get(value) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(value)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else {
+                                      return "null";
+                                    }
+                                  })
+                              .collect(Collectors.joining(",")));
+                    }
+
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Header for csv file: {}", header);
                   } else {
@@ -383,26 +403,44 @@ public class ExportServiceImpl implements ExportService {
 
                     logger.trace("Export header is not null");
 
-                    osw.write(
-                        columnHeader.entrySet().stream().map(entry -> {
-                            String key = entry.getKey();
-                            String value = entry.getValue();
+                    if (columnHeader == null || columnHeader.isEmpty()) {
+                      osw.write(
+                          Arrays.stream(exportBean.getColumnHeader())
+                              .map(
+                                  val -> {
+                                    if (((LinkedHashMap) line).get(val) == null) {
+                                      return "null";
+                                    }
+                                    return "\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                  })
+                              .collect(Collectors.joining(",")));
+                    } else {
+                      osw.write(
+                          columnHeader.entrySet().stream()
+                              .map(
+                                  entry -> {
+                                    String key = entry.getKey();
+                                    String value = entry.getValue();
 
-                            LinkedHashMap<String, Object> linkedHashMap = (LinkedHashMap) line;
-                            LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
-                                ExportUtils.convert(linkedHashMap);
+                                    LinkedHashMap<String, Object> linkedHashMap =
+                                        (LinkedHashMap) line;
+                                    LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
+                                        ExportUtils.convert(linkedHashMap);
 
-                            if (linkedCaseInsensitiveMap.get(key) != null) {
-                                return DOUBLE_QUOTE_ESCAPE
-                                    + linkedCaseInsensitiveMap.get(key) + DOUBLE_QUOTE_ESCAPE;
-                            } else if (linkedCaseInsensitiveMap.get(value) != null) {
-                                return DOUBLE_QUOTE_ESCAPE
-                                    + linkedCaseInsensitiveMap.get(value) + DOUBLE_QUOTE_ESCAPE;
-                            } else {
-                                return "null";
-                            }
-                        })
-                            .collect(Collectors.joining(",")));
+                                    if (linkedCaseInsensitiveMap.get(key) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(key)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else if (linkedCaseInsensitiveMap.get(value) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(value)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else {
+                                      return "null";
+                                    }
+                                  })
+                              .collect(Collectors.joining(",")));
+                    }
                     osw.write(System.getProperty("line.separator"));
                   }
                 }

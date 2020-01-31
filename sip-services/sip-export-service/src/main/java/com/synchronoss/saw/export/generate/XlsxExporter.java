@@ -301,42 +301,45 @@ public class XlsxExporter implements IFileExporter {
 
     LinkedCaseInsensitiveMap<Object> caseInsensitiveData = ExportUtils.convert(data);
 
-    for (Entry<String, String> entry : columnHeaderMap.entrySet()) {
-      String entryKey = entry.getKey();
-      String entryValue = entry.getValue();
-
-      String value = null;
-
-      if (caseInsensitiveData.get(entryKey) != null) {
-        value = String.valueOf(caseInsensitiveData.get(entryKey));
-      } else if (caseInsensitiveData.get(entryValue) != null) {
-        value = String.valueOf(caseInsensitiveData.get(entryValue));
-      } else {
-        value = "null";
+    if (columnHeaderMap == null || columnHeaderMap.isEmpty()) {
+      for (String val : header) {
+        if (val instanceof String) {
+          String value = String.valueOf(data.get(val));
+          DataField.Type[] types = exportBean.getColumnDataType();
+          SXSSFCell cell = excelRow.createCell(colNum);
+          if (types != null && types.length > 0) {
+            DataField.Type colType = exportBean.getColumnDataType()[colNum];
+            String dataType = colType != null ? colType.value() : null;
+            addXlsxCell(value, cell, dataType, workBook, cellStyle);
+          }
+          colNum++;
+        }
       }
+    } else {
+      for (Entry<String, String> entry : columnHeaderMap.entrySet()) {
+        String entryKey = entry.getKey();
+        String entryValue = entry.getValue();
 
-      DataField.Type[] types = exportBean.getColumnDataType();
-      SXSSFCell cell = excelRow.createCell(colNum);
-      if (types != null && types.length > 0) {
-        DataField.Type colType = exportBean.getColumnDataType()[colNum];
-        String dataType = colType != null ? colType.value() : null;
-        addXlsxCell(value, cell, dataType, workBook, cellStyle);
+        String value = null;
+
+        if (caseInsensitiveData.get(entryKey) != null) {
+          value = String.valueOf(caseInsensitiveData.get(entryKey));
+        } else if (caseInsensitiveData.get(entryValue) != null) {
+          value = String.valueOf(caseInsensitiveData.get(entryValue));
+        } else {
+          value = "null";
+        }
+
+        DataField.Type[] types = exportBean.getColumnDataType();
+        SXSSFCell cell = excelRow.createCell(colNum);
+        if (types != null && types.length > 0) {
+          DataField.Type colType = exportBean.getColumnDataType()[colNum];
+          String dataType = colType != null ? colType.value() : null;
+          addXlsxCell(value, cell, dataType, workBook, cellStyle);
+        }
+        colNum++;
       }
-      colNum++;
     }
-//    for (String val : header) {
-//      if (val instanceof String) {
-//        String value = String.valueOf(data.get(val));
-//        DataField.Type[] types = exportBean.getColumnDataType();
-//        SXSSFCell cell = excelRow.createCell(colNum);
-//        if (types != null && types.length > 0) {
-//          DataField.Type colType = exportBean.getColumnDataType()[colNum];
-//          String dataType = colType != null ? colType.value() : null;
-//          addXlsxCell(value, cell, dataType, workBook, cellStyle);
-//        }
-//        colNum++;
-//      }
-//    }
   }
 
   /**
