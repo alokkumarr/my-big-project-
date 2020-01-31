@@ -1,5 +1,7 @@
 package com.sncr.saw.security.app.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,6 +63,7 @@ import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.Privileges;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -93,6 +96,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -133,9 +137,9 @@ public class SecurityController {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
-  private final String AdminRole = "ADMIN";
-  private final String ALERTS = "ALERTS";
-  private final String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
+  private final static String AdminRole = "ADMIN";
+  private final static String ALERTS = "ALERTS";
+  private final static String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -238,74 +242,75 @@ public class SecurityController {
        return ssoRequestHandler.processSSORequest(token);
 	}
 
-	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
-	public LoginResponse accessToken(@RequestBody String rToken, HttpServletResponse response) throws ServletException {
-		Boolean validity = false;
-		try {
-			Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
-			// Check if the refresh Token is valid
-			Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
-			String masterLoginId = null;
-			while (it.hasNext()) {
-				Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
-				if (pair.getKey().equals("validUpto")) {
-					validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
-				}
-				if (pair.getKey().equals("masterLoginId")) {
-					masterLoginId = pair.getValue().toString();
-				}
-				it.remove();
-			}
-			if (!validity) {
-				return new LoginResponse(validity, "Token has expired. Please re-login");
-			} else {
+  @RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
+  public LoginResponse accessToken(@RequestBody String rToken, HttpServletResponse response) throws ServletException {
+    Boolean validity = false;
+    try {
+      Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
+      // Check if the refresh Token is valid
+      Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
+      String masterLoginId = null;
+      while (it.hasNext()) {
+        Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+        if (pair.getKey().equals("validUpto")) {
+          validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
+        }
+        if (pair.getKey().equals("masterLoginId")) {
+          masterLoginId = pair.getValue().toString();
+        }
+        it.remove();
+      }
+      if (!validity) {
+        return new LoginResponse(validity, "Token has expired. Please re-login");
+      } else {
 
-			logger.info("Ticket will be created..");
-			logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
+        logger.info("Ticket will be created..");
+        logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
 
-				Ticket ticket = null;
-				User user = null;
-				ticket = new Ticket();
-				ticket.setMasterLoginId(masterLoginId);
-				RefreshToken newRToken = null;
-				try {
-					user = new User();
-					user.setMasterLoginId(masterLoginId);
-					user.setValidMins((nSSOProperties.getValidityMins() != null
-							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
-					ticket = tHelper.createTicket(user, false);
-					newRToken = new RefreshToken();
-					newRToken.setValid(true);
-					newRToken.setMasterLoginId(masterLoginId);
-					newRToken
-							.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
-									? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
-				} catch (DataAccessException de) {
-					logger.error("Exception occured creating ticket ", de, null);
-					ticket.setValidityReason("Database error. Please contact server Administrator.");
-					ticket.setValid(false);
-					ticket.setError(de.getMessage());
-					return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-							.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
-				} catch (Exception e) {
-					logger.error("Exception occured creating ticket ", e, null);
-					return null;
-				}
+        Ticket ticket = null;
+        User user = null;
+        ticket = new Ticket();
+        ticket.setMasterLoginId(masterLoginId);
+        RefreshToken newRToken = null;
+        try {
+          user = new User();
+          user.setMasterLoginId(masterLoginId);
+          user.setValidMins((nSSOProperties.getValidityMins() != null
+              ? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
+          ticket = tHelper.createTicket(user, false);
+          newRToken = new RefreshToken();
+          newRToken.setValid(true);
+          newRToken.setMasterLoginId(masterLoginId);
+          newRToken
+              .setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
+                  ? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
+        } catch (DataAccessException de) {
+          logger.error("Exception occured creating ticket ", de, null);
+          ticket.setValidityReason("Database error. Please contact server Administrator.");
+          ticket.setValid(false);
+          ticket.setError(de.getMessage());
+          return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
+              .setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+        } catch (Exception e) {
+          logger.error("Exception occured creating ticket ", e, null);
+          return null;
+        }
 
-				ticket.setValid(true);
-				return new LoginResponse(
-						Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
-								.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
-						Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
-								.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
-			}
+        ticket.setValid(true);
+        return new LoginResponse(
+            Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
+                .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
+            Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
+                .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+      }
 
-		}catch (Exception ex) {
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			logger.error("Error occurred while validating the ticket : {}", ex.getMessage());
-			return new LoginResponse(validity, UNAUTHORIZED_USER);
-		}
-	}
+    }catch (Exception ex) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      logger.error("Error occurred while validating the ticket : {}", ex.getMessage());
+      return new LoginResponse(validity, UNAUTHORIZED_USER);
+    }
+  }
+
 
 	@RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
 	public LoginResponse getDefaults(@RequestBody LoginDetails loginDetails) {
@@ -358,29 +363,37 @@ public class SecurityController {
 		try {
 			return gson.toJson(tHelper.logout(ticketID));
 		} catch (DataAccessException de) {
+			logger.error("Error while logout {}", de);
 			return de.getMessage();
 		}
 	}
 
-    /**
-     *
-     * @return
-     */
-    @RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
-    public String logout(@RequestHeader("Authorization") String token) {
-        token = token.replaceAll("Bearer", "").trim();
-        Ticket ticket = null;
-        try {
-             ticket = TokenParser.retrieveTicket(token);
-        } catch (IOException e) {
-            logger.error("Error occurred while parsing the Token");
-        }
-        try {
-            return tHelper.logout(ticket.getTicketId());
-        } catch (DataAccessException de) {
-            return de.getMessage();
-        }
-    }
+	/**
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
+	public String logout(@RequestHeader("Authorization") String token, HttpServletRequest request,
+			HttpServletResponse response) {
+		Gson gson = new Gson();
+		if (StringUtils.isEmpty(token) || request == null) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return gson.toJson("Invalid Token");
+		}
+		Ticket ticket = SipCommonUtils.getTicket(request);
+		Boolean validity =
+				ticket != null && ticket.getValidUpto() != null ? ticket.getValidUpto() > (new Date()
+						.getTime()) : false;
+		if (!validity) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return gson.toJson("Token has expired. Please re-login");
+		}
+
+		try {
+			return gson.toJson(tHelper.logout(ticket.getTicketId()));
+		} catch (DataAccessException de) {
+			return gson.toJson("Error occurred while logging out! Contact ADMIN!!");
+		}
+	}
 
 	/**
 	 *
@@ -420,17 +433,18 @@ public class SecurityController {
 		if (message == null && valid.getValid()) {
 			try {
 				message = userRepository.changePassword(loginId, newPass, oldPass);
-				if (message != null && message.equals("Password Successfully Changed.")) {
+				if ("Password Successfully Changed.".equals(message)) {
 					valid.setValid(true);
                     valid.setValidityMessage(message);
                     return valid;
-				} else if (message.equals("Value provided for old Password did not match.")) {
+				} else if ("Value provided for old Password did not match.".equals(message)) {
 				    valid.setValid(false);
 				    valid.setValidityMessage(message);
 				    return valid;
                 }
 
 			} catch (DataAccessException de) {
+				logger.error("Database error. Please contact server Administrator. {}", de);
 				valid.setValidityMessage("Database error. Please contact server Administrator.");
 				valid.setError(de.getMessage());
 				return valid;
@@ -452,10 +466,10 @@ public class SecurityController {
 		String message = null;
 		try {
 			String eMail = userRepository.getUserEmailId(resetPwdDtls.getMasterLoginId());
-			if (eMail.equals("Invalid")) {
+			if ("Invalid".equals(eMail)) {
 				logger.error("Invalid user Id, Unable to perform Reset Password Process. error message:", null, null);
 				message = "Invalid user Id";
-			} else if (eMail.equals("no email")) {
+			} else if ("no email".equals(eMail)) {
 				logger.error("Email Id is not configured for the User", null, null);
 				message = "Email Id is not configured for the User";
 			} else {
@@ -464,19 +478,15 @@ public class SecurityController {
 				userRepository.insertResetPasswordDtls(resetPwdDtls.getMasterLoginId(), randomString, createdTime,
 						createdTime + (24 * 60 * 60 * 1000));
 				String resetpwdlk = resetPwdDtls.getProductUrl();
-				// resetpwdlk = resetpwdlk+"/vfyRstPwd?rhc="+randomString;
 				resetpwdlk = resetpwdlk + "?rhc=" + randomString;
 				message = sendResetMail(resetPwdDtls.getMasterLoginId(), eMail, resetpwdlk, createdTime);
 				if (message == null) {
 					valid.setValid(true);
-					message = "Mail sent successfully to " + eMail;// + ".
-																	// Requesting
-																	// user is "
-																	// +
-																	// resetPwdDtls.getMasterLoginId();
+					message = "Mail sent successfully to " + eMail;
 				}
 			}
 		} catch (DataAccessException de) {
+			logger.error("Database error. Please contact server Administrator. {}", de);
 			valid.setValidityMessage("Database error. Please contact server Administrator.");
 			valid.setError(de.getMessage());
 			return valid;
@@ -493,13 +503,14 @@ public class SecurityController {
 	@RequestMapping(value = "/vfyRstPwd", method = RequestMethod.POST)
 	public ResetValid vfyRstPwd(@RequestBody RandomHashcode randomHashcode) {
 		// P2: handle expired password scenario
-		ResetValid rv = null;
+		ResetValid rv = new ResetValid();
 		try {
 			rv = userRepository.validateResetPasswordDtls(randomHashcode.getRhc());
 		} catch (DataAccessException de) {
 			rv.setValid(false);
 			rv.setValidityReason("Database error. Please contact server Administrator.");
 			rv.setError(de.getMessage());
+			logger.error("Database error. Please contact server Administrator. {}", de);
 			return rv;
 		}
 		return rv;
@@ -509,12 +520,9 @@ public class SecurityController {
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 		Properties mailProperties = new Properties();
-		// mailProperties.put("mail.smtp.auth", auth);
-		// mailProperties.put("mail.smtp.starttls.enable", starttls);
 		mailSender.setJavaMailProperties(mailProperties);
 		mailSender.setHost(nSSOProperties.getMailHost());
 		mailSender.setPort(nSSOProperties.getMailPort());
-		// mailSender.setProtocol(protocol);
 
 		mailSender.setUsername(nSSOProperties.getMailUserName());
 		if (nSSOProperties.getMailPassword().length != 0) {
@@ -1267,7 +1275,7 @@ public class SecurityController {
 			}
 
         DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups,custId);
-        if (dskValidity.getValid().booleanValue() == true)  {
+        if (dskValidity.getValid().booleanValue())  {
             return dskValidity;
         }
         else {
@@ -1311,7 +1319,7 @@ public class SecurityController {
 				return valid;
 			}
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1340,7 +1348,7 @@ public class SecurityController {
         }
         Valid dskValidity = dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
 
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1368,7 +1376,7 @@ public class SecurityController {
             return valid;
         }
         Valid dskValidity = dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1409,7 +1417,7 @@ public class SecurityController {
         dskList.add(0,securityGroupId.toString());
         dskList.add(1,attributeName);
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1438,7 +1446,7 @@ public class SecurityController {
             return valid;
         }
         Valid dskValidity = dataSecurityKeyRepository.updateUser(securityGroupName,userSysId,custId);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1480,6 +1488,7 @@ public class SecurityController {
       response = UsersList.class)
   @RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
   public UsersList addUser(HttpServletRequest request,
+      HttpServletResponse httpServletResponse,
       @ApiParam(value = "Authorization token") @RequestHeader("Authorization") String authToken,
       @ApiParam(value = "User details to store", required = true) @RequestBody User user) {
     String[] valuesFromToken =
@@ -1491,6 +1500,12 @@ public class SecurityController {
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
+        userList= securityService.validateUserDetails(user);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return userList;
+        }
+
         Valid validity = PasswordValidation.validatePassword(user.getPassword(), user.getMasterLoginId());
         userList.setValid(validity.getValid());
         userList.setValidityMessage(validity.getValidityMessage());
@@ -1525,9 +1540,14 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
-	public UsersList updateUser(HttpServletRequest request, @RequestBody User user) {
-		UsersList userList = new UsersList();
-		Valid valid = null;
+	public UsersList updateUser(HttpServletRequest request,HttpServletResponse servletResponse,@RequestBody User user) {
+		UsersList userList = null;
+        userList = securityService.validateUserDetails(user);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            servletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return userList;
+        }
+        Valid valid = null;
 		try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
@@ -2229,14 +2249,31 @@ public class SecurityController {
      * @return
      */
 	@RequestMapping(value= "/auth/user/preferences/upsert", method = RequestMethod.POST)
-    public Object addUserPreferences(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Preference> preferenceList) {
+    public UserPreferences addUserPreferences(HttpServletRequest request, HttpServletResponse response,
+																							@RequestBody List<Preference> preferenceList) {
 	    UserPreferences userPreferences = new UserPreferences();
-	    String jwtToken = JWTUtils.getToken(request);
-	    String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        userPreferences.setUserID(extractValuesFromToken[0]);
-        userPreferences.setCustomerID(extractValuesFromToken[1]);
-        userPreferences.setPreferences(preferenceList);
-        return preferenceRepository.upsertPreferences(userPreferences);
+			try {
+				Ticket ticket = SipCommonUtils.getTicket(request);
+				userPreferences.setUserID(ticket.getUserId().toString());
+				userPreferences.setCustomerID(ticket.getCustID());
+				Preference preference = preferenceList.stream().
+						filter(p -> "defaultDashboardCategory".equalsIgnoreCase(p.getPreferenceName())).findFirst().get();
+				Long categoryId = preference != null && preference.getPreferenceValue() != null ?
+						Long.valueOf(preference.getPreferenceValue()) : 0L;
+
+				if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.CREATE)) {
+					userPreferences.setPreferences(preferenceList);
+					userPreferences = preferenceRepository.upsertPreferences(userPreferences);
+				} else {
+					userPreferences.setMessage(UNAUTHORIZED_USER);
+					response.setStatus(HttpStatus.UNAUTHORIZED.value());
+					response.sendError(HttpStatus.UNAUTHORIZED.value(),UNAUTHORIZED_USER);
+				}
+			}catch (Exception ex) {
+				userPreferences.setMessage("Please contact server Administrator" + ex.getMessage());
+				logger.error("Please contact server Administrator {}", ex);
+			}
+			return userPreferences;
     }
 
     /**
@@ -2244,19 +2281,36 @@ public class SecurityController {
      * @return
      */
     @RequestMapping(value= "/auth/user/preferences/delete", method = RequestMethod.POST)
-    public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
+    public UserPreferences deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
                                         @RequestBody List<Preference> preferenceList,
                                         @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
         UserPreferences userPreferences = new UserPreferences();
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        userPreferences.setUserID(extractValuesFromToken[0]);
-        userPreferences.setCustomerID(extractValuesFromToken[1]);
-        userPreferences.setPreferences(preferenceList);
-        if (inactivateAll!=null && inactivateAll)
-            return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
-        else
-            return preferenceRepository.deletePreferences(userPreferences,false);
+				try {
+					Ticket ticket = SipCommonUtils.getTicket(request);
+					userPreferences.setUserID(ticket.getUserId().toString());
+					userPreferences.setCustomerID(ticket.getCustID());
+					Preference preference = preferenceList.stream().
+							filter(p -> "defaultDashboardCategory".equalsIgnoreCase(p.getPreferenceName())).findFirst().get();
+					Long categoryId = preference != null && preference.getPreferenceValue() != null ?
+							Long.valueOf(preference.getPreferenceValue()) : 0L;
+
+					if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.DELETE)) {
+						userPreferences.setPreferences(preferenceList);
+						if (inactivateAll!=null && inactivateAll) {
+							return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
+						} else {
+							return preferenceRepository.deletePreferences(userPreferences,false);
+						}
+					} else {
+						userPreferences.setMessage(UNAUTHORIZED_USER);
+						response.setStatus(HttpStatus.UNAUTHORIZED.value());
+						response.sendError(HttpStatus.UNAUTHORIZED.value(),	UNAUTHORIZED_USER);
+					}
+				}catch (Exception ex) {
+					userPreferences.setMessage("Please contact server Administrator" + ex.getMessage());
+					logger.error("Please contact server Administrator {}", ex);
+				}
+			return userPreferences;
     }
 
     /**

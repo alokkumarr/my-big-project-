@@ -150,7 +150,7 @@ public class GatewayController {
           if (!ServletFileUpload.isMultipartContent(request)) {
           proxiedRequest = createHttpUriRequest(request,userMetadata);  
           proxiedResponse = httpClient.execute(proxiedRequest);
-          responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()), 
+          responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity()),
               makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
           }
           else {
@@ -196,8 +196,12 @@ public class GatewayController {
                   "Filename : %s has been deleted from temp folder after uploading to the destination",
                   file.getFilename()));
             file.getFile().delete();}
-            responseEntity = new ResponseEntity<>(uploadResponseEntity.getBody(), makeResponseHeadersUpload(), HttpStatus.OK);
-            logger.trace("uploadResponseEntity response structure {}",  uploadResponseEntity.getBody() + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
+            String uploadResponse = "";
+            if(uploadResponseEntity != null){
+                uploadResponse = uploadResponseEntity.getBody();
+                logger.trace("uploadResponseEntity response structure {}",  uploadResponse + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
+            }
+            responseEntity = new ResponseEntity<>(uploadResponse, makeResponseHeadersUpload(), HttpStatus.OK);
             logger.trace("responseEntity response structure {}",  responseEntity.getStatusCodeValue());
             return responseEntity;
           }
@@ -214,7 +218,7 @@ public class GatewayController {
       if (request.getRequestURI().endsWith(URLRequestTransformer.API_DOCS_PATH)) {
           proxiedRequest = createHttpUriRequest(request, new UserCustomerMetaData());
           proxiedResponse = httpClient.execute(proxiedRequest);
-          return new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()), 
+          return new ResponseEntity<>(read(proxiedResponse.getEntity()),
               makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
         }
         responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
@@ -225,8 +229,10 @@ public class GatewayController {
 
   private HttpHeaders makeResponseHeaders(HttpResponse response) {
     HttpHeaders result = new HttpHeaders();
-    Header h = response.getFirstHeader(CONTENT_TYPE);
-    result.set(h.getName(), h.getValue());
+    Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE);
+    if(contentTypeHeader != null){
+        result.set(contentTypeHeader.getName(), contentTypeHeader.getValue());
+    }
     return result;
   }
 
@@ -289,10 +295,14 @@ public class GatewayController {
     return headersRequestTransformer.transform(request).build();
   }
 
-  private String read(InputStream input) throws IOException {
-    try (BufferedReader buffer = new BufferedReader(new InputStreamReader(input))) {
-      return buffer.lines().collect(Collectors.joining("\n"));
-    }
+  private String read(org.apache.http.HttpEntity entity) throws IOException {
+        if(entity == null){
+            return "";
+        }else{
+            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(entity.getContent()))) {
+                return buffer.lines().collect(Collectors.joining("\n"));
+            }
+        }
   }
   
   @ExceptionHandler(value=NoHandlerFoundException.class)

@@ -58,7 +58,7 @@ public class ObserveControllerRestTest {
             .header(HttpHeaders.LOCATION, "http://localhost/observe/dashboards/create");
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
     MockHttpServletResponse response = result.getResponse();
-    assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+    assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
   }
 
   @Test
@@ -73,9 +73,8 @@ public class ObserveControllerRestTest {
     logger.info("Response code {}", result.getResponse());
     String expected =
         getObserveResponseString(
-            ObserveUtils.prepareResponse(observe, "Entity has been retrieved successfully"));
-    System.out.println(expected);
-    System.out.println(result.getResponse().getContentAsString());
+            ObserveUtils.prepareResponse(observe,
+                "UNAUTHORIZED ACCESS : User don't have the Access privileges for dashboard!!"));
     JSONAssert.assertEquals(result.getResponse().getContentAsString(), expected, false);
   }
 
@@ -91,7 +90,7 @@ public class ObserveControllerRestTest {
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
     logger.info("Response code {}", result.getResponse());
     MockHttpServletResponse response = result.getResponse();
-    assertEquals(HttpStatus.OK.value(), response.getStatus());
+    assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
   }
 
   /**
