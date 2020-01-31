@@ -22,7 +22,6 @@
         <jjwt.version>0.7.0</jjwt.version>
         <gson.version>2.8.0</gson.version>
         <spring-security.version>4.0.2.RELEASE</spring-security.version>
-        <slfj.version>1.7.6</slfj.version>
     </properties>
 
     <repositories>
@@ -90,16 +89,6 @@
             <version>5.2.0</version>
         </dependency>
         <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-          <version>${slfj.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-          <version>${slfj.version}</version>
-        </dependency>
-      <dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-test</artifactId>
     		<version>3.1.2.RELEASE</version>
