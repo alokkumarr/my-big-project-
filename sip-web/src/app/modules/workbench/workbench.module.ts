@@ -39,7 +39,9 @@ import {
   DatasetsCardPageComponent,
   DatasetsGridPageComponent,
   DatasetActionsComponent,
-  DatapodActionsComponent
+  DatapodActionsComponent,
+  DatasetFilterComponent,
+  DatasetStringFilterComponent
 } from './components/data-objects-view/index';
 import {
   DatasourceComponent,
@@ -108,7 +110,9 @@ const COMPONENTS = [
   JobLogsPageComponent,
   JobFiltersComponent,
   NewRegistrationComponent,
-  AppkeysViewComponent
+  AppkeysViewComponent,
+  DatasetFilterComponent,
+  DatasetStringFilterComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
