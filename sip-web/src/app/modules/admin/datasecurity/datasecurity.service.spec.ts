@@ -96,4 +96,58 @@ describe('User Assignment Service', () => {
       ).toBeTruthy();
     });
   });
+
+  describe('getFiltersFor', () => {
+    it('should get filters', () => {
+      const spy = spyOn(datasecurityService, 'getRequest').and.returnValue({
+        pipe: () => {}
+      });
+      datasecurityService.getFiltersFor('123');
+      expect(spy).toHaveBeenCalledWith('auth/admin/dsk-security-groups/123');
+    });
+  });
+
+  describe('getList', () => {
+    it('should get list of user assignments', () => {
+      const spy = spyOn(datasecurityService, 'getRequest').and.returnValue({
+        toPromise: () => {}
+      });
+      datasecurityService.getList();
+      expect(spy).toHaveBeenCalledWith('auth/admin/user-assignments');
+    });
+  });
+
+  describe('attributeToGroup', () => {
+    it('should call post if new attribute is being created', () => {
+      const spy = spyOn(datasecurityService, 'postRequest').and.returnValue({});
+      datasecurityService.attributetoGroup({
+        attributeName: '',
+        value: '',
+        mode: 'create',
+        groupSelected: { secGroupSysId: '2' }
+      });
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call put if old attribute is being edited', () => {
+      const spy = spyOn(datasecurityService, 'putrequest').and.returnValue({});
+      datasecurityService.attributetoGroup({
+        attributeName: '',
+        value: '',
+        mode: 'edit',
+        groupSelected: { secGroupSysId: '2' }
+      });
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('assignGroupToUser', () => {
+    it('should call correct url', () => {
+      const spy = spyOn(datasecurityService, 'putrequest').and.returnValue({});
+      datasecurityService.assignGroupToUser({
+        userId: '123'
+      });
+      expect(spy).toHaveBeenCalled();
+    });
+  });
 });
