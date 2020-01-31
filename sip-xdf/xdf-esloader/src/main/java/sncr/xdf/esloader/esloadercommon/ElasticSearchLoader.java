@@ -136,11 +136,9 @@ public class ElasticSearchLoader {
         configMap.put("es.net.ssl.truststore.location",config.getKeyStorePath());
         configMap.put("es.net.ssl.cert.allow.self.signed","true");
         }
-        config.getAdditionalParams().forEach((paramKey,paramVal) ->  
-        		configMap.put(paramKey,paramVal));
-        
         logger.debug("############ ES Config Params :: ###############");
-        configMap.forEach((paramKey,paramVal) ->  logger.debug(paramKey+ "-->"+ paramVal));
+        //Modifying as per Review Comments from
+        config.getAdditionalParams().forEach((paramKey,paramVal) -> { configMap.put(paramKey,paramVal); logger.debug(paramKey+ "-->"+ paramVal); });
         logger.debug("############ End of ES Config Params :: ###############");
         return configMap;
     }
