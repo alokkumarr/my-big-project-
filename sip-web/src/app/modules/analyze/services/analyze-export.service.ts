@@ -48,11 +48,11 @@ export class AnalyzeExportService {
           },
           keys: columnNames
         };
-
-        exportData = wrapFieldValues(exportData);
         exportData = ['report', 'esReport'].includes(analysisType)
           ? alterDateInData(exportData, analysis.sipQuery)
           : exportData;
+
+        exportData = wrapFieldValues(exportData);
 
         json2csv(
           exportData,
