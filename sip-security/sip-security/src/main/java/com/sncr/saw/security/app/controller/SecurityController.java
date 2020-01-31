@@ -1481,6 +1481,7 @@ public class SecurityController {
       response = UsersList.class)
   @RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
   public UsersList addUser(HttpServletRequest request,
+      HttpServletResponse httpServletResponse,
       @ApiParam(value = "Authorization token") @RequestHeader("Authorization") String authToken,
       @ApiParam(value = "User details to store", required = true) @RequestBody User user) {
     String[] valuesFromToken =
@@ -1492,6 +1493,12 @@ public class SecurityController {
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
+        userList= securityService.validateUserDetails(user);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return userList;
+        }
+
         Valid validity = PasswordValidation.validatePassword(user.getPassword(), user.getMasterLoginId());
         userList.setValid(validity.getValid());
         userList.setValidityMessage(validity.getValidityMessage());
@@ -1526,9 +1533,14 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
-	public UsersList updateUser(HttpServletRequest request, @RequestBody User user) {
-		UsersList userList = new UsersList();
-		Valid valid = null;
+	public UsersList updateUser(HttpServletRequest request,HttpServletResponse servletResponse,@RequestBody User user) {
+		UsersList userList = null;
+        userList = securityService.validateUserDetails(user);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            servletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return userList;
+        }
+        Valid valid = null;
 		try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
