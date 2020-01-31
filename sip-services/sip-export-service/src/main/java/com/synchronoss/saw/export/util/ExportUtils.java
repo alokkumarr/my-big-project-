@@ -47,6 +47,8 @@ public class ExportUtils {
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
   private static final String DEFAULT_FILE_TYPE = "csv";
 
+  private static final String ANALYSIS_TYPE = "report";
+
   private ExportUtils() {}
   /**
    * Create Request header with common properties
@@ -75,7 +77,7 @@ public class ExportUtils {
     boolean haveDLQuery = sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty();
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
-    if (analysis.getType() == "report") {
+    if (ANALYSIS_TYPE.equals(analysis.getType())) {
       if (analysis.getDesignerEdit() != null && !analysis.getDesignerEdit()) {
         for (Artifact artifact : sipQuery.getArtifacts()) {
           String artifactName = artifact.getArtifactsName();
