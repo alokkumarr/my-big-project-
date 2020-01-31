@@ -80,3 +80,56 @@
   overflow: auto;
   background-color: $background-color;
 }
+
+.titleClass {
+  text-align: left;
+  color: $primary-blue-b1;
+  padding-left: 10px;
+  font-weight: bold !important;
+  font-size: 18px;
+}
+
+.view-container {
+  &__filter {
+    width: 350px;
+    background-color: $background-color;
+
+    &__header {
+      padding: 0 9px;
+
+      &__title {
+        @extend .titleClass;
+        padding-left: 30px;
+      }
+    }
+  }
+  .view-container-content {
+    padding: 3px;
+
+    &__header {
+      padding: 0 9px;
+      background-color: $background-color;
+
+      &__title {
+        @extend .titleClass;
+      }
+
+      &__iconBtn {
+        height: 36px;
+        width: 36px;
+        line-height: 36px;
+        font-size: 18px;
+      }
+    }
+
+    &__body {
+      height: calc(100% - 45px);
+      padding: 0 7px;
+      background-color: $background-color;
+
+      &__grid {
+        border-radius: 3px;
+      }
+    }
+  }
+}

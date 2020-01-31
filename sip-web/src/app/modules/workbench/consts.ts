@@ -1,4 +1,7 @@
-export { DATAPOD_CATEGORIES } from '../../common/consts';
+export {
+  DATAPOD_CATEGORIES,
+  DATASET_CATEGORIES_TYPE
+} from '../../common/consts';
 
 /**
  * User should be able to add underscore in DS name while adding datasets in workbench module.
