@@ -391,7 +391,7 @@ public class SecurityController {
 		try {
 			return gson.toJson(tHelper.logout(ticket.getTicketId()));
 		} catch (DataAccessException de) {
-			return gson.toJson(de.getMessage());
+			return gson.toJson("Error occurred while logging out! Contact ADMIN!!");
 		}
 	}
 
