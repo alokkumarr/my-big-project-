@@ -318,7 +318,14 @@ public class Input {
         @SerializedName("base")
         BASE("base"),
         @SerializedName("partition")
-        PARTITION("partition");
+        PARTITION("partition"),
+        @SerializedName("RawDataSet")
+        RAW_DATA_SET("Raw Data Set"),
+        @SerializedName("EnrichedDataSet")
+        ENRICHED_DATA_SET("Enriched Data Set"),
+        @SerializedName("AggregatedDataset")
+        AGGREGATED_DATA_SET("Aggregated Data Set");
+
         private final String value;
         private static Map<String, Input.Dstype> constants = new HashMap<String, Input.Dstype>();
 
