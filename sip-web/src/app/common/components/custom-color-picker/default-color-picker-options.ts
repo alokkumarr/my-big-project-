@@ -3,7 +3,7 @@ export const DEFAULT_COLOR_PICKER_OPTION = {
   bgColor: '',
   position: 'top-right',
   width: '180px',
-  height: '300px',
+  height: '325px',
   display: 'popup',
   mode: 'color',
   labelText: 'Color :',

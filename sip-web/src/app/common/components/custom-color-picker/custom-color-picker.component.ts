@@ -82,8 +82,8 @@ export class CustomColorPickerComponent implements OnInit {
     );
 
     forEach(presetColorDiv, div => {
-      this.renderer.setStyle(div, 'height', '12px');
-      this.renderer.setStyle(div, 'width', '12px');
+      this.renderer.setStyle(div, 'height', '9px');
+      this.renderer.setStyle(div, 'width', '9px');
     });
 
     const typeDiv = this.elRef.nativeElement.querySelector('div.type-policy');
@@ -103,39 +103,39 @@ export class CustomColorPickerComponent implements OnInit {
     this.renderer.setStyle(
       cmykDiv,
       'height',
-      '55px',
+      '50px',
       RendererStyleFlags2.Important
     );
     this.renderer.setStyle(
       hslaDiv,
       'height',
-      '55px',
+      '50px',
       RendererStyleFlags2.Important
     );
     this.renderer.setStyle(
       hexDiv,
       'height',
-      '55px',
+      '50px',
       RendererStyleFlags2.Important
     );
     this.renderer.setStyle(
       rgbaDiv,
       'height',
-      '55px',
+      '50px',
       RendererStyleFlags2.Important
     );
 
     this.renderer.setStyle(
       colorDiv,
       'height',
-      '100px',
+      '90px',
       RendererStyleFlags2.Important
     );
 
     this.renderer.setStyle(
       typeDiv,
       'top',
-      '166px',
+      '160px',
       RendererStyleFlags2.Important
     );
   }

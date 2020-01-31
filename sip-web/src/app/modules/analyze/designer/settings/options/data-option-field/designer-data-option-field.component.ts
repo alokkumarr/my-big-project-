@@ -25,7 +25,19 @@ import { CHART_COLORS } from 'src/app/common/consts';
 import { DATA_AXIS } from '../../../consts';
 
 const ALIAS_CHANGE_DELAY = 500;
-const Default_Chart_Colors = cloneDeep(CHART_COLORS);
+const DEFAULT_CHART_COLORS = cloneDeep(CHART_COLORS);
+const ADDITIONAL_PRESET_COLORS = [
+  '#4e79a7',
+  '#59a14f',
+  '#9c755f',
+  '#f28e2b',
+  '#edc948',
+  '#bab0ac',
+  '#e15759',
+  '#b07aa1',
+  '#76b7b2',
+  '#ff9da7'
+];
 
 @Component({
   selector: 'designer-data-option-field',
@@ -70,7 +82,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       this.analysisSubtype
     );
     this.colorPickerConfig = cloneDeep(DEFAULT_COLOR_PICKER_OPTION);
-    const presetColors = take(Default_Chart_Colors, 12);
+    const presetColors = [
+      ...take(DEFAULT_CHART_COLORS, 11),
+      ...ADDITIONAL_PRESET_COLORS
+    ];
     if (this.isDataField) {
       set(this.colorPickerConfig, 'bgColor', this.artifactColumn.seriesColor);
     }
