@@ -26,11 +26,7 @@ class AnalyzePage extends CreateAnalysisModel {
     this._deleteButton = element(
       by.css(`[e2e="actions-menu-selector-delete"]`)
     );
-    this._scheduleButton = element(
-      by.xpath(
-        `//*[@e2e="actions-menu-selector-publish" and contains(text(),"Schedule")]`
-      )
-    );
+    this._scheduleButton = element(by.css(`[e2e="actions-menu-selector-schedule"]`));
     this._actionMenuOptions = element(
       by.xpath('//div[contains(@class,"mat-menu-panel")]')
     );
