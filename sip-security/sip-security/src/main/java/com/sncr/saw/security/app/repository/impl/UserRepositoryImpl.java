@@ -4,8 +4,8 @@ package com.sncr.saw.security.app.repository.impl;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.repository.impl.extract.SubCategoryDetailExtractor;
-import com.sncr.saw.security.app.repository.impl.extract.TicketValidExtractor;
 import com.sncr.saw.security.app.repository.result.extract.LongExtractor;
+import com.sncr.saw.security.app.repository.result.extract.UserCustomerDetailsExtractor;
 import com.sncr.saw.security.app.repository.result.extract.UserDetailsExtractor;
 import com.sncr.saw.security.app.repository.result.extract.UserDetailsListExtractor;
 import com.sncr.saw.security.common.UserUnsuccessfulLoginAttemptBean;
@@ -33,7 +33,12 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.dsk.BooleanCriteria;
+import com.synchronoss.bda.sip.dsk.Model;
+import com.synchronoss.bda.sip.dsk.Operator;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
+import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
@@ -49,9 +54,11 @@ import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -69,6 +76,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 /**
  * This class is used to do CRUD operations on the Mariadb data base having nsso
@@ -76,6 +84,8 @@ import org.springframework.stereotype.Repository;
  *
  * @author girija.sankar
  *
+ * This class contains more than 3K LOC,
+ * the refactoring should be done as part of SIP-9923 in the near future.
  */
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -83,6 +93,8 @@ public class UserRepositoryImpl implements UserRepository {
   private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
   private final JdbcTemplate jdbcTemplate;
+
+	private static final String VALUE_DELIMITER = "~:";
 
   @Autowired
   public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
@@ -655,24 +667,10 @@ public class UserRepositoryImpl implements UserRepository {
           preparedStatement.setString(2, ticketDetails.getRoleCode());
         }, new UserRepositoryImpl.PrepareProdModFeatureChildExtractor());
 
-              String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
-								   + "EC_GROUP SG INNER JOIN SEC_GROUP_DSK_ATTRIBUTE SGDA ON "
-								   + "(SG.SEC_GROUP_SYS_ID = SGDA.SEC_GROUP_SYS_ID) INNER JOIN SEC_GROUP_DSK_VALUE SGDV "
-								   + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
-								   + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
-								   + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-
-        Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, preparedStatement -> preparedStatement.setString(1, masterLoginId), new UserRepositoryImpl.DSKValuesExtractor());
-         // DSK values should be array in JSON object hence converting into list.
-        List<TicketDSKDetails> dskList = new ArrayList<>();
-				for (String key : dskValueMapping.keySet()) {
-					TicketDSKDetails dskDetails = new TicketDSKDetails();
-					dskDetails.setName(key);
-					dskDetails.setValues(dskValueMapping.get(key));
-					dskList.add(dskDetails);
-				}
-				ticketDetails.setDataSKey(dskList);
-
+				List<SipDskAttribute> dskAttributeList = fetchDskGroupAttributes(null, masterLoginId);
+				SipDskAttribute sipDskAttribute =
+						CollectionUtils.isEmpty(dskAttributeList) ? null : dskAttributeList.get(0);
+				ticketDetails.setDskAttribute(sipDskAttribute);
 
 				ArrayList<ProductModuleFeature> prodModFeatrChildSorted;
 				ArrayList<ProductModules> prodModSorted;
@@ -785,38 +783,6 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 			return dskValues;
 		}
-	}
-
-  @Override
-  public DataSecurityKeys fetchDSKDetailByUserId(String userId) {
-    String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
-        + "EC_GROUP SG INNER JOIN SEC_GROUP_DSK_ATTRIBUTE SGDA ON "
-        + "(SG.SEC_GROUP_SYS_ID = SGDA.SEC_GROUP_SYS_ID) INNER JOIN SEC_GROUP_DSK_VALUE SGDV "
-        + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
-        + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
-        + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-    Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, preparedStatement -> preparedStatement.setString(1, userId), new UserRepositoryImpl.DSKValuesExtractor());
-    // DSK values should be array in JSON object hence converting into list.
-    List<TicketDSKDetails> dskList = new ArrayList<>();
-    for (String key : dskValueMapping.keySet()) {
-      TicketDSKDetails dskDetails = new TicketDSKDetails();
-      dskDetails.setName(key);
-      dskDetails.setValues(dskValueMapping.get(key));
-      dskList.add(dskDetails);
-    }
-
-    String fetchJVDetails = "SELECT CUST.CUSTOMER_CODE, CUST.IS_JV_CUSTOMER, CV.FILTER_BY_CUSTOMER_CODE FROM CUSTOMERS CUST," +
-				"USERS U, CONFIG_VAL CV WHERE CUST.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID " +
-				"AND CV.CONFIG_VAL_OBJ_GROUP = CUST.CUSTOMER_CODE AND U.USER_ID= ?";
-
-    Map<String, String> jvDetails = jdbcTemplate.query(fetchJVDetails, preparedStatement -> preparedStatement.setString(1, userId), new UserRepositoryImpl.JVDetailExtractor());
-
-		DataSecurityKeys securityKeys = new DataSecurityKeys();
-		securityKeys.setDataSecurityKeys(dskList);
-		securityKeys.setCustomerCode(jvDetails.get("customerCode"));
-		securityKeys.setIsJvCustomer(Integer.parseInt(jvDetails.get("isJVCustomer")));
-		securityKeys.setFilterByCustomerCode(Integer.parseInt(jvDetails.get("filterByCustomerCode")));
-		return securityKeys;
 	}
 
   @Override
@@ -3274,4 +3240,86 @@ public class UserRepositoryImpl implements UserRepository {
     }
     return false;
   }
+
+  @Override
+  public DskDetails getUserById(String masterLoginId) {
+    DskDetails details = null;
+    String sql =
+        "SELECT U.USER_ID, C.CUSTOMER_CODE, S.SEC_GROUP_SYS_ID,C.CUSTOMER_SYS_ID,C.IS_JV_CUSTOMER, S.SEC_GROUP_NAME"
+            + " FROM USERS U left outer join (select * from SEC_GROUP where ACTIVE_STATUS_IND = 1 ) S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID  inner join customers C "
+            + " on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.ACTIVE_STATUS_IND = 1  AND C.ACTIVE_STATUS_IND = 1 AND U.USER_ID=?;";
+    try {
+      details =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> {
+                preparedStatement.setString(1, masterLoginId);
+              },
+              new UserCustomerDetailsExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+    return details;
+  }
+
+	public List<SipDskAttribute> fetchDskGroupAttributes(String parentId, String masterLoginId) {
+		String dskDetailsSql =
+				"SELECT SAM.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID, SAM.SEC_GROUP_SYS_ID, SAM.SEC_GROUP_DSK_PARENT_ID,  SAM.BOOLEAN_CRITERIA, SAM.COLUMN_NAME, SAM.OPERATOR, SAM.ATTRIBUTE_VALUES "
+						+ " FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL SAM INNER JOIN SEC_GROUP SG ON (SAM.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID) INNER JOIN CUSTOMERS C ON (SG.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID) INNER JOIN USERS U ON (U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID) "
+						+ "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1' AND SAM.SEC_GROUP_DSK_PARENT_ID "
+						+ ((parentId == null) ? "IS NULL" : "=?");
+		List<SipDskAttribute> dskAttributeList = new LinkedList<>();
+		try {
+			dskAttributeList = jdbcTemplate.query(dskDetailsSql, ps -> {
+				ps.setString(1,masterLoginId);
+				if (parentId != null) {
+					ps.setString(2, parentId);
+				}
+			}, resultSet -> {
+				List<SipDskAttribute> list = new LinkedList<>();
+				while (resultSet.next()) {
+					String attributeId = resultSet.getString("SEC_GROUP_DSK_ATTRIBUTE_SYS_ID");
+					String booleanCriteriaStr = resultSet.getString("BOOLEAN_CRITERIA");
+
+					SipDskAttribute attribute = new SipDskAttribute();
+					attribute.setAttributeId(attributeId);
+
+					if (booleanCriteriaStr == null) {
+						// Add leaf node to the list
+						String columnName = resultSet.getString("COLUMN_NAME");
+						String operatorStr = resultSet.getString("OPERATOR");
+
+						Model model = new Model();
+						Operator operator = Operator.valueOf(operatorStr);
+						String values = resultSet.getString("ATTRIBUTE_VALUES");
+						model.setOperator(operator);
+						model.setValues(Arrays.asList(values.split(VALUE_DELIMITER)));
+
+						attribute.setColumnName(columnName);
+						attribute.setModel(model);
+
+					} else {
+						BooleanCriteria booleanCriteria = BooleanCriteria.valueOf(booleanCriteriaStr);
+						attribute.setBooleanCriteria(booleanCriteria);
+						List<SipDskAttribute> booleanQuery =
+								fetchDskGroupAttributes(attributeId, masterLoginId);
+						attribute.setBooleanQuery(booleanQuery);
+					}
+					list.add(attribute);
+				}
+				return list;
+			});
+		} catch (Exception ex) {
+			logger.error("Error occurred: " + ex.getMessage(), ex);
+		}
+
+		logger.info("DSK Object : {}",dskAttributeList.toString());
+		return dskAttributeList;
+	}
 }

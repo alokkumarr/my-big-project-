@@ -44,6 +44,9 @@ public class Filter {
   @JsonProperty("isAggregationFilter")
   private Boolean isAggregationFilter;
 
+  @JsonProperty("aggregate")
+  private Aggregate aggregate;
+
   @JsonProperty("model")
   private Model model;
 
@@ -121,7 +124,17 @@ public class Filter {
     isAggregationFilter = aggregationFilter;
   }
 
-    @JsonProperty("model")
+  @JsonProperty("aggregate")
+  public Aggregate getAggregate() {
+    return aggregate;
+  }
+
+  @JsonProperty("aggregate")
+  public void setAggregate(Aggregate aggregate) {
+    this.aggregate = aggregate;
+  }
+
+  @JsonProperty("model")
   public Model getModel() {
     return model;
   }
@@ -141,6 +154,7 @@ public class Filter {
         .append("isRuntimeFilter", isRuntimeFilter)
         .append("isGlobalFilter", isGlobalFilter)
         .append("isAggregationFilter",isAggregationFilter)
+        .append("aggregate",aggregate)
         .append("model", model)
         .toString();
   }
@@ -154,6 +168,7 @@ public class Filter {
         .append(columnName)
         .append(isGlobalFilter)
         .append(isAggregationFilter)
+        .append(aggregate)
         .append(type)
         .append(isOptional)
         .toHashCode();
@@ -175,6 +190,7 @@ public class Filter {
         .append(columnName, rhs.columnName)
         .append(isGlobalFilter, rhs.isGlobalFilter)
         .append(isAggregationFilter,rhs.isAggregationFilter)
+        .append(aggregate,rhs.aggregate)
         .append(type, rhs.type)
         .append(isOptional, rhs.isOptional)
         .isEquals();

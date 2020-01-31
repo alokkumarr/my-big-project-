@@ -18,6 +18,7 @@ import {
   ViewChild,
   ElementRef
 } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 
 const dummyPassword = '**********';
 
@@ -30,9 +31,9 @@ export class PasswordToggleComponent implements OnInit {
   // @ViewChild('passwords') passwords;
   @ViewChild('passwordHide', { static: false }) passwordHide: ElementRef;
   @ViewChild('passwordShow', { static: false }) passwordShow: ElementRef;
+  public userPasswordControl = new FormControl('', Validators.required);
   public showPassword: boolean;
-  public userPassword: String;
-  public placeHolder: String;
+  public placeHolder: string;
   public isUserEditMode: boolean;
   public shouldShowIcon: boolean;
 
@@ -59,16 +60,20 @@ export class PasswordToggleComponent implements OnInit {
   set setUserEditMode(data) {
     this.isUserEditMode = data;
   }
-  constructor() {}
 
   ngOnInit() {
     this.showPassword = false;
     if (this.isUserEditMode) {
-      this.userPassword = dummyPassword;
+      this.userPasswordControl.setValue(dummyPassword);
       this.shouldShowIcon = false;
     } else {
       this.shouldShowIcon = true;
     }
+    this.userPasswordControl.valueChanges.subscribe(value => {
+      if (this.isUserEditMode && value !== '' && value !== dummyPassword) {
+        this.shouldShowIcon = true;
+      }
+    });
   }
 
   togglePassword() {
@@ -76,9 +81,10 @@ export class PasswordToggleComponent implements OnInit {
   }
 
   onPasswordFocus() {
-    if (this.isUserEditMode && this.userPassword === dummyPassword) {
+    const userPassword = this.userPasswordControl.value;
+    if (this.isUserEditMode && userPassword === dummyPassword) {
       this.shouldShowIcon = false;
-      this.userPassword = '';
+      this.userPasswordControl.setValue('');
     }
   }
 
@@ -86,17 +92,7 @@ export class PasswordToggleComponent implements OnInit {
     if (event.target.value === '' && this.isUserEditMode) {
       this.shouldShowIcon = false;
       this.showPassword = false;
-      this.userPassword = dummyPassword;
-    }
-  }
-
-  passwordChange(event) {
-    if (
-      this.isUserEditMode &&
-      event.target.value !== '' &&
-      event.target.value !== dummyPassword
-    ) {
-      this.shouldShowIcon = true;
+      this.userPasswordControl.setValue(dummyPassword);
     }
   }
 }

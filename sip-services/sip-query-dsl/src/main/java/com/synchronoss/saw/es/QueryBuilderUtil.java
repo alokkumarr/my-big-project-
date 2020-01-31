@@ -2,16 +2,16 @@ package com.synchronoss.saw.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.bda.sip.dsk.BooleanCriteria;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.model.Aggregate;
-import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
+
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.Model.Operation;
 import com.synchronoss.saw.model.Model.Operator;
-import com.synchronoss.saw.model.SipQuery;
+
 import com.synchronoss.saw.util.BuilderUtil;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,9 +19,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.util.CollectionUtil;
-import org.elasticsearch.common.util.CollectionUtils;
+
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -35,6 +36,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.springframework.util.CollectionUtils;
 
 public class QueryBuilderUtil {
 
@@ -255,45 +257,64 @@ public class QueryBuilderUtil {
    * @param item
    * @return
    */
-  public static Script prepareAggregationFilter(Filter item) {
-    Script script = null;
-
+  public static String prepareAggregationFilter(Filter item, String aggregatedColumnName) {
     Operator operator = item.getModel().getOperator();
-
+    String scriptQuery = null;
     switch (operator) {
-        case BTW: script =
-            new Script(
-                "params."
-                    + item.getColumnName()
-                    + " " + Operation.LTE + " "
-                    + item.getModel().getValue()
-                    + "&& "
-                    + "params."
-                    + item.getColumnName()
-                    + " " + Operation.GTE + " "
-                    + item.getModel().getOtherValue());
+      case BTW:
+        scriptQuery =
+            String.format(
+                " (params.%s %s %s && params.%s %s %s) ",
+                aggregatedColumnName,
+                Operation.LTE,
+                item.getModel().getValue(),
+                aggregatedColumnName,
+                Operation.GTE,
+                item.getModel().getOtherValue());
         break;
       case GT:
-        script = new Script("params." + item.getColumnName() + " " + Operation.GT.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.GT, item.getModel().getValue());
+
         break;
       case GTE:
-        script = new Script("params." + item.getColumnName() + " " + Operation.GTE.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.GTE, item.getModel().getValue());
         break;
       case LT:
-        script = new Script("params." + item.getColumnName() + " " + Operation.LT.value() +  " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.LT, item.getModel().getValue());
+
         break;
       case LTE:
-        script = new Script("params." + item.getColumnName() + " " + Operation.LTE.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.LTE, item.getModel().getValue());
+
         break;
       case EQ:
-        script = new Script("params." + item.getColumnName() + " " + Operation.EQ.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.EQ, item.getModel().getValue());
+
         break;
       case NEQ:
-        script = new Script("params." + item.getColumnName() + " " + Operation.NEQ.value() +  " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.NEQ, item.getModel().getValue());
+
         break;
     }
-
-    return script;
+    return scriptQuery;
   }
 
   /**
@@ -392,7 +413,7 @@ public class QueryBuilderUtil {
         (val) -> {
           // Add the lowercase value as terms to lookup based on custom analyser.
           if (val instanceof String) {
-            stringValues.add(((String) val).toLowerCase());
+            stringValues.add(((String) val).trim().toLowerCase().trim());
           }
         });
     return stringValues;
@@ -438,151 +459,65 @@ public class QueryBuilderUtil {
    * query builder for DSK node. TODO: Original DSK was supporting only string format, So query
    * builder is in place only for String.
    *
-   * @param dataSecurityKeyNode
-   * @param builder
-   */
-  public static List<QueryBuilder> queryDSKBuilder(
-      DataSecurityKey dataSecurityKeyNode, List<QueryBuilder> builder) {
-    if (dataSecurityKeyNode != null) {
-      for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
-        String[] col = dsk.getName().split("\\.");
-        String dskColName = col.length == 1 ? col[0] : col[1];
-        // If dsk name as <TableName.columnName>; then split for '.' and select columnName.
-        // If dsk name is <columnName>; then return columnName.
-        // If dsk name as <TableName.columnName.keyword>; then split length return 3, select
-        // columnName.
-        TermsQueryBuilder termsQueryBuilder =
-            new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX), dsk.getValues());
-        List<?> modelValues = QueryBuilderUtil.buildStringTermsfilter(dsk.getValues());
-        TermsQueryBuilder termsQueryBuilder1 =
-            new TermsQueryBuilder(QueryBuilderUtil.buildFilterColumn(dsk.getName()), modelValues);
-        BoolQueryBuilder dataSecurityBuilder = new BoolQueryBuilder();
-        dataSecurityBuilder.should(termsQueryBuilder);
-        dataSecurityBuilder.should(termsQueryBuilder1);
-        builder.add(dataSecurityBuilder);
-      }
-    }
-    return builder;
-  }
-
-  /**
-   * This method will validate whether Data security keys will be applicable for the * analysis and
-   * return the list of Key which all are applicable.
-   *
-   * @param sipQuery
-   * @param dataSecurityKey
+   * @param attribute
    * @return
    */
-  public static DataSecurityKey checkDSKApplicableAnalysis(
-      SipQuery sipQuery, DataSecurityKey dataSecurityKey, List<String> artifactFromAnalysis ) {
-    List<DataSecurityKeyDef> dataSecurityKeyDefList =
-        dataSecurityKey.getDataSecuritykey() != null ? dataSecurityKey.getDataSecuritykey() : null;
-    List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
-    List<Artifact> artifactList = sipQuery != null ? sipQuery.getArtifacts() : null;
-    if ((artifactList != null && !artifactList.isEmpty())
-        && (dataSecurityKeyDefList != null && !dataSecurityKeyDefList.isEmpty())) {
-      for (Artifact artifact : artifactList) {
-
-        String artifactName = artifact.getArtifactsName();
-        if (artifactFromAnalysis.contains(artifactName.toUpperCase())) {
-          List<Field> fieldList = artifact.getFields();
-          for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-            if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
-              String[] dskColName = dataSecurityKeyDef.getName().split("\\.");
-              String colName = dskColName.length > 1 ? dskColName[1] : dskColName[0];
-              dataSecurityKeyDef.setName(artifactName + "." + colName);
-              dataSecurityKeyDefs.add(dataSecurityKeyDef);
-            }
+  public static BoolQueryBuilder queryDSKBuilder(SipDskAttribute attribute) {
+    BoolQueryBuilder boolQuery = new BoolQueryBuilder();
+    BooleanCriteria booleanCriteria = null;
+    if (attribute == null) {
+      return boolQuery;
+    }
+    if (attribute.getBooleanCriteria() == null && attribute.getBooleanQuery() == null) {
+      return boolQuery;
+    }
+    if (attribute.getBooleanCriteria() != null) {
+      booleanCriteria = attribute.getBooleanCriteria();
+    }
+    for (SipDskAttribute dskAttribute : attribute.getBooleanQuery()) {
+      if (dskAttribute.getBooleanQuery() != null) {
+        BoolQueryBuilder childQuery = queryDSKBuilder(dskAttribute);
+        if (childQuery != null) {
+          switch (booleanCriteria) {
+            case AND:
+              boolQuery.must(childQuery);
+              break;
+            case OR:
+              boolQuery.should(childQuery);
+              break;
           }
+        }
+      } else {
+        BoolQueryBuilder dataSecurityBuilder = buildFilterObject(dskAttribute);
+        switch (booleanCriteria) {
+          case AND:
+            boolQuery.must(dataSecurityBuilder);
+            break;
+          case OR:
+            boolQuery.should(dataSecurityBuilder);
+            break;
         }
       }
     }
-    DataSecurityKey dataSecurityKeyNew = new DataSecurityKey();
-    dataSecurityKeyNew.setDataSecuritykey(dataSecurityKeyDefs);
-    return dataSecurityKeyNew;
+    return boolQuery;
   }
 
-  /**
-   * This method will validate whether Data security keys will be applicable for the * analysis and
-   * return the list of Key which all are applicable.
-   *
-   * @param artsName
-   * @param query
-   * @param dsk
-   * @param savedQuery
-   * @return
-   */
-  public static DataSecurityKey checkDSKApplicableAnalysis(List<String> artsName, String query,
-      DataSecurityKey dsk, SipQuery savedQuery) {
-    List<DataSecurityKeyDef> dataSecurityKeyDefList =
-        dsk.getDataSecuritykey() != null ? dsk.getDataSecuritykey() : null;
-    List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
-    if (!StringUtils.isEmpty(query) && dsk != null && dsk.getDataSecuritykey().size() != 0) {
-      for (String artifact : artsName) {
-        for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-          List<Field> fields = new ArrayList<>();
-          savedQuery.getArtifacts().forEach(artifact1 -> {
-            if (!StringUtils.isEmpty(artifact1.getArtifactsName()) && artifact1.getArtifactsName()
-                .equalsIgnoreCase(artifact)) {
-              fields.addAll(artifact1.getFields());
-            }
-          });
-          if (query.contains(artifact) && isColumnPresentInSemantic(artifact, fields,
-              dataSecurityKeyDef)) {
-            String[] dskColName = dataSecurityKeyDef.getName().split("\\.");
-            String colName = dskColName.length > 1 ? dskColName[1] : dskColName[0];
-            dataSecurityKeyDef.setName(artifact + "." + colName);
-            dataSecurityKeyDefs.add(dataSecurityKeyDef);
-          }
-        }
-      }
-    }
-    DataSecurityKey dataSecurityKeyNew = new DataSecurityKey();
-    dataSecurityKeyNew.setDataSecuritykey(dataSecurityKeyDefs);
-    return dataSecurityKeyNew;
-  }
-
-  /**
-   * This method will validate whether Data security keys will be applicable for the * analysis and
-   * return the list of Key which all are applicable.
-   *
-   * @param artifactName
-   * @param fieldList
-   * @param dataSecurityKeyDef
-   * @return
-   */
-  public static boolean checkDSKApplicableAnalysis(
-      String artifactName, List<Field> fieldList, DataSecurityKeyDef dataSecurityKeyDef) {
-    if (isColumnApplicable(artifactName, fieldList, dataSecurityKeyDef)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Ths method will check whether DSK columns is available in selected artifacts.
-   *
-   * @param artifactName
-   * @param fieldList
-   * @param dataSecurityKeyDef
-   * @return
-   */
-  public static boolean isColumnApplicable(
-      String artifactName, List<Field> fieldList, DataSecurityKeyDef dataSecurityKeyDef) {
-
-    String colName = dataSecurityKeyDef.getName();
-    for (Field field : fieldList) {
-      String[] col = field.getColumnName().split("\\.");
-      if (colName.equalsIgnoreCase(field.getColumnName())
-          || colName.equalsIgnoreCase(artifactName + "." + col[0])
-          || colName.equalsIgnoreCase(col[0])
-          || colName.equalsIgnoreCase(artifactName + "." + col)) {
-        return true;
-      }
-    }
-
-    return false;
+  private static BoolQueryBuilder buildFilterObject(SipDskAttribute dskAttribute) {
+    String[] col = dskAttribute.getColumnName().trim().split("\\.");
+    String dskColName = col.length == 1 ? col[0] : col[1];
+    List<String> values = dskAttribute.getModel().getValues().stream().map(String::trim)
+        .collect(Collectors.toList());
+    TermsQueryBuilder termsQueryBuilder =
+        new TermsQueryBuilder(
+            dskColName.trim().concat(BuilderUtil.SUFFIX),values);
+    List<?> modelValues =
+        QueryBuilderUtil.buildStringTermsfilter(dskAttribute.getModel().getValues());
+    TermsQueryBuilder termsQueryBuilder1 =
+        new TermsQueryBuilder(QueryBuilderUtil.buildFilterColumn(dskColName.trim()), modelValues);
+    BoolQueryBuilder dataSecurityBuilder = new BoolQueryBuilder();
+    dataSecurityBuilder.should(termsQueryBuilder);
+    dataSecurityBuilder.should(termsQueryBuilder1);
+    return dataSecurityBuilder;
   }
 
   /**
@@ -607,26 +542,5 @@ public class QueryBuilderUtil {
       data.add(row);
     }
     return data;
-  }
-
-  /**
-   * Check if column present in semantic.
-   *
-   * @param artifactName
-   * @param fieldList
-   * @param dataSecurityKeyDef
-   * @return
-   */
-  public static boolean isColumnPresentInSemantic(String artifactName, List<Field> fieldList,
-      DataSecurityKeyDef dataSecurityKeyDef) {
-    String colName = dataSecurityKeyDef.getName();
-    for (Field field : fieldList) {
-      String col = field.getColumnName();
-      if (colName.equalsIgnoreCase(col)
-          || colName.equalsIgnoreCase(artifactName + "." + col)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

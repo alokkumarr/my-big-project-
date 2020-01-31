@@ -17,7 +17,12 @@ const API_ROUTES = {
   USERS: '/saw/security/auth/admin/cust/manage/users/add',
   ADD_CATEGORIES: '/saw/security/auth/admin/cust/manage/categories/add',
   PRIVILEGES: '/saw/security/auth/admin/cust/manage/privileges/upsert',
-  DELETE_DASHBOARD: '/saw/services/observe/dashboards'
+  DELETE_DASHBOARD: '/saw/services/observe/dashboards',
+  ALERTS: '/sip/services/alerts'
+};
+const MODULE_ID = {
+  ALERT: 9,
+  WORKBENCH: 4
 };
 
 const LOG_LEVELS = {
@@ -47,5 +52,6 @@ module.exports = {
   E2E_OUTPUT_BASE_DIR,
   NUMBER_TYPES,
   SFTP_DETAILS,
-  HTTP_PROTOCOL
+  HTTP_PROTOCOL,
+  MODULE_ID
 };

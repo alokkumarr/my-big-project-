@@ -12,9 +12,11 @@ export const TABLE_CUSTCODE_COLUMNNAME = 'customerCode';
 
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
-export const DEFAULT_PRECISION = 2;
-export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
+export const STRING_TYPES = ['string'];
+export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
+export const ALL_TYPES = [...NUMBER_TYPES, ...DATE_TYPES, ...STRING_TYPES];
+export const DEFAULT_PRECISION = 2;
 export const EMAIL_REGEX = /^[_a-zA-Z0-9]+(\.[_a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,4})$/;
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
@@ -253,28 +255,32 @@ export const AGGREGATE_TYPES = [
     designerLabel: 'SUM',
     value: 'sum',
     icon: 'icon-Sum',
-    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map'],
+    validDataType: [...NUMBER_TYPES]
   },
   {
     label: 'Average',
     designerLabel: 'AVG',
     value: 'avg',
     icon: 'icon-ic-average',
-    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map'],
+    validDataType: [...NUMBER_TYPES]
   },
   {
     label: 'Mininum',
     designerLabel: 'MIN',
     value: 'min',
     icon: 'icon-ic-min',
-    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map'],
+    validDataType: [...NUMBER_TYPES]
   },
   {
     label: 'Maximum',
     designerLabel: 'MAX',
     value: 'max',
     icon: 'icon-ic-max',
-    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map'],
+    validDataType: [...NUMBER_TYPES]
   },
   {
     label: 'Count',
@@ -282,7 +288,8 @@ export const AGGREGATE_TYPES = [
     value: 'count',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map'],
+    validDataType: [...ALL_TYPES]
   },
   {
     label: 'Distinct Count',
@@ -290,7 +297,8 @@ export const AGGREGATE_TYPES = [
     value: 'distinctcount',
     icon: 'icon-Count',
     type: 'long',
-    valid: ['chart', 'pivot', 'report', 'esReport', 'map']
+    valid: ['chart', 'pivot', 'report', 'esReport', 'map'],
+    validDataType: [...ALL_TYPES]
   },
   {
     label: 'Percentage',
@@ -298,7 +306,8 @@ export const AGGREGATE_TYPES = [
     value: 'percentage',
     icon: 'icon-Percentage',
     type: 'float',
-    valid: ['pivot', 'map', 'report', 'esReport']
+    valid: ['pivot', 'map', 'report', 'esReport'],
+    validDataType: [...NUMBER_TYPES]
   },
   {
     label: 'Percentage by Column',
@@ -306,7 +315,8 @@ export const AGGREGATE_TYPES = [
     value: 'percentage',
     icon: 'icon-Percentage',
     type: 'float',
-    valid: ['chart']
+    valid: ['chart'],
+    validDataType: [...NUMBER_TYPES]
   },
   {
     label: 'Percentage By Row',
@@ -314,7 +324,8 @@ export const AGGREGATE_TYPES = [
     value: 'percentagebyrow',
     icon: 'icon-Percentage',
     type: 'float',
-    valid: ['chart']
+    valid: ['chart'],
+    validDataType: [...NUMBER_TYPES]
   }
   // {
   //   label: 'Median',
@@ -341,6 +352,16 @@ export const AGGREGATE_TYPES = [
   //   valid: ['chart']
   // }
 ];
+
+export const filterAggregatesByAnalysisType = (
+  analysisType: string,
+  aggregates = AGGREGATE_TYPES
+) => aggregates.filter(aggregate => aggregate.valid.includes(analysisType));
+
+export const filterAggregatesByDataType = (
+  dataType: string,
+  aggregates = AGGREGATE_TYPES
+) => aggregates.filter(aggregate => aggregate.validDataType.includes(dataType));
 
 export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
 
@@ -511,3 +532,26 @@ export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(NUMBER_FILTER_OPERATORS);
+
+export const DATASET_CATEGORIES_TYPE = [
+  {
+    value: 'base',
+    displayName: 'Base'
+  },
+  {
+    value: 'partition',
+    displayName: 'Partition'
+  },
+  {
+    value: 'Raw Data Set',
+    displayName: 'Raw Data Set'
+  },
+  {
+    value: 'Enriched Data Set',
+    displayName: 'Enriched Data Set'
+  },
+  {
+    value: 'Aggregated Data Set',
+    displayName: 'Aggregated Data Set'
+  }
+];

@@ -20,6 +20,8 @@ import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.context.XDFReturnCode;
 
 
 public class NGSQLExecutor implements Serializable {
@@ -104,8 +106,11 @@ public class NGSQLExecutor implements Serializable {
                             if (location == null || location.isEmpty()) {
                                 logger.error("Data location is Empty, cancel processing");
                                 return -1;
+                            }else{
+                                if(!HFileOperations.exists(location)){
+                                    throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, tn);
+                                }
                             }
-
                                 logger.debug("Load data from: " + location + ", registered table name: " + tn);
 
                                 if (jobDataFrames.get(tn) != null) {
@@ -118,7 +123,7 @@ public class NGSQLExecutor implements Serializable {
 
                                 if (loc_desc == null)
                                 	return -1;
-                                   // throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
+                                   // throw new XDFException(XDFReturnCode.PartitionCalcError, tn);
 
                                 logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
                                 

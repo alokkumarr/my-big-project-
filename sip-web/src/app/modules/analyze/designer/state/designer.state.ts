@@ -58,7 +58,8 @@ import {
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
-  DesignerUpdateAggregateInSorts
+  DesignerUpdateAggregateInSorts,
+  DesignerCheckAggregateFilterSupport
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -128,19 +129,16 @@ export class DesignerState {
     /* If this is a report, and query is present, we can request data */
     if (analysis.type === 'report' && !!sipQuery.query) {
       return true;
-    } else {
-      /* Else, there should be at least one field selected in artifacts */
-      return (
-        (
-          fpFlatMap(
-            artifact => artifact.fields,
-            get(state, 'analysis.sipQuery.artifacts')
-          ) || []
-        ).length > 0
-      );
     }
-
-    return false;
+    /* Else, there should be at least one field selected in artifacts */
+    return (
+      (
+        fpFlatMap(
+          artifact => artifact.fields,
+          get(state, 'analysis.sipQuery.artifacts')
+        ) || []
+      ).length > 0
+    );
   }
 
   @Selector()
@@ -170,6 +168,11 @@ export class DesignerState {
   @Selector()
   static analysis(state: DesignerStateModel) {
     return state.analysis;
+  }
+
+  @Selector()
+  static analysisFilters(state: DesignerStateModel) {
+    return get(state.analysis, 'sipQuery.filters', []);
   }
 
   @Selector()
@@ -267,9 +270,10 @@ export class DesignerState {
     const artifactColumnIndex = findIndex(
       artifacts[artifactIndex].fields,
       ({ columnName, dataField, area }) =>
-        dataField
+        artifactColumn.dataField
           ? dataField === artifactColumn.dataField
-          : columnName === artifactColumn.columnName
+          : columnName === artifactColumn.columnName &&
+            area === artifactColumn.area
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
@@ -279,8 +283,9 @@ export class DesignerState {
     );
 
     // if sort is applied for the field that is removed, remove sort from SIPQUERY
-    const sorts = filter(sipQuery.sorts, sort =>
-      sort.columnName !== artifactColumn.columnName
+    const sorts = filter(
+      sipQuery.sorts,
+      sort => sort.columnName !== artifactColumn.columnName
     );
     patchState({
       analysis: {
@@ -387,6 +392,42 @@ export class DesignerState {
     });
   }
 
+  @Action(DesignerCheckAggregateFilterSupport)
+  checkAggregateFilterSupport({
+    getState,
+    dispatch
+  }: StateContext<DesignerStateModel>) {
+    const { analysis } = getState();
+    const isReport = ['report', 'esReport'].includes(analysis.type);
+    if (!isReport) {
+      return;
+    }
+
+    const allFields: ArtifactColumnDSL[] = fpFlatMap(
+      artifact => artifact.fields || [],
+      get(analysis, 'sipQuery.artifacts', [])
+    );
+
+    /* If selected artifacts has an aggregated field, no need to do anything. */
+    if (allFields.some(field => !!field.aggregate)) {
+      return;
+    }
+
+    /* Otherwise, remove aggregation filters. We don't support aggregation
+       filters in reports if no aggregated field is present */
+    const analysisFilters = get(analysis, 'sipQuery.filters', []);
+    const hasAggregationFilters = analysisFilters.find(
+      f => f.isAggregationFilter
+    );
+    if (hasAggregationFilters) {
+      return dispatch(
+        new DesignerUpdateFilters(
+          analysisFilters.filter(f => !f.isAggregationFilter)
+        )
+      );
+    }
+  }
+
   @Action(DesignerApplyChangesToArtifactColumns)
   reorderArtifactColumns({
     getState,
@@ -400,14 +441,18 @@ export class DesignerState {
     const areaIndexMap = fpPipe(
       fpFlatMap(adapter => adapter.artifactColumns),
       fpReduce((accumulator, artifactColumn) => {
-        accumulator[artifactColumn.columnName] = artifactColumn.areaIndex;
+        const { dataField, columnName, area } = artifactColumn;
+        const key = dataField || `${columnName}:${area}`;
+        accumulator[key] = artifactColumn.areaIndex;
         return accumulator;
       }, {})
     )(groupAdapters);
 
     forEach(artifacts, artifact => {
       forEach(artifact.fields, field => {
-        field.areaIndex = areaIndexMap[field.columnName];
+        const { dataField, columnName, area } = field;
+        const key = dataField || `${columnName}:${area}`;
+        field.areaIndex = areaIndexMap[key];
       });
     });
 
@@ -803,7 +848,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
@@ -826,11 +871,7 @@ export class DesignerState {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
     const column = adapter.artifactColumns[columnIndex];
-    adapter.reverseTransform(column);
     groupAdapters[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // const updatedGroupAdapters = produce(groupAdapters, draft => {
-    //   draft[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // });
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
@@ -867,17 +908,17 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    filters.forEach(filter => {
-      filter.artifactsName = filter.tableName;
+    filters.forEach(filt => {
+      filt.artifactsName = filt.tableName || filt.artifactsName;
       if (
-        filter.type === 'date' &&
-        !filter.isRuntimeFilter &&
-        !filter.isGlobalFilter &&
-        filter.model.preset === CUSTOM_DATE_PRESET_VALUE
+        filt.type === 'date' &&
+        !filt.isRuntimeFilter &&
+        !filt.isGlobalFilter &&
+        filt.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
-        filter.model = {
-          gte: filter.model.gte,
-          lte: filter.model.lte,
+        filt.model = {
+          gte: filt.model.gte,
+          lte: filt.model.lte,
           format: 'yyyy-MM-dd HH:mm:ss',
           preset: CUSTOM_DATE_PRESET_VALUE
         };

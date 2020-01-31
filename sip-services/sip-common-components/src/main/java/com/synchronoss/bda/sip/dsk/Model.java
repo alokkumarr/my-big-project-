@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(Include.NON_NULL)
 @ApiModel
@@ -36,5 +37,13 @@ public class Model {
   @JsonProperty("values")
   public void setValues(List<String> values) {
     this.values = values;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("operator", operator)
+        .append("values", values)
+        .toString();
   }
 }
