@@ -534,3 +534,25 @@ export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
 )(NUMBER_FILTER_OPERATORS);
 
 export const DEFAULT_BRANDING_COLOR = '#0077be';
+export const DATASET_CATEGORIES_TYPE = [
+  {
+    value: 'base',
+    displayName: 'Base'
+  },
+  {
+    value: 'partition',
+    displayName: 'Partition'
+  },
+  {
+    value: 'Raw Data Set',
+    displayName: 'Raw Data Set'
+  },
+  {
+    value: 'Enriched Data Set',
+    displayName: 'Enriched Data Set'
+  },
+  {
+    value: 'Aggregated Data Set',
+    displayName: 'Aggregated Data Set'
+  }
+];

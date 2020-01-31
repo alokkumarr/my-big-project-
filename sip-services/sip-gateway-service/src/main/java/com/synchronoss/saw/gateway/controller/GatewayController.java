@@ -196,8 +196,12 @@ public class GatewayController {
                   "Filename : %s has been deleted from temp folder after uploading to the destination",
                   file.getFilename()));
             file.getFile().delete();}
-            responseEntity = new ResponseEntity<>(uploadResponseEntity.getBody(), makeResponseHeadersUpload(), HttpStatus.OK);
-            logger.trace("uploadResponseEntity response structure {}",  uploadResponseEntity.getBody() + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
+            String uploadResponse = "";
+            if(uploadResponseEntity != null){
+                uploadResponse = uploadResponseEntity.getBody();
+                logger.trace("uploadResponseEntity response structure {}",  uploadResponse + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
+            }
+            responseEntity = new ResponseEntity<>(uploadResponse, makeResponseHeadersUpload(), HttpStatus.OK);
             logger.trace("responseEntity response structure {}",  responseEntity.getStatusCodeValue());
             return responseEntity;
           }

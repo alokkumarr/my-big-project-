@@ -17,3 +17,8 @@ export {
 export {
   DatapodActionsComponent
 } from './datapod-actions/datapod-actions.component';
+
+export {
+  DatasetFilterComponent,
+  DatasetStringFilterComponent
+} from './dataset-filters';
