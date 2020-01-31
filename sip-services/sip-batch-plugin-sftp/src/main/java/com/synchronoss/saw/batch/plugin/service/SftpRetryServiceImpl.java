@@ -104,10 +104,12 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                   }
                  
                 }
+
+                String batchId = getBatchId();
                 filesInfo.addAll(
                     sftpServiceImpl.transferDataFromChannel(
                         template, sourceLocation, metaInfo.getFilePattern(),
-                        destinationLocation, channelId, routeId, 
+                        destinationLocation, batchId, channelId, routeId,
                         fileExclusions, isDisable, SourceType.RETRY.name(),
                         lastModifiedHoursLmt, jobId, true));
                 BisJobEntity job = sipLogService.retriveJobById(jobId);

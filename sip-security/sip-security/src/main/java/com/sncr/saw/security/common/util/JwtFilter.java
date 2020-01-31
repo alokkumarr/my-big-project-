@@ -33,6 +33,7 @@ public class JwtFilter extends GenericFilterBean {
 
   private final String INVALID_TOKEN = "Token is not valid.";
   private final String TOKEN_EXPIRED = "Token has expired. Please re-login.";
+  private final String HEADER_ERROR = "Missing or invalid Authorization header.";
   private final String UNAUTHORISED_USER = "You are not authorized to perform this operation.";
 
   private final String jwtSecretKey;
@@ -55,45 +56,49 @@ public class JwtFilter extends GenericFilterBean {
     if (!("OPTIONS".equals(request.getMethod()))) {
       final String authHeader = request.getHeader("Authorization");
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-        throw new ServletException("Missing or invalid Authorization header.");
-      }
-
-      final String token = authHeader.substring(7); // The part after Bearer
-      Claims claims = null;
-      try {
-        claims =
-            Jwts.parser()
-                .setSigningKey(jwtSecretKey)
-                .parseClaimsJws(token)
-                .getBody();
-        request.setAttribute("claims", claims);
-      } catch (final SignatureException e) {
         haveInValidFlow = true;
-        errorMessage = TOKEN_EXPIRED;
-      } catch (MalformedJwtException ex) {
-        haveInValidFlow = true;
-        errorMessage = TOKEN_EXPIRED;
-      } catch (ExpiredJwtException expired) {
-        haveInValidFlow = true;
-        errorMessage = TOKEN_EXPIRED;
-      }
-
-      // This checks the validity of the token. logging out does not need
-      // the token to be active.
-      String requestURI = request.getRequestURI();
-      logger.trace("Request Header URI : " + requestURI);
-      if (!requestURI.equals(SIP_AUTH + "/doLogout")) {
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        Ticket ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
-        if (!ticket.isValid()) {
+        errorMessage = HEADER_ERROR;
+      } else {
+        final String token = authHeader.substring(7); // The part after Bearer
+        Claims claims = null;
+        try {
+          claims = Jwts.parser()
+              .setSigningKey(jwtSecretKey)
+              .parseClaimsJws(token)
+              .getBody();
+          request.setAttribute("claims", claims);
+        } catch (final SignatureException e) {
           haveInValidFlow = true;
           errorMessage = TOKEN_EXPIRED;
-        } else if (requestURI.startsWith(SIP_AUTH + "/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
+        } catch (MalformedJwtException ex) {
           haveInValidFlow = true;
-          errorMessage = UNAUTHORISED_USER;
-        } else if (!(ticket.getTicketId() != null && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
+          errorMessage = TOKEN_EXPIRED;
+        } catch (ExpiredJwtException expired) {
           haveInValidFlow = true;
-          errorMessage = INVALID_TOKEN;
+          errorMessage = TOKEN_EXPIRED;
+        }
+
+        // This checks the validity of the token. logging out does not need
+        // the token to be active.
+        String requestURI = request.getRequestURI();
+        logger.trace("Request Header URI : " + requestURI);
+        if (!requestURI.equals(SIP_AUTH + "/doLogout")) {
+          mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+          Object claimTicket = claims != null ? claims.get("ticket") : null;
+          Ticket ticket = mapper.convertValue(claimTicket, Ticket.class);
+          if (ticket == null) {
+            haveInValidFlow = true;
+            errorMessage = INVALID_TOKEN;
+          } else if (!ticket.isValid()) {
+            haveInValidFlow = true;
+            errorMessage = TOKEN_EXPIRED;
+          } else if (requestURI.startsWith(SIP_AUTH + "/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
+            haveInValidFlow = true;
+            errorMessage = UNAUTHORISED_USER;
+          } else if (!(ticket.getTicketId() != null && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
+            haveInValidFlow = true;
+            errorMessage = INVALID_TOKEN;
+          }
         }
       }
     }

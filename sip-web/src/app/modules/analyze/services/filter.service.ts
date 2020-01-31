@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
+import * as flatMap from 'lodash/flatMap';
 import * as get from 'lodash/get';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
@@ -21,14 +22,38 @@ export class FilterService {
     private locationService: Location
   ) {}
 
-  private openRuntimeModal(
-    analysis: AnalysisDSL,
-    filters = [],
-    navigateTo: string
-  ) {
+  getRuntimeFiltersFrom(filters = []) {
+    return filter(f => f.isRuntimeFilter, filters);
+  }
+
+  supportsAggregatedFilters(analysis: AnalysisDSL): boolean {
+    /* DL reports are not supported for aggregated filters yet */
+    if (analysis.type === 'report') {
+      return false;
+    }
+    return [/*'report', */ 'esReport'].includes(analysis.type)
+      ? flatMap(
+          analysis.sipQuery.artifacts,
+          artifact => artifact.fields
+        ).some(field => Boolean(field.aggregate))
+      : true;
+  }
+
+  hasRuntimeAggregatedFilters(analysis: AnalysisDSL): boolean {
+    return analysis.sipQuery.filters.some(
+      f => f.isAggregationFilter && f.isRuntimeFilter
+    );
+  }
+
+  openRuntimeModal(analysis: AnalysisDSL, filters = [], navigateTo: string) {
     return new Promise(resolve => {
       this._dialog
-        .openFilterPromptDialog(filters, analysis)
+        .openFilterPromptDialog(
+          filters,
+          analysis,
+          this.supportsAggregatedFilters(analysis) &&
+            this.hasRuntimeAggregatedFilters(analysis)
+        )
         .afterClosed()
         .subscribe(result => {
           if (!result) {

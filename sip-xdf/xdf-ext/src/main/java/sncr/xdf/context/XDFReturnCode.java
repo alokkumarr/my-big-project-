@@ -2,10 +2,7 @@ package sncr.xdf.context;
 
 public enum XDFReturnCode {
     SUCCESS(0,"Success. %s"),
-    PARTIAL_SUCCESS(1,"Partial Success. %s"),
-    FAILURE(2,"Failure. %s"),
-    INTERNAL_ERROR(3,"Internal Server Error. %s"),
-    UNKNOWN_ERROR(4, ""),
+    INTERNAL_ERROR(4,"Internal Server Error. %s"),
     INCORRECT_OR_ABSENT_PARAMETER(5,"Parameter: [ %s ] is invalid or absent"),
     EMBEDDED_EXCEPTION(6, " ==> exception root source: %s"),
     DATA_OBJECT_NOT_FOUND(7, "Data object: %s was not found in app. configuration file, configuration is not correct"),
@@ -53,7 +50,10 @@ public enum XDFReturnCode {
     MOVE_ERROR(44,"Could not complete move phase! %s"),
     ARCHIVAL_ERROR(45,"Could not complete archive phase! %s"),
     VERIFY_COMPONENT_SERVICES_ERROR(46,"Component %s is not serviceStatus"),
-    UPDATE_STATUS_ERROR(47,"Could not update datasets / could not create Audit log entry. %s");
+    UPDATE_STATUS_ERROR(47,"Could not update datasets / could not create Audit log entry. %s"),
+    INPUT_DATA_EMPTY_ERROR(48,"Input File or Dataset is Empty. Input File/Dataset: %s"),
+    OUTPUT_DATA_EMPTY_ERROR(49,"Output Dataset is empty. All records are rejected. %s"),
+    SOME_RECORDS_REJECTED_ERROR(50,"%s records are rejected.");
 
     private final int code;
     private final String description;
@@ -70,6 +70,10 @@ public enum XDFReturnCode {
 
     public String getDescription() {
         return this.description;
+    }
+
+    public String getDescription(Object... args) {
+        return String.format(getDescription(), args);
     }
 
     public boolean equals(XDFReturnCode rc){
