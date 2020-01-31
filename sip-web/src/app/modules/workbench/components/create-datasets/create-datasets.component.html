@@ -168,6 +168,7 @@
                       formControlName="nameControl"
                       maxlength="18"
                       required
+                      (keyup)="changedToUppercase($event)"
                     />
                     <mat-error
                       *ngIf="
@@ -184,9 +185,22 @@
                       "
                       i18n
                     >
-                      <strong> Only alphabets, numbers are allowed </strong>
+                      <strong>
+                        {{ dsNameHintAndError }}
+                      </strong>
                     </mat-error>
-                    <mat-hint> Only alphabets, numbers are allowed </mat-hint>
+                    <mat-error
+                      *ngIf="nameFormGroup.get('nameControl').errors?.isUnique"
+                      i18n
+                    >
+                      <strong>
+                        Dataset with same name already exists. Please provide
+                        different name.
+                      </strong>
+                    </mat-error>
+                    <mat-hint>
+                      {{ dsNameHintAndError }}
+                    </mat-hint>
                   </mat-form-field>
                   <!-- <div class="margin20">
                     <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">
