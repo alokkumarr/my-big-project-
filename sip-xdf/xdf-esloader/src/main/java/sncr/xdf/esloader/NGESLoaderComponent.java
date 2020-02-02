@@ -46,7 +46,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
     private static final Logger logger = Logger.getLogger(NGESLoaderComponent.class);
 
     //TODO: Remove thisx
-    public static String ESLOADER_DATASET;
+    private static String ESLOADER_DATASET;
 
     private Map<String, Object> esDataset;
     private String dataSetName;

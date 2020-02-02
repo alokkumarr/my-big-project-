@@ -7,6 +7,8 @@ import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,6 +29,8 @@ import com.sncr.saw.security.common.util.JwtFilter;
 
 @SpringBootApplication
 public class NSSOApplication extends SpringBootServletInitializer {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(NSSOApplication.class);
 	
 	private static String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 	private static final String pidPath = "/var/bda/saw-security/run/saw-security.pid";
@@ -39,38 +43,17 @@ public class NSSOApplication extends SpringBootServletInitializer {
     private NSSOProperties nSSOProperties;
     @Autowired private TicketHelper ticketHelper;
 
-    @Bean
-    public TomcatServletWebServerFactory tomcatEmbedded() {
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-        tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
-            if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
-                ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
-            }
-        });
-        return tomcat;
-    }
-
  	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 		return builder.sources(NSSOApplication.class);
 	}
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @Bean
-    public FilterRegistrationBean<?> jwtFilter() {
-      final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-      registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey(),ticketHelper));
-      registrationBean.addUrlPatterns("/sip-security/auth/*");
-  
-      return registrationBean;
-    }
-
 	public static void main(String[] args) {
 		try {        	
 			Files.write(Paths.get(pidPath), pid.getBytes());
-		} catch (IOException e) {			
-			e.printStackTrace();
-		} 
+		} catch (IOException e) {
+      LOGGER.error("Error while reading file.");
+		}
 		// Launch the application
 		ConfigurableApplicationContext context = SpringApplication.run(NSSOApplication.class, args);
 		@SuppressWarnings("unused")
