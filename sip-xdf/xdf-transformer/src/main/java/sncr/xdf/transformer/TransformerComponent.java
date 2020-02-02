@@ -52,7 +52,6 @@ public class TransformerComponent extends Component implements WithMovableResult
                 System.exit(r);
            }
         } catch (Exception e){
-            e.printStackTrace();
             System.exit(-1);
         }
     }

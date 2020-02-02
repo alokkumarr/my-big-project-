@@ -15,12 +15,6 @@ public abstract class MetadataBase {
     public static final String DS_DL_CATALOGS = "catalogs";
     public static final String DS_DL_SETS = "sets";
     public static final String DS_DL_SET  = "set";
-//    public static final String DS_DL_OBS_SETS = "_obs_sets";
-
-//    public static final String DS_MD_CATEGORY = "category";
-//    public static final String DS_MD_SUBCATEGORY = "subcategory";
-
-
     public static final String PREDEF_DATA_SOURCE = "fs";
     public static final String PREDEF_TEMP_DIR = "temp";
     public static final String PREDEF_ARCHIVE_DIR = "archive";
@@ -32,8 +26,8 @@ public abstract class MetadataBase {
     public static final String DEFAULT_CATALOG = "data";
 
 
-    public static String XDF_DATA_ROOT = "XDF_DATA_ROOT";
-    public static String FILE_DESCRIPTOR = ".bda_meta";
+    public static final String XDF_DATA_ROOT = "XDF_DATA_ROOT";
+    public static final String FILE_DESCRIPTOR = ".bda_meta";
 
     protected final FileSystem fs;
     protected String dlRoot;
@@ -68,18 +62,6 @@ public abstract class MetadataBase {
         }
         else
             throw new IllegalArgumentException("XDF data root parameter must be provided");
-
-/*
-        else{
-            String xdfDataRootEnv = System.getenv(XDF_DATA_ROOT);
-            if (xdfDataRootEnv != null && !xdfDataRootEnv.isEmpty()) {
-                dlRoot = xdfDataRootEnv;
-            }
-        }
-        if (!HFileOperations.exists(dlRoot)){
-            throw new BDAException(BDAException.ErrorCodes.NonExistingDataRoot, dlRoot);
-        }
-*/
         return dlRoot;
     }
 

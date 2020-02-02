@@ -1,18 +1,12 @@
 package mapr.streaming;
 
-import exceptions.ErrorCodes;
-import exceptions.RTException;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -21,13 +15,13 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class EventSender {
 
-    private static Logger m_log = LoggerFactory.getLogger(EventSender.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSender.class.getName());
 
-    private static AtomicLong msg_counter = new AtomicLong(0);
+    private static AtomicLong msgCounter = new AtomicLong(0);
 
-    public String queue;
-    private KafkaProducer<String, Object> byte_producer;
-    private KafkaProducer<String, String> string_producer;
+    protected String queue;
+    private KafkaProducer<String, Object> byteProducer;
+    private KafkaProducer<String, String> stringProducer;
     private boolean isDevNullDest = false;
     private long lastTS = 0;
     private long hbInt = -1;
@@ -39,16 +33,16 @@ public class EventSender {
             if (stream.equalsIgnoreCase("none")) {
                 isDevNullDest = true;
                 queue = null;
-                m_log.debug("Will send everything to /dev/null");
+                LOGGER.debug("Will send everything to /dev/null");
             } else {
                 queue = "/" + stream + ":" + topic;
-                m_log.debug("Create producer for: " + queue);
-                string_producer = new KafkaProducer<>(p);
-                byte_producer = new KafkaProducer<>(p);
+                LOGGER.debug("Create producer for: {}",  queue);
+                stringProducer = new KafkaProducer<>(p);
+                byteProducer = new KafkaProducer<>(p);
             }
         }
         catch(Exception e){
-            m_log.error("Init error: ", e);
+            LOGGER.error("Init error: ", e);
         }
     }
 
@@ -68,11 +62,11 @@ public class EventSender {
             heartBeat();
             if (!isDevNullDest) {
                 Future<RecordMetadata> byteProdMD;
-                synchronized (byte_producer) {
+                synchronized (byteProducer) {
                     ProducerRecord pr = new ProducerRecord(queue, msg);
-                    byteProdMD = byte_producer.send(pr);
+                    byteProdMD = byteProducer.send(pr);
                 }
-                m_log.debug("Msg with length {} was successfully sent",msg.length);
+                LOGGER.debug("Msg with length {} was successfully sent",msg.length);
                 return byteProdMD;
             }
             else
@@ -80,17 +74,17 @@ public class EventSender {
         }
         else
         {
-            m_log.warn("Message is NULL");
+            LOGGER.warn("Message is NULL");
             return null;
         }
     }
 
     private void heartBeat() {
-        long msc = msg_counter.incrementAndGet();
+        long msc = msgCounter.incrementAndGet();
         if (hbInt > 0) {
             long currTS = System.currentTimeMillis();
             if ( currTS - lastTS >= hbInt ){
-                m_log.info("LastTS: {}, Msg.cnt: {}",lastTS, msc);
+                LOGGER.info("LastTS: {}, Msg.cnt: {}",lastTS, msc);
                 lastTS = currTS;
             }
         }
@@ -101,13 +95,12 @@ public class EventSender {
         if (msg != null && !msg.isEmpty()) {
             heartBeat();
             if(!isDevNullDest) {
-//                m_log.trace("===> The string message : {}\n to ===> {} ", msg, queue);
                 Future<RecordMetadata> stringProdMD;
-                synchronized (string_producer) {
+                synchronized (stringProducer) {
                     ProducerRecord pr = new ProducerRecord(queue, msg);
-                    stringProdMD = string_producer.send(pr);
+                    stringProdMD = stringProducer.send(pr);
                 }
-                m_log.debug("Msg with length: {} and ID: {} was successfully sent",msg.length(), messageID );
+                LOGGER.debug("Msg with length: {} and ID: {} was successfully sent",msg.length(), messageID );
                 return stringProdMD;
             }
             else
@@ -115,7 +108,7 @@ public class EventSender {
         }
         else
         {
-            m_log.warn("Message is NULL");
+            LOGGER.warn("Message is NULL");
             return null;
         }
     }

@@ -31,7 +31,6 @@ public class ZeroComponent extends Component implements WithMovableResult, WithS
                 System.exit(r);
             }
         } catch (Exception e){
-            e.printStackTrace();
             System.exit(-1);
         }
     }
