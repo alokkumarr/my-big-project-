@@ -188,20 +188,22 @@ export function wrapFieldValues(data) {
   )(data);
 }
 
-export function alterDateInData(data, sipQuery) {
+export function alterDateInData(data, sipQuery, analysisType = 'pivot') {
   if (isEmpty(data)) {
     return data;
   }
   const dateFields = [];
   flatMap(sipQuery.artifacts, artifact =>
     fpPipe(
-      fpMap(fpPick(['columnName', 'type', 'aggregate'])),
-      fpFilter(({ type, columnName, aggregate }) => {
+      fpMap(fpPick(['columnName', 'type', 'aggregate', 'alias'])),
+      fpFilter(({ type, columnName, aggregate, alias }) => {
         if (
           type === 'date' &&
           !['count', 'distinctCount', 'distinctcount'].includes(aggregate)
         ) {
-          dateFields.push(columnName);
+          dateFields.push(
+            analysisType === 'report' ? alias || columnName : columnName
+          );
         }
       })
     )(artifact.fields)
@@ -227,7 +229,7 @@ export function flattenReportData(data, analysis) {
     return data;
   }
 
-  data = alterDateInData(data, analysis.sipQuery);
+  data = alterDateInData(data, analysis.sipQuery, analysis.type);
 
   return data.map(row => {
     return mapKeys(row, (value, key) => {

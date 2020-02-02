@@ -1,10 +1,14 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { ReportGridComponent } from './report-grid.component';
+import {
+  ReportGridComponent,
+  findDuplicateColumns
+} from './report-grid.component';
 import { MaterialModule } from 'src/app/material.module';
 import { DxDataGridModule } from 'devextreme-angular';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
+import { ArtifactDSL } from 'src/app/models';
 
 describe('Designer Chart Component', () => {
   let fixture: ComponentFixture<ReportGridComponent>;
@@ -78,5 +82,26 @@ describe('Designer Chart Component', () => {
       component.getDataField(column);
       expect(column).toBeDefined();
     });
+  });
+
+  describe('findDuplicates', () => {
+    it('should be able to find duplicate columns', () => {
+      const artifacts = [
+        { fields: [{ columnName: 'abc' }] },
+        { fields: [{ columnName: 'abc' }] }
+      ];
+      const duplicates = findDuplicateColumns(artifacts as ArtifactDSL[]);
+      expect(duplicates.abc).toEqual(true);
+    });
+  });
+
+  it('should calculate duplicate column when setting analysis', () => {
+    const artifacts = [
+      { fields: [{ columnName: 'abc' }] },
+      { fields: [{ columnName: 'abc' }] }
+    ];
+    expect(Object.keys(component.duplicateColumns).length).toEqual(0);
+    component._analysis = { sipQuery: { artifacts } } as any;
+    expect(Object.keys(component.duplicateColumns).length).toEqual(1);
   });
 });
