@@ -7,6 +7,8 @@ import {
   ConfigService
 } from '../../../common/services';
 import { MatDialog } from '@angular/material';
+import { BrandingService } from './../../../modules/admin/branding/branding.service';
+import { DEFAULT_BRANDING_COLOR } from './../../../common/consts';
 
 @Component({
   selector: 'login-form',
@@ -22,7 +24,8 @@ export class LoginComponent implements OnInit {
     public _router: Router,
     public _route: ActivatedRoute,
     public dialog: MatDialog,
-    public element: ElementRef<HTMLElement>
+    public element: ElementRef<HTMLElement>,
+    public _brandingService: BrandingService
   ) {}
 
   public dataHolder = {
@@ -45,6 +48,7 @@ export class LoginComponent implements OnInit {
         this.states.error = changePassMsg;
       }
     });
+    this._brandingService.savePrimaryColor(DEFAULT_BRANDING_COLOR);
   }
 
   login() {

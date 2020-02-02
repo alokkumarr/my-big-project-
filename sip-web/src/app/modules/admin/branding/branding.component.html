@@ -1,0 +1,47 @@
+<h1 e2e="branding-details">Manage Colors and Logos</h1>
+<form [formGroup]="saveForm"
+      (submit)="saveBrandingDetails()">
+  <div fxLayout="column" class="brand-form" style="width: 400px;">
+    <div class="cust-info">
+      <label class="cust-label">CUSTOMER NAME:</label>
+    <span>  {{ticket.custCode}}</span>
+    </div>
+    <mat-form-field>
+      <label>Branding Color</label>
+      <input
+        matInput
+        formControlName="color"
+        [value]="primaryColor"
+        required
+      />
+      <mat-error *ngIf="saveForm.controls.color.hasError('required')" i18n>
+        Brand Color is
+        <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+    <span class="hint">** Branding color is a six-digit, three-byte hexadecimal number specified with notation using a leading number sign (#) <b>Eg: #BB0000</b> </span>
+    <mat-form-field>
+      <label>&nbsp;</label>
+      <input
+        matInput
+        autocomplete="off"
+        formControlName="logo"
+        required
+      />
+      <label class="file-upload">
+          Branding Logo(Click to Upload)
+         <input type="file" style="visibility: hidden;" (change)="prepareBrandingForUpload($event)" accept=".png,.jpeg,.jpg"/>
+         {{binaryFormatImage}}
+     </label>
+    </mat-form-field>
+    <mat-error *ngIf="fileUploadState" style="font-size: 75%;">
+      Brand Image is
+      <strong>required</strong>
+    </mat-error>
+    <span class="hint">** Branding Logo/Image can be of format <b>(JPG, JPEG, PNG)</b> and cannot exceed 5MB </span>
+    <!-- <img *ngIf="brandImage.length > 0" [src]="brandImage" width="16" height="14" alt="embedded folder icon"> -->
+  </div><br/>
+  <button type="submit" mat-raised-button color="primary">Save</button>
+  <button type="button" mat-button i18n (click)="resetBrandingData()">Reset to Default</button>
+</form>
+
