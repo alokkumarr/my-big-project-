@@ -1,0 +1,17 @@
+{
+  "alertRulesSysId": "123456",
+  "activeInd": "false",
+  "aggregation": "AVG",
+  "alertSeverity": "CRITICAL",
+  "categoryId": "12",
+  "product": "MCT",
+  "datapodId": "abc",
+  "datapodName": "ABc",
+  "monitoringEntity": "abc123",
+  "operator": "LT",
+  "attributeName": "testAttribute",
+  "attributeValue": "attribute123",
+  "alertRuleDescription": "Tests",
+  "alertRuleName": "myName",
+  "thresholdValue": "2"
+}

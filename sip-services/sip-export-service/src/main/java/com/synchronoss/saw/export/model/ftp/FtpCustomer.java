@@ -10,7 +10,7 @@ public class FtpCustomer {
     public FtpCustomer() {
     }
 
-    public List<FTPDetails> ftpList;
+    private List<FTPDetails> ftpList;
 
     public List<FTPDetails> getFtpList() {
         return ftpList;

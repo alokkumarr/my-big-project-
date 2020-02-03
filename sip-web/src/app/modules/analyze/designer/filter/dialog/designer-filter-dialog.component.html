@@ -3,7 +3,7 @@
 </header>
 <div class="dialog__content">
   <div class="filter-container">
-    <div *ngFor="let artifact of data.artifacts; trackBy: trackByIndex">
+    <div *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn">
       <div class="filter__table-name">
         {{ artifact.artifactName }}
       </div>
@@ -11,14 +11,18 @@
       <div class="filter__list">
         <designer-filter-row
           *ngFor="
-            let filter of groupedFilters[
+            let filter of nonAggregatedFiltersFor(
               artifact.artifactName || artifact.artifactsName
-            ];
+            );
             let i = index;
             trackBy: filterRowTrackBy
           "
           (removeRequest)="
-            removeFilter(i, artifact.artifactName || artifact.artifactsName)
+            removeFilter(
+              i,
+              artifact.artifactName || artifact.artifactsName,
+              false
+            )
           "
           (filterChange)="onFilterChange()"
           (filterModelChange)="onFilterModelChange()"
@@ -35,6 +39,53 @@
         *ngIf="!data.isInRuntimeMode"
         [attr.e2e]="'filter-add-btn-' + artifact.artifactName"
         (click)="addFilter(artifact.artifactName)"
+      >
+        <mat-icon fontIcon="icon-plus"></mat-icon>
+      </button>
+    </div>
+  </div>
+  <h3 *ngIf="data.supportsAggregationFilters">Aggregated Filters</h3>
+  <div
+    *ngIf="data.supportsAggregationFilters"
+    class="filter-container filter-container__aggregated"
+  >
+    <div *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn">
+      <div class="filter__table-name">
+        {{ artifact.artifactName }}
+      </div>
+      <mat-divider></mat-divider>
+      <div class="filter__list">
+        <designer-filter-row
+          *ngFor="
+            let filter of aggregatedFiltersFor(
+              artifact.artifactName || artifact.artifactsName
+            );
+            let i = index;
+            trackBy: filterRowTrackBy
+          "
+          (removeRequest)="
+            removeFilter(
+              i,
+              artifact.artifactName || artifact.artifactsName,
+              true
+            )
+          "
+          (filterChange)="onFilterChange()"
+          (filterModelChange)="onFilterModelChange()"
+          [analysisType]="data.analysisType"
+          [filter]="filter"
+          [supportsGlobalFilters]="false"
+          [isInRuntimeMode]="data.isInRuntimeMode"
+          [artifactColumns]="artifact.columns || artifact.fields"
+          [showFilterOptions]="data.showFilterOptions"
+        >
+        </designer-filter-row>
+      </div>
+      <button
+        mat-icon-button
+        *ngIf="!data.isInRuntimeMode"
+        [attr.e2e]="'filter-add-btn-' + artifact.artifactName"
+        (click)="addFilter(artifact.artifactName, false, true)"
       >
         <mat-icon fontIcon="icon-plus"></mat-icon>
       </button>

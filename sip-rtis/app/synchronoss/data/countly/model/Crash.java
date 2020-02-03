@@ -13,9 +13,9 @@ import java.util.Map;
 /*@ApiModel(value = "Crash Data", description =  "The class stores all crash report attributes including crash report itself as base64 string")*/
 public class Crash extends BaseEvent {
 
-    public static byte Signature = 'C';
+    public static final byte Signature = 'C';
 
-    public String incident_id;        //UUID to identify a particular crash, the field is required for ES
+    private String incident_id;        //UUID to identify a particular crash, the field is required for ES
 
     @ApiModelProperty(
             value = "_os",
@@ -23,7 +23,7 @@ public class Crash extends BaseEvent {
             notes = "Generic name, example: Android",
             access = "public",
             dataType = "string")
-    public String _os;
+    private String _os;
 
     @ApiModelProperty(
             value = "_os_version",
@@ -31,7 +31,7 @@ public class Crash extends BaseEvent {
             notes = "Full version code",
             access = "public",
             dataType = "string" )
-    public String _os_version;
+    private String _os_version;
 
     @ApiModelProperty(
             value = "_manufacture",
@@ -39,7 +39,7 @@ public class Crash extends BaseEvent {
             notes = "Example: Samsung, may not be provided for ios or be constant, like Apple",
             access = "public",
             dataType = "string")
-    public String _manufacture;
+    private String _manufacture;
 
     @ApiModelProperty(
             value = "_device",
@@ -47,7 +47,7 @@ public class Crash extends BaseEvent {
             notes = "Example: Samsung Galaxy",
             access = "public",
             dataType = "string")
-    public String _device;
+    private String _device;
 
     @ApiModelProperty(
             value = "_resolution",
@@ -55,14 +55,14 @@ public class Crash extends BaseEvent {
             notes = "Phone screen resolution, example: 1200x800",
             access = "public",
             dataType = "string")
-    public String _resolution;
+    private String _resolution;
 
     @ApiModelProperty(
             value = "_app_version",
             name = "Application version",
             access = "public",
             dataType = "string")
-    public String _app_version;
+    private String _app_version;
 
     @ApiModelProperty(
             value = "_cpu",
@@ -70,7 +70,7 @@ public class Crash extends BaseEvent {
             notes = "Type of cpu used on device (for ios will be based on device), example = armv7",
             access = "public",
             dataType = "string")
-    public String _cpu;
+    private String _cpu;
 
     @ApiModelProperty(
             value = "_opengl",
@@ -78,7 +78,7 @@ public class Crash extends BaseEvent {
             notes = "version of Open GL supported, example: 2.1",
             access = "public",
             dataType = "string")
-    public String _opengl;
+    private String _opengl;
 
     @ApiModelProperty(
             value = "_orientation",
@@ -86,7 +86,7 @@ public class Crash extends BaseEvent {
             notes = "in which device was held, landscape, portrait, etc",
             access = "public",
             dataType = "string")
-    public String _orientation;
+    private String _orientation;
 
     @ApiModelProperty(
             value = "_error",
@@ -94,7 +94,7 @@ public class Crash extends BaseEvent {
             notes = "Some error stack here, can provide multiple separated by blank new line",
             access = "public",
             dataType = "string")
-    public String _error;
+    private String _error;
 
     @ApiModelProperty(
             value = "_name",
@@ -102,7 +102,7 @@ public class Crash extends BaseEvent {
             notes = "optional if provided by OS/Platform, else will use first line of stack, example: 'Null Pointer exception'",
             access = "public",
             dataType = "string")
-    public String _name;
+    private String _name;
 
     @ApiModelProperty(
             value = "_ram_current",
@@ -110,7 +110,7 @@ public class Crash extends BaseEvent {
             notes = "Current RAM size in megabytes, Example: 1024",
             access = "public",
             dataType = "integer")
-    public String _ram_current;
+    private String _ram_current;
 
     @ApiModelProperty(
             value = "_ram_total",
@@ -118,7 +118,7 @@ public class Crash extends BaseEvent {
             notes = "Total RAM size in megabytes, Example: 4096",
             access = "public",
             dataType = "integer")
-    public String _ram_total;
+    private String _ram_total;
 
     @ApiModelProperty(
             value = "_disk_current",
@@ -126,7 +126,7 @@ public class Crash extends BaseEvent {
             notes = "Used disk size in megabytes, Example: 3000",
             access = "public",
             dataType = "integer")
-    public String _disk_current;
+    private String _disk_current;
 
     @ApiModelProperty(
             value = "_disk_total",
@@ -134,7 +134,7 @@ public class Crash extends BaseEvent {
             notes = "Total disk size in megabytes, Example: 10240",
             access = "public",
             dataType = "integer")
-    public String _disk_total;
+    private String _disk_total;
 
     @ApiModelProperty(
             value = "_bat",
@@ -142,7 +142,7 @@ public class Crash extends BaseEvent {
             notes = "battery level from 0 to 100",
             access = "public",
             dataType = "integer")
-    public String _bat;
+    private String _bat;
 
     @ApiModelProperty(
             value = "_bat_current",
@@ -150,7 +150,7 @@ public class Crash extends BaseEvent {
             notes = "Alternative to _bat field: current battery state",
             access = "public",
             dataType = "integer")
-    public String _bat_current;
+    private String _bat_current;
 
     @ApiModelProperty(
             value = "_bat_total",
@@ -158,7 +158,7 @@ public class Crash extends BaseEvent {
             notes = "Alternative to _bat field: Battery scale",
             access = "public",
             dataType = "integer")
-    public String _bat_total;
+    private String _bat_total;
 
     @ApiModelProperty(
             value = "_run",
@@ -166,7 +166,7 @@ public class Crash extends BaseEvent {
             notes = "Running time since app start in seconds, e.g.: 180",
             access = "public",
             dataType = "integer")
-    public String _run;
+    private String _run;
 
     @ApiModelProperty(
             value = "_online",
@@ -174,7 +174,7 @@ public class Crash extends BaseEvent {
             notes = "true if device is connected to the internet (WiFi or 3G), false or  not provided if not connected",
             access = "public",
             dataType = "boolean")
-    public String _online;
+    private String _online;
 
     @ApiModelProperty(
             value = "_root",
@@ -182,7 +182,7 @@ public class Crash extends BaseEvent {
             notes = "true if device is rooted/jailbroken, false or not provided if not",
             access = "public",
             dataType = "boolean")
-    public String _root;
+    private String _root;
 
     @ApiModelProperty(
             value = "_muted",
@@ -190,7 +190,7 @@ public class Crash extends BaseEvent {
             notes = "true if volume is off, device is in muted state",
             access = "public",
             dataType = "boolean")
-    public String _muted;
+    private String _muted;
 
     @ApiModelProperty(
             value = "_background",
@@ -198,7 +198,7 @@ public class Crash extends BaseEvent {
             notes = "True if app was in background when it crashed",
             access = "public",
             dataType = "boolean")
-    public String _background;
+    private String _background;
 
     @ApiModelProperty(
             value = "_nonfatal",
@@ -206,7 +206,7 @@ public class Crash extends BaseEvent {
             notes = "True if handled exception, false or not provided if unhandled crash",
             access ="public",
             dataType = "boolean")
-    public String _nonfatal;
+    private String _nonfatal;
 
     @ApiModelProperty(
             value = "_logs",
@@ -214,7 +214,7 @@ public class Crash extends BaseEvent {
             notes = "Some additional logs provided, if any",
             access ="public",
             dataType = "string")
-    public String _logs;
+    private String _logs;
 
     @ApiModelProperty(
             value = "_error_details",
@@ -222,10 +222,10 @@ public class Crash extends BaseEvent {
             notes = "Base64 encoded crash report string",
             access ="public",
             dataType = "string")
-    public byte[]  _error_details;
+    private byte[]  _error_details;
 
 
-    public Map<String, String> custom_values;
+    private Map<String, String> custom_values;
 
     public Crash(String uuid)
     {

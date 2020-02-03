@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -283,4 +284,29 @@ public class BisFileLog implements Serializable {
 	  this.source = source;
   }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("pid", pid)
+            .append("routeSysId", routeSysId)
+            .append("channelSysId", channelSysId)
+            .append("channelType", channelType)
+            .append("filePattern", filePattern)
+            .append("source", source)
+            .append("fileName", fileName)
+            .append("actualFileRecDate", actualFileRecDate)
+            .append("recdFileName", recdFileName)
+            .append("recdFileSize", recdFileSize)
+            .append("mflFileStatus", mflFileStatus)
+            .append("bisProcessState", bisProcessState)
+            .append("modifiedDate", modifiedDate)
+            .append("createdDate", createdDate)
+            .append("transferStartTime", transferStartTime)
+            .append("transferEndTime", transferEndTime)
+            .append("transferDuration", transferDuration)
+            .append("checkpointDate", checkpointDate)
+            .append("job", job)
+            .append("reason", reason)
+            .toString();
+    }
 }

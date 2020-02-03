@@ -24,7 +24,6 @@ import sncr.xdf.context.ComponentServices;
     import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
     import sncr.xdf.exceptions.FatalXDFException;
     import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.exceptions.XDFException.ErrorCodes;
 import sncr.xdf.ngcomponent.AbstractComponent;
     import sncr.xdf.ngcomponent.WithSpark;
     import sncr.xdf.services.NGContextServices;
@@ -34,6 +33,8 @@ import sncr.xdf.ngcomponent.AbstractComponent;
     import java.util.HashMap;
     import java.util.List;
     import java.util.Map;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
     import static java.util.stream.Collectors.toList;
 
@@ -45,7 +46,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
     private static final Logger logger = Logger.getLogger(NGESLoaderComponent.class);
 
     //TODO: Remove thisx
-    public static String ESLOADER_DATASET;
+    private static String ESLOADER_DATASET;
 
     private Map<String, Object> esDataset;
     private String dataSetName;
@@ -67,6 +68,9 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
         NGContextServices ngCtxSvc;
         CliHandler cli = new CliHandler();
+        NGESLoaderComponent component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
             long start_time = System.currentTimeMillis();
 
@@ -76,22 +80,22 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices pcs[] = {
@@ -110,28 +114,24 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                 logger.warn(id)
             );
             logger.warn(ngCtxSvc.getNgctx().toString());
-            NGESLoaderComponent component = new NGESLoaderComponent(ngCtxSvc.getNgctx());
-            if (!component.initComponent(null))
-                System.exit(-1);
-
-            logger.debug("Starting NGESLoaderComponent......:");
-            int rc = component.run();
-
-            long end_time = System.currentTimeMillis();
-            long difference = end_time-start_time;
-            logger.info("ESLoader total time " + difference );
-
-            System.exit(rc);
-        } catch (Exception exception) {
-            logger.error("Exception while running ESLoader component"+ exception.getMessage());
-            System.exit(-1);
+            component = new NGESLoaderComponent(ngCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                logger.debug("Starting NGESLoaderComponent......:");
+                rc = component.run();
+                long end_time = System.currentTimeMillis();
+                long difference = end_time - start_time;
+                logger.info("ESLoader total time " + difference);
+            }
+        }catch (Exception ex) {
+            exception = ex;
         }
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        System.exit(rc);
     }
 
     @Override
     protected int execute() {
         int retVal = 0;
-
         try {
             esLoaderConfig = ngctx.componentConfiguration.getEsLoader();
 
@@ -186,13 +186,14 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                 );
                 logger.info("Alert configure for the dataset sent notification to stream");
             }
-
-            return retVal;
-        } catch (Exception ex) {
-            logger.error(ex);
-            retVal = -1;
+        }catch (Exception e) {
+            logger.error("Es-loader Executor runtime exception:", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
         }
-
         return retVal;
     }
 
@@ -490,7 +491,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         return ESLoaderComponent.analyzeAndValidate(config);
     }
 
-    private Map<String, Dataset> createDatasetMap() {
+    private Map<String, Dataset> createDatasetMap() throws Exception{
         Map<String, Dataset> dataSetmap = new HashMap();
 
         for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputDataSets.entrySet()) {
@@ -503,26 +504,30 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             logger.debug("Data"+ ngctx.datafileDFmap);
             logger.debug("TEst data"+ ngctx.datafileDFmap.get(desc.get("Name")));
             String datasetName = (String)desc.get("Name");
-            Dataset ds = ngctx.datafileDFmap.get(datasetName);
+            Dataset ds = null;
             logger.debug("is running in pipeline ::"+ ngctx.runningPipeLine);
             
-            if(ngctx.runningPipeLine) {
+            if(ngctx.runningPipeLine && ngctx.datafileDFmap.containsKey(datasetName)) {
             	ds = ngctx.datafileDFmap.get(datasetName);
             } else {
-            	switch (format.toLowerCase()) {
-                case "json":
-                    ds = ctx.sparkSession.read().json(loc); break;
-                case "parquet":
-                    ds = ctx.sparkSession.read().parquet(loc); break;
-                default:
-                    error = "Unsupported data format: " + format;
-                    logger.error(error);
-                    throw new FatalXDFException(XDFException.ErrorCodes.UnsupportedDataFormat, -1);
-            }
+                if(HFileOperations.exists(loc)){
+                    switch (format.toLowerCase()) {
+                        case "json":
+                            ds = ctx.sparkSession.read().json(loc); break;
+                        case "parquet":
+                            ds = ctx.sparkSession.read().parquet(loc); break;
+                        default:
+                            logger.error("Unsupported data format: " + format);
+                            throw new XDFException(XDFReturnCode.UNSUPPORTED_DATA_FORMAT, -1);
+                    }
+                }
             
             }
             
             logger.debug("Dataset = " + ds);
+            if(ds==null){
+                throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, datasetName);
+            }
             /*switch (format.toLowerCase()) {
                 case "json":
                     ds = ctx.sparkSession.read().json(loc); break;
@@ -531,7 +536,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                 default:
                     error = "Unsupported data format: " + format;
                     logger.error(error);
-                    throw new FatalXDFException(XDFException.ErrorCodes.UnsupportedDataFormat, -1);
+                    throw new FatalXDFException(XDFReturnCode.UnsupportedDataFormat, -1);
             }*/
             dataSetmap.put(entry.getKey(), ds);
         }

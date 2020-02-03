@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 public class MigrateExecutions {
   private static final Logger logger = LoggerFactory.getLogger(MigrateExecutions.class);
 
-  public String migrationDirectory = "/opt/migration/";
-  public String migrationStatusFile = "migrationStatus.json";
+  private static final String migrationDirectory = "/opt/migration/";
+  private static final String migrationStatusFile = "migrationStatus.json";
 
   private ProductModuleMetaStore analysisMetadataStore = null;
   private JsonElement oldAnalysisDef;

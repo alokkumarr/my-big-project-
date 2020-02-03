@@ -25,6 +25,7 @@ import sncr.bda.core.file.HFileOperations;
 
 public class SAWDelimitedInspector {
   private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SAWDelimitedInspector.class);
+
   private CsvParserSettings settings;
   private CsvParser parser;
   private SAWDelimitedInspectorRowProcessor rowProcessor;
@@ -48,8 +49,7 @@ public class SAWDelimitedInspector {
       writer.write(str);
       writer.close();
     } catch (Exception e) {
-      e.printStackTrace();
-      logger.error("Exception during inspecting a file", e);
+      logger.error("Exception during inspecting a file : {}", e);
     }
     System.out.println("Total memory : " + Runtime.getRuntime().totalMemory());
     System.out.println("Free memory  : " + Runtime.getRuntime().freeMemory());

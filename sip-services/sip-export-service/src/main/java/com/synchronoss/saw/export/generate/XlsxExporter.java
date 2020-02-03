@@ -1,10 +1,12 @@
 package com.synchronoss.saw.export.generate;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.SipQuery;
+import java.util.Map.Entry;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -16,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -25,14 +28,14 @@ public class XlsxExporter implements IFileExporter {
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporter.class);
   private static final String DATA_SPLITER = "|||";
   private static final String GENERAL = "General";
-  private static final Long  startingRowNumber = 1l;
+  private static final Long STARTING_ROW_NUMBER = 1l;
 
   @Override
   public Workbook getWorkBook(ExportBean exportBean, List<Object> recordRowList) {
     Workbook workBook = new XSSFWorkbook();
     String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
     XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
-    addxlsxRows(exportBean, workBook, sheet, recordRowList, startingRowNumber);
+    addxlsxRows(exportBean, workBook, sheet, recordRowList, STARTING_ROW_NUMBER);
     return workBook;
   }
 
@@ -48,7 +51,7 @@ public class XlsxExporter implements IFileExporter {
   public void addxlsxRows(
       ExportBean exportBean, Workbook workBook, XSSFSheet workSheet, List<Object> recordRowList,
       Long rowCount) {
-    logger.debug(this.getClass().getName() + " addxlsxRows starts");
+    logger.debug(this.getClass().getName(), "{} addxlsxRows starts");
 
     // Create instance here to optimize apache POI cell style
     CellStyle cellStyle = workBook.createCellStyle();
@@ -67,7 +70,7 @@ public class XlsxExporter implements IFileExporter {
         buildXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
       }
     }
-    logger.debug(this.getClass().getName() + " addxlsxDataRows ends");
+    logger.debug(this.getClass().getName(),"{} addxlsxDataRows ends");
   }
 
   /**
@@ -98,8 +101,15 @@ public class XlsxExporter implements IFileExporter {
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
       cellStyle.setAlignment(HorizontalAlignment.LEFT);
-      cell.setCellStyle(cellStyle);
-      cell.setCellValue(value);
+      if(NumberUtils.isNumber(value)){
+        cell.setCellType(CellType.NUMERIC);
+        cell.setCellStyle(cellStyle);
+        Double d = new Double(value);
+        cell.setCellValue(d);
+      } else {
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(value);
+      }
     } else if (specialType != null
         && (specialType.equalsIgnoreCase(DataField.Type.FLOAT.value())
         || specialType.equalsIgnoreCase(DataField.Type.DOUBLE.value()))) {
@@ -139,34 +149,34 @@ public class XlsxExporter implements IFileExporter {
   /**
    * Added the cells in xlsx workbook with cell style.
    *
-   * @param sipQuery
+   * @param analysis
    * @param exportBean
    * @param workBook
    * @param workSheet
    * @param recordRow
    */
   public void buildXlsxSheet(
-      SipQuery sipQuery,
+      Analysis analysis,
       ExportBean exportBean,
       Workbook workBook,
       SXSSFSheet workSheet,
       List<Object> recordRow,
       Long limitToExport,
       Long rowCount) {
-    logger.debug(this.getClass().getName() + " addXlsxRows starts");
+    logger.debug(this.getClass().getName(),"{} addXlsxRows starts");
 
     // Create instance here to optimize apache POI cell style
     String[] header = null;
     CellStyle cellStyle = workBook.createCellStyle();
-    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
+    Map<String, String> columnHeaderMap = ExportUtils.buildColumnHeaderMap(analysis);
     for (int rowNum = 0; rowNum < recordRow.size() && rowNum <= limitToExport; rowNum++) {
       SXSSFRow excelRow = workSheet.createRow(rowCount.intValue() + rowNum);
       Object data = recordRow.get(rowNum);
 
       if (data instanceof LinkedHashMap) {
         if (exportBean.getColumnHeader() == null || exportBean.getColumnHeader().length == 0) {
-          Object[] obj = columnHeader != null && !columnHeader.isEmpty() ?
-              columnHeader.keySet().toArray() : ((LinkedHashMap) data).keySet().toArray();
+          Object[] obj = columnHeaderMap != null && !columnHeaderMap.isEmpty() ?
+              columnHeaderMap.keySet().toArray() : ((LinkedHashMap) data).keySet().toArray();
           header = Arrays.copyOf(obj, obj.length, String[].class);
 
           // set column header to export bean
@@ -197,13 +207,13 @@ public class XlsxExporter implements IFileExporter {
           }
 
           exportBean.setColumnDataType(columnDataType);
-          addReportHeaderRow(exportBean, workBook, workSheet, columnHeader);
+          addReportHeaderRow(exportBean, workBook, workSheet, columnHeaderMap);
         } else if (header == null || header.length <= 0) {
           header = exportBean.getColumnHeader();
           if (rowCount == 1)
-            addReportHeaderRow(exportBean, workBook, workSheet, columnHeader);
+            addReportHeaderRow(exportBean, workBook, workSheet, columnHeaderMap);
         }
-        buildReportXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
+        buildReportXlsxCells(exportBean, workBook, header, columnHeaderMap, cellStyle, excelRow, (LinkedHashMap) data);
       }
     }
   }
@@ -216,9 +226,8 @@ public class XlsxExporter implements IFileExporter {
    * @param sheet
    */
   public void addReportHeaderRow(ExportBean exportBean, Workbook wb, SXSSFSheet sheet, Map<String, String> columnHeader) {
-    logger.debug(this.getClass().getName() + " addHeaderRow starts");
+    logger.debug(this.getClass().getName(), "{} addHeaderRow starts");
     int col = 0;
-    Field.Type[] type = exportBean.getColumnFieldDataType();
     DataField.Type[] specialType = exportBean.getColumnDataType();
 
     Font font = wb.createFont();
@@ -266,7 +275,7 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellValue(colHeader);
       col++;
     }
-    logger.debug(this.getClass().getName() + " addHeaderRow ends");
+    logger.debug(this.getClass().getName(), "{} addHeaderRow ends");
   }
 
   /**
@@ -283,14 +292,44 @@ public class XlsxExporter implements IFileExporter {
       ExportBean exportBean,
       Workbook workBook,
       String[] header,
+      Map<String, String> columnHeaderMap,
       CellStyle cellStyle,
       SXSSFRow excelRow,
       LinkedHashMap data) {
 
     int colNum = 0;
-    for (String val : header) {
-      if (val instanceof String) {
-        String value = String.valueOf(data.get(val));
+
+    LinkedCaseInsensitiveMap<Object> caseInsensitiveData = ExportUtils.convert(data);
+
+    if (columnHeaderMap == null || columnHeaderMap.isEmpty()) {
+      for (String val : header) {
+        if (val instanceof String) {
+          String value = String.valueOf(data.get(val));
+          DataField.Type[] types = exportBean.getColumnDataType();
+          SXSSFCell cell = excelRow.createCell(colNum);
+          if (types != null && types.length > 0) {
+            DataField.Type colType = exportBean.getColumnDataType()[colNum];
+            String dataType = colType != null ? colType.value() : null;
+            addXlsxCell(value, cell, dataType, workBook, cellStyle);
+          }
+          colNum++;
+        }
+      }
+    } else {
+      for (Entry<String, String> entry : columnHeaderMap.entrySet()) {
+        String entryKey = entry.getKey();
+        String entryValue = entry.getValue();
+
+        String value = null;
+
+        if (caseInsensitiveData.get(entryKey) != null) {
+          value = String.valueOf(caseInsensitiveData.get(entryKey));
+        } else if (caseInsensitiveData.get(entryValue) != null) {
+          value = String.valueOf(caseInsensitiveData.get(entryValue));
+        } else {
+          value = "null";
+        }
+
         DataField.Type[] types = exportBean.getColumnDataType();
         SXSSFCell cell = excelRow.createCell(colNum);
         if (types != null && types.length > 0) {
@@ -392,7 +431,7 @@ public class XlsxExporter implements IFileExporter {
    * @param sheet
    */
   public void addHeaderRow(ExportBean exportBean, Workbook wb, Sheet sheet, Map<String, String> columnHeader) {
-    logger.debug(this.getClass().getName() + " addHeaderRow starts");
+    logger.debug(this.getClass().getName(), "{} addHeaderRow starts");
     int col = 0;
     Field.Type[] type = exportBean.getColumnFieldDataType();
     DataField.Type[] specialType = exportBean.getColumnDataType();
@@ -469,6 +508,6 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellValue(colHeader);
       col++;
     }
-    logger.debug(this.getClass().getName() + " addHeaderRow ends");
+    logger.debug(this.getClass().getName(), "{} addHeaderRow ends");
   }
 }

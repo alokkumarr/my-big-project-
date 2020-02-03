@@ -103,7 +103,7 @@ public class CreatePivotTable {
       fileOut.close();
       logger.debug(this.getClass().getName() + " createPivot ends");
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("Error while building the pivot sheet : {}", e.getMessage());
     }
   }
 
@@ -142,6 +142,40 @@ public class CreatePivotTable {
        * */
       for (int index = 0; index < fields.size(); index++) {
         for (Field dataField : fields) {
+          if ("data".equalsIgnoreCase(dataField.getArea())
+              && "string".equalsIgnoreCase(dataField.getType().value())
+              && dataField.getAreaIndex() != null && dataField.getAreaIndex().equals(index)) {
+
+            String columnName = dataField.getAlias() != null && !dataField.getAlias().isEmpty()
+                ? dataField.getAlias()
+                : dataField.getDisplayName() != null && !dataField.getDisplayName().isEmpty()
+                ? dataField.getDisplayName()
+                : dataField.getColumnName();
+
+            switch (dataField.getAggregate()) {
+              case COUNT:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.SUM, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+              case DISTINCTCOUNT:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.SUM, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+            }
+          }
+
           if ("data".equalsIgnoreCase(dataField.getArea())
               && !"string".equalsIgnoreCase(dataField.getType().value())
               && !"date".equalsIgnoreCase(dataField.getType().value())

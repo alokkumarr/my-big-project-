@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by skbm0001 on 30/1/2018.
@@ -76,8 +77,6 @@ public class ElasticSearchLoader {
             logger.debug("DocumentIDField = " + esLoader.getDocumentIDField());
             this.esConfig.put(ES_MAPPING_ID, esLoader.getDocumentIDField());
         }
-
-        logger.debug("ES Config = " + this.esConfig);
 
 
         this.esClient = new ESHttpClient(config);
@@ -138,7 +137,7 @@ public class ElasticSearchLoader {
         //long totalRecordCount = 0;
 
         if(!essm.elasticSearchLoaderConfigured()){
-            throw new XDFException(XDFException.ErrorCodes.ConfigError);
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR);
         }
 
         // In case of partitioned data, each partition will be loaded separately
@@ -229,8 +228,6 @@ public class ElasticSearchLoader {
                 finalFrame = filterData(originalFrame, filterString).select(scala.collection.JavaConversions.asScalaBuffer(lst).readOnly())
                         .persist(StorageLevel.MEMORY_AND_DISK_SER());
             }
-
-            logger.debug("Data = " + finalFrame + ", Destination Index = " + destinationIdx + ", Config = " + esConfig);
 
             JavaEsSparkSQL.saveToEs(finalFrame, destinationIdx, esConfig);
 

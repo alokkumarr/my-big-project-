@@ -8,11 +8,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"type",})
 
 public class StoreField {
+
+  private static final Logger logger = LoggerFactory.getLogger(StoreField.class);
 
   private String name;
   @JsonProperty("type")
@@ -82,7 +86,7 @@ public class StoreField {
     try {
       result= new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(this);
   } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
   }
   return result;
   }
