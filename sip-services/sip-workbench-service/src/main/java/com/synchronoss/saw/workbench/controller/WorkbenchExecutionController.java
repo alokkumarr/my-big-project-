@@ -123,11 +123,15 @@ public class WorkbenchExecutionController {
     xdfOutput.put("name", Component.DATASET.output.name());
     xdfOutput.put("desc", description);
 
-    ObjectNode userData = mapper.createObjectNode();
+    JsonNode userDataNode = config.path("userdata");
+    if (!userDataNode.isObject()) {
+          throw new RuntimeException(
+              "Expected userData to be an object: " + userDataNode);
+    }
+    ObjectNode userData = (ObjectNode) userDataNode;
     userData.put(DataSetProperties.createdBy.toString(), ticket.getUserFullName());
-
-
     xdfOutput.set(DataSetProperties.UserData.toString(), userData);
+
     /* Invoke XDF component */
     return workbenchExecutionService.execute(
       project, name, component, xdfConfig.toString());
