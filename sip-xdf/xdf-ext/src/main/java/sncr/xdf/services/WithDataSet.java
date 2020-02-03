@@ -20,6 +20,7 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import sncr.bda.conf.DSCategory;
 
 import java.time.Instant;
 import java.util.*;
@@ -402,12 +403,19 @@ public interface WithDataSet {
                 logger.debug("UserDataobject = " + userDataObject);
 
                 JsonObject userData = null;
-                if (userDataObject != null) {
-                    userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
-                    if (userData != null) {
-                        resOutput.put(DataSetProperties.UserData.name(), userData);
-                    }
+                if (userDataObject == null) {
+                    userData = new JsonObject();
+                }else {
+                    userData = new Gson().toJsonTree((LinkedTreeMap) userDataObject).getAsJsonObject();
                 }
+                if(!userData.hasKey(DataSetProperties.Category.name())
+                   || userData.getString(DataSetProperties.Category.name()) == null
+                    || userData.getString(DataSetProperties.Category.name()).trim().isEmpty()){
+                    userData.addProperty(DataSetProperties.Category.name(), DSCategory.DEFAULT);
+                }else{
+                    DSCategory.fromValue(userData.getString(DataSetProperties.Category.name()));
+                }
+                resOutput.put(DataSetProperties.UserData.name(), userData);
 
                 //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>(output.getPartitionKeys());
