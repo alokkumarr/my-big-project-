@@ -4,6 +4,7 @@ import com.sncr.saw.security.app.repository.CustomerRepository;
 import com.sncr.saw.security.app.model.Customer;
 
 import com.sncr.saw.security.app.repository.impl.extract.BrandDetailsExtractor;
+import com.sncr.saw.security.app.repository.impl.extract.CustomerDetailsExtractor;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.BrandDetails;
 import org.slf4j.Logger;
@@ -148,5 +149,24 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
       logger.error("Exception occured during the branding upsert.");
     }
     return deletedBrandDetails;
+  }
+
+  @Override
+  public Customer fetchCustomerDetails(String customerCode) {
+    String sql =
+        "SELECT CUSTOMER_SYS_ID, CUSTOMER_CODE,COMPANY_NAME,COMPANY_BUSINESS,"
+            + "LANDING_PROD_SYS_ID,ACTIVE_STATUS_IND,DOMAIN_NAME,IS_JV_CUSTOMER"
+            + " FROM CUSTOMERS WHERE CUSTOMER_CODE = ?;";
+    try {
+      return jdbcTemplate.query(
+          sql,
+          ps -> {
+            ps.setString(1, customerCode);
+          },
+          new CustomerDetailsExtractor());
+    } catch (Exception ex) {
+      logger.error("Exception occured fetching the customer Details:{}", ex);
+      throw new RuntimeException("Exception occured while fetching customer details");
+    }
   }
 }

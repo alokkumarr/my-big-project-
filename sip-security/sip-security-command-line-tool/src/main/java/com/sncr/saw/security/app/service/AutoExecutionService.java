@@ -2,6 +2,8 @@ package com.sncr.saw.security.app.service;
 
 import com.sncr.saw.security.app.repository.impl.ConfigValRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.CustomerRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.PreferenceRepositoryImpl;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.ConfigValDetails;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +15,20 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AutoExecutionService {
-  @Autowired
-  private CustomerRepositoryDaoImpl customerDao;
+  @Autowired private CustomerRepositoryDaoImpl customerDao;
 
-  @Autowired
-  private ConfigValRepositoryDaoImpl configValRepositoryDao;
+  @Autowired private PreferenceRepositoryImpl configValRepositoryDao;
 
   public ConfigValDetails getConfigDetails(String customerCode) {
-    ConfigValDetails configValDetailsList = configValRepositoryDao.fetchConfigValues(customerCode);
-    return configValDetailsList;
+    return configValRepositoryDao.getConfigDetails(customerCode);
   }
 
-  public ConfigValDetails addConfigVal(ConfigValDetails cv) {
-     return configValRepositoryDao.insertConfigVal(cv);
+  public Valid addConfigVal(ConfigValDetails cv) {
+    // return configValRepositoryDao.insertConfigVal(cv);
+    return configValRepositoryDao.addConfigVal(cv);
   }
 
+  public Valid updateConfigValue(String customerCode, int activeStatusInd) {
+    return configValRepositoryDao.updateConfigVal(customerCode, activeStatusInd);
+  }
 }
