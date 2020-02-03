@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
@@ -21,7 +22,6 @@ import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.bda.conf.DSCategory;
-import com.google.gson.JsonPrimitive;
 
 import java.time.Instant;
 import java.util.*;
@@ -436,21 +436,35 @@ public interface WithDataSet {
         }
 
         private void addDatasetCategory(JsonObject userData){
-            if(userData.has(DataSetProperties.Category.name())){
-                JsonPrimitive categoryPrimitive = userData.getAsJsonPrimitive(DataSetProperties.Category.name());
-                String category = null;
-                if(categoryPrimitive != null){
-                    category = categoryPrimitive.getAsString();
+            List<String> categories = null;
+            if(userData.has(DataSetProperties.Category.name())) {
+                JsonElement categoriesElement = userData.get(DataSetProperties.Category.name());
+                if (categoriesElement != null) {
+                    JsonArray categoriesArray = categoriesElement.getAsJsonArray();
+                    if (categoriesArray != null && categoriesArray.size() != 0) {
+                        categories = new ArrayList<>();
+                        for (JsonElement categoryElement : categoriesArray) {
+                            String inputCategory = categoryElement.getAsString();
+                            if(inputCategory != null && !inputCategory.trim().isEmpty()) {
+                                categories.add(inputCategory.trim());
+                            }
+                        }
+                    }
                 }
-                if(category == null || category.trim().isEmpty()) {
-                    userData.addProperty(DataSetProperties.Category.name(), DSCategory.DEFAULT.name());
-                }else{
-                    DSCategory categoryConstant = DSCategory.fromValue(category);
-                    userData.addProperty(DataSetProperties.Category.name(), categoryConstant.name());
-                }
-            }else{
-                userData.addProperty(DataSetProperties.Category.name(), DSCategory.DEFAULT.name());
             }
+            JsonArray dsCategoryArray = new JsonArray();
+            if(categories == null || categories.size() == 0) {
+                dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.name()));
+            }else {
+                for(String category : categories) {
+                    DSCategory categoryConstant = DSCategory.fromValue(category);
+                    dsCategoryArray.add(new JsonPrimitive(categoryConstant.name()));
+                }
+                if(!categories.contains(DSCategory.DEFAULT.name())) {
+                    dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.name()));
+                }
+            }
+            userData.add(DataSetProperties.Category.name(),dsCategoryArray);
         }
 
         private Input.Dstype getOutputDatasetType() {
