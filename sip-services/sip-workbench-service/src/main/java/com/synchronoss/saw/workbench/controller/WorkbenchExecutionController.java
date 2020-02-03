@@ -123,12 +123,17 @@ public class WorkbenchExecutionController {
     xdfOutput.put("name", Component.DATASET.output.name());
     xdfOutput.put("desc", description);
 
-    JsonNode userDataNode = config.path("userdata");
-    if (!userDataNode.isObject()) {
-          throw new RuntimeException(
-              "Expected userData to be an object: " + userDataNode);
+    JsonNode userDataNode = config.get("userdata");
+    ObjectNode userData = null;
+    if(userDataNode == null){
+        userData = mapper.createObjectNode();
+    }else{
+        if(!userDataNode.isObject()){
+            throw new RuntimeException(
+                "Expected userData to be an object: " + userDataNode);
+        }
+        userData = (ObjectNode) userDataNode;
     }
-    ObjectNode userData = (ObjectNode) userDataNode;
     userData.put(DataSetProperties.createdBy.toString(), ticket.getUserFullName());
     xdfOutput.set(DataSetProperties.UserData.toString(), userData);
 
