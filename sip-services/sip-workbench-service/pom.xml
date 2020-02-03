@@ -190,6 +190,14 @@
 					<groupId>org.elasticsearch</groupId>
 					<artifactId>elasticsearch-spark-${scala.version.exclude}</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.elasticsearch</groupId>
+					<artifactId>elasticsearch-spark-20_2.11</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.synchronoss.bda</groupId>
+					<artifactId>xdf-rtps</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -215,27 +223,7 @@
 			<version>${revision}</version>
 
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-core_${scala.major.version}</artifactId>
-			<version>2.3.2.0-mapr-1901</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_${scala.major.version}</artifactId>
-			<version>2.3.2.0-mapr-1901</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-           		<groupId>org.apache.spark</groupId>
-			<artifactId>spark-yarn_2.11</artifactId>
-			<version>2.3.2.0-mapr-1901</version>
-			<scope>provided</scope>
 		
-		
-		</dependency>
 		<dependency>
 			<groupId>com.mapr.hadoop</groupId>
 			<artifactId>maprfs</artifactId>

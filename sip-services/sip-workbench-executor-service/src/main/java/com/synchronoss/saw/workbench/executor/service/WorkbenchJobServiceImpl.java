@@ -1,10 +1,9 @@
-package com.synchronoss.saw.workbench.service;
+package com.synchronoss.saw.workbench.executor.service;
 
 import java.util.Iterator;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -14,39 +13,53 @@ import org.apache.spark.sql.types.StructField;
 import org.ojai.DocumentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
+import com.synchronoss.saw.workbench.executor.SparkConfig;
 import com.typesafe.config.Config;
 
+import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.parser.NGParser;
 import sncr.xdf.services.NGContextServices;
-import sncr.xdf.sql.ng.NGSQLComponent;
-import sncr.xdf.transformer.ng.NGTransformerComponent;
 
-@Service
+
 public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	
 	
 	private static final long serialVersionUID = 1113799434508676066L;
 	
-	
+	private static String root = "/var/sip/workbench/";
 	  private static final Logger logger = LoggerFactory.getLogger(WorkbenchJobServiceImpl.class);
 	  
-	  @Autowired
-		JavaSparkContext jsCtx;
+	  public String createDatasetDirectory(String project, String catalog, String name) throws Exception {
+		    logger.trace("generate data system path for starts here :" + project + " : " + name); 
+		    String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
+		        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
+		        + catalog + Path.SEPARATOR + name + Path.SEPARATOR
+		        + MetadataBase.PREDEF_DATA_DIR;
+		    logger.info("createDatasetDirectory path = " + path);
+		    if (!HFileOperations.exists(path)) {
+		      HFileOperations.createDir(path);
+		    }
+		    logger.trace("generate data system path for starts here " + path);
+		    return path;
+		  }
 	  
 	@Override
-	public Object executeJob(String root, String cfg, String project, String component, String batchID) {
+	public Object executeJob(String root, String cfg, String project, String componentName, String batchID) {
 		     logger.debug("Inside execute Job!!....######");
 			  
-			 // createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+			 try {
+				createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, "test-workbench");
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			    
 
 			    ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
@@ -54,7 +67,7 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 
 			    //String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 
-			    NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
+			    NGContextServices contextServices = new NGContextServices(root, config, project, componentName, batchID);
 			    contextServices.initContext();
 			    logger.debug("Init content done ....######");
 			    contextServices.registerOutputDataSet();
@@ -62,31 +75,45 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 			    NGContext ngctx = contextServices.getNgctx();
 
 			    ngctx.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-
+			  //  ngctx.serviceStatus.put(ComponentServices.Spark, true);
 			    
 			    logger.info("Start execute job");
-			    AbstractComponent aac = null;
+			    AbstractComponent component = null;
 			    switch (ngctx.componentName) {
 			      case "sql":
-			        aac = new NGSQLComponent(ngctx);
+			       // component = new NGSQLComponent(ngctx);
 			        break;
 			      case "parser":
 			    	  logger.debug("Invoking Parser !!!! ....######");
-			        aac = new NGParser(ngctx);
+			    	  try {
+			    		  component = new NGParser(ngctx);
+			    	  }catch(Exception exception) {
+			    		  exception.printStackTrace();
+			    	  }
+			      
 			        break;
 			      case "transformer":
-			        aac = new NGTransformerComponent(ngctx);
+			       // component = new NGTransformerComponent(ngctx);
 			        break;
 			      default:
 			        throw new IllegalArgumentException("Unknown component: " + ngctx.componentName);
 			    }
-			    NGContext workBenchcontext = contextServices.getNgctx();
-
-			    workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-			   // JavaSparkContext jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(this.initSpark().setMaster("local") ));
-			    jsCtx.setLogLevel("DEBUG");
+			  
+			   // SparkConfig.jsc.setLogLevel("DEBUG");
+			    logger.debug("#### Setting librarires as class path for spark context ######");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.core-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-core-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-parser-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.meta-api-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-data-profiler-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-preview-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-component-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-ext-4.jar");
+			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.saw.sip-workbench-executor-service-4.jar");
+			    logger.debug("#### Manual class path settings completed!! ######");
+			    
 			    try {
-					if (!aac.initComponent(jsCtx)) {
+					if (!component.initComponent(SparkConfig.jsc)) {
 					  logger.error("Could not initialize component");
 					  throw new RuntimeException("Could not initialize component:");
 					}
@@ -94,8 +121,8 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 					logger.error(e.getMessage());
 				}
 			    logger.info("Starting Workbench job");
-			    int rc = aac.run();
-			    logger.info("Workbench job completed, result: " + rc + " error: " + aac.getError());
+			    int rc = component.run();
+			    logger.info("Workbench job completed, result: " + rc + " error: " + component.getError());
 
 			    if (rc != 0) {
 			      throw new RuntimeException("XDF returned non-zero status: " + rc);

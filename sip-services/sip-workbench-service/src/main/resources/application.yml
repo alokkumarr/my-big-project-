@@ -54,7 +54,8 @@ connector : http
 workbench:
         project-key: "workbench"
         project-path: "/workbench"
-        project-root: "maprfs:///var/sip"
+        project-root: 
+
         preview-limit: 100
         livy-uri: "http://sip-mapr:8998/"
         storage-uri: ${connector}://localhost:9800

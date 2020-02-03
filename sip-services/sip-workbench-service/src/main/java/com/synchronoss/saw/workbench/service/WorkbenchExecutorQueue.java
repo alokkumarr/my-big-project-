@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.mapr.streams.Admin;
 import com.mapr.streams.StreamDescriptor;
 import com.mapr.streams.Streams;
-import com.synchronoss.saw.workbench.executor.listener.WorkbenchExecutorListener;
 
 import sncr.bda.core.file.HFileOperations;
 
@@ -32,12 +31,10 @@ public class WorkbenchExecutorQueue {
 	  private String topic="";
 	  private String workbenchExecutorStream="";
 	  KafkaProducer<String, String> producer=null;
-	  @Autowired
-	  WorkbenchExecutorListener listener;
-
+	 
 	  @PostConstruct
 	  public void init() {
-		  logger.info("#### Post construct of WorkbenchQueue Manager");
+		  logger.debug("#### Post construct of WorkbenchQueue Manager");
 	      String sipBasePath = "";
 	     
 	      this.streamBasePath = sipBasePath + File.separator + "services/workbench/executor";
@@ -62,6 +59,7 @@ public class WorkbenchExecutorQueue {
 	   * @throws Exception when unable to create stream path.
 	   */
 	   private void createIfNotExists(int retries) throws Exception {
+		   logger.debug("Here");
 	    try {
 	      HFileOperations.createDir(streamBasePath);
 	    } catch (Exception e) {
@@ -93,34 +91,26 @@ public class WorkbenchExecutorQueue {
 	        streamAdmin.close();
 	      }
 	    }
-	    logger.info("####### Starting workbench consumer thread....");
-	    Runnable r =
-		        () -> {
-		          try {
-		        	  
-		      	    listener.runWorkbenchConsumer();
-		          } catch (Exception e) {
-		            logger.error("Error occurred while running the stream consumer : " + e);
-		          }
-		        };
-		    new Thread(r).start();
-		    logger.info("#######Workbench consumer thread started");
-		    
-		    
 	    
-	    if(producer == null) {
-	    	Properties properties = new Properties();
-		    properties.setProperty(
-		        "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-		    properties.setProperty(
-		        "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-		    
-		    producer = new KafkaProducer(properties);
-	    }
+	    createProducer();
+	    
+	   
 	    
 	    
 	    
 	  }
+	   
+	   public void createProducer() {
+		   if(producer == null) {
+		    	Properties properties = new Properties();
+			    properties.setProperty(
+			        "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+			    properties.setProperty(
+			        "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+			    
+			    producer = new KafkaProducer(properties);
+		    }
+	   }
 
 	  public boolean sendWorkbenchMessageToStream(String recordContent) {
 	   

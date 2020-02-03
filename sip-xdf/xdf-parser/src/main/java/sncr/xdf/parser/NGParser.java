@@ -264,9 +264,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 							logger.debug("Files length = 1 and is a directory");
 							// If so - we have to process all the files inside - create the mask
 							sourcePath += Path.SEPARATOR + "*";
+							logger.debug("###Glob status for path ####"+ sourcePath);
 							// ... and query content
 							files = fs.globStatus(new Path(sourcePath));
 						}
+						logger.debug("###Glob resutlt :: "+ files);
+						logger.debug("#### Parsing files in output mode ####"+ outputDataSetMode);
 						retval = parseFiles(files, outputDataSetMode);
 					} else {
 						logger.debug("No Header");
@@ -337,6 +340,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         } else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
+         	 logger.debug("##########Parsing for file format  JSON########");
+        	
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
             Dataset<Row> inputDataset = null;
@@ -358,7 +363,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
             logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
          } else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))    {
-        
+        	 logger.debug("##########Parsing for file format  Parquet########");
 
                 NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
                 Dataset<Row> inputDataset = null;
@@ -566,6 +571,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
 
     private int parseSingleFile(Path file, Path destDir){
+    	
+    	//JavaSparkContext context  = new JavaSparkContext(ctx.sparkSession.sparkContext());
+    	//JavaRDD<String> rdd  = context.textFile("/opt/bda/apps/xng-test-aks-Oozie-1.0.0_dev/tcs/tc090/tc090-data-1.csv");
+    	
+    	//logger.debug("##### COUNT FROM NGPARSER ####"+ rdd.count());
+    	
+    	//JavaRDD<Row> rejectedRdd = rdd.filter(row -> (int)row.get(rejectedColumn) == 1); 
+    	//return 0;
+    	
         logger.trace("Parsing " + file + " to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
         JavaRDD<String> rdd = null;
@@ -577,22 +591,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     .textFile(file.toString(), 1);
         } else {
         	logger.debug("##### Crating new JavaSparkContext ...");
-        	rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
+        	JavaSparkContext context  = new JavaSparkContext(ctx.sparkSession.sparkContext());
+        	rdd = context
                     .textFile(file.toString(), 1);
         }
         
-        logger.debug("##### Reding Completed!! ...");
-       // logger.debug("###RDD Size###"+ rdd.count());
-        JavaPairRDD<String, Long> lineNumbersRDD = rdd.zipWithIndex();
-        logger.debug("##### Line numbers Completed!! ...");
-        JavaPairRDD<String, Long> filtered = lineNumbersRDD.filter(new HeaderFilter(headerSize));
-        logger.debug("##### FilteringCompleted!! ...");
-        JavaRDD<String> rows = filtered.keys();
-        logger.debug("##### Line numbers removed!! ...");
-        JavaRDD<Row> parseRdd = rows.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter));
-        logger.debug("##### Convert to rows completed!! ...");
-      /*  JavaRDD<Row> parseRdd = rdd
+        logger.debug("##### Reding Completed!! ... COUNT::"+ rdd.count());
+        
+        JavaRDD<Row> parseRdd = rdd
                 // Add line numbers
                 .zipWithIndex()
                 // Filter out header based on line number
@@ -600,17 +606,21 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 // Get rid of file numbers
                 .keys()
                 .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                    quoteEscapeChar, '\'', recCounter, errCounter));*/
+                    quoteEscapeChar, '\'', recCounter, errCounter));
+        
+        logger.debug("##### Convert to rows completed!! ... COUNT::"+ parseRdd.count());
 
         logger.debug("##### Parsed RDD!! ...");
      // Create output dataset
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
-       // logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
+        logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
+        logger.debug("####### Output RDD COUNT:: "+ outputRdd.count());
         int rc = 0;
         scala.collection.Seq<Column> outputColumns = null;
         if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
         {
+        	logger.debug("###### Output field list less than or equal to zero in if ####");
             outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
                     createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
@@ -628,7 +638,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Write dataset status = " + rc);
         }
         else {
-
+        	logger.debug("###### Output field list less than or equal to zero in else ####");
             outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
                     createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
@@ -921,6 +931,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private JavaRDD<Row> getRejectedData (JavaRDD<Row> parsedData) {
         int rejectedColumn = internalSchema.length() - 2;
+        logger.debug("######## Rejcted COLUMN #####" + rejectedColumn);
         JavaRDD<Row> rejectedRdd = parsedData.filter(row -> (int)row.get(rejectedColumn) == 1);
 
         return rejectedRdd;

@@ -1,39 +1,29 @@
 package com.synchronoss.saw.workbench.service;
 
-import java.util.UUID;
-
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.apache.hadoop.fs.Path;
 import org.joda.time.DateTime;
-import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
-import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutor;
-import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorImpl;
 
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
-import sncr.bda.metastore.DataSetStore;
-import sncr.xdf.context.ComponentServices;
-import sncr.xdf.context.NGContext;
-import sncr.xdf.services.NGContextServices;
+
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -60,11 +50,13 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private String previewsTablePath;
   
+
+
   @Autowired
   WorkbenchExecutor executor;
-
- 
-
+  
+  
+  
   @PostConstruct
   private void init() throws Exception {
 	  log.info("#### Inside Post Construct ####");
@@ -137,25 +129,18 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
     String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 
-    NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
-    contextServices.initContext();
-
-    contextServices.registerOutputDataSet();
-
-    NGContext workBenchcontext = contextServices.getNgctx();
-
-    workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
+   
     executor.executeJob(project, name, component, cfg);
     
     //String project, String name, String component, String cfg
     //client.submit(new WorkbenchExecuteJob(workBenchcontext));
-    ObjectNode root = mapper.createObjectNode();
+    /*ObjectNode root = mapper.createObjectNode();
     ArrayNode ids = root.putArray("outputDatasetIds");
     for (String id: workBenchcontext.registeredOutputDSIds) {
       ids.add(id);
-    }
+    }*/
     log.info("Executing dataset transformation ends here ");
-    return root;
+    return null;
   }
 
   /**
@@ -186,56 +171,15 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    */
   @Override
   public ObjectNode preview(String project, String name) throws Exception {
-    log.info("Creating dataset transformation preview");
-    /* Get physical location of dataset */
-    DataSetStore dss = new DataSetStore(metastoreBase);
-    String json = dss.readDataSet(project, name);
-    log.debug("Dataset metadata: {}", json);
-    if (json == null) {
-      throw new RuntimeException("Dataset not found: " + name);
-    }
-    JsonNode dataset = mapper.readTree(json);
-    String status = dataset.path("asOfNow").path("status").asText();
-    if (status == null || !status.equals("SUCCESS")) {
-      throw new RuntimeException("Unhandled dataset status: " + status);
-    }
-    String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
-    /* Submit job to Livy for reading out preview data */
-//    WorkbenchClient client = getWorkbenchClient();
-    String id = UUID.randomUUID().toString();
-    WorkbenchExecutor service = new WorkbenchExecutorImpl();
-    
-    service.createPreview(id, location, previewLimit, id, project, name);
-    //service.preview(id, location, previewLimit, id, project, name);
-    //client.submit(new WorkbenchPreviewJob(id, location, previewLimit, previewsTablePath),
-     //   () -> handlePreviewFailure(id));
-    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "queued");
-    preview.insert();
-    /*
-     * Return generated preview ID to client to be used for retrieving preview data
-     */
-    ObjectNode root = mapper.createObjectNode();
-    root.put("id", id);
-    return root;
+    return null;
   }
 
   private void handlePreviewFailure(String previewId) {
-    log.error("Creating preview failed");
-    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, previewId, "failed");
-    preview.insert();
+   
   }
 
   @Override
   public ObjectNode getPreview(String previewId) throws Exception {
-    log.debug("Getting dataset transformation preview");
-    /* Locate the preview data in MapR-DB */
-    Table table = MapRDB.getTable(previewsTablePath);
-    Document doc = table.findById(previewId);
-    /* Return the preview data */
-    if (doc == null) {
-      return null;
-    }
-    JsonNode json = mapper.readTree(doc.toString());
-    return (ObjectNode) json;
+	  return null;
   }
 }

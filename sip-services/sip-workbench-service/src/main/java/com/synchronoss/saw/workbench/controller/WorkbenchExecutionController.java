@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.component.Component;
+import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -120,7 +120,7 @@ public class WorkbenchExecutionController {
     ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
     ObjectNode xdfOutput = xdfOutputs.addObject();
     xdfOutput.put("dataSet", name);
-    xdfOutput.put("name", Component.DATASET.output.name());
+    xdfOutput.put("name", "output");
     xdfOutput.put("desc", description);
 
     ObjectNode userData = mapper.createObjectNode();
