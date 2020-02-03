@@ -1,9 +1,11 @@
 package sncr.bda.conf;
 import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
+import java.util.Map;
+import java.util.HashMap;
 
 @Generated("org.jsonschema2pojo")
-public static enum DSCategory {
+public enum DSCategory {
 
     @SerializedName("default")
     DEFAULT("default"),

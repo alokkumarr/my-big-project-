@@ -21,6 +21,7 @@ import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.bda.conf.DSCategory;
+import com.google.gson.JsonPrimitive;
 
 import java.time.Instant;
 import java.util.*;
@@ -397,25 +398,7 @@ public interface WithDataSet {
 
                 //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
                 resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
-
-                //Extract User Information
-                Object userDataObject = output.getUserdata();
-                logger.debug("UserDataobject = " + userDataObject);
-
-                JsonObject userData = null;
-                if (userDataObject == null) {
-                    userData = new JsonObject();
-                }else {
-                    userData = new Gson().toJsonTree((LinkedTreeMap) userDataObject).getAsJsonObject();
-                }
-                if(!userData.hasKey(DataSetProperties.Category.name())
-                   || userData.getString(DataSetProperties.Category.name()) == null
-                    || userData.getString(DataSetProperties.Category.name()).trim().isEmpty()){
-                    userData.addProperty(DataSetProperties.Category.name(), DSCategory.DEFAULT);
-                }else{
-                    DSCategory.fromValue(userData.getString(DataSetProperties.Category.name()));
-                }
-                resOutput.put(DataSetProperties.UserData.name(), userData);
+                resOutput.put(DataSetProperties.UserData.name(), getUserDataJsonObject(output.getUserdata()));
 
                 //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>(output.getPartitionKeys());
@@ -440,7 +423,37 @@ public interface WithDataSet {
             return resMap;
         }
 
-        public Input.Dstype getOutputDatasetType() {
+        private JsonObject getUserDataJsonObject(Object userDataObject){
+            logger.debug("UserDataobject = " + userDataObject);
+            JsonObject userData = null;
+            if (userDataObject == null) {
+                userData = new JsonObject();
+            }else {
+                userData = new Gson().toJsonTree((LinkedTreeMap) userDataObject).getAsJsonObject();
+            }
+            addDatasetCategory(userData);
+            return userData;
+        }
+
+        private void addDatasetCategory(JsonObject userData){
+            if(userData.has(DataSetProperties.Category.name())){
+                JsonPrimitive categoryPrimitive = userData.getAsJsonPrimitive(DataSetProperties.Category.name());
+                String category = null;
+                if(categoryPrimitive != null){
+                    category = categoryPrimitive.getAsString();
+                }
+                if(category == null || category.trim().isEmpty()) {
+                    userData.addProperty(DataSetProperties.Category.name(), DSCategory.DEFAULT.name());
+                }else{
+                    DSCategory categoryConstant = DSCategory.fromValue(category);
+                    userData.addProperty(DataSetProperties.Category.name(), categoryConstant.name());
+                }
+            }else{
+                userData.addProperty(DataSetProperties.Category.name(), DSCategory.DEFAULT.name());
+            }
+        }
+
+        private Input.Dstype getOutputDatasetType() {
             String componentName = this.ctx.componentName;
             logger.debug("getOutputDatasetType() : componentName : " + componentName);
             if(componentName != null && !componentName.trim().isEmpty()){
