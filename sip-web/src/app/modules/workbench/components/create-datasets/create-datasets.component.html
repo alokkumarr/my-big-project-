@@ -192,7 +192,7 @@
                     <mat-error
                       *ngIf="nameFormGroup.get('nameControl').errors?.isUnique"
                       i18n
-                    >
+                  >
                       <strong>
                         Dataset with same name already exists. Please provide
                         different name.
@@ -201,6 +201,14 @@
                     <mat-hint>
                       {{ dsNameHintAndError }}
                     </mat-hint>
+                    <mat-label>Category: </mat-label>
+                    <mat-select formControlName="dsCategoryControl">
+                      <mat-option
+                        *ngFor="let category of categoryList"
+                        [value]="category.value"
+                        >{{ category.label }}</mat-option
+                      >
+                    </mat-select>
                   </mat-form-field>
                   <!-- <div class="margin20">
                     <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">

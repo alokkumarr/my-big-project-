@@ -5,6 +5,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import * as isUndefined from 'lodash/isUndefined';
+import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs';
 
@@ -37,6 +38,7 @@ export class CreateDatasetsComponent implements OnInit {
   public listOfDS: any[] = [];
   public folNamePattern = cloneDeep(DS_NAME_PATTERN);
   public dsNameHintAndError = cloneDeep(DS_NAME_PATTERN_HINT_ERROR);
+  public categoryList: Array<any> = [];
 
   constructor(
     public router: Router,
@@ -51,6 +53,7 @@ export class CreateDatasetsComponent implements OnInit {
   public detailsComponent: DatasetDetailsComponent;
 
   ngOnInit() {
+    this.getListOfCategories();
     this.csvConfig = cloneDeep(CSV_CONFIG);
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
@@ -68,7 +71,8 @@ export class CreateDatasetsComponent implements OnInit {
         Validators.required,
         Validators.minLength(5),
         Validators.maxLength(99)
-      ])
+      ]),
+      dsCategoryControl: new FormControl('', [Validators.required])
     });
 
     this.getListOfDatasets();
@@ -139,6 +143,7 @@ export class CreateDatasetsComponent implements OnInit {
       name: this.nameFormGroup.value.nameControl,
       description: this.nameFormGroup.value.descControl,
       component: 'parser',
+      category: this.nameFormGroup.value.dsCategoryControl,
       configuration: {
         fields: this.fieldsConf.fields,
         file: this.fieldsConf.info.file,
@@ -186,5 +191,16 @@ export class CreateDatasetsComponent implements OnInit {
    */
   doesDSNameExist(name: string): Observable<boolean> {
     return of(this.listOfDS.includes(name));
+  }
+
+  getListOfCategories() {
+    this.workBench.getCategoryList().subscribe(result => {
+      this.categoryList = map(result.document, ({ SENSOR_TYPE, TYPE }) => {
+        return {
+          label: TYPE,
+          value: SENSOR_TYPE
+        };
+      });
+    });
   }
 }

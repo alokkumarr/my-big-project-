@@ -13,6 +13,7 @@ import { SQLEXEC_SAMPLE, ARTIFACT_SAMPLE } from '../sample-data';
 import APP_CONFIG from '../../../../../appConfig';
 
 const userProject = 'workbench';
+const categoryList = 'sip-category';
 
 @Injectable({
   providedIn: 'root'
@@ -283,6 +284,16 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', [])));
   }
 
+
+  /** GET datasets from the server */
+  getCategoryList(): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/proxy/storage/product-module/${categoryList}/configuration`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
   /**
    * Handle Http operation that failed.
    * Let the app continue.
