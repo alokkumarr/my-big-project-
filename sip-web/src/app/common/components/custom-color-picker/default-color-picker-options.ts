@@ -11,7 +11,7 @@ export const DEFAULT_COLOR_PICKER_OPTION = {
   okButton: false,
   okButtonClass: '',
   oKButtonText: '',
-  alphaChannel: 'hex6',
+  alphaChannel: 'disabled',
   cancelButton: false,
   cancelButtonClass: '',
   cancelButtonText: '',
