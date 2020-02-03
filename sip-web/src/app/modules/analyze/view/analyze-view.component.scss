@@ -1,4 +1,5 @@
 @import "src/themes/base/colors";
+@import "src/themes/_angular_next";
 
 :host {
   width: 100%;
@@ -38,7 +39,7 @@
 
     &.mat-radio-checked {
       mat-icon {
-        color: $primary-blue-b2;
+        color: map-get($mat-primary, 600);
       }
     }
 

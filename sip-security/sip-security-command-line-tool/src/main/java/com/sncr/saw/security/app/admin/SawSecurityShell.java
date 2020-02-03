@@ -26,21 +26,20 @@ class SawSecurityShell {
   private static final Logger logger = LoggerFactory.getLogger(SawSecurityShell.class);
 
  // @Autowired
-  public OnBoardService onboard;
+  private OnBoardService onboard;
 
  // @ShellMethod("Onboard the customer")
   public void onboardCustomer() {
     try {
       CustomerRepositoryDaoImpl custDao = onboard.getCustomerDao();
       // check if connection is working fine only then proceed
-      if (custDao.testSql() == 1) {
+      if (custDao.haveCustomerInfo() == 1) {
 
         // display all the products
         display(onboard.getProductsDao().getProductList());
 
         // customer creation
         Long created_cust_id = customerCreation(custDao);
-        System.out.println("Generated CUSTOMER_SYS_ID: " + created_cust_id);
         logger.info("Created user with ID: " + created_cust_id);
 
         // customer product linkages
@@ -50,8 +49,6 @@ class SawSecurityShell {
         // it's just going to be 1
         Map<Integer, String> cust_prod_linkage_ids = createCustomerProductLinkages(created_cust_id);
         String created_cust_prod_id = cust_prod_linkage_ids.get(1);
-        System.out.println(created_cust_prod_id);
-        System.out.println("Generated CUST_PROD_SYS_ID: " + created_cust_prod_id);
         logger.info("Created CUST_PROD entry with ID: " + created_cust_prod_id);
 
         // display product modules
@@ -72,7 +69,6 @@ class SawSecurityShell {
 
         // create Admin user
         Long createdAdminUserSysId = createAdminUser(createdAdminRoleSysId, created_cust_id);
-        System.out.println("Generated User ID for current user is: " + createdAdminUserSysId);
         logger.info("Created Admin user with ID: " + createdAdminUserSysId);
 
         // At the very end add just one privilege for admin user by admin user
@@ -90,7 +86,6 @@ class SawSecurityShell {
 
       } else {
         // connection is not working fine
-        System.out.println("Please check your connection");
         logger.info("Can not connect to database");
       }
     } catch (Exception e) {
@@ -109,21 +104,21 @@ class SawSecurityShell {
     // customer creation
     Customer customer = new Customer();
     Scanner scanner = new Scanner(System.in);
-    System.out.print("Enter CUSTOMER_CODE: (UNIQUE CODE TO IDENTIFY your company / division) ");
+    logger.info("Enter CUSTOMER_CODE: (UNIQUE CODE TO IDENTIFY your company / division) ");
     customer.setCustCode(scanner.next());
-    System.out.print("Enter COMPANY NAME: ");
+    logger.info("Enter COMPANY NAME: ");
     customer.setCompanyName(scanner.next());
-    System.out.print("Enter COMPANY BUSINESS: ");
+    logger.info("Enter COMPANY BUSINESS: ");
     customer.setCompanyBusiness(scanner.next());
     boolean truth = false;
     Long prod_sys_id = -1L;
     while (truth == false) {
       // do it until they enter existing product ID
-      System.out.print("Enter PRODUCT ID from above for default landing page: ");
+      logger.info("Enter PRODUCT ID from above for default landing page: ");
       prod_sys_id = scanner.nextLong();
       truth = onboard.getProductsDao().checkProductExistance(prod_sys_id);
       if (!truth) {
-        System.out.print("Entered PRODUCT ID does not exist!!!");
+        logger.info("Entered PRODUCT ID does not exist!!!");
       }
     }
     customer.setLandingProdSysId(prod_sys_id);
@@ -131,47 +126,47 @@ class SawSecurityShell {
     customer.setCreatedBy("admin");
     // default keep 30
     customer.setPasswordExpiryDate(30);
-    System.out.print("Enter DOMAIN_NAME: ");
+    logger.info("Enter DOMAIN_NAME: ");
     customer.setDomainName(scanner.next());
     return custDao.createNewCustomerDao(customer);
   }
 
   private Long createAdminUser(Long roleId, Long custId) {
-    System.out.println("====== USERS TABLE for ADMIN USER ======");
+    logger.info("====== USERS TABLE for ADMIN USER ======");
     User user = new User();
     UserRepositoryImpl userdao = onboard.getUsersDao();
     Scanner scanner = new Scanner(System.in);
-    System.out.println("Enter MASTER_LOGIN: ");
+    logger.info("Enter MASTER_LOGIN: ");
     user.setMasterLoginId(scanner.next());
-    System.out.print(" Enter EMAIL: ");
+    logger.info(" Enter EMAIL: ");
     user.setEmail(scanner.next());
     user.setRoleId(roleId);
     user.setCustomerId(custId);
-    System.out.print("Enter PASSWORD: ");
+    logger.info("Enter PASSWORD: ");
     user.setPassword(scanner.next());
-    System.out.println("Enter FIRST_NAME: ");
+    logger.info("Enter FIRST_NAME: ");
     user.setFirstName(scanner.next());
-    System.out.println("Enter MIDDLE_NAME: ");
+    logger.info("Enter MIDDLE_NAME: ");
     user.setMiddleName(scanner.next());
-    System.out.println("Enter LAST_NAME: ");
+    logger.info("Enter LAST_NAME: ");
     user.setLastName(scanner.next());
     user.setActiveStatusInd("1");
     return userdao.createAdminUserForOnboarding(user);
   }
 
   public Map<Integer, String> createCustomerProductLinkages(Long custId) {
-    System.out.println("====== CUSTOMER_PRODUCTS TABLE ======");
+    logger.info("====== CUSTOMER_PRODUCTS TABLE ======");
     CustomerProductRepositoryDaoImpl custProd = onboard.getCustProductsDao();
     Scanner scanner = new Scanner(System.in);
     boolean truth = false;
     Long prod_sys_id = -1L;
     while (truth == false) {
       // do it until they enter existing product ID
-      System.out.print("Enter PRODUCT_SYS_ID: ");
+      logger.info("Enter PRODUCT_SYS_ID: ");
       prod_sys_id = scanner.nextLong();
       truth = onboard.getProductsDao().checkProductExistance(prod_sys_id);
       if (!truth) {
-        System.out.println("Entered PRODUCT_SYS_ID does not exist!!!");
+        logger.info("Entered PRODUCT_SYS_ID does not exist!!!");
       }
     }
     return custProd.createCustomerProductLinkageForOnboarding(custId, prod_sys_id);
@@ -179,7 +174,7 @@ class SawSecurityShell {
 
   public Map<Integer, String> createCustomerProductModuleLinkages(Long custProdId,
       Long custId) {
-    System.out.println("====== CUSTOMER PRODUCT MODULES ======");
+    logger.info("====== CUSTOMER PRODUCT MODULES ======");
     CustomerProductModuleRepositoryDaoImpl custProdMod = onboard.getCustProdModulesDao();
     Map<Integer, String> results = new HashMap<Integer, String>();
     Scanner scanner = new Scanner(System.in);
@@ -191,18 +186,18 @@ class SawSecurityShell {
       Long prodModId = -1L;
       while (truth == false) {
         // do until they enter correct product module ID
-        System.out.println("Enter MODULE_ID (from above shown values): ");
+        logger.info("Enter MODULE_ID (from above shown values): ");
         prodModId = scanner.nextLong();
         truth = onboard.getProdModulesDao().checkProductModuleExistance(prodModId);
         if (!truth) {
-          System.out.println("Entered PROD_MOD_SYS_ID does not exist!!!");
+          logger.info("Entered PROD_MOD_SYS_ID does not exist!!!");
         }
       }
       results.put(count, custProdMod
           .createCustomerProductModuleLinkageForOnboarding(custProdId, prodModId, custId)
           .get(1));
       count++;
-      System.out.print("Enter more? (yes/no): ");
+      logger.info("Enter more? (yes/no): ");
       String temp = scanner.next();
       if (temp.equals("yes") || temp.equals("y") || temp.equals("Y") || temp.equals("YES")) {
         addMoreModules = true;

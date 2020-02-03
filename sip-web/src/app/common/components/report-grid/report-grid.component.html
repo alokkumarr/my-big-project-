@@ -33,6 +33,18 @@
   >
     <div fxLayout="row" class="header-details">
       <mat-icon
+        *ngIf="
+          duplicateColumns[
+            cell.column.payload.alias || cell.column.payload.columnName
+          ]
+        "
+        class="duplicate-column-icon"
+        matTooltip="A field of this name already exists on grid. Rename this field to avoid errors."
+        (click)="renameColumn(cell.column, cell.column.index)"
+        color="warn"
+        fontIcon="icon-info-solid"
+      ></mat-icon>
+      <mat-icon
         class="selected-aggregate"
         *ngIf="cell.column.payload.aggregate && !isInQueryMode"
         [style.width.px]="26"
@@ -61,7 +73,7 @@
           Aggregation
         </button>
         <button
-          (click)="renameColumn(cell.column)"
+          (click)="renameColumn(cell.column, cell.column.index)"
           class="report-options"
           mat-menu-item
         >

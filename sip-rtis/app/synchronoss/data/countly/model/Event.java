@@ -13,7 +13,7 @@ import java.util.IllegalFormatException;
 /*@ApiModel(value = "Event Data", description = "Class composes several parts of event to store all flavors of incoming events")*/
 public class Event extends  BaseEvent{
 
-    public static byte Signature = 'E';
+    private static byte Signature = 'E';
 
     @ApiModelProperty( value = "metrics",
             name = "Device Metrics",

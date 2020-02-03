@@ -7,7 +7,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.sncr.saw.security.app.model.response.CustomerBrandResponse;
 import com.sncr.saw.security.app.properties.NSSOProperties;
+import com.sncr.saw.security.app.repository.CustomerRepository;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
@@ -26,8 +28,8 @@ import com.sncr.saw.security.common.bean.ResetPwdDtls;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.UserPreferences;
-import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.repo.BrandDetails;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
@@ -40,8 +42,6 @@ import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
 import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
-import com.sncr.saw.security.common.bean.repo.admin.UserDetailsResponse;
-import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -56,7 +56,6 @@ import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
-import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.DskGroupPayload;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
@@ -71,8 +70,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -80,7 +82,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.UUID;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -89,11 +90,16 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.util.StringUtils;
@@ -105,38 +111,34 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- * @author gsan0003
- *
- */
+
 @RestController
 @RequestMapping("/sip-security")
 @Api(value="sip-security", description = "SIP Security APIs")
 public class SecurityController {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
-	@Autowired
+  @Autowired
+  private TicketHelper tHelper;
+  @Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private NSSOProperties nSSOProperties;
-
-    @Autowired
-    private TicketHelper tHelper;
-
+  @Autowired
+  private SecurityService securityService;
 	@Autowired
-	SSORequestHandler ssoRequestHandler;
-
+	private SSORequestHandler ssoRequestHandler;
 	@Autowired
-    PreferenceRepository preferenceRepository;
-
+	private CustomerRepository customerRepository;
 	@Autowired
-    DataSecurityKeyRepository dataSecurityKeyRepository;
+  private PreferenceRepository preferenceRepository;
+	@Autowired
+  private DataSecurityKeyRepository dataSecurityKeyRepository;
 
-    @Autowired SecurityService securityService;
 
 	private final ObjectMapper mapper = new ObjectMapper();
-
   private final static String AdminRole = "ADMIN";
   private final static String ALERTS = "ALERTS";
   private final static String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
@@ -242,75 +244,74 @@ public class SecurityController {
        return ssoRequestHandler.processSSORequest(token);
 	}
 
-  @RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
-  public LoginResponse accessToken(@RequestBody String rToken, HttpServletResponse response) throws ServletException {
-    Boolean validity = false;
-    try {
-      Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
-      // Check if the refresh Token is valid
-      Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
-      String masterLoginId = null;
-      while (it.hasNext()) {
-        Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
-        if (pair.getKey().equals("validUpto")) {
-          validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
-        }
-        if (pair.getKey().equals("masterLoginId")) {
-          masterLoginId = pair.getValue().toString();
-        }
-        it.remove();
-      }
-      if (!validity) {
-        return new LoginResponse(validity, "Token has expired. Please re-login");
-      } else {
+	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
+	public LoginResponse accessToken(@RequestBody String rToken, HttpServletResponse response) throws ServletException {
+		Boolean validity = false;
+		try {
+			Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
+			// Check if the refresh Token is valid
+			Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
+			String masterLoginId = null;
+			while (it.hasNext()) {
+				Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+				if (pair.getKey().equals("validUpto")) {
+					validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
+				}
+				if (pair.getKey().equals("masterLoginId")) {
+					masterLoginId = pair.getValue().toString();
+				}
+				it.remove();
+			}
+			if (!validity) {
+				return new LoginResponse(validity, "Token has expired. Please re-login");
+			} else {
 
-        logger.info("Ticket will be created..");
-        logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+				logger.info("Ticket will be created..");
+				logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
 
-        Ticket ticket = null;
-        User user = null;
-        ticket = new Ticket();
-        ticket.setMasterLoginId(masterLoginId);
-        RefreshToken newRToken = null;
-        try {
-          user = new User();
-          user.setMasterLoginId(masterLoginId);
-          user.setValidMins((nSSOProperties.getValidityMins() != null
-              ? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
-          ticket = tHelper.createTicket(user, false);
-          newRToken = new RefreshToken();
-          newRToken.setValid(true);
-          newRToken.setMasterLoginId(masterLoginId);
-          newRToken
-              .setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
-                  ? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
-        } catch (DataAccessException de) {
-          logger.error("Exception occured creating ticket ", de, null);
-          ticket.setValidityReason("Database error. Please contact server Administrator.");
-          ticket.setValid(false);
-          ticket.setError(de.getMessage());
-          return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-              .setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
-        } catch (Exception e) {
-          logger.error("Exception occured creating ticket ", e, null);
-          return null;
-        }
+				Ticket ticket = null;
+				User user = null;
+				ticket = new Ticket();
+				ticket.setMasterLoginId(masterLoginId);
+				RefreshToken newRToken = null;
+				try {
+					user = new User();
+					user.setMasterLoginId(masterLoginId);
+					user.setValidMins((nSSOProperties.getValidityMins() != null
+							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
+					ticket = tHelper.createTicket(user, false);
+					newRToken = new RefreshToken();
+					newRToken.setValid(true);
+					newRToken.setMasterLoginId(masterLoginId);
+					newRToken
+							.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
+									? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
+				} catch (DataAccessException de) {
+					logger.error("Exception occured creating ticket ", de, null);
+					ticket.setValidityReason("Database error. Please contact server Administrator.");
+					ticket.setValid(false);
+					ticket.setError(de.getMessage());
+					return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
+							.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+				} catch (Exception e) {
+					logger.error("Exception occured creating ticket ", e, null);
+					return null;
+				}
 
-        ticket.setValid(true);
-        return new LoginResponse(
-            Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
-            Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
-      }
+				ticket.setValid(true);
+				return new LoginResponse(
+						Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
+								.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
+						Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
+								.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+			}
 
-    }catch (Exception ex) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      logger.error("Error occurred while validating the ticket : {}", ex.getMessage());
-      return new LoginResponse(validity, UNAUTHORIZED_USER);
-    }
-  }
-
+		}catch (Exception ex) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			logger.error("Error occurred while validating the ticket : {}", ex.getMessage());
+			return new LoginResponse(validity, UNAUTHORIZED_USER);
+		}
+	}
 
 	@RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
 	public LoginResponse getDefaults(@RequestBody LoginDetails loginDetails) {
@@ -2323,6 +2324,156 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
+
+  @ApiOperation(value = "Create customer brand",
+      nickname = "createCustomerBrand",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
+      method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse createCustomerBrand(@RequestParam("brandColor") String brandColor,
+                                                   @RequestParam(value = "brandLogo", required = false) MultipartFile file,
+                                                   HttpServletRequest request,
+                                                   HttpServletResponse response) {
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      brandResponse.setMessage("No Customer exit for branding.");
+      return brandResponse;
+    }
+
+    if (file == null || brandColor == null) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+      return brandResponse;
+    }
+    Valid valid = new Valid();
+    try {
+      byte[] brandLogo = file.getBytes();
+      valid = customerRepository.upsertCustomerBrand(customerId, brandColor, brandLogo);
+      brandResponse.setBrandColor(brandColor);
+      brandResponse.setBrandImage(brandLogo);
+      // build final response for the user
+      if (valid.getValid()) {
+        brandResponse.setMessage("Brand details are updated successfully.");
+      } else {
+        brandResponse.setMessage("Operation failed for brand upsert.");
+				response.setStatus(HttpStatus.FORBIDDEN.value());
+      }
+    }catch (IOException ex) {
+      logger.error("Error while adding the branding details.");
+			response.setStatus(HttpStatus.FORBIDDEN.value());
+    }
+    return brandResponse;
+  }
+
+
+  @ApiOperation(value = "Fetch customer branding details.",
+      nickname = "fetchBrandDetails",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/user/cust/brand",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+
+
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage("No Customer exit for branding.");
+      return brandResponse;
+    }
+
+    // Try to determine file's logo details
+    try {
+      BrandDetails brandDetails = customerRepository.fetchCustomerBrand(customerId);
+      if (brandDetails != null) {
+        brandResponse.setBrandColor(brandDetails.getBrandColor());
+        Blob blob = brandDetails.getBrandLogo();
+        brandResponse.setBrandImage(blob.getBytes(1,(int)blob.length()));
+        brandResponse.setMessage("Brand details are fetched.");
+      }
+    } catch (Exception ex) {
+      String error = "Could not determine logo location.";
+      logger.error(error);
+      brandResponse.setMessage(error);
+    }
+    return brandResponse;
+  }
+
+  @ApiOperation(value = "Delete customer branding details.",
+      nickname = "deleteBrandDetails",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
+      method = RequestMethod.DELETE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse deleteBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+
+
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the delete operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage("No Customer exist for branding.");
+      return brandResponse;
+    }
+
+    // Try to determine file's logo location
+    try {
+      boolean brandDetailsCleared = customerRepository.deleteCustomerBrand(customerId);
+      if (brandDetailsCleared) {
+        brandResponse.setMessage("Brand details are cleared.");
+      }
+    } catch (Exception ex) {
+      String error = "Could not determine logo location.";
+      logger.error(error);
+      brandResponse.setMessage(error);
+    }
+    return brandResponse;
+  }
 
   private void setUnauthorized(HttpServletResponse response) {
     try {

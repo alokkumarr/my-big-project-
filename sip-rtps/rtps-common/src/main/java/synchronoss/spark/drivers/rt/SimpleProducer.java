@@ -13,12 +13,12 @@ import java.util.concurrent.TimeoutException;
  */
 public class SimpleProducer {
     // Set the stream and topic to publish to.
-    public static String topic = "/<path to and name of the stream>:<name of topic>";
+    private static String topic = "/<path to and name of the stream>:<name of topic>";
     // Set the number of messages to send.
-    public static int numMessages = 50;
+    private static int numMessages = 50;
 
     // Declare a new producer.
-    public static KafkaProducer producer;
+    private static KafkaProducer producer;
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         System.out.println("Sending message to stream...");

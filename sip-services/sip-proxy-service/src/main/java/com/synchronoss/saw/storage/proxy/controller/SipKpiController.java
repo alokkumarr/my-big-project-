@@ -57,7 +57,7 @@ public class SipKpiController {
 
     private static final String CUSTOMER_CODE = "customerCode";
 
-  public Gson gson = new Gson();
+  private Gson gson = new Gson();
 
   @RequestMapping(
       value = "/kpi",
