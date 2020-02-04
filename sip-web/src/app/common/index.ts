@@ -37,6 +37,7 @@ import {
 } from 'devextreme-angular';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 import { DndModule } from './dnd';
 import {
@@ -85,6 +86,7 @@ import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-p
 import { ChartGridComponent } from './components/chart-grid';
 import { SSOAuthComponent } from './components/sso-auth/sso-auth.component';
 import { EmailListComponent } from './email-list';
+import { CustomColorPickerComponent } from './components/custom-color-picker';
 
 import { UChartModule } from './components/charts';
 import { MapBoxModule } from './map-box/map-box.module';
@@ -139,7 +141,8 @@ const MODULES = [
   OwlNativeDateTimeModule,
   UChartModule,
   ClickOutsideModule,
-  MapBoxModule
+  MapBoxModule,
+  ColorPickerModule
 ];
 
 const COMPONENTS = [
@@ -172,7 +175,8 @@ const COMPONENTS = [
   RemoteFolderSelectorComponent,
   CreatefolderDialogComponent,
   SSOAuthComponent,
-  EmailListComponent
+  EmailListComponent,
+  CustomColorPickerComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];

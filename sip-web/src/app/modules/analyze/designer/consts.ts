@@ -46,3 +46,5 @@ export const MAP_STYLES = [
   label: startCase(style),
   value: `mapbox://styles/mapbox/${style}-v9`
 }));
+
+export const DATA_AXIS = ['y', 'z', 'data'];

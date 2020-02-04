@@ -37,7 +37,7 @@
   >
     <designer-analysis-options
       class="designer__options"
-      (change)="change.emit($event)"
+      (change)="changeDataOptions($event)"
       [analysisType]="analysisType"
       [analysisSubtype]="analysisSubtype"
       [sipQuery]="sipQuery"
@@ -165,7 +165,7 @@
           </designer-pivot>
           <designer-map
             class="designer__data"
-            *ngIf="analysisType | isAnalysisType: 'map':analysisSubtype"
+            *ngIf="(analysisType | isAnalysisType: 'map':analysisSubtype)"
             [auxSettings]="auxSettings"
             [data]="data"
             [sipQuery]="sipQuery"
@@ -173,7 +173,7 @@
           </designer-map>
           <designer-map-chart
             class="designer__data"
-            *ngIf="analysisType | isAnalysisType: 'mapChart':analysisSubtype"
+            *ngIf="(analysisType | isAnalysisType: 'mapChart':analysisSubtype)"
             [chartType]="analysisSubtype"
             [auxSettings]="auxSettings"
             [data]="data"
@@ -189,6 +189,7 @@
             [auxSettings]="auxSettings"
             [data]="data"
             [sipQuery]="sipQuery"
+            [artifactCol]="artifactCol"
           >
           </designer-chart>
         </mat-card>
