@@ -1,13 +1,16 @@
 <div class="filter__form__title">
-  Filter By Category Type
+  {{ filterLabel }}
 </div>
 <form class="filter__form" [formGroup]="filterFormGroup" autocomplete="off">
   <mat-form-field class="margin20 select-form-field" appearance="outline">
-    <mat-label>Type: </mat-label>
+    <mat-label>{{ dropDownLabel }}: </mat-label>
     <mat-select formControlName="value">
       <mat-option *ngFor="let val of filterList" [value]="val.value">
         {{ val.displayName || val.label }}
       </mat-option>
     </mat-select>
   </mat-form-field>
+  <!-- <button mat-icon-button (click)="removeFilter()">
+    <mat-icon fontIcon="icon-close" class="remove-filter"> </mat-icon>
+  </button> -->
 </form>

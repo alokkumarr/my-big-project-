@@ -1,6 +1,7 @@
 export {
   DATAPOD_CATEGORIES,
-  DATASET_CATEGORIES_TYPE
+  DATASET_CATEGORIES_TYPE,
+  DATASET_CATEGORY_LIST
 } from '../../common/consts';
 
 /**

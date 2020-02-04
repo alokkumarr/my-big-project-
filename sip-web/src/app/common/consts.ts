@@ -556,3 +556,17 @@ export const DATASET_CATEGORIES_TYPE = [
     displayName: 'Aggregated Data Set'
   }
 ];
+export const DATASET_CATEGORY_LIST = [
+  {
+    value: 'default',
+    displayName: 'Default'
+  },
+  {
+    value: 'Category_1',
+    displayName: 'Category 1'
+  },
+  {
+    value: 'Category_2',
+    displayName: 'Category 2'
+  }
+];

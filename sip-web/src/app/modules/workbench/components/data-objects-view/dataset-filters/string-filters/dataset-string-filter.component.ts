@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 import * as isEmpty from 'lodash/isEmpty';
+import * as startCase from 'lodash/startCase';
 
 @Component({
   selector: 'dataset-string-filter',
@@ -11,7 +12,10 @@ import * as isEmpty from 'lodash/isEmpty';
 export class DatasetStringFilterComponent implements OnInit {
   public filterFormGroup: FormGroup;
   public filterList;
-  @Output() typeFilterChange = new EventEmitter<any>();
+  public filterLabel;
+  public dropDownLabel;
+  @Output() filterChange = new EventEmitter<any>();
+  @Output() filterRemoved = new EventEmitter<any>();
 
   @Input('resetFilters') set resetFilter(data) {
     if (data) {
@@ -21,10 +25,18 @@ export class DatasetStringFilterComponent implements OnInit {
     }
   }
 
-  @Input('typeFilterList') set setFilterList(data) {
+  @Input('filterList') set setFilterList(data) {
     if (!isEmpty(data)) {
       this.filterList = data;
     }
+  }
+
+  @Input('filterLabel') set setFilterLabel(data) {
+    this.filterLabel = data;
+  }
+
+  @Input('label') set setLabel(data) {
+    this.dropDownLabel = startCase(data) || 'Select a value';
   }
 
   constructor(private fb: FormBuilder) {
@@ -39,8 +51,17 @@ export class DatasetStringFilterComponent implements OnInit {
 
     this.filterFormGroup.valueChanges.subscribe(({ value }) => {
       if (this.filterFormGroup.valid && !isEmpty(value)) {
-        this.typeFilterChange.emit({ name: 'dsStringFilter', data: value });
+        this.filterChange.emit({ data: value });
       }
     });
   }
+
+  /*
+  Use this function to remove/reset individual filter.
+  removeFilter() {
+    this.filterFormGroup.patchValue({
+      value: ''
+    });
+    this.filterRemoved.emit({ filterType: this.dropDownLabel.toLowerCase() });
+  } */
 }

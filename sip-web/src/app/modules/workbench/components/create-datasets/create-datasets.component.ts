@@ -15,7 +15,11 @@ import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { isUnique } from 'src/app/common/validators';
-import { DS_NAME_PATTERN, DS_NAME_PATTERN_HINT_ERROR } from '../../consts';
+import {
+  DS_NAME_PATTERN,
+  DS_NAME_PATTERN_HINT_ERROR,
+  DATASET_CATEGORY_LIST
+} from '../../consts';
 
 @Component({
   selector: 'create-datasets',
@@ -38,7 +42,7 @@ export class CreateDatasetsComponent implements OnInit {
   public listOfDS: any[] = [];
   public folNamePattern = cloneDeep(DS_NAME_PATTERN);
   public dsNameHintAndError = cloneDeep(DS_NAME_PATTERN_HINT_ERROR);
-  public categoryList: Array<any> = [];
+  public categoryList: Array<any> = cloneDeep(DATASET_CATEGORY_LIST);
 
   constructor(
     public router: Router,
@@ -53,7 +57,7 @@ export class CreateDatasetsComponent implements OnInit {
   public detailsComponent: DatasetDetailsComponent;
 
   ngOnInit() {
-    this.getListOfCategories();
+    // this.getListOfCategories();
     this.csvConfig = cloneDeep(CSV_CONFIG);
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
@@ -143,7 +147,6 @@ export class CreateDatasetsComponent implements OnInit {
       name: this.nameFormGroup.value.nameControl,
       description: this.nameFormGroup.value.descControl,
       component: 'parser',
-      category: this.nameFormGroup.value.dsCategoryControl,
       configuration: {
         fields: this.fieldsConf.fields,
         file: this.fieldsConf.info.file,
@@ -151,7 +154,10 @@ export class CreateDatasetsComponent implements OnInit {
         delimiter: this.fieldsConf.delimiter,
         quoteChar: this.fieldsConf.quoteChar,
         quoteEscape: this.fieldsConf.quoteEscapeChar,
-        headerSize: this.fieldsConf.headerSize
+        headerSize: this.fieldsConf.headerSize,
+        userdata: {
+          category: this.nameFormGroup.value.dsCategoryControl
+        }
       }
     };
     this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
