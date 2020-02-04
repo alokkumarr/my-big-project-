@@ -17,6 +17,7 @@ import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.esloader.esloadercommon.ElasticSearchStructureManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class ElasticSearchLoaderTest {
     public void setUp() {
         config = new ESConfig(esHosts, esUser, esPassword, esPort, index);
         config.setEsClusterName(clusterName);
+        config.setAdditionalParams(new HashMap<String,String>());
 
         dataEntries = new ArrayList<>();
     }

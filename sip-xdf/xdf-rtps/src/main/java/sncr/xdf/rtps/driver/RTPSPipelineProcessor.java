@@ -339,6 +339,11 @@ public class RTPSPipelineProcessor {
 			//ngSQLCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
 			ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; // TRANS_out
 			ngSQLCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
+			logger.debug("##### Begining to prcess SQL######");
+			datafileDFmap.forEach((k,v)->{
+				logger.info("#########Table Name:: "+ k);
+				v.show();
+			});
 			//ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey, datafileDFmap.get(dataSetName)); // TRANS_OUT
 			ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 			ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
