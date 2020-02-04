@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.Optional;
 import sncr.bda.datasets.conf.DataSetProperties;
 import org.apache.log4j.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by srya0001 on 10/30/2017.
@@ -124,31 +125,27 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
             for(Map.Entry<DataSetProperties, String[]> entry : searchParams.entrySet()){
                 DataSetProperties searchParam = entry.getKey();
                 String[] values  =  entry.getValue();
+                logger.debug("searchParam: "+searchParam+" - values: "+ Arrays.toString(values));
                 if ( values != null && values.length != 0){
-                    for(String value : values){
-                        if(value != null && !value.trim().isEmpty()){
-                            logger.debug("searchParam: "+searchParam+" - value: "+ value);
-                            switch (searchParam) {
-                                case Category:
-                                    cond = addEqOrLikeClause(cond, "userData.category", value.trim());
-                                    break;
-                                case SubCategory:
-                                    if (searchParams.get(DataSetProperties.Category) != null
-                                        && searchParams.get(DataSetProperties.Category).length != 0) {
-                                        cond = addEqOrLikeClause(cond, "userData.subCategory", value.trim());
-                                    }
-                                    break;
-                                case Catalog:
-                                    cond = addEqOrLikeClause(cond, "system.catalog", value.trim());
-                                    break;
-                                case DataSource:
-                                    cond = addEqOrLikeClause(cond, "userData.type", value.trim());
-                                    break;
-                                case Type:
-                                    cond = addEqOrLikeClause(cond, "system.dstype", value.trim());
-                                    break;
+                    switch (searchParam) {
+                        case Category:
+                            getQueryCondition(cond, "userData.category", values);
+                            break;
+                        case SubCategory:
+                            if (searchParams.get(DataSetProperties.Category) != null
+                                && searchParams.get(DataSetProperties.Category).length != 0) {
+                                getQueryCondition(cond, "userData.subCategory", values);
                             }
-                        }
+                            break;
+                        case Catalog:
+                            getQueryCondition(cond, "system.catalog", values);
+                            break;
+                        case DataSource:
+                            getQueryCondition(cond, "userData.type", values);
+                            break;
+                        case Type:
+                            getQueryCondition(cond, "system.dstype", values);
+                            break;
                     }
                 }
             }
@@ -165,7 +162,17 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         Document res = table.findById(project + delimiter + datasetName);
         return res.asJsonString();
     }
-
+    private void getQueryCondition(QueryCondition cond, String key, String[] values){
+        List<String> valuesList = Arrays.stream(values)
+            .filter(value -> (value != null && !value.trim().isEmpty()))
+            .map(value -> value.trim())
+            .collect(Collectors.toList());
+        if(valuesList.size() == 1) {
+            addEqOrLikeClause(cond, key, valuesList.get(0));
+        }else if(valuesList.size() > 1){
+            addInClause(cond, key, valuesList);
+        }
+    }
     /**
      * Convenient method to start building query conditions
      * It assumes AND conjunction.
@@ -174,14 +181,13 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @param value - search value
      * @return - pre-build QC
      */
-    private QueryCondition addEqOrLikeClause(QueryCondition cond, String key, String value){
-
+    private void addEqOrLikeClause(QueryCondition cond, String key, String value){
         if (value.indexOf('%') >= 0)
             cond.like(key, value);
         else
             cond.is(key, QueryCondition.Op.EQUAL, value);
-        return cond;
     }
-
-
+    private void addInClause(QueryCondition cond, String key, List<String> values){
+        cond.in(key, values);
+    }
 }
