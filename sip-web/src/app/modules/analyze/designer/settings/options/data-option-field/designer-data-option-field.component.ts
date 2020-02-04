@@ -1,6 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import * as take from 'lodash/take';
 import * as filter from 'lodash/filter';
+import * as set from 'lodash/set';
 import * as debounce from 'lodash/debounce';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
@@ -17,8 +20,24 @@ import {
 import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
+import { DEFAULT_COLOR_PICKER_OPTION } from '../../../../../../common/components/custom-color-picker/default-color-picker-options';
+import { CHART_COLORS } from 'src/app/common/consts';
+import { DATA_AXIS } from '../../../consts';
 
 const ALIAS_CHANGE_DELAY = 500;
+const DEFAULT_CHART_COLORS = cloneDeep(CHART_COLORS);
+const ADDITIONAL_PRESET_COLORS = [
+  '#4e79a7',
+  '#59a14f',
+  '#9c755f',
+  '#f28e2b',
+  '#edc948',
+  '#bab0ac',
+  '#e15759',
+  '#b07aa1',
+  '#76b7b2',
+  '#ff9da7'
+];
 
 @Component({
   selector: 'designer-data-option-field',
@@ -38,13 +57,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     )(sipQuery.artifacts);
     this.fieldCount = fields.length;
   }
-
   public typeIcon: string;
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
   public hasDateInterval = false;
   public isDataField = false;
+  public colorPickerConfig = {};
 
   constructor(private _store: Store) {
     this.onAliasChange = debounce(this.onAliasChange, ALIAS_CHANGE_DELAY);
@@ -53,7 +72,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   ngOnInit() {
     const type = this.artifactColumn.type;
     this.hasDateInterval = DATE_TYPES.includes(type);
-    this.isDataField = ['y', 'z', 'data'].includes(
+    this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
     );
 
@@ -62,6 +81,16 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       this.analysisType,
       this.analysisSubtype
     );
+    this.colorPickerConfig = cloneDeep(DEFAULT_COLOR_PICKER_OPTION);
+    const presetColors = [
+      ...take(DEFAULT_CHART_COLORS, 11),
+      ...ADDITIONAL_PRESET_COLORS
+    ];
+    if (this.isDataField) {
+      set(this.colorPickerConfig, 'bgColor', this.artifactColumn.seriesColor);
+    }
+    set(this.colorPickerConfig, 'presetColors', presetColors);
+    set(this.colorPickerConfig, 'iscustomStyleNeeded', true);
   }
 
   onAliasChange(alias) {
@@ -122,5 +151,16 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   checkChartType() {
     return AggregateChooserComponent.supportsPercentByRow(this.analysisSubtype);
+  }
+
+  selectedColor(event) {
+    if (event.data) {
+      set(this.artifactColumn, 'seriesColor', event.data);
+      set(this.artifactColumn, 'colorSetFromPicker', true);
+      this.change.emit({
+        subject: 'seriesColorChange',
+        data: { artifact: this.artifactColumn }
+      });
+    }
   }
 }

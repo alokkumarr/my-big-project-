@@ -6,8 +6,7 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
-import { validateEntityName
-} from './../../../../common/validators/field-name-rule.validator';
+import { validateEntityName } from './../../../../common/validators/field-name-rule.validator';
 
 @Component({
   selector: 'toolbar-action-dialog',
