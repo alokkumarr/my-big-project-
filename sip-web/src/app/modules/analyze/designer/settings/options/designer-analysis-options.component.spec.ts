@@ -1,6 +1,7 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DesignerAnalysisOptionsComponent } from './designer-analysis-options.component';
+// import * as forEach from 'lodash/forEach';
 
 const sipQuery = {
   artifacts: [
@@ -69,9 +70,11 @@ describe('Designer Analysis Options Component', () => {
     expect(name).toEqual(column.columnName);
   });
 
-  it('should set data options default colors ', () => {
-    const colorSpy = spyOn(component, 'setSeriesColorToEachDataOption');
+  it('should set series color to each data options. ', () => {
     component.setArtifacts = sipQuery;
-    expect(colorSpy).toBeTruthy();
+    expect(component.sipQuery).toEqual(sipQuery);
+    component.selectedColumns = sipQuery.artifacts[0].fields;
+    component.setSeriesColorToEachDataOption();
+    expect(component.selectedColumns).toBeTruthy();
   });
 });
