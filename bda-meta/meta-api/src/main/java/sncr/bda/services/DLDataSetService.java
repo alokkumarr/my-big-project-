@@ -243,6 +243,12 @@ public class DLDataSetService {
                 logger.debug("Modified by " + DataSetProperties.modifiedBy.name() + " " + modifiedBy);
                 dl.add(DataSetProperties.modifiedBy.toString(), new JsonPrimitive(modifiedBy));
             }
+
+            if (userData.has(DataSetProperties.Category.name())) {
+                JsonArray categoriesArray = userData.get(DataSetProperties.Category.name()).getAsJsonArray();
+                logger.debug("category " + DataSetProperties.Category.name() + " " + categoriesArray);
+                dl.add(DataSetProperties.Category.toString(), categoriesArray);
+            }
         }
 
 //        dl.add(DataSetProperties.User.toString(), new JsonPrimitive(ctx.user));

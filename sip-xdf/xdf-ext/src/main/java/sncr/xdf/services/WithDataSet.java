@@ -438,8 +438,8 @@ public interface WithDataSet {
         private void addDatasetCategory(JsonObject userData){
             logger.debug("addDatasetCategory(): userData : "+ userData);
             List<String> categories = null;
-            if(userData.has(DataSetProperties.Category.name())) {
-                JsonElement categoriesElement = userData.get(DataSetProperties.Category.name());
+            if(userData.has(DataSetProperties.Category.toString())) {
+                JsonElement categoriesElement = userData.get(DataSetProperties.Category.toString());
                 if (categoriesElement != null) {
                     JsonArray categoriesArray = categoriesElement.getAsJsonArray();
                     if (categoriesArray != null && categoriesArray.size() != 0) {
@@ -455,14 +455,14 @@ public interface WithDataSet {
             }
             JsonArray dsCategoryArray = new JsonArray();
             if(categories == null || categories.size() == 0) {
-                dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.name()));
+                dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.toString()));
             }else {
                 for(String category : categories) {
                     DSCategory categoryConstant = DSCategory.fromValue(category);
-                    dsCategoryArray.add(new JsonPrimitive(categoryConstant.name()));
+                    dsCategoryArray.add(new JsonPrimitive(categoryConstant.toString()));
                 }
                 if(!categories.contains(DSCategory.DEFAULT.name())) {
-                    dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.name()));
+                    dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.toString()));
                 }
             }
             userData.add(DataSetProperties.Category.name(),dsCategoryArray);

@@ -129,7 +129,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
                 if ( values != null && values.length != 0){
                     switch (searchParam) {
                         case Category:
-                            addQueryCondition(cond, "userData.category", values);
+                            addQueryCondition(cond, "system.category", values);
                             break;
                         case SubCategory:
                             if (searchParams.get(DataSetProperties.Category) != null
