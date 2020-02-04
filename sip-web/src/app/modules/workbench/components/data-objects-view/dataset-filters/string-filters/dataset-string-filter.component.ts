@@ -51,7 +51,10 @@ export class DatasetStringFilterComponent implements OnInit {
 
     this.filterFormGroup.valueChanges.subscribe(({ value }) => {
       if (this.filterFormGroup.valid && !isEmpty(value)) {
-        this.filterChange.emit({ data: value });
+        this.filterChange.emit({
+          data: value,
+          filterType: this.dropDownLabel.toLowerCase()
+        });
       }
     });
   }

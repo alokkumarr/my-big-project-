@@ -2,8 +2,6 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
-import * as find from 'lodash/find';
-import * as forEach from 'lodash/forEach';
 
 @Component({
   selector: 'dataset-filters',
@@ -23,14 +21,7 @@ export class DatasetFilterComponent implements OnInit {
   ngOnInit() {}
 
   filterChange(event) {
-    forEach(this.filterList, filter => {
-      const obj = find(filter.data, {
-        value: event.data
-      });
-      if (!isEmpty(obj)) {
-        set(this.filterPayload, filter.filterName, [obj.value]);
-      }
-    });
+    set(this.filterPayload, event.filterType, [event.data]);
   }
 
   isFilterSelected() {
