@@ -125,26 +125,26 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
             for(Map.Entry<DataSetProperties, String[]> entry : searchParams.entrySet()){
                 DataSetProperties searchParam = entry.getKey();
                 String[] values  =  entry.getValue();
-                logger.debug("searchParam: "+searchParam+" - values: "+ Arrays.toString(values));
+                logger.debug("getListOfDS() : searchParam: "+searchParam+" - values: "+ Arrays.toString(values));
                 if ( values != null && values.length != 0){
                     switch (searchParam) {
                         case Category:
-                            getQueryCondition(cond, "userData.category", values);
+                            addQueryCondition(cond, "userData.category", values);
                             break;
                         case SubCategory:
                             if (searchParams.get(DataSetProperties.Category) != null
                                 && searchParams.get(DataSetProperties.Category).length != 0) {
-                                getQueryCondition(cond, "userData.subCategory", values);
+                                addQueryCondition(cond, "userData.subCategory", values);
                             }
                             break;
                         case Catalog:
-                            getQueryCondition(cond, "system.catalog", values);
+                            addQueryCondition(cond, "system.catalog", values);
                             break;
                         case DataSource:
-                            getQueryCondition(cond, "userData.type", values);
+                            addQueryCondition(cond, "userData.type", values);
                             break;
                         case Type:
-                            getQueryCondition(cond, "system.dstype", values);
+                            addQueryCondition(cond, "system.dstype", values);
                             break;
                     }
                 }
@@ -162,11 +162,13 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         Document res = table.findById(project + delimiter + datasetName);
         return res.asJsonString();
     }
-    private void getQueryCondition(QueryCondition cond, String key, String[] values){
+    private void addQueryCondition(QueryCondition cond, String key, String[] values){
+        logger.debug("addQueryCondition() - Key: "+key+" - values: "+ Arrays.toString(values));
         List<String> valuesList = Arrays.stream(values)
             .filter(value -> (value != null && !value.trim().isEmpty()))
             .map(value -> value.trim())
             .collect(Collectors.toList());
+        logger.debug("addQueryCondition() - valuesList: "+ valuesList);
         if(valuesList.size() == 1) {
             addEqOrLikeClause(cond, key, valuesList.get(0));
         }else if(valuesList.size() > 1){
@@ -182,12 +184,14 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @return - pre-build QC
      */
     private void addEqOrLikeClause(QueryCondition cond, String key, String value){
+        logger.debug("addInClause() - Key: "+key+" - value: "+ value);
         if (value.indexOf('%') >= 0)
             cond.like(key, value);
         else
             cond.is(key, QueryCondition.Op.EQUAL, value);
     }
     private void addInClause(QueryCondition cond, String key, List<String> values){
+        logger.debug("addInClause() - Key: "+key+" - values: "+ values);
         cond.in(key, values);
     }
 }

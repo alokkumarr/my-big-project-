@@ -397,9 +397,7 @@ public interface WithDataSet {
                 resOutput.put(DataSetProperties.Description.name(), description);
 
                 //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
-                //resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
-                //SIP-9791 Disable Sampling for XDF Pipeline runs as it required for only Workbench
-                resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.NONE);
+                resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
                 resOutput.put(DataSetProperties.UserData.name(), getUserDataJsonObject(output.getUserdata()));
 
                 //TODO:: Do we really need it??
@@ -438,6 +436,7 @@ public interface WithDataSet {
         }
 
         private void addDatasetCategory(JsonObject userData){
+            logger.debug("addDatasetCategory(): userData : "+ userData);
             List<String> categories = null;
             if(userData.has(DataSetProperties.Category.name())) {
                 JsonElement categoriesElement = userData.get(DataSetProperties.Category.name());
