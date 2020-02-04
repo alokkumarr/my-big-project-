@@ -175,60 +175,27 @@
 			<version>${common.io}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.synchronoss.bda</groupId>
-			<artifactId>xdf</artifactId>
-			<version>${revision}</version>
-			<exclusions>
-
-				<!--Exclude the xdf-esloader lib to resolve conflict with hadoop-es lib. -->
-				<exclusion>
-					<groupId>com.synchronoss.bda</groupId>
-					<artifactId>xdf-esloader</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.elasticsearch</groupId>
-					<artifactId>elasticsearch-spark-${scala.version.exclude}</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.elasticsearch</groupId>
-					<artifactId>elasticsearch-spark-20_2.11</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.synchronoss.bda</groupId>
-					<artifactId>xdf-rtps</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.synchronoss.bda</groupId>
-			<artifactId>xdf-component</artifactId>
-			<version>${revision}</version>
-
-		</dependency>
-		<dependency>
-			<groupId>com.synchronoss.bda</groupId>
-			<artifactId>xdf-ext</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.synchronoss.bda</groupId>
-			<artifactId>xdf-sql</artifactId>
-			<version>${revision}</version>
-
-		</dependency>
-		<dependency>
-			<groupId>com.synchronoss.bda</groupId>
-			<artifactId>xdf-parser</artifactId>
-			<version>${revision}</version>
-
-		</dependency>
 		
 		<dependency>
 			<groupId>com.mapr.hadoop</groupId>
 			<artifactId>maprfs</artifactId>
 			<version>${mapr.core.version}-mapr</version>
 			<scope>provided</scope>
+			<exclusions>
+                             <exclusion>
+                                     <groupId>org.slf4j</groupId>
+                                     <artifactId>slf4j-log4j12</artifactId>
+                             </exclusion>
+                             <exclusion>
+                                     <groupId>log4j</groupId>
+                                     <artifactId>log4j</artifactId>
+                             </exclusion>
+                             <exclusion>
+                                     <groupId>commons-logging</groupId>
+                                     <artifactId>commons-logging</artifactId>
+                             </exclusion>
+                     </exclusions>
+			
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
