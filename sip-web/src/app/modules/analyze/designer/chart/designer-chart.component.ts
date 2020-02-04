@@ -11,6 +11,8 @@ import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
 import * as reverse from 'lodash/reverse';
+import * as set from 'lodash/set';
+import * as find from 'lodash/find';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
@@ -25,6 +27,7 @@ import {
   shouldReverseChart
 } from './../../../../common/utils/dataFlattener';
 import { DesignerState } from '../state/designer.state';
+let designerChartUpdater;
 @Component({
   selector: 'designer-chart',
   templateUrl: './designer-chart.component.html',
@@ -35,9 +38,41 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
   chartType: string;
   _auxSettings: any = {};
   CHART_TYPES_OBJ = CHART_TYPES_OBJ;
+  updater: BehaviorSubject<any[]>;
 
   chartOptions: any;
-  @Input() updater;
+  /**
+   * Need to temporarily save the updater to change the series color when any saved analysis
+   * is edited and series color is changed. As updater is updated with reflow value when dataoption
+   * slide bar is opened.
+   */
+  @Input('updater') set setUpdater(data) {
+    this.updater = data;
+    if (this.updater) {
+      this.updater.subscribe(result => {
+        if (result.length > 1) {
+          designerChartUpdater = fpFilter(obj => obj.path === 'series')(result);
+        }
+      });
+    }
+  }
+
+  @Input('artifactCol') set setArtifactCol(data) {
+    if (data) {
+      fpPipe(
+        fpFlatMap(mapobj => {
+          const matchedObj = find(mapobj.data, ({ dataType, aggregate }) => {
+            return (
+              dataType === data.artifact.type &&
+              aggregate === data.artifact.aggregate
+            );
+          });
+          set(matchedObj, 'color', data.artifact.seriesColor);
+          this.updater.next([mapobj]);
+        })
+      )(designerChartUpdater);
+    }
+  }
   @Select(DesignerState.isDataTooMuchForChart)
   isDataTooMuchForChart$: Observable<Boolean>;
 
@@ -209,6 +244,18 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
       path: 'chart.inverted',
       data: Boolean(this._auxSettings.isInverted)
     });
-    this.updater.next(changes);
+
+    const seriesData = find(changes, ({ path }) => {
+      return path === 'series';
+    });
+    map(dataFields, serie => {
+      const matchedObj = find(seriesData.data, ({ dataType, aggregate }) => {
+        return dataType === serie.type && aggregate === serie.aggregate;
+      });
+      set(matchedObj, 'color', serie.seriesColor);
+    });
+    if (this.updater) {
+      this.updater.next(changes);
+    }
   }
 }
