@@ -65,9 +65,9 @@ public class SIPDSLTest {
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     JsonNode jsonNode =
         objectMapper.readTree(new File(classLoader.getResource("response_sample.json").getPath()));
-    ElasticSearchQueryBuilder.groupByFields = new String[2];
-    ElasticSearchQueryBuilder.groupByFields[1] = "date";
-    ElasticSearchQueryBuilder.groupByFields[0] = "string";
+    String[] groupByFields = new String[2];
+    groupByFields[1] = "date";
+    groupByFields[0] = "string";
 
     ESResponseParser esResponseParser = new ESResponseParser(aggregationFields);
     List<Object> result = esResponseParser.parseData(jsonNode);
@@ -235,6 +235,70 @@ public class SIPDSLTest {
   }
 
   @Test
+  public void testPercentageWithAlias() {
+    SIPDSL sipdsl = testUtil();
+    DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+
+    List<Field> fieldList = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+
+    Field field = new Field();
+    field.setColumnName("double");
+    field.setType(Type.DOUBLE);
+    field.setAggregate(Aggregate.SUM);
+    field.setDataField("double");
+    field.setAggregate(Aggregate.PERCENTAGE);
+    field.setAlias("DOUBLE_PERCENTAGE");
+    fieldList.add(field);
+
+    sipdsl.getSipQuery().getArtifacts().get(0).setFields(fieldList);
+    String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+    String percentQuery =
+        "SELECT SALES.string, SALES.integer, (SALES.double*100)/(Select sum(SALES.double) FROM SALES) as `DOUBLE_PERCENTAGE` FROM SALES GROUP BY SALES.string, SALES.integer, SALES.double";
+    Assert.assertEquals(percentQuery, assertForAggSort);
+  }
+
+  @Test
+  public void testDistinctCount() {
+    SIPDSL sipdsl = testUtil();
+    DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+
+    List<Field> fieldList = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+
+    Field field = new Field();
+    field.setColumnName("double");
+    field.setType(Type.DOUBLE);
+    field.setAggregate(Aggregate.DISTINCTCOUNT);
+    fieldList.add(field);
+
+    sipdsl.getSipQuery().getArtifacts().get(0).setFields(fieldList);
+    String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+    String percentQuery =
+        "SELECT SALES.string, SALES.integer, count(distinct SALES.double) as `distinctCount(double)` FROM SALES GROUP BY SALES.string, SALES.integer";
+    Assert.assertEquals(percentQuery, assertForAggSort);
+  }
+
+    @Test
+    public void testDistinctCountWithAlias() {
+        SIPDSL sipdsl = testUtil();
+        DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+
+        List<Field> fieldList = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
+
+        Field field = new Field();
+        field.setColumnName("double");
+        field.setType(Type.DOUBLE);
+        field.setAggregate(Aggregate.DISTINCTCOUNT);
+        field.setAlias("DISTINCT_COUNT_DOUBLE");
+        fieldList.add(field);
+
+        sipdsl.getSipQuery().getArtifacts().get(0).setFields(fieldList);
+        String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+        String percentQuery =
+            "SELECT SALES.string, SALES.integer, count(distinct SALES.double) as `DISTINCT_COUNT_DOUBLE` FROM SALES GROUP BY SALES.string, SALES.integer";
+        Assert.assertEquals(percentQuery, assertForAggSort);
+    }
+
+  @Test
   public void testFilter() {
     SIPDSL sipdsl = testUtil();
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
@@ -266,13 +330,13 @@ public class SIPDSLTest {
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
     String query = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertion =
-        "SELECT SALES.string, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE (SALES.long = 1000.0 AND SALES.Double = 2000.0) GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE (SALES.long = 1000.0 AND SALES.Double = 2000.0) GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(query, assertion);
 
     sipdsl.getSipQuery().setFilters(new ArrayList<Filter>());
     String queryWithoutFilters = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertionQueryWithoutFilters =
-        "SELECT SALES.string, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(queryWithoutFilters, assertionQueryWithoutFilters);
   }
 
@@ -299,7 +363,7 @@ public class SIPDSLTest {
     dsk.setDataSecuritykey(dskDefList);
     String query = dlSparkQueryBuilder.buildDskDataQuery(sipdsl.getSipQuery(), dsk);
     String assertQuery = "SELECT "
-        + "SALES.string, "
+        + "SALES.string AS `String`, "
         + "avg(SALES.integer), "
         + "avg(SALES.long), "
         + "SALES.date, "
