@@ -152,7 +152,7 @@ public class WorkbenchExecutionController {
     /* Extract dataset name which is to be previewed */
     String name = body.path("name").asText();
     /* Start asynchronous preview creation */
-    return workbenchExecutionService.preview(project, name);
+    return workbenchExecutionService.createPreview(project, name);
   }
 
   /**

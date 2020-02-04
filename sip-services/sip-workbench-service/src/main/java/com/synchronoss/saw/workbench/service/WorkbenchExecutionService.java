@@ -11,7 +11,7 @@ public interface WorkbenchExecutionService {
   /**
    * Start creating preview of given dataset asynchronously.
    */
-  ObjectNode preview(String project, String name) throws Exception;
+  ObjectNode createPreview(String project, String name) throws Exception;
 
   /**
    * Get dataset preview data by preview ID.

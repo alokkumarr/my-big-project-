@@ -21,12 +21,28 @@ public class SparkConfig {
 	SparkConf conf = new SparkConf();
 
 	public static JavaSparkContext jsc = null;
+	public static SparkConf sparkConfig = null;
 	
 	public SparkConfig() {
 		this.initiProperties();
 		
 		logger.debug("#### Initializing spark context ######");
-		this.jsc =  new JavaSparkContext(initSparkConf());
+		sparkConfig = initSparkConf();
+		jsc =  new JavaSparkContext(sparkConfig);
+		
+		
+	    logger.debug("#### Setting librarires as class path for spark context ######");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.core-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-core-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-parser-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.meta-api-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-data-profiler-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-preview-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-component-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-ext-4.jar");
+	    jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.saw.sip-workbench-executor-service-4.jar");
+	    logger.debug("#### Manual class path settings completed!! ######");
+	    
 
 		logger.debug("#### Initializing spark context completed s######"+ this.jsc);
 	}
@@ -52,6 +68,18 @@ public class SparkConfig {
 
 	public SparkConf initSparkConf() {
 		logger.debug("################setting sparak parameters.....");
+		final String LIB_PATH = "/opt/bda/sip-workbench-executor/lib/";
+		String jars = LIB_PATH + "com.synchronoss.bda.core-4.jar," 
+				+  LIB_PATH + "com.synchronoss.bda.xdf-core-4.jar" 
+				+  LIB_PATH + "com.synchronoss.bda.xdf-parser-4.jar,"
+				+  LIB_PATH + "com.synchronoss.bda.meta-api-4.jar,"
+				+  LIB_PATH +"com.synchronoss.bda.xdf-data-profiler-4.jar,"
+				+  LIB_PATH + "com.synchronoss.bda.xdf-preview-4.jar,"
+				+  LIB_PATH + "com.synchronoss.bda.xdf-component-4.jar"
+				+  LIB_PATH + "com.synchronoss.bda.xdf-ext-4.jar"
+				+  LIB_PATH + "com.synchronoss.saw.sip-workbench-executor-service-4.jar";
+		
+		logger.debug("####spark.jars ####"+ jars);
 		
 		this.conf
 				// .set("spark.driver.extraJavaOptions",
@@ -63,6 +91,7 @@ public class SparkConfig {
 				 .set("driver.memory",this.configParams.get("driver.memory"))
 				// .set("spark.yarn.jars",this.sparkYarnJars)
 				 .set("spark.master", this.configParams.get("spark.master"))
+				 .set("spark.jars", jars)
 				.set("spark.hadoop.yarn.resourcemanager.hostname",
 						this.configParams.get("spark.hadoop.yarn.resourcemanager.hostname"))
 				.set("spark.cores.max", this.configParams.get("spark.cores.max"))
@@ -80,6 +109,12 @@ public class SparkConfig {
 		setIfPathExists(conf, "spark.yarn.archive", this.configParams.get("spark.yarn.archive"));
 		setIfPathExists(conf, "spark.yarn.dist.archives", this.configParams.get("spark.yarn.dist.archives"));
 		setIfPathExists(conf, "spark.executor.instances", this.configParams.get("spark.executor.instances"));
+		
+		
+		
+		
+		
+		
 		//setIfPathExists(conf, "spark.driver.port", this.configParams.get("spark.driver.port"));
 		//setIfPathExists(conf, "spark.driver.host", this.configParams.get("spark.driver.host"));
 		//setIfPathExists(conf, "spark.driver.bindAddress", this.configParams.get("spark.driver.bindAddress"));

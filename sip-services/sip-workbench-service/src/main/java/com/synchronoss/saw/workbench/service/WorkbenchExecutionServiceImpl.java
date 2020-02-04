@@ -1,28 +1,34 @@
 package com.synchronoss.saw.workbench.service;
 
+import java.util.UUID;
+
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.apache.hadoop.fs.Path;
 import org.joda.time.DateTime;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
+import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutor;
 
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.metastore.DataSetStore;
 
 
 @Service
@@ -103,13 +109,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     String project, String name, String component, String cfg) throws Exception {
 	  
 	  
-	System.out.print("Checking logger level...");
-	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
-	logger4j.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
-	System.out.print("Logger level set to debug");
 	
-	//org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
-	//logger.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
 	
 	
     log.debug("Executing dataset transformation starts here ");
@@ -170,16 +170,55 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    * Also used for simply viewing the contents of an existing dataset.
    */
   @Override
-  public ObjectNode preview(String project, String name) throws Exception {
-    return null;
+  public ObjectNode createPreview(String project, String name) throws Exception {
+
+    log.info("Creating dataset transformation preview");
+    /* Get physical location of dataset */
+    DataSetStore dss = new DataSetStore(metastoreBase);
+    String json = dss.readDataSet(project, name);
+    log.debug("Dataset metadata: {}", json);
+    if (json == null) {
+      throw new RuntimeException("Dataset not found: " + name);
+    }
+    JsonNode dataset = mapper.readTree(json);
+    String status = dataset.path("asOfNow").path("status").asText();
+    if (status == null || !status.equals("SUCCESS")) {
+      throw new RuntimeException("Unhandled dataset status: " + status);
+    }
+    String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+    
+    
+    String id = UUID.randomUUID().toString();
+    
+    /**
+     * Send preview request to Workbench-executor
+     */
+    executor.createPreview(id, location, previewLimit, previewsTablePath, project, name);
+    
+    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "queued");
+    preview.insert();
+    /*
+     * Return generated preview ID to client to be used for retrieving preview data
+     */
+    ObjectNode root = mapper.createObjectNode();
+    root.put("id", id);
+	
+    return root;
   }
 
-  private void handlePreviewFailure(String previewId) {
-   
-  }
+ 
 
   @Override
   public ObjectNode getPreview(String previewId) throws Exception {
-	  return null;
-  }
+	    log.debug("Getting dataset transformation preview");
+	    /* Locate the preview data in MapR-DB */
+	    Table table = MapRDB.getTable(previewsTablePath);
+	    Document doc = table.findById(previewId);
+	    /* Return the preview data */
+	    if (doc == null) {
+	      return null;
+	    }
+	    JsonNode json = mapper.readTree(doc.toString());
+	    return (ObjectNode) json;
+	  }
 }

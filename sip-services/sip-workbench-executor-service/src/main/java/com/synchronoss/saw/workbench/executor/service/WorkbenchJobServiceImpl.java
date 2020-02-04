@@ -100,17 +100,7 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 			    }
 			  
 			   // SparkConfig.jsc.setLogLevel("DEBUG");
-			    logger.debug("#### Setting librarires as class path for spark context ######");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.core-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-core-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-parser-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.meta-api-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-data-profiler-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-preview-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-component-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.bda.xdf-ext-4.jar");
-			    SparkConfig.jsc.addJar("/opt/bda/sip-workbench-executor/lib/com.synchronoss.saw.sip-workbench-executor-service-4.jar");
-			    logger.debug("#### Manual class path settings completed!! ######");
+			
 			    
 			    try {
 					if (!component.initComponent(SparkConfig.jsc)) {
@@ -149,14 +139,32 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 
 	@Override
 	public ObjectNode createPreview(String id, String location, String previewLimit, String previewsTablePath, String project, String name) {
+		logger.debug("###### Creating preview .....######");
+		logger.debug("#### id ::"+ id);
+		logger.debug("#### location ::"+ location);
+		logger.debug("#### previewLimit ::"+ previewLimit);
+		logger.debug("#### previewsTablePath ::"+ previewsTablePath);
+		logger.debug("#### project ::"+ project);
+		logger.debug("#### Name ::"+ name);
+		
+		
 	    Logger log = LoggerFactory.getLogger(getClass().getName());
 	    log.info("Starting preview job");
 	    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "success");
 	    DocumentBuilder document = preview.getDocumentBuilder();
 	    document.putNewArray("rows");
-	   //// SparkSession session = jobContext.sparkSession();
-	    Dataset<Row> dataset = getDataset(null, location); //replace spark session in place of null  @@Naresh
+	    logger.debug("###### creating spark session from workbench-executor configuration .....######");
+	    SparkSession sparkSession =  SparkSession
+	            .builder()
+	            .config(SparkConfig.sparkConfig)
+	            .getOrCreate();
+	    
+	    logger.debug("###### created spark session from workbench-executor configuration .....######");
+	    logger.debug("##### getting dataset from lcoation ####"+ location);
+	    Dataset<Row> dataset = getDataset(sparkSession, location); 
+	    
 	    if (dataset != null) {
+	    	logger.debug("Dataset created Successfully !!####");
 	      StructField[] fields = dataset.schema().fields();
 	      Iterator<Row> rows = dataset.limit(Integer.valueOf(previewLimit)).toLocalIterator();
 	      rows.forEachRemaining(

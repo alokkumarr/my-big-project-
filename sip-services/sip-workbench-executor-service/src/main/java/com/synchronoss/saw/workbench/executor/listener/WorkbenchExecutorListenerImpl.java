@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonSyntaxException;
 import com.synchronoss.saw.workbench.executor.SparkConfig;
+
 import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutionType;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchJobService;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchJobServiceImpl;
@@ -113,15 +114,18 @@ public class WorkbenchExecutorListenerImpl implements WorkbenchExecutorListener 
 						try {
 							String[] content = record.value().split("˜˜");
 
-							logger.debug("#### content ::" + content);
+							logger.debug("#### content[0]...execution type ::" + content[0]);
 
 							WorkbenchExecutionType executionType = WorkbenchExecutionType.valueOf(content[0]);
+							
+							logger.debug("checking logic for ::"+ executionType);
 
 							switch (executionType) {
 							case EXECUTE_JOB:
-								logger.debug("Processing exeucte job type in consumer ....");
+								
 
 								if (content.length == 5) {
+									logger.debug(" #######  Processing exeucte job type in consumer .... #######");
 									String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 
 									String project = content[1];
@@ -133,15 +137,18 @@ public class WorkbenchExecutorListenerImpl implements WorkbenchExecutorListener 
 								}
 								break;
 
-							case SHOW_PREVIEW:
+							case CREATE_PREVIEW:
+								
+								logger.debug("######## Total number of elements in message  #######"+ content.length);
 
-								if (content.length == 6) {
-									String id = content[0];
-									String location = content[1];
-									String previewLimit = content[2];
-									String previewsTablePath = content[3];
-									String project = content[4];
-									String name = content[5];
+								if (content.length == 7) {
+									logger.debug("####### Processing create preview  type in consumer ....##########");
+									String id = content[1];
+									String location = content[2];
+									String previewLimit = content[3];
+									String previewsTablePath = content[4];
+									String project = content[5];
+									String name = content[6];
 									WorkbenchJobService service = new WorkbenchJobServiceImpl();
 									service.createPreview(id, location, previewLimit, previewsTablePath, project, name);
 									break;

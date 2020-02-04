@@ -10,7 +10,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mapr.streams.Admin;
@@ -35,6 +34,7 @@ public class WorkbenchExecutorQueue {
 	  @PostConstruct
 	  public void init() {
 		  logger.debug("#### Post construct of WorkbenchQueue Manager");
+		  logger.info("Here");
 	      String sipBasePath = "";
 	     
 	      this.streamBasePath = sipBasePath + File.separator + "services/workbench/executor";
