@@ -49,8 +49,8 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
   });
 
   using(
-    testDataReader.testData['SCHEDULE-REPORT']['dlreport']
-      ? testDataReader.testData['SCHEDULE-REPORT']['dlreport']
+    testDataReader.testData['SCHEDULE-REPORT']['positive']
+      ? testDataReader.testData['SCHEDULE-REPORT']['positive']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -136,16 +136,21 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
               case 'Yearly-On-Week':
                 schedulePage.yearlyOnWeekSchedule(data.yearlyWeeks,data.yearlyDayName,data.yearlyMonth,data.Hours,data.Minutes,data.timeStamp);
                 break;
+              case 'removeSchedule':
+                schedulePage.hourlySchedule(data.Hours,data.Minutes);
+                break;
             }
 
           schedulePage.setEmail(data.userEmail);
           schedulePage.scheduleReport();
 
           if(data.scheduleFrom === 'card') {
+            schedulePage.handleToastMessage();
             analyzePage.goToView('card');
             analyzePage.verifyScheduledTimingsInCardView(ReportName,data.scheduleTimings);
             analyzePage.clickOnAnalysisLink(ReportName);
           } else if (data.scheduleFrom === 'list') {
+            schedulePage.handleToastMessage();
             analyzePage.goToView('list');
             analyzePage.verifyScheduledTimingsInListView(ReportName,data.scheduleTimings);
             analyzePage.clickOnAnalysisLink(ReportName);
@@ -157,6 +162,21 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
             executePage.clickPreviousVersions();
             executePage.verifyScheduleDetails();
             executePage.closeActionMenu();
+          }
+
+          if(ScheduleType==="removeSchedule") {
+            executePage.clickOnActionLink();
+            executePage.clickSchedule();
+            schedulePage.removeSchedule();
+            /*Verify Removed schedule*/
+            if(data.scheduleFrom === 'card') {
+              analyzePage.verifyScheduledTimingsInCardView(ReportName,data.noSchedule);
+              analyzePage.clickOnAnalysisLink(ReportName);
+            } else {
+              analyzePage.goToView('list');
+              analyzePage.verifyScheduledTimingsInListView(ReportName,data.blankSchedule);
+              analyzePage.clickOnAnalysisLink(ReportName);
+            }
           }
           /*Delete the Report*/
           schedulePage.handleToastMessage();
@@ -172,7 +192,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
         testId: id,
         data: data,
         feature: 'SCHEDULE-REPORT',
-        dataProvider: 'dlreport'
+        dataProvider: 'positive'
       };
     });
 });

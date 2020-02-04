@@ -1,9 +1,8 @@
 {
   "SCHEDULE-REPORT": {
-    "dlreport": {
+    "positive": {
       "SHDL01": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -25,7 +24,6 @@
       },
       "SHDL02": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -47,8 +45,7 @@
       },
       "SHDL03": {
         "suites": [
-          "critical",
-          "regression"
+          "sanity"
         ],
         "user": "admin",
         "userEmail": "admin@xyz.com",
@@ -71,7 +68,6 @@
       },
       "SHDL04": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -95,7 +91,6 @@
       },
       "SHDL05": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -121,7 +116,6 @@
       },
       "SHDL06": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -147,7 +141,6 @@
       },
       "SHDL07": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -172,7 +165,6 @@
       },
       "SHDL08": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -197,7 +189,6 @@
       },
       "SHDL09": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -223,7 +214,6 @@
       },
       "SHDL10": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -249,7 +239,6 @@
       },
       "SHDL11": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -275,7 +264,6 @@
       },
       "SHDL12": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -302,7 +290,6 @@
       },
       "SHDL13": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -329,7 +316,6 @@
       },
       "SHDL14": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -357,7 +343,6 @@
       },
       "SHDL15": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -385,7 +370,6 @@
       },
       "SHDL16": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -412,7 +396,6 @@
       },
       "SHDL17": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -439,7 +422,6 @@
       },
       "SHDL18": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -467,7 +449,6 @@
       },
       "SHDL19": {
         "suites": [
-          "critical",
           "regression"
         ],
         "user": "admin",
@@ -491,10 +472,10 @@
               "Date"
             ]
           }
-        ],
-        "SHDL20": {
+        ]
+      },
+      "SHDL20": {
           "suites": [
-            "critical",
             "regression"
           ],
           "user": "admin",
@@ -520,16 +501,17 @@
         },
         "SHDL21": {
           "suites": [
-            "critical",
             "regression"
           ],
           "user": "admin",
           "userEmail": "admin@xyz.com",
-          "scheduleType": "Hourly",
+          "scheduleType": "removeSchedule",
           "Hours": "0",
           "Minutes": "3",
           "scheduleFrom": "list",
           "scheduleTimings": "Every 3 minutes",
+          "noSchedule": "No Schedule Set",
+          "blankSchedule": "",
           "description": "admin should be able remove schedule from list view",
           "tables": [
             {
@@ -545,4 +527,3 @@
       }
     }
   }
-}
