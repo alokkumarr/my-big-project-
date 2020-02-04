@@ -129,7 +129,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
                 if ( values != null && values.length != 0){
                     switch (searchParam) {
                         case Category:
-                            addQueryCondition(cond, "system.category", values);
+                            addQueryCondition(cond, "system.category[]", values);
                             break;
                         case SubCategory:
                             if (searchParams.get(DataSetProperties.Category) != null
@@ -184,7 +184,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @return - pre-build QC
      */
     private void addEqOrLikeClause(QueryCondition cond, String key, String value){
-        logger.debug("addInClause() - Key: "+key+" - value: "+ value);
+        logger.debug("addEqOrLikeClause() - Key: "+key+" - value: "+ value);
         if (value.indexOf('%') >= 0)
             cond.like(key, value);
         else
