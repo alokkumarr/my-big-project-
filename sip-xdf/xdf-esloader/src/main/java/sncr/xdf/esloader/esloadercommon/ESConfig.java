@@ -1,9 +1,10 @@
 package sncr.xdf.esloader.esloadercommon;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import java.util.List;
 
 /**
  * Created by skbm0001 on 29/1/2018.
@@ -18,8 +19,11 @@ public class ESConfig {
     private String keyStorePath;
     private String storePassword;
     private String esIndex;
+    private Map<String,String> additionalParams;
 
-    private String dataLocation;
+    
+
+	private String dataLocation;
 
     public ESConfig(List<String> esHost, String esUser, String esPassword, String esIndex) {
         this.esHost = esHost;
@@ -132,6 +136,24 @@ public class ESConfig {
     public void setStorePassword(String storePassword) {
         this.storePassword = storePassword;
     }
+    
+    /**
+     * Gets additional params
+     * 
+     * @return
+     */
+    public Map<String, String> getAdditionalParams() {
+		return additionalParams;
+	}
+
+    /**
+     * Sets additional params
+     * 
+     * @param additionalParams
+     */
+	public void setAdditionalParams(Map<String, String> additionalParams) {
+		this.additionalParams = additionalParams;
+	}
 
     @Override
     public boolean equals(Object o) {

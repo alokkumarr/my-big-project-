@@ -1,13 +1,14 @@
 package sncr.bda.conf;
 
 import java.util.List;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import java.util.Map;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import javax.annotation.Generated;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 
 /**
@@ -126,9 +127,23 @@ public class ESLoader {
      */
     @SerializedName("alert")
     @Expose
-    private Alert alerts;
-
+    private Alert alerts; 
+    
     /**
+     * @return 
+     * 
+     */
+    @SerializedName("additonalESConfigParams")
+    @Expose
+    private Map<String, String> additonalESConfigParams = null;
+
+    
+
+
+
+    
+
+	/**
      * No args constructor for use in serialization
      *
      */
@@ -396,6 +411,15 @@ public class ESLoader {
     public Alert getAlerts() {
         return alerts;
     }
+    
+    /**
+     * gets additional es config parameters
+     * 
+     * @return list of params
+     */
+    public Map<String, String> getAdditonalESConfigParams() {
+		return additonalESConfigParams;
+	}
 
     /**
      * Sets alerts.
@@ -410,10 +434,23 @@ public class ESLoader {
     public void setStorePassword(String storePassword) {
         this.storePassword = storePassword;
     }
+    
+    /**
+     * Sets additonal ES config params.
+     * 
+     * @param additonalESConfigParams
+     */
+	public void setAdditonalESConfigParams(Map<String, String> additonalESConfigParams) {
+		this.additonalESConfigParams = additonalESConfigParams;
+	}
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("destinationIndexName", destinationIndexName).append("indexMappingfile", indexMappingfile).append("documentIDField", documentIDField).append("filterString", filterString).append("aliases", aliases).append("esNodes", esNodes).append("esClusterName", esClusterName).append("esPort", esPort).append("esMappingId", esMappingId).append("esUser", esUser).append("esPass", esPass).toString();
+        return new ToStringBuilder(this).append("destinationIndexName", destinationIndexName)
+        		.append("indexMappingfile", indexMappingfile).append("documentIDField", documentIDField)
+        		.append("filterString", filterString).append("aliases", aliases).append("esNodes", esNodes)
+        		.append("esClusterName", esClusterName).append("esPort", esPort).append("esMappingId", esMappingId)
+        		.append("esUser", esUser).append("additonalESConfigParams", additonalESConfigParams).append("esPass", esPass).toString();
     }
 
     @Override
@@ -430,6 +467,7 @@ public class ESLoader {
                 .append(indexMappingfile)
                 .append(aliases)
                 .append(esMappingId)
+                .append(additonalESConfigParams)
                 .toHashCode();
     }
 
@@ -453,6 +491,7 @@ public class ESLoader {
                 .append(filterString, rhs.filterString)
                 .append(indexMappingfile, rhs.indexMappingfile)
                 .append(aliases, rhs.aliases)
+                .append(additonalESConfigParams, rhs.additonalESConfigParams)
                 .append(esMappingId, rhs.esMappingId).isEquals();
     }
 

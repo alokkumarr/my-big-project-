@@ -303,7 +303,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
 
                         ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-                        logger.debug("####### end of parser after caching "+ outputDS.count());
+                        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+                        //TODO: This is a crude way of checking. This need to be revisited.
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("####### end of parser after caching " + outputDS.count());
+                        }
                     }
                     else {
                         outputColumns =
@@ -346,6 +350,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 }else {
                     throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                 }
+            }
+
+             //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+             //TODO: This is a crude way of checking. This need to be revisited.
+            if(logger.isDebugEnabled()) {
+                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
             }
 
         }
@@ -730,9 +740,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             } else {
                 acceptedDataCollector = acceptedDataCollector.union(acceptedRdd);
             }
-            
-            
-            logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
+
+
+             //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+             //TODO: This is a crude way of checking. This need to be revisited.
+            if(logger.isDebugEnabled()) {
+                logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
+            }
 
         } catch (Exception exception) {
             logger.error(exception);
