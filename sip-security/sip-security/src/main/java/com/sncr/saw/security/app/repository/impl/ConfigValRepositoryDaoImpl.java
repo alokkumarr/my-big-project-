@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class ConfigValRepositoryDaoImpl implements ConfigValRepository {
-  private static final Logger logger = LoggerFactory.getLogger(CustomerRepositoryDaoImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(ConfigValRepositoryDaoImpl.class);
 
   private final JdbcTemplate jdbcTemplate;
 
