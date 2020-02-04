@@ -49,8 +49,8 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
   });
 
   using(
-    testDataReader.testData['SCHEDULE-REPORT']['positive']
-      ? testDataReader.testData['SCHEDULE-REPORT']['positive']
+    testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
+      ? testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -192,7 +192,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
         testId: id,
         data: data,
         feature: 'SCHEDULE-REPORT',
-        dataProvider: 'positive'
+        dataProvider: 'positiveTest'
       };
     });
 });

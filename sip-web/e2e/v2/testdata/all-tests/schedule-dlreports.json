@@ -1,6 +1,6 @@
 {
   "SCHEDULE-REPORT": {
-    "positive": {
+    "positiveTest": {
       "SHDL01": {
         "suites": [
           "regression"
