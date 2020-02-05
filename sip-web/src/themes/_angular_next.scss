@@ -12,6 +12,7 @@ $sncr-typography: mat-typography-config(
 
 $mat-primary: (
   50 : var(--theme-primary-50),
+  90 : var(--theme-primary-90),
   100 : var(--theme-primary-100),
   200 : var(--theme-primary-200),
   300 : var(--theme-primary-300),
@@ -27,6 +28,7 @@ $mat-primary: (
   A700 : var(--theme-primary-A700),
   contrast: (
     50: var(--theme-primary-contrast-50),
+    90: var(--theme-primary-contrast-90),
     100: var(--theme-primary-contrast-100),
     200: var(--theme-primary-contrast-200),
     300: var(--theme-primary-contrast-300),
