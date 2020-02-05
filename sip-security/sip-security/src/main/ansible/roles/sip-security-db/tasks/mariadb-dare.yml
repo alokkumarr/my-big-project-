@@ -48,7 +48,7 @@
 
 # encrypt the sip_mariadb_dare_key using openssl enc
 - name: encrypt sip_mariadb_dare_key
-  shell: echo "{{ sip_mariadb_dare_key.stdout }}" | openssl enc -aes-256-cbc -md sha1 -k "{{ sip_mariadb_dare_key_password.stdout }}" -out /etc/my.cnf.d/sip_mariadb_dare_key.enc
+  shell: echo "{{ reg_sip_mariadb_dare_key.stdout }}" | openssl enc -aes-256-cbc -md sha1 -k "{{ reg_sip_mariadb_dare_key_password.stdout }}" -out /etc/my.cnf.d/sip_mariadb_dare_key.enc
   when: not path_sip_mariadb_dare_key.stat.exists
   register: encrpt_sip_mariadb_dare_key
 
