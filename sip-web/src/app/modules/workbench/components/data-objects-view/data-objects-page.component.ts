@@ -14,6 +14,7 @@ import { ToastService } from '../../../../common/services/toastMessage.service';
 import { SearchBoxComponent } from '../../../../common/components/search-box';
 
 import { DATASET_CATEGORIES_TYPE, DATASET_CATEGORY_LIST } from '../../consts';
+import { DatasetFilters } from '../../models/workbench.interface';
 
 @Component({
   selector: 'data-objects-page',
@@ -37,16 +38,18 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   public timerSubscription;
   public poll = false;
   public interval = 20000;
-  public dsTypeFilters = {
-    filterType: 'string',
-    filterName: 'dstype',
+  public dsTypeFilters: DatasetFilters = {
+    type: 'string',
+    name: 'dstype',
     label: 'Filter By Dataset Type',
+    isMultiSelect: false,
     data: cloneDeep(DATASET_CATEGORIES_TYPE)
   };
-  public dsCategoryFilter = {
-    filterType: 'string',
-    filterName: 'category',
+  public dsCategoryFilter: DatasetFilters = {
+    type: 'string',
+    name: 'category',
     label: 'Filter By Category Type',
+    isMultiSelect: true,
     data: cloneDeep(DATASET_CATEGORY_LIST)
   };
   public searchFilters = [];

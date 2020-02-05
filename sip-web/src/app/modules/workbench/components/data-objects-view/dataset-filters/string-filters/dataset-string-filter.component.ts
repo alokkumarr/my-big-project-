@@ -14,13 +14,15 @@ export class DatasetStringFilterComponent implements OnInit {
   public filterList;
   public filterLabel;
   public dropDownLabel;
+  public isMultiSelect;
   @Output() filterChange = new EventEmitter<any>();
   @Output() filterRemoved = new EventEmitter<any>();
+  @Output() emptyFilter = new EventEmitter<any>();
 
   @Input('resetFilters') set resetFilter(data) {
     if (data) {
       this.filterFormGroup.patchValue({
-        value: ''
+        filter: ''
       });
     }
   }
@@ -39,6 +41,9 @@ export class DatasetStringFilterComponent implements OnInit {
     this.dropDownLabel = startCase(data) || 'Select a value';
   }
 
+  @Input('isMultiSelect') set setMultiSelect(data) {
+    this.isMultiSelect = data;
+  }
   constructor(private fb: FormBuilder) {
     this.createFilterForm();
   }
@@ -46,25 +51,34 @@ export class DatasetStringFilterComponent implements OnInit {
 
   createFilterForm() {
     this.filterFormGroup = this.fb.group({
-      value: ['']
+      filter: ['']
     });
 
-    this.filterFormGroup.valueChanges.subscribe(({ value }) => {
-      if (this.filterFormGroup.valid && !isEmpty(value)) {
+    this.filterFormGroup.valueChanges.subscribe(({ filter }) => {
+      if (!isEmpty(filter)) {
         this.filterChange.emit({
-          data: value,
+          data: filter,
           filterType: this.dropDownLabel.toLowerCase()
         });
+      } else {
+        this.dropDownLabel
+          ? this.filterRemoved.emit({
+              name: 'removeFilter',
+              filterType: this.dropDownLabel.toLowerCase()
+            })
+          : ''; // Do Nothing in else
       }
     });
   }
 
-  /*
-  Use this function to remove/reset individual filter.
+  /* // Use this function to remove/reset individual filter.
   removeFilter() {
     this.filterFormGroup.patchValue({
-      value: ''
+      filter: ''
     });
-    this.filterRemoved.emit({ filterType: this.dropDownLabel.toLowerCase() });
+    this.filterRemoved.emit({
+      name: 'resetFilter',
+      filterType: this.dropDownLabel.toLowerCase()
+    });
   } */
 }

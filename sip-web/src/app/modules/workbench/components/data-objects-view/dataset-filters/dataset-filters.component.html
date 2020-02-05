@@ -5,36 +5,19 @@
   fxLayoutAlign="space-around center"
 >
   <mat-card class="mat-elevation-z3" style="width: 80%;">
-    <!-- <mat-card-content
-      fxLayout="column"
-      fxLayoutAlign="space-around center"
-      *ngFor="let filter of filterList; trackBy: trackByIndex; let i = index"
-    >
-      <div *ngIf="filter.filterType === 'string' && filter.data.length > 0">
-        <dataset-string-filter
-          (filterChange)="filterChange($event)"
-          (filterRemoved)="filterRemoved($event)"
-          [filterList]="filter.data"
-          [label]="filter.filterName"
-          [filterLabel]="filter.label || 'Filter ' + trackByIndex(i + 1)"
-          [resetFilters]="isFilterSelected()"
-        >
-        </dataset-string-filter>
-      </div>
-    </mat-card-content> -->
-
-    <!-- Use above html when individual filter reset functionality is needed. -->
     <mat-card-content
       fxLayout="column"
       fxLayoutAlign="space-around center"
       *ngFor="let filter of filterList; trackBy: trackByIndex; let i = index"
     >
-      <div *ngIf="filter.filterType === 'string' && filter.data.length > 0">
+      <div *ngIf="filter.type === 'string' && filter.data.length > 0">
         <dataset-string-filter
           (filterChange)="filterChange($event)"
+          (filterRemoved)="filterRemoved($event)"
           [filterList]="filter.data"
-          [label]="filter.filterName"
+          [label]="filter.name"
           [filterLabel]="filter.label || 'Filter ' + trackByIndex(i + 1)"
+          [isMultiSelect]="filter.isMultiSelect"
           [resetFilters]="isFilterSelected()"
         >
         </dataset-string-filter>
