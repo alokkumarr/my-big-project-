@@ -28,6 +28,24 @@
   delegate_to: "{{groups['saw-security'][0]}}"
   when: sip_mariadb_dare_key_password.changed
 
+- name: Look up dare key from inventory_dir file
+  set_fact:
+    sip_mariadb_dare_keyfile: >-
+      {{ lookup('file', inventory_dir+'/sip_mariadb_dare_key') }}
+
+- name: Look up dare key password from inventory_dir file
+  set_fact:
+    sip_mariadb_dare_key_passwordfile: >-
+      {{ lookup('file', inventory_dir+'/sip_mariadb_dare_key_password') }}
+
+- name: register sip_mariadb_dare_keys
+  shell: echo "{{ sip_mariadb_dare_keyfile }}"
+  register: reg_sip_mariadb_dare_key
+
+- name: register sip_mariadb_dare_password
+  shell: echo "{{ sip_mariadb_dare_key_passwordfile }}"
+  register: reg_sip_mariadb_dare_key_password
+
 # encrypt the sip_mariadb_dare_key using openssl enc
 - name: encrypt sip_mariadb_dare_key
   shell: echo "{{ sip_mariadb_dare_key.stdout }}" | openssl enc -aes-256-cbc -md sha1 -k "{{ sip_mariadb_dare_key_password.stdout }}" -out /etc/my.cnf.d/sip_mariadb_dare_key.enc
