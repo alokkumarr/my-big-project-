@@ -266,7 +266,6 @@ public class SecurityController {
 				response.setStatus(HttpStatus.UNAUTHORIZED.value());
 				return new LoginResponse(validity, "Token has expired. Please re-login");
 			} else {
-
 				logger.info("Ticket will be created..");
 				logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
 
