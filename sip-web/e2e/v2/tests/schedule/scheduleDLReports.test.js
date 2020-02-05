@@ -48,7 +48,6 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-/*
   using(
     testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
       ? testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
@@ -65,7 +64,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           const analyzePage = new AnalyzePage();
           analyzePage.goToView('card');
 
-          /!*create report*!/
+          /*create report*/
           analyzePage.clickOnAddAnalysisButton();
           analyzePage.clickOnAnalysisType(analysisType);
           analyzePage.clickOnNextButton();
@@ -81,7 +80,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           const schedulePage = new SchedulePage();
           schedulePage.handleToastMessage();
 
-          /!*Verify Analysis Details*!/
+          /*Verify Analysis Details*/
           schedulePage.handleToastMessage();
           analyzePage.clickOnAnalysisLink(ReportName);
           const executePage = new ExecutePage();
@@ -94,7 +93,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           executePage.closeDetails();
           schedulePage.handleToastMessage();
 
-          /!*Select page need to schedule report*!/
+          /*Select page need to schedule report*/
           if(data.scheduleFrom === 'details') {
             analyzePage.clickOnAnalysisLink(ReportName);
             executePage.clickOnActionLink();
@@ -169,7 +168,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
             executePage.clickOnActionLink();
             executePage.clickSchedule();
             schedulePage.removeSchedule();
-            /!*Verify Removed schedule*!/
+            /*Verify Removed schedule*/
             if(data.scheduleFrom === 'card') {
               analyzePage.verifyScheduledTimingsInCardView(ReportName,data.noSchedule);
               analyzePage.clickOnAnalysisLink(ReportName);
@@ -179,7 +178,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
               analyzePage.clickOnAnalysisLink(ReportName);
             }
           }
-          /!*Delete the Report*!/
+          /*Delete the Report*/
           schedulePage.handleToastMessage();
           executePage.clickOnActionLink();
           executePage.clickOnDelete();
@@ -196,7 +195,6 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
         dataProvider: 'positiveTest'
       };
     });
-*/
 
   using(
     testDataReader.testData['SCHEDULE-REPORT']['negativeTest']
