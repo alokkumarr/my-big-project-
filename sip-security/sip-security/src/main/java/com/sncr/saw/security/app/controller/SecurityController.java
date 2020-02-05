@@ -263,6 +263,7 @@ public class SecurityController {
 				it.remove();
 			}
 			if (!validity) {
+				response.setStatus(HttpStatus.UNAUTHORIZED.value());
 				return new LoginResponse(validity, "Token has expired. Please re-login");
 			} else {
 
