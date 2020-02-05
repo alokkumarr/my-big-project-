@@ -48,6 +48,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
+/*
   using(
     testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
       ? testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
@@ -64,7 +65,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           const analyzePage = new AnalyzePage();
           analyzePage.goToView('card');
 
-          /*create report*/
+          /!*create report*!/
           analyzePage.clickOnAddAnalysisButton();
           analyzePage.clickOnAnalysisType(analysisType);
           analyzePage.clickOnNextButton();
@@ -80,7 +81,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           const schedulePage = new SchedulePage();
           schedulePage.handleToastMessage();
 
-          /*Verify Analysis Details*/
+          /!*Verify Analysis Details*!/
           schedulePage.handleToastMessage();
           analyzePage.clickOnAnalysisLink(ReportName);
           const executePage = new ExecutePage();
@@ -93,7 +94,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           executePage.closeDetails();
           schedulePage.handleToastMessage();
 
-          /*Select page need to schedule report*/
+          /!*Select page need to schedule report*!/
           if(data.scheduleFrom === 'details') {
             analyzePage.clickOnAnalysisLink(ReportName);
             executePage.clickOnActionLink();
@@ -168,7 +169,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
             executePage.clickOnActionLink();
             executePage.clickSchedule();
             schedulePage.removeSchedule();
-            /*Verify Removed schedule*/
+            /!*Verify Removed schedule*!/
             if(data.scheduleFrom === 'card') {
               analyzePage.verifyScheduledTimingsInCardView(ReportName,data.noSchedule);
               analyzePage.clickOnAnalysisLink(ReportName);
@@ -178,7 +179,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
               analyzePage.clickOnAnalysisLink(ReportName);
             }
           }
-          /*Delete the Report*/
+          /!*Delete the Report*!/
           schedulePage.handleToastMessage();
           executePage.clickOnActionLink();
           executePage.clickOnDelete();
@@ -193,6 +194,101 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
         data: data,
         feature: 'SCHEDULE-REPORT',
         dataProvider: 'positiveTest'
+      };
+    });
+*/
+
+  using(
+    testDataReader.testData['SCHEDULE-REPORT']['negativeTest']
+      ? testDataReader.testData['SCHEDULE-REPORT']['negativeTest']
+      : {},
+    (data, id) => {
+      it(`${id}:${data.description}`, () => {
+        try {
+          const ReportName = `schdle ${moment().format('MMM Do h mm ss a')}`;
+          const analysisType = 'table:report';
+          const tables = data.tables;
+          const loginPage = new LoginPage();
+          loginPage.loginAs(data.user, /analyze/);
+          const ReportDescription = `Schedule DL Report ${new Date().toString()}`;
+          const analyzePage = new AnalyzePage();
+          analyzePage.goToView('card');
+
+          /*create report*/
+          analyzePage.clickOnAddAnalysisButton();
+          analyzePage.clickOnAnalysisType(analysisType);
+          analyzePage.clickOnNextButton();
+          analyzePage.clickOnDataPods(dataSets.report);
+          analyzePage.clickOnCreateButton();
+          const reportDesignerPage = new ReportDesignerPage();
+          reportDesignerPage.clickOnReportFields(tables);
+          reportDesignerPage.verifyDisplayedColumns(tables);
+          reportDesignerPage.clickOnSave();
+          reportDesignerPage.enterAnalysisName(ReportName);
+          reportDesignerPage.enterAnalysisDescription(ReportDescription);
+          reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+          const schedulePage = new SchedulePage();
+          schedulePage.handleToastMessage();
+
+          /*Verify Analysis Details*/
+          schedulePage.handleToastMessage();
+          analyzePage.clickOnAnalysisLink(ReportName);
+          const executePage = new ExecutePage();
+          executePage.verifyTitle(ReportName);
+          analysisId = executePage.getAnalysisId();
+          executePage.clickOnActionLink();
+          executePage.clickOnDetails();
+          executePage.verifyDescription(ReportDescription);
+          executePage.closeActionMenu();
+          executePage.closeDetails();
+          schedulePage.handleToastMessage();
+          analyzePage.clickOnAnalysisLink(ReportName);
+          executePage.clickOnActionLink();
+          executePage.clickSchedule();
+          schedulePage.setEmail(data.userEmail);
+          schedulePage.scheduleReport();
+          schedulePage.verifyInvalidScheduleErrorMessage(data.invalidScheduleMessage);
+          schedulePage.handleToastMessage();
+          schedulePage.closeSchedule();
+          executePage.clickOnActionLink();
+          executePage.clickSchedule();
+          schedulePage.selectHourlyTab();
+          schedulePage.clickEveryHour();
+          schedulePage.selectHours(data.scheduleHours);
+          schedulePage.clickMinutes();
+          schedulePage.selectMinutes(data.scheduleMinutes);
+          schedulePage.scheduleReport();
+          schedulePage.verifyInvalidOptionErrorMessage(data.invalidOptionMessage);
+          schedulePage.handleToastMessage();
+          schedulePage.closeSchedule();
+          executePage.clickOnActionLink();
+          executePage.clickSchedule();
+          schedulePage.selectDailyTab();
+          schedulePage.scheduleReport();
+          schedulePage.verifyInvalidScheduleErrorMessage(data.invalidScheduleMessage);
+          schedulePage.verifyInvalidOptionErrorMessage(data.invalidOptionMessage);
+          schedulePage.handleToastMessage();
+          schedulePage.closeSchedule();
+          executePage.clickOnActionLink();
+          executePage.clickOnDetails();
+          executePage.clickPreviousVersions();
+          executePage.verifyScheduleDetailsNotPresent();
+          executePage.closeActionMenu();
+
+          /*Delete the Report*/
+          executePage.clickOnActionLink();
+          executePage.clickOnDelete();
+          executePage.confirmDelete();
+          analyzePage.verifyToastMessagePresent("Analysis deleted.");
+          analyzePage.verifyAnalysisDeleted();
+        } catch (e) {
+          console.log(e);
+        }
+      }).result.testInfo = {
+        testId: id,
+        data: data,
+        feature: 'SCHEDULE-REPORT',
+        dataProvider: 'negativeTest'
       };
     });
 });

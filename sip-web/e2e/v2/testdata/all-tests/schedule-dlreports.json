@@ -524,6 +524,21 @@
             }
           ]
         }
+      },
+    "negativeTest": {
+      "SHDL22": {
+        "suites": ["development"],
+        "user": "admin",
+        "userEmail": "admin@xyz.com",
+        "scheduleHours": "0",
+        "scheduleMinutes": "2",
+        "invalidScheduleMessage": "Please Select a valid Schedule",
+        "invalidOptionMessage": "Please enter valid Email ids or Select option for Publish",
+        "description": "admin should not be able to schedule without proper criteria",
+        "tables": [{
+          "name": "SALES",
+          "fields": ["Integer", "String", "Date"]}]
       }
     }
   }
+}
