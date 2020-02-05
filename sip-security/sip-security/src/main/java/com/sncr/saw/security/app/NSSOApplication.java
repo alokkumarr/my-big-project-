@@ -43,31 +43,10 @@ public class NSSOApplication extends SpringBootServletInitializer {
     private NSSOProperties nSSOProperties;
     @Autowired private TicketHelper ticketHelper;
 
-    @Bean
-    public TomcatServletWebServerFactory tomcatEmbedded() {
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-        tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
-            if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
-                ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
-            }
-        });
-        return tomcat;
-    }
-
  	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 		return builder.sources(NSSOApplication.class);
 	}
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @Bean
-    public FilterRegistrationBean<?> jwtFilter() {
-      final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-      registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey(),ticketHelper));
-      registrationBean.addUrlPatterns("/sip-security/auth/*");
-  
-      return registrationBean;
-    }
 
 	public static void main(String[] args) {
 		try {        	

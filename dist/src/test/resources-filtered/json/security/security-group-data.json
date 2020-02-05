@@ -1,0 +1,38 @@
+{
+  "booleanCriteria": "AND",
+  "booleanQuery": [
+    {
+      "columnName": "Field1",
+      "model": {
+        "operator": "ISIN",
+        "values": ["abc"]
+      }
+    },
+    {
+      "columnName": "Field2",
+      "model": {
+        "operator": "ISIN",
+        "values": ["pqr"]
+      }
+    },
+    {
+      "booleanCriteria": "OR",
+      "booleanQuery": [
+        {
+          "columnName": "Field3",
+          "model": {
+            "operator": "ISIN",
+            "values": ["456"]
+          }
+        },
+        {
+          "columnName": "Field4",
+          "model": {
+            "operator": "ISIN",
+            "values": ["123"]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -922,6 +922,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@ctrl/tinycolor@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@ctrl/tinycolor/-/tinycolor-2.6.0.tgz#c269def5ed1f871913f299a475c01bdb39119eee"
+  integrity sha512-bvkszNAcbmR2zrjjkaHbTVbEj07Id44HsBWf57mugPcvJNIPaWLqxWV/GUJVJuXXayqFP2X09cZRqKrCy/v10Q==
+
 "@heroku/socksv5@^0.0.9":
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/@heroku/socksv5/-/socksv5-0.0.9.tgz#7a3905921136b2666979a0f86bb4f062f657f793"
@@ -6623,6 +6628,11 @@ ng2-ace-editor@0.3.9:
   dependencies:
     ace-builds "^1.4.2"
     brace "^0.11.1"
+
+ngx-color-picker@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/ngx-color-picker/-/ngx-color-picker-8.2.0.tgz#36b2e7f173e006f680dea39743d0bfc6c2531454"
+  integrity sha512-rzR+cByjNG9M/UskU5vNoH7cUc6oM8STTDFKOZmnlX4ALOuM1+61CBjsNTGETWfo9a/h5mbGX02oh5/iNAa7vA==
 
 ngx-mapbox-gl@3.0.1:
   version "3.0.1"

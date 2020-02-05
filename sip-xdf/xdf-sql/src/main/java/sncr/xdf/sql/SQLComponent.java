@@ -1,7 +1,8 @@
 package sncr.xdf.sql;
 
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.alert.AlertQueueManager;
@@ -23,7 +24,7 @@ import sncr.xdf.context.XDFReturnCode;
  */
 public class SQLComponent extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
-    private static final Logger logger = Logger.getLogger(SQLComponent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SQLComponent.class);
     private Map<String, SQLDescriptor> resultDataSets;
     JobExecutor executor;
 
@@ -49,19 +50,19 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
             executor = new JobExecutor(ctx, inputDataSets, outputDataSets);
             String script;
             if (ctx.componentConfiguration.getSql().getScriptLocation().equalsIgnoreCase("inline")) {
-                logger.debug("Script is inline encoded");
+                LOGGER.debug("Script is inline encoded");
                 script = new String (Base64.getDecoder().decode(ctx.componentConfiguration.getSql().getScript()));
             }
             else {
                 String pathToSQLScript = getScriptFullPath();
-                logger.debug("Path to script: " + pathToSQLScript);
+                LOGGER.trace("Path to script: {}" + pathToSQLScript);
                 try {
                     script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
                     throw new XDFException(XDFReturnCode.CONFIG_ERROR, e, "Part to SQL script is not correct: " + pathToSQLScript);
                 }
             }
-            logger.trace("Script to execute:\n" +  script);
+            LOGGER.trace("Script to execute:\n" +  script);
             executor.analyze(script);
             String tempDir = generateTempLocation(new WithDataSetService.DataSetServiceAux(ctx, md),  null, null);
             int status = executor.start(tempDir);
@@ -75,12 +76,12 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
                 alertQueueManager.sendMessageToStream(ctx.componentConfiguration.getSql()
                     .getAlerts().getDatapod(),createdTime
                 );
-                logger.info("Alert configure for the dataset sent notification to stream");
+                LOGGER.info("Alert configure for the dataset sent notification to stream");
             }
             return status;
         } catch (Exception e) {
-            error = "SQL Executor runtime exception: " + e.getMessage();
-            logger.error(e);
+            error = "SQL Executor runtime exception: {}" + e.getMessage();
+            LOGGER.error(error);
             return -1;
         }
     }
@@ -120,7 +121,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
 
     private String getScriptFullPath() {
         String sqlScript = ctx.componentConfiguration.getSql().getScriptLocation() + Path.SEPARATOR + ctx.componentConfiguration.getSql().getScript();
-        logger.debug(String.format("Get script %s in location: ", sqlScript));
+        LOGGER.debug(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
 
@@ -131,22 +132,22 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
         if (executor.getResultDataSets() == null ||
             executor.getResultDataSets().size() == 0 )
         {
-            logger.warn("Component does not produce any Data Sets");
+            LOGGER.warn("Component does not produce any Data Sets");
             return 0;
         }
 
         resultDataSets = executor.getResultDataSets();
 
-        logger.debug("Result datasets " + resultDataSets);
-        logger.debug("Output datasets " + outputDataSets);
+        LOGGER.debug("Result data sets : {} ", resultDataSets);
+        LOGGER.debug("Output data sets : {}", outputDataSets);
         outputDataSets.forEach(
             (on, obDesc) ->
             {
                 SQLDescriptor descriptor = resultDataSets.get(on);
-                logger.debug("SQL Descriptor for " + on + " = " + descriptor);
+                LOGGER.debug("SQL Descriptor for " + on + " = " + descriptor);
 
                 if (descriptor != null) {
-                    logger.info("Generating MoveDataDescriptor for " + on + " description " + obDesc);
+                    LOGGER.info("Generating MoveDataDescriptor for {} description {}",on, obDesc);
                     List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
                     String partKeys = on + ": ";
 
@@ -157,7 +158,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
                             (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
                     resultDataDesc.add(desc);
 
-                    logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
+                    LOGGER.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
                             obDesc.get(DataSetProperties.Name.name()),
                             obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
                 }

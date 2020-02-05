@@ -39,7 +39,7 @@ public class Ccode {
             byte[] encrypted = cipher.doFinal(password.getBytes());
             return  Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
             return null;
         }
     }
@@ -62,7 +62,7 @@ public class Ccode {
             byte[] original = cipher.doFinal(encrypted);
             return new String(original);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
             return null;
         }       
     }

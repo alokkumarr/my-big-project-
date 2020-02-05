@@ -22,10 +22,10 @@ public class SawWebApplication  extends SpringBootServletInitializer{
 	protected SpringApplicationBuilder configure(
 			SpringApplicationBuilder builder) {
 		return builder.sources(SawWebApplication.class);
-	}	
-	
+	}
+
     public static void main(String[] args) {
-    	SpringApplication.run(SawWebApplication.class, args);    	
+    	SpringApplication.run(SawWebApplication.class, args);
     }
-	
+
 }

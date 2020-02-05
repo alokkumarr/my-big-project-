@@ -5,6 +5,7 @@ import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.model.Field;
+import java.util.Map.Entry;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
@@ -17,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -166,15 +168,15 @@ public class XlsxExporter implements IFileExporter {
     // Create instance here to optimize apache POI cell style
     String[] header = null;
     CellStyle cellStyle = workBook.createCellStyle();
-    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(analysis);
+    Map<String, String> columnHeaderMap = ExportUtils.buildColumnHeaderMap(analysis);
     for (int rowNum = 0; rowNum < recordRow.size() && rowNum <= limitToExport; rowNum++) {
       SXSSFRow excelRow = workSheet.createRow(rowCount.intValue() + rowNum);
       Object data = recordRow.get(rowNum);
 
       if (data instanceof LinkedHashMap) {
         if (exportBean.getColumnHeader() == null || exportBean.getColumnHeader().length == 0) {
-          Object[] obj = columnHeader != null && !columnHeader.isEmpty() ?
-              columnHeader.keySet().toArray() : ((LinkedHashMap) data).keySet().toArray();
+          Object[] obj = columnHeaderMap != null && !columnHeaderMap.isEmpty() ?
+              columnHeaderMap.keySet().toArray() : ((LinkedHashMap) data).keySet().toArray();
           header = Arrays.copyOf(obj, obj.length, String[].class);
 
           // set column header to export bean
@@ -205,13 +207,13 @@ public class XlsxExporter implements IFileExporter {
           }
 
           exportBean.setColumnDataType(columnDataType);
-          addReportHeaderRow(exportBean, workBook, workSheet, columnHeader);
+          addReportHeaderRow(exportBean, workBook, workSheet, columnHeaderMap);
         } else if (header == null || header.length <= 0) {
           header = exportBean.getColumnHeader();
           if (rowCount == 1)
-            addReportHeaderRow(exportBean, workBook, workSheet, columnHeader);
+            addReportHeaderRow(exportBean, workBook, workSheet, columnHeaderMap);
         }
-        buildReportXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
+        buildReportXlsxCells(exportBean, workBook, header, columnHeaderMap, cellStyle, excelRow, (LinkedHashMap) data);
       }
     }
   }
@@ -290,14 +292,44 @@ public class XlsxExporter implements IFileExporter {
       ExportBean exportBean,
       Workbook workBook,
       String[] header,
+      Map<String, String> columnHeaderMap,
       CellStyle cellStyle,
       SXSSFRow excelRow,
       LinkedHashMap data) {
 
     int colNum = 0;
-    for (String val : header) {
-      if (val instanceof String) {
-        String value = String.valueOf(data.get(val));
+
+    LinkedCaseInsensitiveMap<Object> caseInsensitiveData = ExportUtils.convert(data);
+
+    if (columnHeaderMap == null || columnHeaderMap.isEmpty()) {
+      for (String val : header) {
+        if (val instanceof String) {
+          String value = String.valueOf(data.get(val));
+          DataField.Type[] types = exportBean.getColumnDataType();
+          SXSSFCell cell = excelRow.createCell(colNum);
+          if (types != null && types.length > 0) {
+            DataField.Type colType = exportBean.getColumnDataType()[colNum];
+            String dataType = colType != null ? colType.value() : null;
+            addXlsxCell(value, cell, dataType, workBook, cellStyle);
+          }
+          colNum++;
+        }
+      }
+    } else {
+      for (Entry<String, String> entry : columnHeaderMap.entrySet()) {
+        String entryKey = entry.getKey();
+        String entryValue = entry.getValue();
+
+        String value = null;
+
+        if (caseInsensitiveData.get(entryKey) != null) {
+          value = String.valueOf(caseInsensitiveData.get(entryKey));
+        } else if (caseInsensitiveData.get(entryValue) != null) {
+          value = String.valueOf(caseInsensitiveData.get(entryValue));
+        } else {
+          value = "null";
+        }
+
         DataField.Type[] types = exportBean.getColumnDataType();
         SXSSFCell cell = excelRow.createCell(colNum);
         if (types != null && types.length > 0) {

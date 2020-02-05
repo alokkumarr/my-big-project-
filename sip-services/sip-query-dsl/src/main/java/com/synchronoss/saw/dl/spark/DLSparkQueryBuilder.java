@@ -1,6 +1,7 @@
 package com.synchronoss.saw.dl.spark;
 
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
@@ -19,6 +20,7 @@ import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,7 +54,6 @@ public class DLSparkQueryBuilder {
   public static final String JOIN = "JOIN";
   public static final String SPACE = " ";
   public static final String ORDER_BY = "ORDER BY";
-
 
   List<String> groupByColumns = new ArrayList<>();
 
@@ -93,6 +94,7 @@ public class DLSparkQueryBuilder {
                     Aggregate aggregate = field.getAggregate();
                     String artifactName = artifact.getArtifactsName();
                     String columnName = field.getColumnName();
+                    String aliasName = field.getAlias();
                     if (aggregate != null && !aggregate.value().isEmpty()) {
                       aggCount.getAndIncrement();
                       if (aggregate == Aggregate.DISTINCTCOUNT) {
@@ -101,21 +103,6 @@ public class DLSparkQueryBuilder {
                         column = buildForPercentage(artifactName, field);
                         groupByColumns.add(artifactName + "." + columnName);
                       } else {
-                        if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
-                          column =
-                              aggregate.value()
-                                  + "("
-                                  + artifactName
-                                  + "."
-                                  + columnName.replace(".keyword", "")
-                                  + ") as `"
-                                  + aggregate.value()
-                                  + "("
-                                  + artifactName
-                                  + "_"
-                                  + columnName
-                                  + ")` ";
-                        } else {
                           column =
                               aggregate.value()
                                   + "("
@@ -123,12 +110,18 @@ public class DLSparkQueryBuilder {
                                   + "."
                                   + columnName.replace(".keyword", "")
                                   + ")";
-                        }
+                          if (!StringUtils.isBlank(aliasName)) {
+                            column += " AS `" + aliasName + "`";
+                          }
                       }
                     } else {
                       column = artifactName + "." + columnName.replace(".keyword", "");
                       groupByColumns.add(column);
-                      column = alias4CustomerCodeField(column, columnName, artifactName);
+
+                      String alias = field.getAlias();
+                      if (!StringUtils.isBlank(alias)) {
+                        column = column + " AS `" + alias + "`";
+                      }
                     }
                     selectColumns.add(column);
                   });
@@ -561,27 +554,27 @@ public class DLSparkQueryBuilder {
   private String buildDistinctCount(String artifactName, Field field) {
     String columnName = field.getColumnName().replace(".keyword", "");
     String column = null;
-    if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
-      column =
-          "count(distinct "
-              + artifactName
-              + "."
-              + columnName
-              + ") as `distinctCount("
-              + artifactName
-              + "_"
-              + columnName
-              + ")`";
+
+    String aliasName = field.getAlias();
+    column =
+        "count(distinct "
+            + artifactName
+            + "."
+            + field.getColumnName().replace(".keyword", "")
+            + ") as ";
+
+    StringBuilder aliasBuilder = new StringBuilder();
+    aliasBuilder.append("`");
+
+    if (StringUtils.isBlank(aliasName)) {
+      aliasBuilder.append("distinctCount(").append(field.getColumnName()).append(")");
     } else {
-      column =
-          "count(distinct "
-              + artifactName
-              + "."
-              + field.getColumnName().replace(".keyword", "")
-              + ") as `distinctCount("
-              + field.getColumnName()
-              + ")`";
+      aliasBuilder.append(aliasName);
     }
+
+    aliasBuilder.append("`");
+
+    column += aliasBuilder.toString();
     return column;
   }
 
@@ -618,6 +611,7 @@ public class DLSparkQueryBuilder {
   private String buildForPercentage(String artifactName, Field field) {
     String buildPercentage = "";
     String columnName = field.getColumnName();
+    String aliasName = field.getAlias();
     if (artifactName != null && !artifactName.trim().isEmpty() && columnName != null) {
       buildPercentage =
           buildPercentage.concat(
@@ -631,9 +625,22 @@ public class DLSparkQueryBuilder {
                   + columnName
                   + ") FROM "
                   + artifactName
-                  + ") as `percentage("
-                  + columnName
-                  + ")`");
+                  + ") as ");
+
+      StringBuilder aliasBuilder = new StringBuilder();
+      if (StringUtils.isBlank(aliasName)) {
+        aliasBuilder
+            .append("`")
+            .append("percentage")
+            .append("(")
+            .append(columnName)
+            .append(")")
+            .append("`");
+      } else {
+        aliasBuilder.append("`").append(aliasName).append("`");
+      }
+
+      buildPercentage += aliasBuilder.toString();
     }
 
     return buildPercentage;
@@ -658,22 +665,6 @@ public class DLSparkQueryBuilder {
     return strList.stream().map(addQuotes).collect(Collectors.joining(", "));
   }
 
-  /**
-   * Handling customerCode field present in table joins.
-   *
-   * @param column
-   * @param columnName
-   * @param artifactName
-   * @return
-   */
-  public String alias4CustomerCodeField(String column, String columnName, String artifactName) {
-    if (columnName.equalsIgnoreCase(CUSTOMER_CODE))  {
-      column = column.concat(" as " + artifactName + "_" + columnName + " ");
-      return column;
-    }
-    return column;
-  }
-
   public static String dskForManualQuery(
       SipQuery sipQuery, String query, SipDskAttribute attribute) {
     StringBuffer dskFilter13 = new StringBuffer();
@@ -685,7 +676,7 @@ public class DLSparkQueryBuilder {
       for (Artifact artifact : artifacts) {
         String artifactName = artifact.getArtifactsName();
         StringBuffer dskFilter = new StringBuffer();
-        dskFilter.append(String.format(" (SELECT * FROM %s WHERE ",artifactName));
+        dskFilter.append(String.format(" (SELECT * FROM %s WHERE ", artifactName));
         if (query.toUpperCase().contains(artifactName)) {
           String dskFormedQuery = dskQueryForArtifact(attribute, artifactName);
           logger.info("dskformed query = " + dskFormedQuery);
@@ -697,14 +688,13 @@ public class DLSparkQueryBuilder {
             /*added below line for SIP-9839 ,for  $ character in string the replacement(replaceAll method) replacing $ as well
             ,so to handle that  replacing $ with escapecharacter and $ */
             String dskFilterString = dskFilter.toString().replaceAll("\\$", "\\\\\\$");
-              query =
+            query =
                 query
                     .trim()
                     .replaceAll("\\s{2,}", " ")
                     .replaceAll("(?i)" + artName.toUpperCase(), "FROM " + dskFilterString);
             String artName1 = "JOIN " + artifactName;
-            query =
-                query.replaceAll("(?i)" + artName1.toUpperCase(), "JOIN " + dskFilterString);
+            query = query.replaceAll("(?i)" + artName1.toUpperCase(), "JOIN " + dskFilterString);
             logger.info("Logged query : " + query);
           }
         }
@@ -715,8 +705,7 @@ public class DLSparkQueryBuilder {
     return query;
   }
 
-  public static String dskQueryForArtifact(
-      SipDskAttribute attribute, String arifactName) {
+  public static String dskQueryForArtifact(SipDskAttribute attribute, String arifactName) {
     boolean flag = true;
     String boolenaCriteria = null;
     StringBuilder dskquery = new StringBuilder();
@@ -793,8 +782,7 @@ public class DLSparkQueryBuilder {
    * @param sipDskAttribute DataSecurityKey Object
    * @return sipQuery semantic sipQuery
    */
-  public String buildDskQuery(
-      SipQuery sipQuery, SipDskAttribute sipDskAttribute) {
+  public String buildDskQuery(SipQuery sipQuery, SipDskAttribute sipDskAttribute) {
     booleanCriteria = sipQuery.getBooleanCriteria();
     StringBuilder select = new StringBuilder(SELECT).append(SPACE);
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
@@ -816,9 +804,7 @@ public class DLSparkQueryBuilder {
           .append(")")
           .append(SPACE);
     }
-    select
-        .append(queryDskBuilder(sipDskAttribute, sipQuery))
-        .append(buildGroupBy());
+    select.append(queryDskBuilder(sipDskAttribute, sipQuery)).append(buildGroupBy());
 
     String sort = buildSort(sipQuery.getSorts());
     if (sort != null && !StringUtils.isEmpty(sort)) {
@@ -833,8 +819,7 @@ public class DLSparkQueryBuilder {
    * @param sipQuery
    * @return
    */
-  public static String queryDskBuilder(
-      SipDskAttribute sipDskAttribute, SipQuery sipQuery) {
+  public static String queryDskBuilder(SipDskAttribute sipDskAttribute, SipQuery sipQuery) {
     StringBuilder dskFilter = new StringBuilder();
     if (sipDskAttribute != null
         && (sipDskAttribute.getBooleanCriteria() != null

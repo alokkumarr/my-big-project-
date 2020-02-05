@@ -149,7 +149,8 @@ export interface DesignerChangeEvent {
     | 'derivedMetricAdded'
     | 'addNewDerivedMetric'
     | 'updateDerivedMetric'
-    | 'mapSettings';
+    | 'mapSettings'
+    | 'seriesColorChange';
   column?: ArtifactColumn;
   data?: any;
 }
