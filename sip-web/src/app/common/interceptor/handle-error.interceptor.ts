@@ -14,6 +14,7 @@ const ERROR_TITLE_LENGTH = 30;
 import { CUSTOM_HEADERS } from '../consts';
 
 import { ToastService } from '../services/toastMessage.service';
+import { UserService } from '../services';
 
 @Injectable()
 export class HandleErrorInterceptor implements HttpInterceptor {
@@ -27,7 +28,10 @@ export class HandleErrorInterceptor implements HttpInterceptor {
     let newReq = req;
     // send the newly created request
     /* Don't show errors from validate token requests */
-    if (/validateToken/.test(req.url)) {
+    if (
+      /validateToken/.test(req.url) ||
+      new RegExp(UserService.refreshTokenEndpoint).test(req.url)
+    ) {
       showToast = false;
     }
     if (req.headers.has(CUSTOM_HEADERS.SKIP_TOAST)) {
