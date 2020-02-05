@@ -3,7 +3,12 @@ package com.synchronoss.saw.workbench.executor.service;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import org.ojai.DocumentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Workbench preview builder. Used for creating a MapR-DB document for storing a Workbench preview.
+ */
 /**
  * Workbench preview builder. Used for creating a MapR-DB document for storing a Workbench preview.
  */

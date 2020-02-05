@@ -195,8 +195,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
      */
     executor.createPreview(id, location, previewLimit, previewsTablePath, project, name);
     
-    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "queued");
-    preview.insert();
+   
     /*
      * Return generated preview ID to client to be used for retrieving preview data
      */
@@ -210,12 +209,14 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
   @Override
   public ObjectNode getPreview(String previewId) throws Exception {
-	    log.debug("Getting dataset transformation preview");
+	    log.debug("######Getting dataset transformation preview for previewId"+ previewId);
 	    /* Locate the preview data in MapR-DB */
 	    Table table = MapRDB.getTable(previewsTablePath);
 	    Document doc = table.findById(previewId);
+	    log.debug("document retrived ????"+ doc);
 	    /* Return the preview data */
 	    if (doc == null) {
+	    	log.debug("######### document not generated yet");
 	      return null;
 	    }
 	    JsonNode json = mapper.readTree(doc.toString());

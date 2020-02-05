@@ -139,6 +139,7 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 
 	@Override
 	public ObjectNode createPreview(String id, String location, String previewLimit, String previewsTablePath, String project, String name) {
+		
 		logger.debug("###### Creating preview .....######");
 		logger.debug("#### id ::"+ id);
 		logger.debug("#### location ::"+ location);
@@ -153,18 +154,12 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "success");
 	    DocumentBuilder document = preview.getDocumentBuilder();
 	    document.putNewArray("rows");
-	    logger.debug("###### creating spark session from workbench-executor configuration .....######");
-	    SparkSession sparkSession =  SparkSession
+	    SparkSession session = SparkSession
 	            .builder()
 	            .config(SparkConfig.sparkConfig)
 	            .getOrCreate();
-	    
-	    logger.debug("###### created spark session from workbench-executor configuration .....######");
-	    logger.debug("##### getting dataset from lcoation ####"+ location);
-	    Dataset<Row> dataset = getDataset(sparkSession, location); 
-	    
+	    Dataset<Row> dataset = getDataset(session, location);
 	    if (dataset != null) {
-	    	logger.debug("Dataset created Successfully !!####");
 	      StructField[] fields = dataset.schema().fields();
 	      Iterator<Row> rows = dataset.limit(Integer.valueOf(previewLimit)).toLocalIterator();
 	      rows.forEachRemaining(
@@ -174,23 +169,23 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	              if (row.isNullAt(i)) {
 	                continue;
 	              }
-	              //String name = fields[i].name();
+	              String fieldName = fields[i].name();
 	              DataType dataType = fields[i].dataType();
 	              if (dataType.equals(DataTypes.StringType)) {
-	                document.put(name, row.getString(i));
+	                document.put(fieldName, row.getString(i));
 	              } else if (dataType.equals(DataTypes.IntegerType)) {
-	                document.put(name, row.getInt(i));
+	                document.put(fieldName, row.getInt(i));
 	              } else if (dataType.equals(DataTypes.LongType)) {
-	                document.put(name, row.getLong(i));
+	                document.put(fieldName, row.getLong(i));
 	              } else if (dataType.equals(DataTypes.FloatType)) {
-	                document.put(name, row.getFloat(i));
+	                document.put(fieldName, row.getFloat(i));
 	              } else if (dataType.equals(DataTypes.DoubleType)) {
-	                document.put(name, row.getDouble(i));
+	                document.put(fieldName, row.getDouble(i));
 	              } else if (dataType.equals(DataTypes.TimestampType)) {
-	                document.put(name, row.getTimestamp(i).toString());
+	                document.put(fieldName, row.getTimestamp(i).toString());
 	              } else {
 	                log.warn("Unhandled Spark data type: {}", dataType);
-	                document.put(name, row.get(i).toString());
+	                document.put(fieldName, row.get(i).toString());
 	              }
 	            }
 	            document.endMap();
@@ -200,6 +195,7 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	    preview.insert();
 	    log.info("Finished preview job");
 	    return null;
+		
 	  }
 	
 
