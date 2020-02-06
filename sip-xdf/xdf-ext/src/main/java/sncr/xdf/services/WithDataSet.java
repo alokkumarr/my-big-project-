@@ -461,9 +461,6 @@ public interface WithDataSet {
                     DSCategory categoryConstant = DSCategory.fromValue(category);
                     dsCategoryArray.add(new JsonPrimitive(categoryConstant.toString()));
                 }
-                if(!categories.contains(DSCategory.DEFAULT.toString())) {
-                    dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.toString()));
-                }
             }
             userData.add(DataSetProperties.Category.name(),dsCategoryArray);
         }
