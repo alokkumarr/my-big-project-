@@ -166,7 +166,7 @@
       <pre>{{ artifactColumn.formula }}</pre>
     </div>
 
-    <div *ngIf="isDataField">
+    <div *ngIf="isDataField && analysisType == 'chart'">
       <custom-color-picker
         [config]="colorPickerConfig"
         (change)="selectedColor($event)"
