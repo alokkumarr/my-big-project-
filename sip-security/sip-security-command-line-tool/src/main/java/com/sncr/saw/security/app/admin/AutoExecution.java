@@ -24,7 +24,7 @@ public class AutoExecution {
 
   @ShellMethod("Adds auto execution configuration")
   public String autoExecution(
-      @ShellOption(value = "--C", help = "Customer-Code", defaultValue = "_NONE_") String customerCode,
+      @ShellOption(value = "--C", help = "Customer-Code") String customerCode,
       @ShellOption(value = "--F", help = "Active Status Indicator flag", defaultValue = "1") String activeStatusInd) {
     if (StringUtils.isEmpty(customerCode) || customerCode.equalsIgnoreCase("_NONE_")) {
       logger.error("Missing argument!! Use 'help command to print usage!!");

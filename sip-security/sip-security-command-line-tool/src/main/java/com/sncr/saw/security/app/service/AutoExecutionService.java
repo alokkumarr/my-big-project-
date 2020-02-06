@@ -38,6 +38,10 @@ public class AutoExecutionService {
     cv.setFilterByCustCode(customer.getIsJvCustomer() == 1 ? 0 : 1);
     ConfigValDetails cvd = getConfigDetails(cv.getConfigValObjGroup());
     if (cvd != null && !StringUtils.isEmpty(cvd.getConfigValObjGroup())) {
+      if (cv.getActiveStatusInd() == cvd.getActiveStatusInd()) {
+        throw new IllegalArgumentException(
+            "Same entry is already present in the system!! No update required!!");
+      }
       return updateConfigValue(cv.getConfigValObjGroup(),cv.getActiveStatusInd());
     }
      return configValRepositoryDao.addConfigVal(cv);
