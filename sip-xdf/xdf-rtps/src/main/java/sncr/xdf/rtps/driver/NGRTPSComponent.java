@@ -30,8 +30,9 @@ import sncr.xdf.ngcomponent.WithSpark;
 import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
-import sncr.xdf.exceptions.XDFException.ErrorCodes;
 import sncr.xdf.rtps.driver.EventProcessingApplicationDriver;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 
 public class NGRTPSComponent extends AbstractComponent
@@ -52,28 +53,31 @@ public class NGRTPSComponent extends AbstractComponent
 	    }
 	@Override
 	protected int execute() {
-		logger.debug("########rtps execute started#######");
-        EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
-        logger.debug("######## reading config path "+ this.configPath);
-        String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
-        ComponentConfiguration config = null;
         try {
-        	config = NGRTPSComponent.analyzeAndValidate(configAsStr);
-		} catch (Exception ex) {
-			// TODO Auto-generated catch block
-			logger.error(ex.getMessage());
-		}
-		Rtps rtpsProps = config.getRtps();
-		
-		if(ngctx == null) {
-			driver.run(rtpsProps, Optional.empty(), Optional.empty());
-		} else {
-			driver.run(rtpsProps, Optional.of(ngctx), Optional.of(ctx));
-	        
-		}
-        
-       // ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());
-		logger.debug("########rtps execute completed#######");
+            logger.debug("########rtps execute started#######");
+            EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
+            logger.debug("######## reading config path " + this.configPath);
+            String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
+            ComponentConfiguration config = null;
+            config = NGRTPSComponent.analyzeAndValidate(configAsStr);
+            Rtps rtpsProps = config.getRtps();
+
+            if (ngctx == null) {
+                driver.run(rtpsProps, Optional.empty(), Optional.empty());
+            } else {
+                driver.run(rtpsProps, Optional.of(ngctx), Optional.of(ctx));
+
+            }
+            // ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());
+            logger.debug("########rtps execute completed#######");
+        } catch (Exception e) {
+            logger.error("RTPS Executor exception:", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
+        }
 		return 0;
 	}
 
@@ -89,13 +93,16 @@ public class NGRTPSComponent extends AbstractComponent
 		NGContextServices ngCtxSvc;
 		CliHandler cli = new CliHandler();
 		String cfgLocation;
+        NGRTPSComponent component = null;
+        int rc= 0;
+        Exception exception = null;
 		try {
 			long start_time = System.currentTimeMillis();
 
 			HFileOperations.init(10);
 			logger.debug("Hadoop file system initialized");
 
-			Map<String, Object> parameters = cli.parse(args);
+            Map<String, Object> parameters = cli.parse(args);
 
 			logger.debug("Command line arguments parsing completed");
 
@@ -103,22 +110,22 @@ public class NGRTPSComponent extends AbstractComponent
 
 			String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 
@@ -144,44 +151,37 @@ public class NGRTPSComponent extends AbstractComponent
             logger.warn(id)
         );
         logger.warn(ngCtxSvc.getNgctx().toString());
-        NGRTPSComponent component = new NGRTPSComponent(ngCtxSvc.getNgctx());
+        component = new NGRTPSComponent(ngCtxSvc.getNgctx());
         logger.debug("setting config path "+ cfgLocation);
         component.configPath  = cfgLocation ;
        
         logger.debug("NGRTPSComponent initialized with NgContext");
-        if (!component.initComponent(null))
-            System.exit(-1);
-
-        logger.debug("Invoking run() method.....");
-        int rc = component.run();
-        logger.debug("run() execution completed");
-        long end_time = System.currentTimeMillis();
-        long difference = end_time-start_time;
-        logger.info("Parser total time " + difference );
-        logger.debug("Exiting from RTPS");
+        if (component.initComponent(null)) {
+            logger.debug("Invoking run() method.....");
+            rc = component.run();
+            logger.debug("run() execution completed");
+            long end_time = System.currentTimeMillis();
+            long difference = end_time - start_time;
+            logger.info("Parser total time " + difference);
+            logger.debug("Exiting from RTPS");
+        }
+        }catch (Exception ex) {
+            exception = ex;
+        }
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
         System.exit(rc);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 
 		ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
 		
-		
 		Rtps parserProps = compConf.getRtps();
 		
 		logger.debug("after parsing ::"+ parserProps);
 		if (parserProps == null) {
-			throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+			throw new XDFException(XDFReturnCode.INVALID_CONF_FILE);
 		}
-
-
-
 		return compConf;
 	}
 

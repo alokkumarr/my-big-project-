@@ -385,7 +385,7 @@ class TestDataGenerator {
         productId,
         customerId,
         users.anyUser.email,
-        4
+        Constants.MODULE_ID.WORKBENCH
       ),
       'generateCategory for ' + categories.workbench
     );
@@ -400,7 +400,7 @@ class TestDataGenerator {
         productId,
         customerId,
         users.anyUser.email,
-        4
+        Constants.MODULE_ID.WORKBENCH
       ),
       'generateSubCategory for ' + createSubCategories.workbenchSubCategory
     );
@@ -415,11 +415,43 @@ class TestDataGenerator {
         token,
         productId,
         users.anyUser.email,
-        4
+        Constants.MODULE_ID.WORKBENCH
       ),
       'generatePrivilege for admin with ' +
         createSubCategories.workbenchSubCategory
     );
+
+    // generate prvivilege for alert module --only for admin start
+    utils.validApiCall(
+      adminHelper.generatePrivilege(
+        apiUrl,
+        privileges.view,
+        roles.admin,
+        categories.alertDefault,
+        createSubCategories.alertView,
+        token,
+        productId,
+        users.anyUser.email,
+        Constants.MODULE_ID.ALERT
+      ),
+      'generatePrivilege for admin with ' + createSubCategories.alertView
+    );
+
+    utils.validApiCall(
+      adminHelper.generatePrivilege(
+        apiUrl,
+        privileges.view,
+        roles.admin,
+        categories.alertDefault,
+        createSubCategories.alertCreate,
+        token,
+        productId,
+        users.anyUser.email,
+        Constants.MODULE_ID.ALERT
+      ),
+      'generatePrivilege for admin with ' + createSubCategories.alertCreate
+    );
+    // generate prvivilege for alert module --only for admin done
   }
 }
 

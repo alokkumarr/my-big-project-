@@ -49,6 +49,7 @@ public class DLDataSetOperations {
             ( (file.getName().endsWith(".csv") || file.getName().endsWith(".dat") || file.getName().endsWith(".txt") )&& (!file.getName().startsWith(".")));
 
     public static final String SIMPLE_SAMPLING = "simple";
+    public static final String NONE = "none";
 
 
     private static PARTITION_STRUCTURE checkLevel(FileSystem fileSystem, String glob, List<String> kl) {

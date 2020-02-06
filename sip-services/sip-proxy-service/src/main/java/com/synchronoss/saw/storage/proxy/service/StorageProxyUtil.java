@@ -9,13 +9,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
+import com.synchronoss.bda.sip.dsk.DskDetails;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.TokenParser;
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
@@ -28,8 +30,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -42,6 +46,7 @@ public class StorageProxyUtil {
 
   private static final String METASTORE = "services/metadata";
   private static List<String> dataLakeJunkIds;
+  private static final String KEYWORD = ".keyword";
 
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
@@ -123,18 +128,19 @@ public class StorageProxyUtil {
    * @param restUtil
    * @return list of dsk details
    */
-  public static DataSecurityKeys getDSKDetailsByUser(String securityServiceUrl, String masterLoginId, RestUtil restUtil) {
-		DataSecurityKeys dataSecurityKeys = null;
-  	try {
+  public static DskDetails getDSKDetailsByUser(
+      String securityServiceUrl, String masterLoginId, RestUtil restUtil) {
+    DskDetails dataSecurityObject = null;
+    try {
       RestTemplate restTemplate = restUtil.restTemplate();
-      String url = securityServiceUrl.concat("/dsk?userId=").concat(masterLoginId);
-      logger.trace("SIP security url to fetch DSK details :", url);
+      String url = securityServiceUrl.concat("/dsk/fetch?userId=").concat(masterLoginId);
+      logger.trace("SIP security url to fetch DSK details :{}", url);
 
-			dataSecurityKeys = restTemplate.getForObject(url, DataSecurityKeys.class);
+      dataSecurityObject = restTemplate.getForObject(url, DskDetails.class);
     } catch (Exception ex) {
-      logger.error("Error while fetching DSK details by user", ex.getMessage());
+      logger.error("Error while fetching DSK details by user:{}", ex.getMessage());
     }
-    return dataSecurityKeys;
+    return dataSecurityObject;
   }
 
   /**
@@ -146,7 +152,6 @@ public class StorageProxyUtil {
   public static SipQuery getSipQuery(
       String semanticId,
       String metaDataServiceExport,
-      HttpServletRequest request,
       RestUtil restUtil) {
     logger.info(
         "URI being prepared"
@@ -338,25 +343,91 @@ public class StorageProxyUtil {
    * Validate for same column name present in two tables within a semantic and dsk applied.
    *
    * @param sipQuery Sematic Artifacts definition
-   * @param dsk DataSecurityKey
+   * @param dskAttribute SipDskAttribute
+   * @param analysis
    * @return
    */
-  public static boolean checkSameColumnAcrossTables(SipQuery sipQuery, DataSecurityKey dsk) {
-    List<DataSecurityKeyDef> dataSecurityKeyDefList =
-        dsk.getDataSecuritykey() != null ? dsk.getDataSecuritykey() : null;
-    boolean flag = false;
-    for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-      for (Artifact artifact : sipQuery.getArtifacts()) {
-        for (Field field : artifact.getFields()) {
-          if (flag && field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName())) {
-            return true;
-          }
-          flag =
-              !flag ? field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName()) : flag;
-        }
+  public static boolean isDskColumnNotPresent(
+      SipQuery sipQuery, SipDskAttribute dskAttribute, Analysis analysis) {
+    if (dskAttribute != null
+        && (dskAttribute.getBooleanCriteria() != null && dskAttribute.getBooleanQuery() != null)) {
+      Optional<SipDskAttribute> isColumnNotPresent=
+          dskAttribute.getBooleanQuery().stream()
+              .filter(
+                  sipDskAttribute -> {
+                    String columnName = sipDskAttribute.getColumnName();
+                    if (sipDskAttribute.getBooleanQuery() != null
+                        && (StringUtils.isEmpty(columnName))) {
+                      return isDskColumnNotPresent(sipQuery, sipDskAttribute,analysis);
+                    }
+                    return !checkColumnPresentAcrossTables(sipQuery, columnName,analysis);
+                  })
+              .findFirst();
+      if (isColumnNotPresent.isPresent()) {
+        return true;
       }
     }
     return false;
   }
 
+  private static boolean checkColumnPresentAcrossTables(
+      SipQuery sipQuery, String columnName, Analysis analysis) {
+    Boolean designerEdit = analysis.getDesignerEdit();
+    List<String> artifactNames = null;
+    if (designerEdit == null || !designerEdit) {
+      artifactNames = getArtifactsNames(analysis.getSipQuery());
+    }
+    String query = analysis.getSipQuery().getQuery();
+    outerloop:
+    for (Artifact artifact : sipQuery.getArtifacts()) {
+      Boolean isArtifactPreset;
+      if (designerEdit == null || !designerEdit) {
+        isArtifactPreset = artifactNames.contains(artifact.getArtifactsName().toUpperCase());
+      } else {
+        isArtifactPreset = StringUtils.containsIgnoreCase(query, artifact.getArtifactsName());
+      }
+      if (isArtifactPreset) {
+        for (Field field : artifact.getFields()) {
+          if (field.getColumnName().equalsIgnoreCase(columnName)
+              || field.getColumnName().equalsIgnoreCase(columnName + KEYWORD)) {
+            continue outerloop;
+          }
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * This method will fetch the Analysis definition with SIP-metadata-service
+   *
+   * @param metadataAnalysisUrl Sip metadata service URL
+   * @param analysisId Analysis Id
+   * @param restUtil Restful template
+   * @return Analysis definition
+   */
+  public static Analysis fetchAnalysisDefinition(
+      String metadataAnalysisUrl, String analysisId, RestUtil restUtil) {
+    String dslUrl = metadataAnalysisUrl + "/dslanalysis/" + analysisId + "?internalCall=true";
+    logger.trace("URL for request body :{} ", dslUrl);
+    AnalysisResponse analysisResponse =
+        restUtil.restTemplate().getForObject(dslUrl, AnalysisResponse.class);
+    Analysis analysis = analysisResponse.getAnalysis();
+    return analysis;
+  }
+
+  /**
+   * This method will delete the Analysis with SIP-metadata-service
+   *
+   * @param metadataAnalysisUrl Sip metadata service URL
+   * @param analysisId Analysis Id
+   * @param restUtil Restful template
+   */
+  public static void deleteAnalysis(
+      String metadataAnalysisUrl, String analysisId, RestUtil restUtil) {
+    String dslUrl = metadataAnalysisUrl + "/dslanalysis/" + analysisId + "?internalCall=true";
+    logger.trace("URL for delete analysis :{} ", dslUrl);
+    restUtil.restTemplate().delete(dslUrl);
+  }
 }

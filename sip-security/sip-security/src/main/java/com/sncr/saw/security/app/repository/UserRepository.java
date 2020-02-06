@@ -18,8 +18,7 @@ import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
-
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
+import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.util.List;
 
@@ -70,7 +69,6 @@ public interface UserRepository {
 	boolean checkSubCatExists(CategoryDetails category);
 	Long createAdminUserForOnboarding(User user);
 	Boolean IsTicketValid(String ticketId, String masterLogin);
-	DataSecurityKeys fetchDSKDetailByUserId(String userId);
 	List<CategoryDetails> fetchCategoriesByProdModId(ProductModuleDetails productModuleDetails, Long roleId);
   Long getCustomerSysid(String customerCode);
   Long getSecurityGroupSysid(String dskGroup,Long customerSysId);
@@ -79,4 +77,5 @@ public interface UserRepository {
   Valid addUserDetails(UserDetails userDetails, String masterLoginId);
   List<UserDetails> getUsersDetailList(Long customerId);
   boolean getRoleStatus(Long roleId);
+  DskDetails getUserById(String masterLoginId);
 }

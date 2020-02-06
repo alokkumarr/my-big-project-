@@ -1,5 +1,10 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.deleteAnalysis;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.isDskColumnNotPresent;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +15,12 @@ import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
+import com.synchronoss.bda.sip.dsk.BooleanCriteria;
+import com.synchronoss.bda.sip.dsk.DskDetails;
+import com.synchronoss.bda.sip.dsk.Model;
+import com.synchronoss.bda.sip.dsk.Operator;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
@@ -19,7 +30,6 @@ import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.es.kpi.GlobalFilterDataQueryBuilder;
 import com.synchronoss.saw.es.kpi.KPIDataQueryBuilder;
 import com.synchronoss.saw.model.Aggregate;
-import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Store;
@@ -42,9 +52,14 @@ import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,12 +71,16 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import com.synchronoss.saw.util.BuilderUtil;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 import sncr.bda.base.MaprConnection;
 
 @Service
@@ -73,6 +92,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private final String executionResultTable = "executionResult";
   private final String analysisMetadataTable = "analysisMetadata";
   private static final String METASTORE = "services/metadata";
+  public static final String CUSTOMER_CODE = "customerCode";
+  public static final String REPORT = "REPORT";
+
 
   @Value("${schema.file}")
   private String schemaFile;
@@ -93,6 +115,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Value("${execution.publish-rows-limit}")
   private Integer publishRowLimit;
+
+  @Value("${sip.security.host}")
+  private String sipSecurityHost;
+
+  @Value("${metadata.service.host}")
+  private String metaDataServiceExport;
+
+  @Autowired private RestUtil restUtil;
 
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
@@ -483,28 +513,25 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public List<Object> execute(
       SipQuery sipQuery,
       Integer size,
-      DataSecurityKey dataSecurityKey,
       ExecutionType executionType,
       String analysisType,
-      Boolean designerEdit)
+      Boolean designerEdit,
+      Ticket ticket)
       throws Exception {
     List<Object> result = null;
     if (size == null) {
-      switch (executionType) {
-        case onetime:
-          size = previewRowLimit;
-          break;
-        case regularExecution:
-          size = publishRowLimit;
-          break;
-        case preview:
-          size = previewRowLimit;
-          break;
-        case publish:
-          size = publishRowLimit;
-          break;
+      getExecutionSize(executionType);
+    }
+    SipDskAttribute sipDskAttribute = null;
+    if (ticket != null) {
+      DskDetails dskDetails =
+          getDSKDetailsByUser(sipSecurityHost, ticket.getMasterLoginId(), restUtil);
+      if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
+        sipDskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
       }
     }
+    SipQuery sipQueryFromSemantic =
+        getSipQuery(sipQuery.getSemanticId(), metaDataServiceExport, restUtil);
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       final String executionId = UUID.randomUUID().toString();
       ExecuteAnalysisResponse response;
@@ -512,15 +539,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           dataLakeExecutionService.executeDataLakeReport(
               sipQuery,
               size,
-              dataSecurityKey,
+              sipDskAttribute,
               executionType,
               designerEdit,
               executionId,
               null,
-              null);
+              null,
+              sipQueryFromSemantic);
       result = (List<Object>) (response.getData());
     } else {
-      result = executeESQueries(sipQuery, size, dataSecurityKey);
+      result = executeESQueries(sipQuery, size, sipDskAttribute);
     }
 
     return result;
@@ -531,8 +559,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    *
    * @param analysis Analysis.
    * @param size Integer.
-   * @param dataSecurityKey DataSecurityKey.
    * @param executionType ExecutionType.
+   * @param masterLoginId
+   * @param authTicket
+   * @param queryId
    * @return ExecuteAnalysisResponse
    */
   @Override
@@ -541,8 +571,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Integer size,
       Integer page,
       Integer pageSize,
-      DataSecurityKey dataSecurityKey,
-      ExecutionType executionType)
+      ExecutionType executionType,
+      String masterLoginId,
+      Ticket authTicket,
+      String queryId,
+      boolean isScheduledExecution)
       throws Exception {
     String analysisType = analysis.getType();
     Boolean designerEdit = analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
@@ -550,52 +583,293 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     final String executionId = UUID.randomUUID().toString();
     ExecuteAnalysisResponse response;
     if (size == null) {
-      switch (executionType) {
-        case onetime:
-          size = previewRowLimit;
-          break;
-        case regularExecution:
-          size = publishRowLimit;
-          break;
-        case preview:
-          size = previewRowLimit;
-          break;
-        case publish:
-          size = publishRowLimit;
-          break;
-      }
+      size = getExecutionSize(executionType);
     }
+    SipQuery sipQueryFromSemantic =
+        getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, restUtil);
+    SipDskAttribute dskAttribute = null;
+    DskDetails dskDetails=null;
+    boolean filterDSKByCustomerCode;
+    String customerCode;
+    if (isScheduledExecution) {
+      masterLoginId =
+          (masterLoginId != null && !StringUtils.isEmpty(masterLoginId))
+              ? masterLoginId
+              : authTicket.getMasterLoginId();
+       dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
+      if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
+        dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+      }
+      filterDSKByCustomerCode = dskDetails != null
+          && dskDetails.getIsJvCustomer() != 1;
+      customerCode = filterDSKByCustomerCode ? dskDetails.getCustomerCode() : null;
+    } else {
+      dskAttribute = authTicket.getSipDskAttribute();
+      filterDSKByCustomerCode = authTicket.getIsJvCustomer() != 1
+          && authTicket.getFilterByCustomerCode() == 1;
+      customerCode = authTicket.getCustCode();
+    }
+    if (isDskColumnNotPresent(sipQueryFromSemantic, dskAttribute,analysis)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "DSK column mandatory!!"
+              + " DSK column is missing in the semantic!!");
+    }
+    dskAttribute = updateDskAttribute(dskAttribute, customerCode, filterDSKByCustomerCode);
+
+    Long startTime = new Date().getTime();
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       response =
           dataLakeExecutionService.executeDataLakeReport(
               sipQuery,
               size,
-              dataSecurityKey,
+              dskAttribute,
               executionType,
               designerEdit,
               executionId,
               page,
-              pageSize);
+              pageSize,
+              sipQueryFromSemantic);
     } else {
       response = new ExecuteAnalysisResponse();
-      List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
+      List<Object> objList = executeESQueries(sipQuery, size, dskAttribute);
       response.setExecutionId(executionId);
       response.setData(objList);
       response.setTotalRows(objList != null ? objList.size() : 0L);
     }
+    saveExecutionResult(
+        executionType, response, analysis, startTime, authTicket, queryId, dskAttribute);
+    if (!REPORT.equalsIgnoreCase(analysis.getType())) {
+
+      // return only requested data based on page no and page size, only for FE
+      List<Object> pagingData = pagingData(page, pageSize, (List<Object>) response.getData());
+      /* If FE is sending the page no and page size then we are setting only   data that
+       * corresponds to page no and page size in response instead of  total data.
+       * For DL reports skipping this step as response from DL is already paginated.
+       * */
+      response.setData(
+          pagingData != null && pagingData.size() > 0 ? pagingData : response.getData());
+      // return user id with data in execution results
+    }
+    response.setUserId(masterLoginId);
+    if (executionType == ExecutionType.scheduled) {
+      ObjectMapper objectMapper = new ObjectMapper();
+      response.setData(null);
+      logger.trace(
+          "Response returned back to scheduler {}", objectMapper.writeValueAsString(response));
+    }
     return response;
   }
 
+  private SipDskAttribute updateDskAttribute(
+      SipDskAttribute dskAttribute,
+      String custCode,
+      boolean filterDSKByCustomerCode) {
+    // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
+    // code.
+    if (filterDSKByCustomerCode) {
+      try {
+        SipDskAttribute sipDskCustomerFilterAttribute = new SipDskAttribute();
+        sipDskCustomerFilterAttribute.setBooleanCriteria(BooleanCriteria.AND);
+        List<SipDskAttribute> attributeList = new ArrayList<>();
+        SipDskAttribute attribute = new SipDskAttribute();
+        attribute.setColumnName(CUSTOMER_CODE);
+        Model model = new Model();
+        model.setOperator(Operator.ISIN);
+        model.setValues(Collections.singletonList(custCode));
+        attribute.setModel(model);
+        attributeList.add(attribute);
+        if (dskAttribute != null) {
+          attributeList.add(dskAttribute);
+        }
+        sipDskCustomerFilterAttribute.setBooleanQuery(attributeList);
+        logger.trace("SipDskAttribute with customer  filter is:{}", sipDskCustomerFilterAttribute);
+        return sipDskCustomerFilterAttribute;
+      } catch (Exception e) {
+        logger.error("Exception occured while updatinng attributes");
+      }
+    }
+    return dskAttribute;
+  }
+
+    private void saveExecutionResult(
+      ExecutionType executionType,
+      ExecuteAnalysisResponse executeResponse,
+      Analysis analysis,
+      Long startTime,
+      Ticket authTicket,
+      String queryId,
+      SipDskAttribute dskAttribute) {
+    {
+      // Execution result will one be stored, if execution type is publish or Scheduled.
+      boolean validExecutionType =
+          executionType.equals(ExecutionType.publish)
+              || executionType.equals(ExecutionType.scheduled);
+
+      boolean tempExecutionType =
+          executionType.equals(ExecutionType.onetime)
+              || executionType.equals(ExecutionType.preview)
+              || executionType.equals(ExecutionType.regularExecution);
+      String executedBy = authTicket != null ? authTicket.getMasterLoginId() : "scheduled";
+      Analysis parentAnalysisDef = null;
+      if (ExecutionType.publish.equals(executionType)) {
+        if (isParentAnalysisIdExists(analysis)) {
+          parentAnalysisDef =
+              StorageProxyUtil.fetchAnalysisDefinition(
+                  metaDataServiceExport, analysis.getParentAnalysisId(), restUtil);
+          if (isPublishigChildToParentCat(analysis, parentAnalysisDef)) {
+            queryId = parentAnalysisDef.getId();
+          }
+        }
+      }
+      if (validExecutionType) {
+        ExecutionResult executionResult =
+            buildExecutionResult(
+                executeResponse.getExecutionId(),
+                analysis,
+                queryId,
+                startTime,
+                executedBy,
+                executionType,
+                dskAttribute,
+                (List<Object>) executeResponse.getData());
+        saveDslExecutionResult(executionResult);
+      }
+      // For published analysis, update analysis metadata table with the category information.
+      if (ExecutionType.publish.equals(executionType)) {
+        Analysis analysisDefinitionToUpdate = null;
+        boolean isChildAndParentSameCatgry = false;
+        if (isPublishigChildToParentCat(analysis, parentAnalysisDef)) {
+          logger.trace("Merging the Analysis of parent with child");
+          isChildAndParentSameCatgry = true;
+          String childAnalysisId = analysis.getId();
+          analysisDefinitionToUpdate =
+              StorageProxyUtil.fetchAnalysisDefinition(
+                  metaDataServiceExport, childAnalysisId, restUtil);
+          analysisDefinitionToUpdate.setParentAnalysisId(null);
+          analysisDefinitionToUpdate.setId(parentAnalysisDef.getId());
+          // Update the new category Id for publish feature
+          analysisDefinitionToUpdate.setCategory(analysis.getCategory());
+          updatePublishAnalysis(analysisDefinitionToUpdate, authTicket);
+          deleteAnalysis(metaDataServiceExport, childAnalysisId, restUtil);
+        }
+        if (!isChildAndParentSameCatgry) {
+          analysisDefinitionToUpdate =
+              StorageProxyUtil.fetchAnalysisDefinition(
+                  metaDataServiceExport, analysis.getId(), restUtil);
+          // Update the new category Id for publish feature
+          analysisDefinitionToUpdate.setCategory(analysis.getCategory());
+          updatePublishAnalysis(analysisDefinitionToUpdate, authTicket);
+        }
+      }
+
+      if (!analysis.getType().equalsIgnoreCase("report")) {
+        logger.info("analysis ." + "not a DL report");
+        if (tempExecutionType) {
+          ExecutionResult executionResult =
+              buildExecutionResult(
+                  executeResponse.getExecutionId(),
+                  analysis,
+                  queryId,
+                  startTime,
+                  executedBy,
+                  executionType,
+                  dskAttribute,
+                  (List<Object>) executeResponse.getData());
+          saveTtlExecutionResult(executionResult);
+        }
+      }
+    }
+  }
+
+  private Boolean isParentAnalysisIdExists(Analysis analysis) {
+    return StringUtils.isNotBlank(analysis.getParentAnalysisId()) ? true : false;
+  }
+
+  private Boolean isPublishigChildToParentCat(Analysis analysis, Analysis parentAnalysis) {
+    if (analysis != null && parentAnalysis != null) {
+      return parentAnalysis.getCategory().equalsIgnoreCase(analysis.getCategory()) ? true : false;
+    }
+    return false;
+  }
+
+    private void updatePublishAnalysis(Analysis analysisDefinitionToUpdate, Ticket authTicket) {
+    if (analysisDefinitionToUpdate.getUserId() == null
+        && authTicket != null
+        && authTicket.getUserId() != null) {
+      analysisDefinitionToUpdate.setUserId(authTicket.getUserId());
+    }
+    if (analysisDefinitionToUpdate.getCreatedTime() == null) {
+      analysisDefinitionToUpdate.setCreatedTime(Instant.now().toEpochMilli());
+    }
+    analysisDefinitionToUpdate.setModifiedTime(Instant.now().toEpochMilli());
+    if (authTicket != null && !authTicket.getUserFullName().isEmpty()) {
+      analysisDefinitionToUpdate.setModifiedBy(authTicket.getUserFullName());
+    }
+    updateAnalysis(analysisDefinitionToUpdate);
+  }
+
+  /**
+   * Build execution result bean.
+   *
+   * @param executionId
+   * @param analysis
+   * @param queryId
+   * @param startTime
+   * @param executedBy
+   * @param executionType
+   * @param data
+   * @return execution
+   */
+  private ExecutionResult buildExecutionResult(
+      String executionId,
+      Analysis analysis,
+      String queryId,
+      Long startTime,
+      String executedBy,
+      ExecutionType executionType,
+      SipDskAttribute sipDskAttribute,
+      List<Object> data) {
+    ExecutionResult executionResult = new ExecutionResult();
+    String type = analysis.getType();
+    executionResult.setExecutionId(executionId);
+    executionResult.setDslQueryId(queryId);
+    executionResult.setAnalysis(analysis);
+    executionResult.setStartTime(startTime);
+    executionResult.setFinishedTime(new Date().getTime());
+    executionResult.setExecutionType(executionType);
+    executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
+    executionResult.setStatus("success");
+    executionResult.setExecutedBy(executedBy);
+    executionResult.setSipDskAttribute(sipDskAttribute);
+    executionResult.setRecordCount(data.size());
+    return executionResult;
+  }
+
+  private Integer getExecutionSize(ExecutionType executionType) {
+    Integer size = null;
+    switch (executionType) {
+      case onetime:
+        size = previewRowLimit;
+        break;
+      case regularExecution:
+        size = publishRowLimit;
+        break;
+      case preview:
+        size = previewRowLimit;
+        break;
+      case publish:
+        size = publishRowLimit;
+        break;
+    }
+    return size;
+  }
+
   private List<Object> executeESQueries(
-      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
+      SipQuery sipQuery, Integer size, SipDskAttribute dskAttribute) throws Exception {
     List<Object> result = null;
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
-    if (dataSecurityKey == null) {
-      logger.info("DataSecurity key is not set !!");
-    } else {
-      logger.info("DataSecurityKey : " + dataSecurityKey.toString());
-    }
     boolean isPercentage =
         dataFields.stream()
             .anyMatch(
@@ -607,7 +881,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             .equalsIgnoreCase(Aggregate.PERCENTAGE.value()));
     if (isPercentage) {
       SearchSourceBuilder searchSourceBuilder =
-          elasticSearchQueryBuilder.percentagePriorQuery(sipQuery ,dataSecurityKey);
+          elasticSearchQueryBuilder
+              .percentagePriorQuery(sipQuery, dskAttribute);
       JsonNode percentageData =
           storageConnectorService.executeESQuery(
               searchSourceBuilder.toString(), sipQuery.getStore());
@@ -615,7 +890,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           sipQuery.getArtifacts().get(0).getFields(), percentageData);
     }
     String query;
-    query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
+    query = elasticSearchQueryBuilder
+        .buildDataQuery(sipQuery, size, dskAttribute);
     logger.trace("ES -Query {} " + query);
     JsonNode response = storageConnectorService.executeESQuery(query, sipQuery.getStore());
     // re-arrange data field based upon sort before flatten
@@ -661,8 +937,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @return boolean
    */
   @Override
-  public List<?> fetchDslExecutionsList(String dslQueryId) {
+  public List<?> fetchDslExecutionsList(String dslQueryId, Ticket authTicket, boolean isScheduled) {
     try {
+      SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+      if (!isScheduled && dskAttribute != null && !CollectionUtils
+          .isEmpty(dskAttribute.getBooleanQuery())) {
+        return new ArrayList<>();
+      }
       // Create executionResult table if doesn't exists.
       new ExecutionResultStore(executionResultTable, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
@@ -699,11 +980,18 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchExecutionsData(
-      String executionId, ExecutionType executionType, Integer page, Integer pageSize) {
+      String executionId, ExecutionType executionType, Integer page, Integer pageSize,
+      Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
-    ObjectMapper objectMapper = new ObjectMapper();
-      ExecutionResult executionResult = null;
-    try {
+    ExecutionResult executionResult = null;
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery()) && executionType != null && !executionType
+        .equals(ExecutionType.onetime)) {
+      return executionResponse;
+    }
+    Instant startTime = Instant.now();
+      try {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
@@ -732,7 +1020,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("time taken for returning excutions data:{}", elapsedTime);
     } catch (Exception e) {
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("Exception occured,time taken before throwing exception:{}", elapsedTime);
       logger.error("Error occurred while fetching the execution result data", e);
     }
 
@@ -825,8 +1119,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchLastExecutionsData(
-      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
+      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize,
+      Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery())) {
+      return executionResponse;
+    }
       ExecutionResult executionResult = null;
     try {
       String tableName =
@@ -889,15 +1189,20 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * This Method will process the global filter request.
    *
    * @param globalFilters globalfilter.
-   * @param dataSecurityKey datasecurity.
    * @return global filter response.
    */
   @Override
-  public Object fetchGlobalFilter(GlobalFilters globalFilters, DataSecurityKey dataSecurityKey)
+  public Object fetchGlobalFilter(GlobalFilters globalFilters, Ticket authTicket)
       throws Exception {
     GlobalFilterDataQueryBuilder globalFilterDataQueryBuilder = new GlobalFilterDataQueryBuilder();
+    boolean filterDSKByCustomerCode = authTicket.getIsJvCustomer() != 1
+        && authTicket.getFilterByCustomerCode() == 1;
+    SipDskAttribute dskAttribute = authTicket.getSipDskAttribute();
+    String customerCode = authTicket.getCustCode();
+    dskAttribute = updateDskAttribute(dskAttribute, customerCode, filterDSKByCustomerCode);
+
     List<GlobalFilterExecutionObject> executionList =
-        globalFilterDataQueryBuilder.buildQuery(globalFilters,dataSecurityKey);
+        globalFilterDataQueryBuilder.buildQuery(globalFilters,dskAttribute);
     JsonNode result = null;
     for (GlobalFilterExecutionObject globalFilterExecutionObject : executionList) {
       globalFilterExecutionObject.getEsRepository();
@@ -924,10 +1229,26 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public Object processKpi(KPIBuilder kpiBuilder, DataSecurityKey dataSecurityKey)
-      throws Exception {
+  public Object processKpi(KPIBuilder kpiBuilder, Ticket authTicket) throws Exception {
+    DskDetails dskDetails = null;
+    SipQuery sipQueryFromSemantic =
+        getSipQuery(kpiBuilder.getKpi().getSemanticId(), metaDataServiceExport, restUtil);
+    SipDskAttribute dskAttribute = authTicket.getSipDskAttribute();
+    Analysis analysis = new Analysis();
+    analysis.setSipQuery(sipQueryFromSemantic);
+    analysis.setSemanticId(kpiBuilder.getKpi().getSemanticId());
+    boolean filterDSKByCustomerCode = authTicket.getIsJvCustomer() != 1
+        && authTicket.getFilterByCustomerCode() == 1;
+    String customerCode = authTicket.getCustCode();
+    if (isDskColumnNotPresent(sipQueryFromSemantic, dskAttribute,analysis)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "DSK column mandatory!!"
+              + " DSK column is missing in the semantic!!");
+    }
+    dskAttribute = updateDskAttribute(dskAttribute, customerCode, filterDSKByCustomerCode);
     KPIExecutionObject kpiExecutionObject =
-        new KPIDataQueryBuilder(dataSecurityKey).buildQuery(kpiBuilder);
+        new KPIDataQueryBuilder(dskAttribute).buildQuery(kpiBuilder);
     Store store = new Store();
     store.setDataStore(
         kpiBuilder.getKpi().getEsRepository().getIndexName()
@@ -997,10 +1318,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public Boolean updateAnalysis(Analysis analysis) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
+      // TODO:  this method needs to be coverted to rest call to SIP-metadata-service
+      // TODO: instead of directly using MaprDB operation to update publish analysis.
       ExecutionResultStore executionResultStore =
           new ExecutionResultStore(analysisMetadataTable, basePath);
-      executionResultStore.update(
-          analysis.getId(), objectMapper.writeValueAsString(analysis));
+      executionResultStore.update(analysis.getId(), objectMapper.writeValueAsString(analysis));
       logger.info(
           String.format("Updated Analysis id : %s with body : %s ", analysis.getId(), analysis));
       return true;
@@ -1013,9 +1335,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchDataLakeExecutionData(
-      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType) {
-    ExecutionResponse executionResponse;
-
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType,
+      Ticket authTicket, boolean isScheduled) {
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery()) && executionType != null && !executionType
+        .equals(ExecutionType.onetime)) {
+      return executionResponse;
+    }
     logger.info("Fetch Execution Data for Data Lake report");
     ExecuteAnalysisResponse excuteResp;
     if ((executionType == ExecutionType.onetime
@@ -1026,7 +1354,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           dataLakeExecutionService.getDataLakeExecutionData(
               executionId, pageNo, pageSize, executionType, null);
     } else {
-      executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize);
+      executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize,
+          authTicket,isScheduled);
       /*here for schedule and publish we are reading data from the same location in DL, so directly
       I am sending publish  as Ui is sending information for only oneTimeExecution,we can send
       schedule as well as */
@@ -1041,10 +1370,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchLastExecutionsDataForDL(
-      String analysisId, Integer pageNo, Integer pageSize) {
+      String analysisId, Integer pageNo, Integer pageSize, Ticket authTicket, boolean isScheduled) {
     logger.info("Fetching last execution data for DL report");
-    ExecutionResult result = fetchLastExecutionResult(analysisId, null, false);
     ExecutionResponse executionResponse = new ExecutionResponse();
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery())) {
+      return executionResponse;
+    }
+
+    ExecutionResult result = fetchLastExecutionResult(analysisId, null, false);
     if (result != null) {
       ExecuteAnalysisResponse executionData =
           dataLakeExecutionService.getDataLakeExecutionData(

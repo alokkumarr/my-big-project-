@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @ApiModel
 @JsonInclude(Include.NON_NULL)
@@ -91,5 +92,17 @@ public class DskGroupPayload {
   @JsonProperty("message")
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("securityGroupSysId", securityGroupSysId)
+        .append("groupName", groupName)
+        .append("groupDescription", groupDescription)
+        .append("dskAttributes", dskAttributes)
+        .append("valid", valid)
+        .append("message", message)
+        .toString();
   }
 }

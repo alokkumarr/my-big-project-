@@ -75,18 +75,18 @@ public class GenericEventAPI {
 		return metadata;
 	}
 
-	public String stringVal;
+	private String stringVal;
 
-	public boolean bVal;
+	private boolean bVal;
 
-	public double flVal;
+	private double flVal;
 
-	public Integer intVal;
+	private Integer intVal;
 
-	public String timestamp;
+	private String timestamp;
 
-	public String metadata;
-	
-	public String value;
+	private String metadata;
+
+	private String value;
 
 }
