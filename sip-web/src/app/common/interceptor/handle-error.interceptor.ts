@@ -42,7 +42,10 @@ export class HandleErrorInterceptor implements HttpInterceptor {
     }
     return next.handle(newReq).pipe(
       catchError((error, caught) => {
-        showToast && this.toast.error(this.getTitle(error), '', { error });
+        error &&
+          error.response !== 401 &&
+          showToast &&
+          this.toast.error(this.getTitle(error), '', { error });
         return throwError(error);
       }) as any
     );
