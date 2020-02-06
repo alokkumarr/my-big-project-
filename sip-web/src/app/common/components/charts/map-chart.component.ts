@@ -199,7 +199,8 @@ export class MapChartComponent {
         {
           exporting: {
             sourceHeight: this.chart.chartHeight,
-            sourceWidth: this.chart.chartWidth
+            sourceWidth: this.chart.chartWidth,
+            filename: config.fileName
           }
         },
         false

@@ -32,7 +32,7 @@ public class ConvertToRow implements Function<String, Row> {
     private LongAccumulator recCounter;
     private LongAccumulator errCounter;
 
-    public static String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
+    private static String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
     private SimpleDateFormat df;
 

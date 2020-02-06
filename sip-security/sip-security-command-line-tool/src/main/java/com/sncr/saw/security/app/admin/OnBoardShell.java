@@ -79,7 +79,7 @@ public class OnBoardShell {
         onBoardCustomer.setFilterByCustomerCode(filterByCustomerCode);
         try {
             // check if connection is working fine only then proceed
-            if (onBoardCustomerRepositoryDao.testSql() == 1) {
+            if (onBoardCustomerRepositoryDao.haveCustomerInfo() == 1) {
                 logger.info("Connection successful !!");
                 List<String> custCodes = onBoardCustomerRepositoryDao.getCustomers();
                 for (String x:custCodes)   {

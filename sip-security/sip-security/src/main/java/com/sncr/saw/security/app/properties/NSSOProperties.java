@@ -90,22 +90,30 @@ public class NSSOProperties {
     this.mailPort = mailPort;
   }
 
-  /** @return the mailFrom */
+  /**
+   * @return the mailFrom
+   */
   public String getMailFrom() {
     return mailFrom;
   }
 
-  /** @param mailFrom the mailFrom to set */
+  /**
+   * @param mailFrom the mailFrom to set
+   */
   public void setMailFrom(String mailFrom) {
     this.mailFrom = mailFrom;
   }
 
-  /** @return the mailSubject */
+  /**
+   * @return the mailSubject
+   */
   public String getMailSubject() {
     return mailSubject;
   }
 
-  /** @param mailSubject the mailSubject to set */
+  /**
+   * @param mailSubject the mailSubject to set
+   */
   public void setMailSubject(String mailSubject) {
     this.mailSubject = mailSubject;
   }
@@ -135,7 +143,9 @@ public class NSSOProperties {
     return ssoSecretKey;
   }
 
-  /** Sets ssoSecretKey */
+  /**
+   * Sets ssoSecretKey
+   */
   public void setSsoSecretKey(String ssoSecretKey) {
     this.ssoSecretKey = ssoSecretKey;
   }

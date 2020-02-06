@@ -5,7 +5,9 @@ const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../conf/protractor.conf');
 
 const fluentWait = protractorConf.timeouts.fluentWait;
-
+const progressBar = element(
+  by.xpath(`//mat-progress-bar[contains(@class,'mat-progress-bar')]`)
+);
 module.exports = {
   waitFor: {
     elementToBeClickable: (element, wait = null) => {
@@ -152,7 +154,11 @@ module.exports = {
     browser.sleep(200);
   },
   fillInput(el, value) {
+    browser.waitForAngular();
+    this.waitFor.elementToBePresent(el);
     this.waitFor.elementToBeVisible(el);
+    browser.sleep(200);
+    el.clear();
     el.clear().sendKeys(value);
   },
   validateText(el, msg) {
@@ -183,5 +189,11 @@ module.exports = {
     el.getText().then(text => {
       expect(text.trim().toLowerCase()).not.toBeNull();
     });
+  },
+  waitForProgressBarToComplete(progressBarElement = null) {
+    browser.waitForAngular();
+    this.waitFor.elementToBeNotVisible(
+      progressBarElement ? progressBarElement : progressBar
+    );
   }
 };

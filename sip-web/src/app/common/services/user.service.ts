@@ -78,9 +78,6 @@ export class UserService {
   logout(path) {
     const route = '/auth/doLogout';
     const token = this._jwtService.get();
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace('-', '+').replace('_', '/');
-    const resp = JSON.parse(window.atob(base64));
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -89,7 +86,7 @@ export class UserService {
     };
 
     return this._http
-      .post(loginUrl + route, resp.ticket.ticketId, httpOptions)
+      .post(loginUrl + route, httpOptions)
       .toPromise()
       .then(
         () => {

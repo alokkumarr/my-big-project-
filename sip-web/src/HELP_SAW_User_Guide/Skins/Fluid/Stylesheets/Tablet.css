@@ -13,10 +13,14 @@
 
 	.off-canvas
 	{
-		display: block;
 		height: 100%;
 		overflow-x: hidden;
 		background-color: #333333;
+	}
+
+	.off-canvas-content
+	{
+		max-height: none;
 	}
 
 	/* Foundation Overrides */
@@ -31,7 +35,7 @@
 	.foundation-wrap,
 	.off-canvas-wrapper
 	{
-		overflow-y: auto;
+		overflow: visible;
 	}
 
 	nav.title-bar .menu-icon
@@ -160,36 +164,6 @@
 		background: inherit;
 	}
 
-	ul.off-canvas-list li a:hover
-	{
-		background-color: #242424;
-	}
-
-	ul.off-canvas-list ul > li > a:hover
-	{
-		background-color: #242424;
-	}
-
-	ul.off-canvas-list ul ul > li > a:hover
-	{
-		background-color: #242424;
-	}
-
-	ul.off-canvas-list ul ul ul > li > a:hover
-	{
-		background-color: #242424;
-	}
-
-	ul.off-canvas-list ul ul ul ul > li > a:hover
-	{
-		background-color: #242424;
-	}
-
-	ul.off-canvas-list li.js-drilldown-back > a:hover
-	{
-		background-color: #242424;
-	}
-
 	.off-canvas ul.off-canvas-list li.is-drilldown-submenu-parent > a:after
 	{
 		margin-left: 0.5rem;
@@ -258,6 +232,7 @@
 	{
 		display: block;
 		height: inherit;
+		max-height: none;
 	}
 
 	.sidenav-wrapper
@@ -267,9 +242,9 @@
 
 	.body-container
 	{
-		overflow: inherit;
 		padding-left: 0px;
 		padding-right: 0px;
+		overflow: inherit;
 	}
 
 	.off-canvas-wrapper-inner nav.title-bar .outer-row
@@ -332,6 +307,36 @@
 	ul.off-canvas-list li.is-accordion-submenu-parent > a span.submenu-toggle
 	{
 		border-top-color: #a1a8ac;
+	}
+
+	ul.off-canvas-list li a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul ul ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list ul ul ul ul > li > a:hover
+	{
+		background-color: #242424;
+	}
+
+	ul.off-canvas-list li.js-drilldown-back > a:hover
+	{
+		background-color: #242424;
 	}
 
 	ul.off-canvas-list li a.selected
@@ -506,7 +511,7 @@
 		background-color: #ffffff;
 	}
 
-	.search-bar .search-filter.open
+	.search-bar .search-filter-wrapper.open
 	{
 		-pie-background: linear-gradient(#d3d3d3, #a9a9a9);
 		background-color: #ffffff;
@@ -525,6 +530,11 @@
 	}
 
 	.search-filter-content ul li:hover
+	{
+		background-color: #ffffff;
+	}
+
+	.search-filter-content ul li button:focus
 	{
 		background-color: #ffffff;
 	}
@@ -559,6 +569,11 @@
 	{
 		background-repeat: no-repeat;
 		background-color: transparent;
+	}
+
+	.skip-to-content
+	{
+		background-color: #ffffff;
 	}
 }
 

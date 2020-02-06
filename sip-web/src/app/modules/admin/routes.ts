@@ -4,6 +4,7 @@ import { AdminMainViewComponent } from './main-view';
 import { AdminExportViewComponent } from './export';
 import { AdminImportViewComponent } from './import';
 import { SecurityGroupComponent } from './datasecurity/security-group/security-group.component';
+import { AdminBrandingComponent } from './branding/branding.component';
 import { IsAdminGuard } from './guards';
 import {
   UsersTableHeader,
@@ -80,6 +81,10 @@ export const routes: Routes = [
           columns: UserAssignmentsTableHeader,
           section: 'user assignments'
         }
+      },
+      {
+        path: 'branding',
+        component: AdminBrandingComponent,
       },
       {
         path: '',

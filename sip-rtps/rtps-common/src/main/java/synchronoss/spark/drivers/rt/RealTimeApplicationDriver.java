@@ -74,7 +74,6 @@ public class RealTimeApplicationDriver {
                 exit_code = 0;
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                e.printStackTrace();
                 exit_code = -1;
             }
         } else {

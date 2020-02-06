@@ -30,10 +30,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class KPIQueryBuilderUtil {
 
-  public static final String DATE_FORMAT = "yyyy-MM-dd";
-  public static final String SPACE_REGX = "\\s+";
-  public static final String EMPTY_STRING = "";
-  public static Map<String, String> dateFormats = new HashMap();
+  private static Map<String, String> dateFormats = new HashMap();
   private static String HITS = "hits";
   private static String _SOURCE = "_source";
 

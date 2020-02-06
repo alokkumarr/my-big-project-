@@ -11,7 +11,11 @@ import { ChartGridComponent, dataFieldToHuman } from './chart-grid.component';
 import { UChartModule } from '../../components/charts';
 import { ChartService } from '../../services';
 import { HeaderProgressService } from './../../../common/services';
-import { setReverseProperty } from './../../../common/utils/dataFlattener';
+import {
+  setReverseProperty,
+  shouldReverseChart
+} from './../../../common/utils/dataFlattener';
+import { QueryDSL } from 'src/app/models';
 
 @Component({
   selector: 'dx-data-grid',
@@ -40,8 +44,57 @@ class DxDataGridStubComponent {
   @Output() onRowClick = new EventEmitter();
 }
 
+const analysis = {
+  chartOptions: {
+    chartType: 'map',
+    xAxis: {
+      reversed: false
+    }
+  },
+  chartType: 'map',
+  type: 'chart',
+  mapOptions: { mapType: 'map' },
+  sipQuery: {
+    artifacts: [
+      {
+        artifactsName: 'sample',
+        fields: [
+          {
+            dataField: 'string',
+            area: 'x',
+            alias: 'String',
+            columnName: 'string.keyword',
+            displayName: 'String',
+            type: 'string'
+          },
+          {
+            dataField: 'integer',
+            area: 'y',
+            columnName: 'integer',
+            displayName: 'Integer',
+            type: 'integer',
+            aggregate: 'avg'
+          }
+        ]
+      }
+    ],
+    booleanCriteria: 'AND',
+    filters: [],
+    sorts: [
+      {
+        artifacts: 'sample',
+        columnName: 'string.keyword',
+        type: 'integer',
+        order: 'desc'
+      }
+    ]
+  }
+};
+
 class ChartStubService {
   getChartConfigFor = () => ({});
+  getMomentDateFormat = () => ({});
+  dataToChangeConfig = () => ({});
 }
 
 class HeaderProgressStubService {
@@ -79,52 +132,7 @@ describe('Chart Grid Component', () => {
       .then(() => {
         fixture = TestBed.createComponent(ChartGridComponent);
         component = fixture.componentInstance;
-        component.analysis = {
-          chartOptions: {
-            chartType: 'map',
-            xAxis: {
-              reversed: false
-            }
-          },
-          chartType: 'map',
-          type: 'chart',
-          mapOptions: { mapType: 'map' },
-          sipQuery: {
-            artifacts: [
-              {
-                artifactsName: 'sample',
-                fields: [
-                  {
-                    dataField: 'string',
-                    area: 'x',
-                    alias: 'String',
-                    columnName: 'string.keyword',
-                    displayName: 'String',
-                    type: 'string'
-                  },
-                  {
-                    dataField: 'integer',
-                    area: 'y',
-                    columnName: 'integer',
-                    displayName: 'Integer',
-                    type: 'integer',
-                    aggregate: 'avg'
-                  }
-                ]
-              }
-            ],
-            booleanCriteria: 'AND',
-            filters: [],
-            sorts: [
-              {
-                artifacts: 'sample',
-                columnName: 'string.keyword',
-                type: 'integer',
-                order: 'desc'
-              }
-            ]
-          }
-        };
+        component.analysis = analysis;
         component.updater = new BehaviorSubject<Object[]>([]);
         fixture.detectChanges();
       });
@@ -173,5 +181,30 @@ describe('Chart Grid Component', () => {
   it('should convert datafield to human friendly format', () => {
     const result = dataFieldToHuman('sum@@double');
     expect(result).toEqual('sum(double)');
+  });
+
+  it('should not fetch column if no data is available ', () => {
+    const spy = spyOn(component, 'fetchColumnData');
+    component.trimKeyword({});
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should be able to get chart height  ', () => {
+    const chartUpdateSpy = spyOn(component, 'getChartUpdates');
+    expect(chartUpdateSpy).not.toHaveBeenCalled();
+    component.data = [{}];
+    expect(chartUpdateSpy).toBeTruthy();
+  });
+
+  it('should be able to  set the analysis  ', () => {
+    const chartUpdateSpy = spyOn(component, 'initChartOptions');
+    expect(chartUpdateSpy).not.toHaveBeenCalled();
+    component.analysis = analysis;
+    expect(chartUpdateSpy).toBeTruthy();
+  });
+
+  it('should reverse chart data based on sorts applied in sipquery', () => {
+    component.analysis.sipQuery.sorts[0].order = 'desc';
+    expect(shouldReverseChart(analysis.sipQuery as QueryDSL)).toBeTruthy();
   });
 });
