@@ -1,7 +1,7 @@
 /*******************************************************************************
- Filename:  V28__DDL_CUSTOMER_BRAND_DETAILS.SQL
- Purpose:   Alter customer details table to store customer logo and customer color for branding.
- Date:      14-01-2020
+ Filename:  V29__DDL_CONFIG_VAL_COMPOSITE_KEY.sql
+ Purpose:   Alter config_val table to add a unique constraint.
+ Date:      06-02-2020
 ********************************************************************************/
 
 	/*******************************************************************************

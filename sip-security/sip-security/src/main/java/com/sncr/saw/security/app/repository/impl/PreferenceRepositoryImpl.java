@@ -28,7 +28,7 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
     // So , put that value as default preference.
     private final String CONFIG_VAL_OBJ_TYPE = "USER_PREFERENCES";
     private final String CONFIG_VAL_CODE ="es-analysis-auto-refresh";
-    private final String SUCCESS_MSG ="success";
+    private final String SUCCESS_MSG ="SUCCESS";
 
     @Override
     public UserPreferences upsertPreferences(UserPreferences userPreferences) {
