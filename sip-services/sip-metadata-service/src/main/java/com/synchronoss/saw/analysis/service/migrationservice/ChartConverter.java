@@ -92,8 +92,7 @@ public class ChartConverter implements AnalysisSipDslConverter {
 
         field.setMinDocCount(0);
         String dateFormat = field.getDateFormat();
-        String interval =
-            QueryBuilderUtil.dateFormats.get(
+        String interval = QueryBuilderUtil.dateFormats.get(
                 dateFormat.replaceAll(QueryBuilderUtil.SPACE_REGX, QueryBuilderUtil.EMPTY_STRING));
         switch (interval) {
           case "month":

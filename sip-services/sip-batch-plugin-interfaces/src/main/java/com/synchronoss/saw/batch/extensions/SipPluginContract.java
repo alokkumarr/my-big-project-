@@ -98,7 +98,7 @@ public abstract class SipPluginContract {
    * used by worker threads.
    */
   public  abstract void executeFileTransfer(String logId, Long jobId, Long channelId, 
-      Long routeId, String fileName);
+      Long routeId, String fileName, Optional<String> destinationDirPath);
 
 
   /**

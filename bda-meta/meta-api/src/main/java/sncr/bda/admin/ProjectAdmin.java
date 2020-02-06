@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 import com.google.gson.JsonArray;
@@ -13,6 +12,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.ProjectStore;
@@ -24,7 +25,7 @@ import sncr.bda.services.DLMetadata;
  */
 public class ProjectAdmin extends ProjectStore{
 
-    private static final Logger logger = Logger.getLogger(ProjectAdmin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectAdmin.class);
     private final DLMetadata dlMd;
     public static final String PLP = "projectLevelParameters";
 
@@ -86,14 +87,14 @@ public class ProjectAdmin extends ProjectStore{
         String dsTablename = getRoot() + Path.SEPARATOR + METASTORE + Path.SEPARATOR + DataSetStore.TABLE_NAME;
         DataSetStore dss = new DataSetStore(getRoot());
         List<Document> datasets = searchAsList(dsTablename, qc);
-        logger.debug("Found # datasets: " + datasets.size());
+        LOGGER.debug("Found # datasets: " + datasets.size());
         datasets.forEach( d -> {
             String id = d.getIdString();
             try {
                 JsonElement dset = dss.read(id);
                 JsonObject jo = dset.getAsJsonObject();
                 JsonPrimitive pl = jo.getAsJsonObject("system").getAsJsonPrimitive("physicalLocation");
-                logger.trace("Process dataset: " + id + " DS descriptor: " + jo.toString() + " physical location = " + ((pl != null)? pl.toString():"n/a"));
+                LOGGER.trace("Process dataset: " + id + " DS descriptor: " + jo.toString() + " physical location = " + ((pl != null)? pl.toString():"n/a"));
                 if (pl != null) {
                     String normPL = pl.toString().replace("\"", "");
                     normPL = normPL.substring(0, normPL.length() - PREDEF_DATA_DIR.length());
@@ -101,7 +102,7 @@ public class ProjectAdmin extends ProjectStore{
                 }
                 dss.delete(id);
             } catch (Exception e) {
-                logger.error("Could not remove datasets from Metadata Store: " + id, e);
+                LOGGER.error("Could not remove datasets from Metadata Store: " + id, e);
             }}
         );
 
@@ -115,7 +116,7 @@ public class ProjectAdmin extends ProjectStore{
             try {
                 ts.delete(id);
             } catch (Exception e) {
-                logger.error("Could not remove transformation from Metadata Store: " + id, e);
+                LOGGER.error("Could not remove transformation from Metadata Store: " + id, e);
             }}
         );
         prj.delete(PLP);
@@ -131,7 +132,7 @@ public class ProjectAdmin extends ProjectStore{
         plpJA.forEach( el -> {
             JsonObject jo = el.getAsJsonObject();
             if (!jo.has("name") || !jo.has("value")) {
-                logger.error("Invalid parameter entry in parameter set. Skip it");
+                LOGGER.error("Invalid parameter entry in parameter set. Skip it");
             }
             else{
                 nParams.put(jo.get("name").getAsString(), jo.get("value").getAsString());
@@ -171,7 +172,7 @@ public class ProjectAdmin extends ProjectStore{
             {
                 JsonObject plpJo = plpel.getAsJsonObject();
                 if (!plpJo.has("name")){
-                  logger.error("Incorrect parameter entry, ignore it");
+                    LOGGER.error("Incorrect parameter entry, ignore it");
                 }
                 else{
                     boolean found = false;
@@ -200,47 +201,32 @@ public class ProjectAdmin extends ProjectStore{
     }
     
     public Map<String, Document> search(QueryCondition qc) throws Exception {
-      logger.trace("Search query on search " + qc.toString());
+      LOGGER.trace("Search query on search " + qc.toString());
       return searchAsMap(table, qc);
   }
 
     public static void main(String args[]){
         try {
             if (args.length < 3 ){
-                System.err.println("prg <project name> <project desc> <prop.file>");
+                LOGGER.error("prg <project name> <project desc> <prop.file>");
                 System.exit(1);
             }
             String root = args[0];
             String prjName = args[1];
             String prjDesc = args[2];
 
-            System.out.println(String.format("Create project with name: %s and description: %s", prjName, prjDesc));
+            LOGGER.info("Create project with name: {} and description: {}", prjName, prjDesc);
             ProjectAdmin ps = new ProjectAdmin(root);
-/*
-            String propFile = null;
-            if (args.length == 4) propFile = args[3];
-            if (propFile == null)
-                //ps.createProject(prjName, prjDesc);
-            else{
-                String jStr = HFileOperations.readFile(propFile);
-                JsonParser jsonParser = new JsonParser();
-                JsonElement je = jsonParser.parse(jStr);
-                System.out.print("Parsed parameter file: \n\n" + je.toString() + "\n");
-                JsonObject jo = je.getAsJsonObject();
-                HashMap<String, String> hm = new HashMap<String, String>();
-                jo.entrySet().forEach( e -> hm.put(e.getKey(), e.getValue().getAsString()) );
-                ps.createProject(prjName, prjDesc, hm);
-            }
-*/
+
             JsonElement readDoc = ps.readProjectData(prjName);
-            System.out.println("Converted to document: \n\n" + readDoc.toString() + "\n");
+            LOGGER.info("Converted to document: \n\n" + readDoc.toString() + "\n");
 
             ps.cleanupProject(prjName);
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.error("No file found error : {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error occurred while processing : {}", e.getMessage());
         }
     }
 

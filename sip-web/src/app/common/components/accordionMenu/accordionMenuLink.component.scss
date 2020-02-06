@@ -10,7 +10,7 @@
 }
 
 .activeButton {
-  background-color: $primary-hover-blue !important;
+  background-color: $primary-blue-b1 !important;
 
   .mat-icon.activeButton {
     height: 40px;
@@ -35,7 +35,7 @@
   }
 
   &:hover {
-    background-color: $primary-hover-blue !important;
+    background-color: $primary-blue-b3 !important;
   }
 
   .mat-icon.activeButton {
@@ -87,6 +87,6 @@ mat-expansion-panel-header.sidenav-mainmenu {
   height: 40px !important;
 
   &:hover {
-    background-color: $primary-hover-blue !important;
+    background-color: $primary-blue-b3 !important;
   }
 }

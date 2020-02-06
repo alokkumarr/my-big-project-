@@ -23,6 +23,8 @@ import sncr.xdf.sql.SQLDescriptor;
 
 import java.util.List;
 import java.util.Map;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 /**
  * Created by asor0002 on 9/11/2017.
@@ -75,10 +77,13 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
             if(rc != 0) {
             	return -1;
             }
-        } catch (Exception e) {
-            error = "SQL Executor runtime exception: " + e.getMessage();
-            logger.error(e.toString());
-            return -1;
+        }catch (Exception e) {
+            logger.error("SQL Executor runtime exception:" , e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
         }
         return 0;
     }
@@ -157,6 +162,9 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
 
         NGContextServices ngCtxSvc;
         CliHandler cli = new CliHandler();
+        NGSQLComponent component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
             long start_time = System.currentTimeMillis();
 
@@ -166,22 +174,22 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices[] scs =
@@ -204,21 +212,17 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
             ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.debug(id)
             );
-            NGSQLComponent component = new NGSQLComponent(ngCtxSvc.getNgctx());
-            if (!component.initComponent(null))
-                System.exit(-1);
-            int rc = component.run();
-
-            long end_time = System.currentTimeMillis();
-            long difference = end_time-start_time;
-            logger.info("SQL total time " + difference );
-
-
-            System.exit(rc);
-        } catch (Exception exception) {
-        	logger.error("Exception while running SQL component"+ exception.getMessage());
-            System.exit(-1);
+            component = new NGSQLComponent(ngCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                long end_time = System.currentTimeMillis();
+                long difference = end_time - start_time;
+                logger.info("SQL total time " + difference);
+            }
+        }catch (Exception ex) {
+            exception = ex;
         }
+        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        System.exit(rc);
     }
-
 }

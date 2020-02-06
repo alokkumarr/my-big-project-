@@ -1,6 +1,8 @@
 import { BehaviorSubject, Subject, Subscription, interval } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Dashboard } from '../models/dashboard.interface';
+import * as isUndefined from 'lodash/isUndefined';
+import { defaultRefreshInterval } from './../consts';
 
 import { map } from 'rxjs/operators';
 
@@ -33,8 +35,10 @@ export class DashboardService {
   setAutoRefresh(dashboard: Dashboard) {
     this.unsetAutoRefresh(dashboard.entityId);
 
+    const timeInterval = isUndefined(dashboard.refreshIntervalSeconds)
+      ? defaultRefreshInterval : dashboard.refreshIntervalSeconds;
     if (dashboard.autoRefreshEnabled) {
-      const observable = interval(dashboard.refreshIntervalSeconds * 1000).pipe(
+      const observable = interval(timeInterval * 1000).pipe(
         map(() => ({
           dashboardId: dashboard.entityId
         }))

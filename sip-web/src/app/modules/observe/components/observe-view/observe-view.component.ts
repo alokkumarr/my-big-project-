@@ -210,6 +210,10 @@ export class ObserveViewComponent implements OnDestroy {
             {
               key: PREFERENCES.DEFAULT_DASHBOARD,
               value: dashboardId
+            },
+            {
+              key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
+              value: this.subCategoryId
             }
           ],
           true

@@ -103,7 +103,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
    * @param channelId Identifer of channel
    * @return unique identifier
    */
-  public String getChannelConnectionIdentifier(Long channelId) {
+  private String getChannelConnectionIdentifier(Long channelId) {
     Optional<BisChannelEntity> entity = bisChannelDataRestRepository.findById(channelId);
     String hostname = null;
     String userName = null;
@@ -131,11 +131,11 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
       }
   
     }
-    logger.trace("Connction identifier from map:: " + channelId + ":" + hostname + ":" + userName  
-          + ":" + password  + ":" + portNumber);
+    logger.trace("Connction identifier from map:: for channelId {}", channelId);
+    String connectionIdentifier = String
+        .format("%s : %s  %s : %s : %s", channelId, hostname, userName, password, portNumber);
     
-    return channelId + ":" + hostname + ":" + userName  
-           + ":" + password  + ":" + portNumber;
+    return connectionIdentifier;
     
   }
   

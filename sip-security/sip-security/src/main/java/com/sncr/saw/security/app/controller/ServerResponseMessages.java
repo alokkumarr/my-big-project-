@@ -40,4 +40,5 @@ public class ServerResponseMessages {
     public static final String CANT_GET_GROUP_ID = "Couldn't able to get Sys Id";
 
     public static final String UNASSIGN_GROUP_FROM_USER = "Failed to un-assign Group from User";
+    public static final String SEC_GRP_DOESNOT_EXIST = "The security group doesn't exist for this customer!";
 }

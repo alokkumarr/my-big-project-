@@ -31,6 +31,7 @@
       [matTooltip]="metadata.name"
       [routerLink]="metadata.url"
       [queryParams]="metadata.queryParams"
+      [attr.e2e]="'actions-menu-link-' + metadata.name"
       (click)="closeSideNav()"
       [class.active]="active"
     >

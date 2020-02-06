@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import static sncr.xdf.transformer.TransformerComponent.*;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.context.XDFReturnCode;
 
 
 /**
@@ -63,7 +65,7 @@ public class NGJexlExecutor extends NGExecutor {
     public void execute(Map<String, Dataset> dsMap) throws Exception {
 
         Dataset ds = dsMap.get(inDataSetName);
-        logger.debug("Initialize structAccumulator: " );
+        logger.debug("Initialize structAccumulator: ");
         schema = ds.schema();
         String[] fNames = ds.schema().fieldNames();
         //TODO:: Add 3 transformation result fields into Accumulator
@@ -72,13 +74,13 @@ public class NGJexlExecutor extends NGExecutor {
             logger.debug("Field: " + fNames[i] + " Type: " + ds.schema().apply(i).toString());
         }
         structAccumulator.add(new Tuple2<>(RECORD_COUNTER, new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty())));
-        structAccumulator.add(new Tuple2<>(TRANSFORMATION_RESULT,  new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty())));
+        structAccumulator.add(new Tuple2<>(TRANSFORMATION_RESULT, new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty())));
         structAccumulator.add(new Tuple2<>(TRANSFORMATION_ERRMSG, new StructField(TRANSFORMATION_ERRMSG, DataTypes.StringType, true, Metadata.empty())));
 
         prepareRefData(dsMap);
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
         Long firstPassTrRes = transformationResult.count();
-        logger.trace("First pass completed: " + firstPassTrRes );
+        logger.trace("First pass completed: " + firstPassTrRes);
         //logger.trace("Create new schema[" + structAccumulator.value().size() + "]: " + String.join(", ", structAccumulator.value().keySet()));
         StructType newSchema = constructSchema(structAccumulator.value());
         // Using structAccumulator do second pass to align schema
@@ -88,8 +90,6 @@ public class NGJexlExecutor extends NGExecutor {
         //logger.debug("Second pass completed: " + c_adf + " Schema: " + jschema);
         createFinalDS(alignedDF);
     }
-
-
 
     private StructType constructSchema(Map<String, StructField> accValues) {
         HashSet<StructField> sf_set = new HashSet();

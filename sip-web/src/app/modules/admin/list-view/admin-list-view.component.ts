@@ -1,7 +1,7 @@
 require('./admin-list-view.component.scss');
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { DxDataGridService } from '../../../common/services/dxDataGrid.service';
-import { UserAssignmentService } from './../datasecurity/userassignment.service';
+import { DataSecurityService } from './../datasecurity/datasecurity.service';
 import * as clone from 'lodash/clone';
 import * as get from 'lodash/get';
 
@@ -32,7 +32,7 @@ export class AdminListViewComponent implements OnInit {
 
   constructor(
     private _dxDataGridService: DxDataGridService,
-    private _userAssignmentService: UserAssignmentService
+    private _userAssignmentService: DataSecurityService
   ) {}
 
   ngOnInit() {
