@@ -14,6 +14,7 @@ import * as jsPlumb from 'jsplumb';
 import * as find from 'lodash/find';
 import * as isEqual from 'lodash/isEqual';
 import * as isEmpty from 'lodash/isEmpty';
+import * as toLower from 'lodash/toLower';
 import * as findIndex from 'lodash/findIndex';
 import { tap } from 'rxjs/operators';
 import { Store } from '@ngxs/store';
@@ -72,7 +73,7 @@ export class JsPlumbCanvasComponent
       (this.artifacts || []).forEach(metricArtifact => {
         const analysisArtifact = find(
           artifacts,
-          a => a.artifactsName === metricArtifact.artifactName
+          a => toLower(a.artifactsName) === toLower(metricArtifact.artifactName)
         );
         if (!analysisArtifact || !analysisArtifact.fields) {
           return;
@@ -84,7 +85,7 @@ export class JsPlumbCanvasComponent
             const analysisField = find(
               analysisArtifact.fields,
               (col: ArtifactColumnDSL) =>
-                metricField.columnName === col.columnName
+                toLower(metricField.columnName) === toLower(col.columnName)
             );
 
             /* If column not found in sipQuery, it's not selected.
