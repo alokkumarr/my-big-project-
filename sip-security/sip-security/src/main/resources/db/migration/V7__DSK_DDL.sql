@@ -1,4 +1,4 @@
-/*******************************************************************************
+    /*******************************************************************************
  Filename:  V7__DSK_DDL_UPDATE.SQL
  Purpose:   To Migrate the DDL (Adding SEC_GROUP_Name,DESC Attribute to SEC_GROUP Table)
  Date:      09-10-2018
