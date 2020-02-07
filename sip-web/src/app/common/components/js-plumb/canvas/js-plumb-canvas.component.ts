@@ -75,7 +75,10 @@ export class JsPlumbCanvasComponent
           artifacts,
           a => toLower(a.artifactsName) === toLower(metricArtifact.artifactName)
         );
+
         if (!analysisArtifact || !analysisArtifact.fields) {
+          // Clear all checkboxes if all fields are unselected
+          this.clearAllCheckboxes(metricArtifact);
           return;
         }
 
@@ -265,5 +268,17 @@ export class JsPlumbCanvasComponent
       this.joins.splice(index, 1);
     }
     this.onChange({ subject: 'joins', data: this.joins });
+  }
+
+  clearAllCheckboxes(metric) {
+    (<ArtifactColumnReport[]>metric.columns).forEach(
+      metricField => {
+        const analysisField = find(
+          (col: ArtifactColumnDSL) =>
+            metricField.checked === true
+        );
+        metricField.checked = Boolean(analysisField);
+      }
+    );
   }
 }
