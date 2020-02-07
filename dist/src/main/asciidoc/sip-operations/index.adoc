@@ -989,7 +989,7 @@ Mapr supports default max row size of table `32768KB`. Size can be checked with 
 maprcli config load -json | grep mfs.db.max.rowsize.kb
 ----
 
-If the users tries to query with more data sets, table will throw an error like:
+If the users tries to query more data (> 32MB) and tries to save in the table, table will throw an error like:
 
 `ERROR com.mapr.fs.Inode - checkAndReplaceOrDelete() on '/var/sip/services/metadata/onetime'
  failed with error: Argument list too long (7).`
