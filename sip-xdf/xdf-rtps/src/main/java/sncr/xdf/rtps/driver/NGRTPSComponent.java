@@ -62,7 +62,6 @@ public class NGRTPSComponent extends AbstractComponent
             try {
                 config = NGRTPSComponent.analyzeAndValidate(configAsStr);
             } catch (Exception ex) {
-                // TODO Auto-generated catch block
                 logger.error(ex.getMessage());
             }
             Rtps rtpsProps = config.getRtps();

@@ -32,7 +32,6 @@ import java.util.Map;
 public class NGContext extends ContextMetadata {
 
     public ComponentConfiguration componentConfiguration;
-    public boolean isErrorHandlingEnabled;
 
     public final String xdfDataRootSys;
     public List<String> registeredOutputDSIds = new ArrayList<>();
@@ -44,9 +43,6 @@ public class NGContext extends ContextMetadata {
         xdfDataRootSys = xdfRoot;
         this.componentConfiguration  = componentConfiguration;
         this.componentName = componentName;
-        if(componentConfiguration != null){
-            isErrorHandlingEnabled = componentConfiguration.isErrorHandlingEnabled();
-        }
     }
 
 
@@ -118,9 +114,6 @@ public class NGContext extends ContextMetadata {
 
         s.append("Output DS maps: ");
         s.append(outputDataSets.toString());
-        s.append("\n");
-        s.append("is XDF Error Handling Enabled: ");
-        s.append(isErrorHandlingEnabled);
         s.append("\n");
 
         return s.toString();

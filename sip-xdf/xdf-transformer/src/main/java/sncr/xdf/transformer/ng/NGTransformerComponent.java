@@ -98,7 +98,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
                 }
                 inputDSCount = ds.count();
-                if(ngctx.isErrorHandlingEnabled && inputDSCount == 0) {
+                if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0) {
                     throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
                 }
             }else{
@@ -110,7 +110,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     if(!HFileOperations.getFileSystem().exists(new Path(loc))){
                         throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
                     }
-                    if(ngctx.isErrorHandlingEnabled && HFileOperations.getFileSystem().getContentSummary(new Path(loc)).getLength() == 0){
+                    if(ngctx.componentConfiguration.isErrorHandlingEnabled() && HFileOperations.getFileSystem().getContentSummary(new Path(loc)).getLength() == 0){
                         inputDSCount = 0;
                         throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
                     }

@@ -54,18 +54,16 @@ public class NGComponentUtil {
                 }
             }
             logger.info("Component Return Code :" + rc);
-            return rc;
         }else{
-            if(rc == 0) {
-                return 0;
-            }else{
-                return -1;
-            }
+            rc = (rc == 0) ? 0 : -1;
         }
+        return rc;
     }
 
     public static boolean isErrorHandlingEnabled(Optional<AbstractComponent> optComponent){
-        if(!optComponent.isPresent() && optComponent.get().getNgctx() != null && optComponent.get().getNgctx().isErrorHandlingEnabled){
+        if(!optComponent.isPresent() && optComponent.get().getNgctx() != null
+            && optComponent.get().getNgctx().componentConfiguration != null
+            && optComponent.get().getNgctx().componentConfiguration.isErrorHandlingEnabled()){
             return true;
         }
         return false;

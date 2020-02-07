@@ -74,15 +74,10 @@ public class XDFDataProcessor  extends AbstractComponent {
         }
         boolean isErrorHandlingEnabled = NGComponentUtil.isErrorHandlingEnabled(Optional.ofNullable(processor));
         logger.info("isErrorHandlingEnabled : "+ isErrorHandlingEnabled);
-        if(isErrorHandlingEnabled) {
-            System.exit(rc);
-        }else{
-            if(rc == 0) {
-                System.exit(0);
-            }else{
-                System.exit(-1);
-            }
+        if(!isErrorHandlingEnabled) {
+            rc = (rc == 0) ? 0 : -1;
         }
+        System.exit(rc);
     }
 
     protected int execute()

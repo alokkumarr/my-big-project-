@@ -166,6 +166,7 @@ public abstract class AbstractComponent implements WithContext{
                 throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR);
             }
             if(ret == 0){
+                logger.info("isErrorHandlingEnabled : "+ ngctx.componentConfiguration.isErrorHandlingEnabled());
                 ret = execute();
                 logger.info("Component execute() return code = " + ret);
                 if (ngctx.runningPipeLine) {
@@ -872,7 +873,7 @@ public abstract class AbstractComponent implements WithContext{
     }
 
     public void validateOutputDSCounts(long inputDSCount){
-        if(ngctx.isErrorHandlingEnabled){
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled()){
             logger.debug("inputDSCount : " + inputDSCount);
             String outDataSetName = null;
             for( Output output: ngctx.componentConfiguration.getOutputs()){
