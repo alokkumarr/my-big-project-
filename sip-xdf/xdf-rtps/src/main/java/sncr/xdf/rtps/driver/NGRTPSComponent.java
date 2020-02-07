@@ -59,7 +59,12 @@ public class NGRTPSComponent extends AbstractComponent
             logger.debug("######## reading config path " + this.configPath);
             String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
             ComponentConfiguration config = null;
-            config = NGRTPSComponent.analyzeAndValidate(configAsStr);
+            try {
+                config = NGRTPSComponent.analyzeAndValidate(configAsStr);
+            } catch (Exception ex) {
+                // TODO Auto-generated catch block
+                logger.error(ex.getMessage());
+            }
             Rtps rtpsProps = config.getRtps();
 
             if (ngctx == null) {
@@ -168,7 +173,7 @@ public class NGRTPSComponent extends AbstractComponent
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
         System.exit(rc);
 	}
 

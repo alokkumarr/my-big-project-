@@ -371,7 +371,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
-            if(inputDSCount == 0 ){
+            if(ngctx.isErrorHandlingEnabled && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
 
@@ -393,7 +393,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             }
             inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
-            if(inputDSCount == 0 ){
+            if(ngctx.isErrorHandlingEnabled && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
 
@@ -408,7 +408,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             inputDataFrame.show();
             inputDSCount = inputDataFrame.count();
             this.recCounter.setValue(inputDSCount);
-            if(inputDSCount == 0 ){
+            if(ngctx.isErrorHandlingEnabled && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
             }
             commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
@@ -502,7 +502,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             .textFile(sourcePath, outputNOF);
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
         inputDSCount = rdd.count();
-        if(inputDSCount == 0 ){
+        if(ngctx.isErrorHandlingEnabled && inputDSCount == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
 
@@ -589,7 +589,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 }
             }
         }
-        if(inputDSCount == 0 ){
+        if(ngctx.isErrorHandlingEnabled && inputDSCount == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
         return 0;
@@ -700,7 +700,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 		} else {
             rddWithoutHeader = rdd;
 		}
-        if(rddWithoutHeader.count() == 0 ){
+        if(ngctx.isErrorHandlingEnabled && rddWithoutHeader.count() == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
         JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
@@ -1022,7 +1022,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
         System.exit(rc);
     }
     
