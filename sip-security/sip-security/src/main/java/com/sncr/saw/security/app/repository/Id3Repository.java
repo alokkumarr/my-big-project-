@@ -9,11 +9,12 @@ public interface Id3Repository {
   /**
    * Method to validate the Id3 request to make sure Domain and client_id whitelisted in SIP.
    *
-   * @param id3Request
    * @param masterLoginId
+   * @param id3DomainName
+   * @param clientId
    * @return
    */
-  boolean validateId3Request(Id3AuthenticationRequest id3Request, String masterLoginId);
+  boolean validateId3Request(String masterLoginId ,String id3DomainName, String clientId);
 
   /**
    * This Method obtains the Authorization Code for Id3 user , domain and client-Id.
@@ -22,7 +23,11 @@ public interface Id3Repository {
    * @param id3Request
    * @return
    */
-  String obtainAuthorizationCode(String masterLoginId, Id3AuthenticationRequest id3Request);
+  String obtainAuthorizationCode(
+      String masterLoginId,
+      Id3AuthenticationRequest id3Request,
+      String id3DomainName,
+      String clientId);
 
   /**
    * Validate the authorization code issued by SIP for authentication after SIP sso redirect.
@@ -30,7 +35,8 @@ public interface Id3Repository {
    * @param authorizationCode
    * @return
    */
-  AuthorizationCodeDetails validateAuthorizationCode(String authorizationCode, Id3AuthenticationRequest id3AuthenticationRequest);
+  AuthorizationCodeDetails validateAuthorizationCode(
+      String authorizationCode, Id3AuthenticationRequest id3AuthenticationRequest);
 
   /**
    * This Method will provide the mechanism to on board the ID3 clients in SIP for whitelisting.

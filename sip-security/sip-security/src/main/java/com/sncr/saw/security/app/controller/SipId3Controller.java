@@ -11,10 +11,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -65,7 +65,6 @@ public class SipId3Controller {
    * To Obtain the SIP access and Refresh token based on ID3 Identity Token.
    *
    * @param token
-   * @param id3AuthenticationRequest
    * @param request
    * @param response
    * @return
@@ -74,14 +73,12 @@ public class SipId3Controller {
   @PostMapping(value = "/token")
   public SSOResponse id3TokenToSipAuthentication(
       @RequestHeader("Authorization") String token,
-      @RequestBody Id3AuthenticationRequest id3AuthenticationRequest,
       HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
     response.setHeader(CACHE_CONTROL, "private");
     String idToken = token.replace(BEARER, "").trim();
-    SSOResponse ssoResponse =
-        ssoRequestHandler.processId3SSORequest(idToken, id3AuthenticationRequest);
+    SSOResponse ssoResponse = ssoRequestHandler.processId3SSORequest(idToken);
     if (ssoResponse == null)
       response.sendError(
           HttpStatus.UNAUTHORIZED.value(),
@@ -127,7 +124,6 @@ public class SipId3Controller {
   /**
    * This method validates the Id3 identity token and provides the authorization code.
    *
-   * @param token
    * @param request
    * @param response
    * @return
@@ -142,23 +138,27 @@ public class SipId3Controller {
       @RequestBody MultiValueMap<String, String> params,
       HttpServletRequest request,
       HttpServletResponse response) {
-    Map<String, String> map = params.toSingleValueMap();
-    response.setHeader(CACHE_CONTROL, "no-store,must-revalidate, max-age=0");
-    String authorizationCode;
-    Id3AuthenticationRequest id3AuthenticationRequest = new Id3AuthenticationRequest();
-    id3AuthenticationRequest.setDomainName(map.get("domainName"));
-    id3AuthenticationRequest.setClientId(map.get("clientId"));
-    id3AuthenticationRequest.setRedirectUrl(map.get("redirectUrl"));
-    id3AuthenticationRequest.setIdToken(map.get("idToken"));
-    String masterLoginId = validateId3IdentityToken.validateToken(id3AuthenticationRequest.getIdToken(), id3AuthenticationRequest);
-    if (masterLoginId != null) {
-      authorizationCode =
-          id3Repository.obtainAuthorizationCode(masterLoginId, id3AuthenticationRequest);
-      ssoRequestHandler.setSsoCookies(response, authorizationCode, id3AuthenticationRequest);
-      response.setStatus(HttpStatus.FOUND.value());
-      response.setHeader("location", id3AuthenticationRequest.getRedirectUrl());
-    } else {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    if (!request.getMethod().equalsIgnoreCase(HttpMethod.OPTIONS.toString())) {
+      Map<String, String> map = params.toSingleValueMap();
+      response.setHeader(CACHE_CONTROL, "no-store,must-revalidate, max-age=0");
+      String authorizationCode;
+      String domain = map.get("domainName");
+      String clientId = map.get("clientId");
+      Id3AuthenticationRequest id3AuthenticationRequest = new Id3AuthenticationRequest();
+      id3AuthenticationRequest.setRedirectUrl(map.get("redirectUrl"));
+      id3AuthenticationRequest.setIdToken(map.get("idToken"));
+      String masterLoginId =
+          validateId3IdentityToken.validateToken(id3AuthenticationRequest.getIdToken());
+      if (masterLoginId != null) {
+        authorizationCode =
+            id3Repository.obtainAuthorizationCode(masterLoginId, id3AuthenticationRequest, domain,clientId);
+        ssoRequestHandler.setSsoCookies(
+            response, authorizationCode, id3AuthenticationRequest, domain, clientId);
+        response.setStatus(HttpStatus.FOUND.value());
+        response.setHeader("location", id3AuthenticationRequest.getRedirectUrl());
+      } else {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      }
     }
   }
 }

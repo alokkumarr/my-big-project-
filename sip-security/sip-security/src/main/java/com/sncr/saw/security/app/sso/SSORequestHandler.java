@@ -69,12 +69,12 @@ public class SSORequestHandler {
     return null;
   }
 
-  public SSOResponse processId3SSORequest(String token, Id3AuthenticationRequest id3Request) {
+  public SSOResponse processId3SSORequest(String token) {
     logger.info("Request received to process single sign-on with Id3");
 
     SSOResponse ssoResponse = null;
     // Check if the Token is valid
-    String masterLoginId = validateId3IdentityToken.validateToken(token, id3Request);
+    String masterLoginId = validateId3IdentityToken.validateToken(token);
     if (masterLoginId != null) {
       logger.trace("Successfully validated single sign-on request for user: " + masterLoginId);
       ssoResponse = createSAWToken(masterLoginId, true);
@@ -166,13 +166,14 @@ public class SSORequestHandler {
    * @param id3Request
    */
   public void setSsoCookies(
-      HttpServletResponse response, String authorizationCode, Id3AuthenticationRequest id3Request) {
+      HttpServletResponse response, String authorizationCode, Id3AuthenticationRequest id3Request ,
+      String domainName , String clientId) {
     // Cookie expires in 2 minutes
     setCookie(
         "sessionID", authorizationCode, id3Request.getRedirectUrl(), 120, true, true, response);
     setCookie(
         "domainName",
-        id3Request.getDomainName(),
+        domainName,
         id3Request.getRedirectUrl(),
         120,
         true,
@@ -180,7 +181,7 @@ public class SSORequestHandler {
         response);
     setCookie(
         "clientId",
-        id3Request.getClientId(),
+        clientId,
         id3Request.getRedirectUrl(),
         120,
         true,

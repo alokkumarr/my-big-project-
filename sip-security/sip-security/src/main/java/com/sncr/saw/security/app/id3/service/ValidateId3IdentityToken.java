@@ -34,18 +34,29 @@ public class ValidateId3IdentityToken {
     this.id3Repository = id3Repository;
   }
 
-  public String validateToken(String token, Id3AuthenticationRequest id3Request) {
+  public String validateToken(String token) {
     String masterLoginId = null;
+    String id3DomainName =null;
+    String clientId = null;
     try {
       String[] jwtParts = token.split("\\.");
-      ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (jwtParts.length == 3) {
+            String payload = new String(Base64.getDecoder().decode(jwtParts[1]));
+            JsonNode decodedToken = objectMapper.readTree(payload);
+            String iss = decodedToken.get("iss").asText();
+            masterLoginId = decodedToken.get("sub").asText();
+            clientId = decodedToken.get("aud").asText();
+            id3DomainName = iss.substring(iss.lastIndexOf('/') + 1);
+            validateId3Domain(id3DomainName, clientId, masterLoginId);
+        }
       URL certUrl =
           new URL(
               String.format(
                   "%s/api/v1/domains/%s/openid-connect/certs",
-                  id3BaseUrl, id3Request.getDomainName()));
+                  id3BaseUrl, id3DomainName));
       RSAKeyProvider keyProvider = new Id3RsaKeyProvider(certUrl);
-      String issuer = String.format("%s/auth/realms/%s", id3BaseUrl, id3Request.getDomainName());
+      String issuer = String.format("%s/auth/realms/%s", id3BaseUrl, id3DomainName);
       Algorithm algorithm = Algorithm.RSA256(keyProvider);
       JWTVerifier verifier =
           JWT.require(algorithm)
@@ -54,15 +65,7 @@ public class ValidateId3IdentityToken {
               // add more checks here if you like
               .build(); // Reusable verifier instance
       DecodedJWT jwt = verifier.verify(token);
-        if (jwtParts.length == 3) {
-            String payload = new String(Base64.getDecoder().decode(jwtParts[1]));
-            JsonNode decodedToken = objectMapper.readTree(payload);
-            String iss = decodedToken.get("iss").asText();
-            masterLoginId = decodedToken.get("sub").asText();
-            String tokenDomain = iss.substring(iss.lastIndexOf('/') + 1);
-            validateId3Domain(tokenDomain, id3Request, masterLoginId);
-            masterLoginId = jwt.getClaims().get("sub").asString();
-        }
+      masterLoginId = jwt.getClaims().get("sub").asString();
 
     } catch (JWTVerificationException | IOException ex) {
       String errorMessage =
@@ -74,13 +77,10 @@ public class ValidateId3IdentityToken {
   }
 
   private boolean validateId3Domain(
-      String tokenDomain, Id3AuthenticationRequest id3Request, String masterLoginId) {
+      String id3DomainName, String clientId , String masterLoginId) {
     // Check token domain name and request domain are same to make sure request is not malformed.
     Boolean valid;
-    if (!tokenDomain.equalsIgnoreCase(id3Request.getDomainName())) {
-      throw new Id3TokenException("Domain Name doesn't match with Id3 token");
-    }
-    if (id3Repository.validateId3Request(id3Request, masterLoginId)) {
+    if (id3Repository.validateId3Request(masterLoginId, id3DomainName, clientId )) {
       valid = true;
     } else {
       valid = false;
