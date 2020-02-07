@@ -204,7 +204,7 @@ public class ExportServiceImpl implements ExportService {
     Object dispatchBean = request.getBody();
 
     logger.debug("Dispatch Bean = {}", dispatchBean);
-    ExportBean exportBean = setExportBeanProps(dispatchBean,analysisId);
+    ExportBean exportBean = setExportBeanProps(dispatchBean);
     logger.debug("Export Bean = {}", exportBean);
 
     String recipients = null;
@@ -238,23 +238,25 @@ public class ExportServiceImpl implements ExportService {
     }
   }
 
-  public ExportBean setExportBeanProps(Object dispatchBean, String analysisId) {
+  public ExportBean setExportBeanProps(Object dispatchBean) {
 
     ExportBean exportBean = new ExportBean();
-    Analysis analysis = getAnalysis(analysisId);
-    exportBean.setAnalysis(analysis);
     // presetting the variables, as their presence will determine which URLs to process
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
       if (((LinkedHashMap) dispatchBean).get("fileType") != null) {
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
       }
-      exportBean.setReportName(analysis.getName());
-      exportBean.setReportDesc(analysis.getDescription());
+      exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+      String reportName =
+          ExportUtils.prepareReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+      exportBean.setReportName(reportName);
       exportBean.setPublishDate(
           String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
       exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
       // consider default format as csv if file type is not provided.
-      String fileName = ExportUtils.prepareFileName(analysis.getName(), exportBean.getFileType());
+      String fileName =
+          ExportUtils.prepareFileName(
+              String.valueOf(((LinkedHashMap) dispatchBean).get("name")), exportBean.getFileType());
       if (exportBean.getFileType() == null || exportBean.getFileType().isEmpty()) {
         exportBean.setFileType(DEFAULT_FILE_TYPE);
       }
@@ -795,6 +797,7 @@ public class ExportServiceImpl implements ExportService {
     // create a directory with unique name in published location.
     final String dispatchFileName = filePath(null, userFileName);
     exportBean.setFileName(dispatchFileName);
+    exportBean.setAnalysis(getAnalysis(analysisId));
     Map<DispatchType, Long> sizeMap = new HashMap<>();
 
     if (!StringUtils.isEmpty(recipients)) {
@@ -1157,7 +1160,9 @@ public class ExportServiceImpl implements ExportService {
     if ( !(StringUtils.isEmpty(recipients))
         || !(StringUtils.isEmpty(s3))
         || !StringUtils.isEmpty(ftp)) {
-      ExportBean exportBean = setExportBeanProps(dispatchBean, analysisId);
+      final Analysis analysis = getAnalysis(analysisId);
+      ExportBean exportBean = setExportBeanProps(dispatchBean);
+      exportBean.setAnalysis(analysis);
       String userFileName = exportBean.getFileName();
       logger.trace("File name: {}",userFileName);
       logger.debug("dispatchBean for Pivot: {}", dispatchBean);

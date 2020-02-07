@@ -69,11 +69,11 @@ public class ServiceUtils {
   public String prepareMailBody(ExportBean exportBean, String body) {
     logger.debug("prepare mail body starts here :" + body);
     if (body.contains(MailBodyResolver.ANALYSIS_NAME)) {
-      body = body.replaceAll("\\" + MailBodyResolver.ANALYSIS_NAME, exportBean.getReportName());
+      body = body.replaceAll("\\" + MailBodyResolver.ANALYSIS_NAME, exportBean.getAnalysis().getName());
     }
     if (body.contains(MailBodyResolver.ANALYSIS_DESCRIPTION)) {
       body =
-          body.replaceAll("\\" + MailBodyResolver.ANALYSIS_DESCRIPTION, exportBean.getReportDesc());
+          body.replaceAll("\\" + MailBodyResolver.ANALYSIS_DESCRIPTION, exportBean.getAnalysis().getDescription());
     }
     if (body.contains(MailBodyResolver.PUBLISH_TIME)) {
       body = body.replaceAll("\\" + MailBodyResolver.PUBLISH_TIME, exportBean.getPublishDate());
