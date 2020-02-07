@@ -5,16 +5,17 @@ import javax.servlet.http.HttpServletResponse;
 /** This is the utility class to set the server cookies. */
 public class ServerCookies {
 
-    /**
-     * Set cookies to HttpServletResponse .
-     * @param name
-     * @param value
-     * @param domain
-     * @param maxAge
-     * @param secure
-     * @param httpOnly
-     * @param response
-     */
+  /**
+   * Set cookies to HttpServletResponse .
+   *
+   * @param name
+   * @param value
+   * @param domain
+   * @param maxAge
+   * @param secure
+   * @param httpOnly
+   * @param response
+   */
   public static void setCookie(
       String name,
       String value,
@@ -29,16 +30,17 @@ public class ServerCookies {
     response.addHeader("set-cookie", cookie);
   }
 
-    /**
-     * Prepare cookie values .
-     * @param headerBuf
-     * @param name
-     * @param value
-     * @param domain
-     * @param maxAge
-     * @param isSecure
-     * @param httpOnly
-     */
+  /**
+   * Prepare cookie values .
+   *
+   * @param headerBuf
+   * @param name
+   * @param value
+   * @param domain
+   * @param maxAge
+   * @param isSecure
+   * @param httpOnly
+   */
   private static void appendCookieValue(
       StringBuffer headerBuf,
       String name,
@@ -53,14 +55,6 @@ public class ServerCookies {
     buf.append("=");
     buf.append(value);
 
-    /*// Add domain information, if present
-    if (domain != null) {
-      buf.append("; Domain=");
-     // buf.append(domain);
-        buf.append("http://13.126.137.89");
-    }
-
-
     if (maxAge > 0) {
       buf.append("; Max-Age=");
       buf.append(maxAge);
@@ -69,17 +63,15 @@ public class ServerCookies {
     // Secure
     if (isSecure) {
       buf.append("; Secure");
-    }*/
+    }
 
-    /*// HttpOnly
+    // HttpOnly
     if (httpOnly) {
       buf.append("; HttpOnly");
-    }*/
-      // Path=path
-     //
-          buf.append("; Path=");
-          buf.append("/");
-     // }
+    }
+    // Path=path
+    buf.append("; Path=");
+    buf.append("/");
     headerBuf.append(buf);
   }
 }
