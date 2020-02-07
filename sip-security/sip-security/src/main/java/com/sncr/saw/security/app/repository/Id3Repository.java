@@ -14,20 +14,15 @@ public interface Id3Repository {
    * @param clientId
    * @return
    */
-  boolean validateId3Request(String masterLoginId ,String id3DomainName, String clientId);
+  boolean validateId3Request(String masterLoginId, String id3DomainName, String clientId);
 
   /**
    * This Method obtains the Authorization Code for Id3 user , domain and client-Id.
    *
-   * @param masterLoginId
-   * @param id3Request
+   * @param authorizationCodeDetails
    * @return
    */
-  String obtainAuthorizationCode(
-      String masterLoginId,
-      Id3AuthenticationRequest id3Request,
-      String id3DomainName,
-      String clientId);
+  String obtainAuthorizationCode(AuthorizationCodeDetails authorizationCodeDetails);
 
   /**
    * Validate the authorization code issued by SIP for authentication after SIP sso redirect.

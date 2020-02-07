@@ -1,6 +1,5 @@
 package com.sncr.saw.security.app.service;
 
-import com.google.common.base.Preconditions;
 import com.sncr.saw.security.app.repository.ModulePrivilegeRepository;
 import com.sncr.saw.security.app.repository.RoleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
@@ -1087,6 +1086,11 @@ public class ExternalSecurityService {
 
   private UserDetailsResponse validateUserDetails(UserDetails userDetails) {
     UserDetailsResponse userDetailsResponse = validateUserDetailsInput(userDetails);
+    if (userDetailsResponse != null
+        && userDetailsResponse.getValid() != null
+        && !userDetailsResponse.getValid()) {
+      return userDetailsResponse;
+    }
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
     userDetailsResponse = new UserDetailsResponse();
     if (customerSysId == null) {

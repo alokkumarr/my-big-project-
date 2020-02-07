@@ -2,6 +2,7 @@ package com.sncr.saw.security.app.controller;
 
 import com.sncr.saw.security.app.id3.model.AuthorizationCodeDetails;
 import com.sncr.saw.security.app.id3.model.Id3AuthenticationRequest;
+import com.sncr.saw.security.app.id3.model.Id3Claims;
 import com.sncr.saw.security.app.id3.service.ValidateId3IdentityToken;
 import com.sncr.saw.security.app.repository.Id3Repository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
@@ -110,7 +111,7 @@ public class SipId3Controller {
     SSOResponse ssoResponse = null;
     AuthorizationCodeDetails authorizationCodeDetails =
         id3Repository.validateAuthorizationCode(authorizationCode, id3AuthenticationRequest);
-    if (authorizationCodeDetails.getMasterLoginId() != null) {
+    if (authorizationCodeDetails.getMasterLoginId() != null && authorizationCodeDetails.isValid()) {
       ssoResponse =
           ssoRequestHandler.createSAWToken(authorizationCodeDetails.getMasterLoginId(), true);
     }
@@ -147,11 +148,15 @@ public class SipId3Controller {
       Id3AuthenticationRequest id3AuthenticationRequest = new Id3AuthenticationRequest();
       id3AuthenticationRequest.setRedirectUrl(map.get("redirectUrl"));
       id3AuthenticationRequest.setIdToken(map.get("idToken"));
-      String masterLoginId =
-          validateId3IdentityToken.validateToken(id3AuthenticationRequest.getIdToken());
-      if (masterLoginId != null) {
-        authorizationCode =
-            id3Repository.obtainAuthorizationCode(masterLoginId, id3AuthenticationRequest, domain,clientId);
+      Id3Claims id3Claims =
+          validateId3IdentityToken.validateToken(
+              id3AuthenticationRequest.getIdToken(), Id3Claims.Type.ID);
+      if (id3Claims != null) {
+        AuthorizationCodeDetails authorizationCodeDetails = new AuthorizationCodeDetails();
+        authorizationCodeDetails.setMasterLoginId(id3Claims.getMasterLoginId());
+        authorizationCodeDetails.setId3ClientId(clientId);
+        authorizationCodeDetails.setId3DomainName(id3Claims.getDomainName());
+        authorizationCode = id3Repository.obtainAuthorizationCode(authorizationCodeDetails);
         ssoRequestHandler.setSsoCookies(
             response, authorizationCode, id3AuthenticationRequest, domain, clientId);
         response.setStatus(HttpStatus.FOUND.value());

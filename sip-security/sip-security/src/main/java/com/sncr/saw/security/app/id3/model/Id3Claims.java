@@ -9,8 +9,9 @@ import java.util.Map;
 public class Id3Claims {
 
   private String domainName;
-  private String clientName;
+  private String clientId;
   private String masterLoginId;
+  private String customerCode;
   private Type type;
 
   /** @return String get the domain name. */
@@ -24,13 +25,13 @@ public class Id3Claims {
   }
 
   /** @return Get the client Id. */
-  public String getClientName() {
-    return clientName;
+  public String getClientId() {
+    return clientId;
   }
 
-  /** @param clientName Set the client Id. */
-  public void setClientName(String clientName) {
-    this.clientName = clientName;
+  /** @param clientId Set the client Id. */
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
   }
 
   /** @return get the master login Id. */
@@ -41,6 +42,24 @@ public class Id3Claims {
   /** @param masterLoginId Set the master login Id. */
   public void setMasterLoginId(String masterLoginId) {
     this.masterLoginId = masterLoginId;
+  }
+
+  /**
+   * Get customer code.
+   *
+   * @return
+   */
+  public String getCustomerCode() {
+    return customerCode;
+  }
+
+  /**
+   * Set Customer Code.
+   *
+   * @param customerCode
+   */
+  public void setCustomerCode(String customerCode) {
+    this.customerCode = customerCode;
   }
 
   /** @return get the type of Token. */

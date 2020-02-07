@@ -1,12 +1,12 @@
 package com.sncr.saw.security.app.sso;
 
 import com.sncr.saw.security.app.id3.model.Id3AuthenticationRequest;
+import com.sncr.saw.security.app.id3.model.Id3Claims;
 import com.sncr.saw.security.app.id3.service.ValidateId3IdentityToken;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.common.bean.RefreshToken;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.app.service.TicketHelper;
-import com.sncr.saw.security.common.util.ServerCookies;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -74,12 +74,12 @@ public class SSORequestHandler {
 
     SSOResponse ssoResponse = null;
     // Check if the Token is valid
-    String masterLoginId = validateId3IdentityToken.validateToken(token);
-    if (masterLoginId != null) {
-      logger.trace("Successfully validated single sign-on request for user: " + masterLoginId);
-      ssoResponse = createSAWToken(masterLoginId, true);
+   Id3Claims id3Claims = validateId3IdentityToken.validateToken(token,Id3Claims.Type.ID);
+    if (id3Claims.getMasterLoginId() != null) {
+      logger.trace("Successfully validated single sign-on request for user: " + id3Claims.getMasterLoginId());
+      ssoResponse = createSAWToken(id3Claims.getMasterLoginId(), true);
     }
-    logger.trace("Authentication failed single sign-on request for user: " + masterLoginId);
+    logger.trace("Authentication failed single sign-on request for user: " + id3Claims.getMasterLoginId());
     return ssoResponse;
   }
 
