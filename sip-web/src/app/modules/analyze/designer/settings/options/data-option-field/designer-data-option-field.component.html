@@ -169,6 +169,7 @@
     <div *ngIf="isDataField">
       <custom-color-picker
         [config]="colorPickerConfig"
+        [bgColor]="artifactColumn.seriesColor || '#ffffff'"
         (change)="selectedColor($event)"
       >
       </custom-color-picker>
