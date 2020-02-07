@@ -983,6 +983,22 @@ curl -X PUT \
   -d '{ "max_result_window" : 300000 }'
 ----
 
+=== MapR Table Size Setting
+Mapr supports default max row size of table `32768KB`. Size can be checked with the below MapR cli command:
+----
+maprcli config load -json | grep mfs.db.max.rowsize.kb
+----
+
+If the users tries to query more data (> 32MB) and tries to save in the table, table will throw an error like:
+
+`ERROR com.mapr.fs.Inode - checkAndReplaceOrDelete() on '/var/sip/services/metadata/onetime'
+ failed with error: Argument list too long (7).`
+
+Below is the command to increase the size of mapr table:
+----
+maprcli config save -values {"mfs.db.max.rowsize.kb":"128000"}
+----
+
 === General guideline for ElasticSearch script support
 
 SIP is using custom scripting of ElasticSearch to build and evaluate
