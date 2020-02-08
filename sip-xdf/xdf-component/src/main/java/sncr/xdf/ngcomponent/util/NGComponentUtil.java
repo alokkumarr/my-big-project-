@@ -29,7 +29,7 @@ public class NGComponentUtil {
                     } else {
                         rc = XDFReturnCode.INTERNAL_ERROR.getCode();
                     }
-                    if (!optComponent.isPresent()) {
+                    if (optComponent.isPresent()) {
                         AbstractComponent component = optComponent.get();
                         component.getErrors().put(rc, description);
                         try {
@@ -61,7 +61,7 @@ public class NGComponentUtil {
     }
 
     public static boolean isErrorHandlingEnabled(Optional<AbstractComponent> optComponent){
-        if(!optComponent.isPresent() && optComponent.get().getNgctx() != null
+        if(optComponent.isPresent() && optComponent.get().getNgctx() != null
             && optComponent.get().getNgctx().componentConfiguration != null
             && optComponent.get().getNgctx().componentConfiguration.isErrorHandlingEnabled()){
             return true;
