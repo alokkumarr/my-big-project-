@@ -8,6 +8,8 @@ import java.util.Base64;
 
 public class TokenParser {
 
+  public static final String SEPARATOR = "\\.";
+
   /**
    * Retrieve Ticket will read the values from jwt token.
    *
@@ -16,7 +18,7 @@ public class TokenParser {
    * @throws IOException throws IO Exception if unable to read token.
    */
   public static Ticket retrieveTicket(String jwtToken) throws IOException {
-    String[] jwtParts = jwtToken.split("\\.");
+    String[] jwtParts = jwtToken.split(SEPARATOR);
     Ticket ticket = null;
     ObjectMapper objectMapper = new ObjectMapper();
     if (jwtParts.length == 3) {

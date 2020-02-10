@@ -16,3 +16,4 @@ export { CustomIconService } from './custom-icon.service';
 export { DndPubsubService, DndEvent } from './dnd-pubsub.service';
 export { HtmlDownloadService } from './html-download.service';
 export { CommonSemanticService } from './semantic.service';
+export { CookiesService } from './cookies.service';

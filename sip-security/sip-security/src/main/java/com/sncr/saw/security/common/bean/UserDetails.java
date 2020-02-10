@@ -38,7 +38,7 @@ public class UserDetails {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty("id3Enabled")
-  private String id3Enabled;
+  private boolean id3Enabled;
 
   @JsonProperty("roleId")
   private Long roleId;
@@ -186,13 +186,13 @@ public class UserDetails {
    * @return id3Enabled
    */
   @JsonProperty("id3Enabled")
-  public String getId3Enabled() {
+  public boolean getId3Enabled() {
     return id3Enabled;
   }
 
   /** Sets id3Enabled. */
   @JsonProperty("id3Enabled")
-  public void setId3Enabled(String id3Enabled) {
+  public void setId3Enabled(boolean id3Enabled) {
     this.id3Enabled = id3Enabled;
   }
 
