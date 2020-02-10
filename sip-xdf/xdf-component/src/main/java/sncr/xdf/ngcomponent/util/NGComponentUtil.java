@@ -12,7 +12,7 @@ public class NGComponentUtil {
     private static final Logger logger = Logger.getLogger(NGComponentUtil.class);
 
     public static int handleErrors(Optional<AbstractComponent> optComponent, int rc, Exception e) {
-        logger.info("handleErrors() : Return Code: " + rc +", Exception : " e);
+        logger.info("handleErrors() : Return Code: " + rc +", Exception : ", e);
         boolean isErrorHandlingEnabled = isErrorHandlingEnabled(optComponent);
         logger.info("isErrorHandlingEnabled : "+ isErrorHandlingEnabled);
         if(isErrorHandlingEnabled) {
