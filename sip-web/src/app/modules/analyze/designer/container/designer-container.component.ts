@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
+import * as isNil from 'lodash/isNil';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
 import * as flatMap from 'lodash/flatMap';
@@ -1054,9 +1055,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
         if (!isEmpty(this.data)) {
           const rowKeys = keys(this.data[0]);
+          const columnIdentifier =
+            this.analysis.type === 'report'
+              ? event.column.alias || event.column.name
+              : event.column.name;
           this.data.map(row => {
-            const key = find(rowKeys, k => includes(k, event.column.name));
-            if (row[key]) {
+            const key = find(rowKeys, k => includes(k, columnIdentifier));
+            if (!isNil(row[key])) {
               row[key] = '';
             }
           });
