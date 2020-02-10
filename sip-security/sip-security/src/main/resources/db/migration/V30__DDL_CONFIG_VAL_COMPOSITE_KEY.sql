@@ -1,5 +1,5 @@
 /*******************************************************************************
- Filename:  V29__DDL_CONFIG_VAL_COMPOSITE_KEY.sql
+ Filename:  V30__DDL_CONFIG_VAL_COMPOSITE_KEY.sql
  Purpose:   Alter config_val table to add a unique constraint.
  Date:      06-02-2020
 ********************************************************************************/
