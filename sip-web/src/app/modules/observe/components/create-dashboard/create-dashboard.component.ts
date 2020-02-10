@@ -84,6 +84,7 @@ export class CreateDashboardComponent
         .getDashboard(dashboardId)
         .subscribe((dashboard: Dashboard) => {
           this.dashboard = dashboard;
+          this.globalFilterService.lastAnalysisFilters = dashboard.filters;
           this.checkEmpty(this.dashboard);
         });
     }
