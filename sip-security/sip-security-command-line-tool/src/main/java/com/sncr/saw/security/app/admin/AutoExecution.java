@@ -22,7 +22,7 @@ public class AutoExecution {
   @Autowired
   AutoExecutionService autoExecutionService;
 
-  @ShellMethod("Adds auto execution configuration")
+  @ShellMethod("Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page")
   public String autoExecution(
       @ShellOption(value = "--C", help = "Customer-Code") String customerCode,
       @ShellOption(value = "--F", help = "Active Status Indicator flag", defaultValue = "1") String activeStatusInd) {
