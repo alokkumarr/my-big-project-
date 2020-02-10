@@ -12,6 +12,7 @@ public class NGComponentUtil {
     private static final Logger logger = Logger.getLogger(NGComponentUtil.class);
 
     public static int handleErrors(Optional<AbstractComponent> optComponent, int rc, Exception e) {
+        logger.info("handleErrors() : Return Code: " + rc +", Exception : " e);
         boolean isErrorHandlingEnabled = isErrorHandlingEnabled(optComponent);
         logger.info("isErrorHandlingEnabled : "+ isErrorHandlingEnabled);
         if(isErrorHandlingEnabled) {
@@ -22,7 +23,6 @@ public class NGComponentUtil {
                     e = new XDFException(XDFReturnCode.INTERNAL_ERROR);
                 }
                 if (e != null) {
-                    logger.error("Exception Occurred : ", e);
                     String description = e.getMessage();
                     if (e instanceof XDFException) {
                         rc = ((XDFException) e).getReturnCode().getCode();
@@ -55,7 +55,7 @@ public class NGComponentUtil {
             }
             logger.info("Component Return Code :" + rc);
         }else{
-            rc = (rc == 0) ? 0 : -1;
+            rc = (rc == 0 && e == null) ? 0 : -1;
         }
         return rc;
     }
