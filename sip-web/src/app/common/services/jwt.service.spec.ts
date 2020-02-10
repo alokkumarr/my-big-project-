@@ -45,13 +45,13 @@ describe('JWT Service', () => {
     expect(jwtService.customerId).toEqual('');
   });
 
-<<<<<<< HEAD
   it('should parse jwt and validate it', () => {
     const validJwt = jwtService.parseJWT(validToken);
     const inValidJwt = jwtService.parseJWT(inValidToken);
     expect(jwtService.isValid(validJwt)).toEqual(true);
     expect(jwtService.isValid(inValidJwt)).toEqual(false);
-=======
+  });
+
   describe('parseJWT', () => {
     it('should handle no input', () => {
       expect(jwtService.parseJWT(null)).toBeFalsy();
@@ -86,6 +86,5 @@ describe('JWT Service', () => {
     });
     expect(jwtService.getLoginId()).toEqual('abc');
     expect(spy).toHaveBeenCalled();
->>>>>>> master
   });
 });
