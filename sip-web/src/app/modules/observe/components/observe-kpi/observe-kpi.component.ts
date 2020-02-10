@@ -72,7 +72,6 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
     this._kpi = data;
     this.dataFormat = get(this._kpi, 'dataFields.0.format');
-    this.executeKPI(this._kpi);
   }
 
   @Input()
@@ -95,7 +94,6 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     const kpiFilters = cloneDeep(this._kpi);
     const filter = this.constructGlobalFilter(filterModel, kpiFilters.filters);
     const kpi = defaults({}, { filters: filter }, kpiFilters);
-
     return this.executeKPI(kpi);
   }
 
