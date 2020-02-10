@@ -31,14 +31,15 @@ public class User implements Serializable {
 	private String firstName;	
 	private String lastName;
 	private String middleName;
-	private String productName;	
+	private String productName;
 	private TicketDetails ticketDetails = null;
 	private String userName;
 	private String roleName;	
 	private String userType;
 	private Long roleId;
 	private String email;
-	private String status;	
+	private String status;
+    private boolean id3Enabled;
 	private Long validMins;
 	private Long customerId;
 	private String password;
@@ -108,7 +109,15 @@ public class User implements Serializable {
 		this.status = status;
 	}
 
-	public String getUserType() {
+  public boolean isId3Enabled() {
+    return id3Enabled;
+  }
+
+  public void setId3Enabled(boolean id3Enabled) {
+    this.id3Enabled = id3Enabled;
+  }
+
+    public String getUserType() {
 		return userType;
 	}
 

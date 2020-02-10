@@ -158,6 +158,7 @@ saw_security_email_host=sip-admin
 #
 sip_maxUnsuccessfulLoginAttemptAllowed=2
 sip_user_lockingTime_mins=2
+sip_id3_url=https://flying-kraken.id3.uat.cloud.synchronoss.net
 
 [saw-security-arbitrator]
 sip-app3
