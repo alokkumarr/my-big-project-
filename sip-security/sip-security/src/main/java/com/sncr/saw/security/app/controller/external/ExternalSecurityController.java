@@ -608,11 +608,6 @@ public class ExternalSecurityController {
       } catch (Exception ex) {
           logger.error("Error occurred while fetching security group details: "
               + ex.getMessage(), ex);
-
-          Valid valid = new Valid();
-          valid.setValidityMessage(ex.getMessage());
-          valid.setValid(false);
-
           response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
       }
 

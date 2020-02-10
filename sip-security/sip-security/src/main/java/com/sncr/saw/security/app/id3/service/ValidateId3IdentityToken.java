@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sncr.saw.security.app.id3.model.Id3Claims;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.Id3Repository;
+import com.synchronoss.bda.sip.jwt.TokenParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class ValidateId3IdentityToken {
     String clientId = null;
     Id3Claims id3Claims = new Id3Claims();
     try {
-      String[] jwtParts = token.split("\\.");
+      String[] jwtParts = token.split(TokenParser.SEPARATOR);
       ObjectMapper objectMapper = new ObjectMapper();
       if (jwtParts.length == 3) {
         String payload = new String(Base64.getDecoder().decode(jwtParts[1]));

@@ -984,14 +984,17 @@ curl -X PUT \
 ----
 
 === MapR Table Size Setting
-Mapr supports default max row size of table `32768KB`. Size can be checked with the below MapR cli command:
+Mapr supports default max row size of table `32768KB`. Size can be
+checked with the below MapR cli command:
 ----
 maprcli config load -json | grep mfs.db.max.rowsize.kb
 ----
 
-If the users tries to query more data (> 32MB) and tries to save in the table, table will throw an error like:
+If the users tries to execute/query Analysis more data (> 32MB) and
+tries to save in the table, table will throw an error like:
 
-`ERROR com.mapr.fs.Inode - checkAndReplaceOrDelete() on '/var/sip/services/metadata/onetime'
+`ERROR com.mapr.fs.Inode - checkAndReplaceOrDelete() on
+'<Table name >'
  failed with error: Argument list too long (7).`
 
 Below is the command to increase the size of mapr table:
