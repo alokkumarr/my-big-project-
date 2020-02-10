@@ -17,6 +17,8 @@ import * as toLower from 'lodash/toLower';
 import * as toUpper from 'lodash/toUpper';
 import * as some from 'lodash/some';
 import * as split from 'lodash/split';
+import * as set from 'lodash/set';
+import * as flatMap from 'lodash/flatMap';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -49,6 +51,8 @@ import {
   CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
+import { DATA_AXIS } from './consts';
+import { CHART_COLORS } from 'src/app/common/consts';
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
@@ -201,6 +205,24 @@ export class DesignerService {
     );
   }
 
+  /**
+   *  Adjusting the default series color to newly selected column.
+   * Added a part of SIP-10225.
+   */
+  static setSeriesColorForColumns(sortedArtifacts) {
+    const selectedColumns = flatMap(sortedArtifacts, x => x.fields);
+    const dataColumn = fpFilter(
+      col => DATA_AXIS.includes(col.area) && !col.colorSetFromPicker
+    )(selectedColumns);
+
+    forEach(dataColumn, (col, index) => {
+      set(col, 'seriesColor', CHART_COLORS[index]);
+      set(col, 'colorSetFromPicker', false);
+    });
+
+    return sortedArtifacts;
+  }
+
   constructor(private _analyzeService: AnalyzeService) {}
 
   createAnalysis(
@@ -293,9 +315,9 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-        artifactColumn.dataField = DesignerService.dataFieldFor(
-          <ArtifactColumnDSL>artifactColumn
-        );
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
       }
     };
 
@@ -416,9 +438,9 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
         artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-        artifactColumn.dataField = DesignerService.dataFieldFor(
-          <ArtifactColumnDSL>artifactColumn
-        );
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
       }
     };
 
@@ -603,9 +625,9 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
 
-        artifactColumn.dataField = DesignerService.dataFieldFor(
-          <ArtifactColumnDSL>artifactColumn
-        );
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;

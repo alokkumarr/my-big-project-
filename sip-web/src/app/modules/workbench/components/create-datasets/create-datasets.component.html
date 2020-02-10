@@ -166,7 +166,7 @@
                       e2e="dataset-name"
                       name="datasetName"
                       formControlName="nameControl"
-                      maxlength="18"
+                      maxlength="25"
                       required
                       (keyup)="changedToUppercase($event)"
                     />
@@ -178,6 +178,15 @@
                     >
                       Dataset Name is
                       <strong>required</strong>
+                    </mat-error>
+
+                    <mat-error
+                      *ngIf="
+                        nameFormGroup.controls.nameControl.hasError('minlength')
+                      "
+                      i18n
+                    >
+                      Minimum <strong>3</strong> characters are required.
                     </mat-error>
                     <mat-error
                       *ngIf="
