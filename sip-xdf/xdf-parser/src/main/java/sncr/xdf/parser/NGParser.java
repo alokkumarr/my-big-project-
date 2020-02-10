@@ -343,6 +343,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         logger.warn("Unable to write rejected data");
                     }
                 }
+
+                //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+                //TODO: This is a crude way of checking. This need to be revisited.
+                if(logger.isDebugEnabled() && ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
+                    logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+                }
+
             }catch (Exception e) {
                 logger.error("Exception in parser module: ",e);
                 if (e instanceof XDFException) {
@@ -351,13 +358,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                 }
             }
-
-             //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
-             //TODO: This is a crude way of checking. This need to be revisited.
-            if(logger.isDebugEnabled()) {
-                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-            }
-
         }
 		else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
@@ -613,7 +613,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         long rddCount = rddWithoutHeader.count();
         logger.info("RDD Count is : " + rddCount);
         int rc = 0;
-        if(rddCount > 0) {
+        if(!ngctx.componentConfiguration.isErrorHandlingEnabled() || rddCount > 0) {
             inputDSCount += rddCount;
             JavaRDD<Row> parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
                 quoteEscapeChar, '\'', recCounter, errCounter));
