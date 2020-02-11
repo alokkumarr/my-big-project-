@@ -343,13 +343,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         logger.warn("Unable to write rejected data");
                     }
                 }
-
-                //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
-                //TODO: This is a crude way of checking. This need to be revisited.
-                if(logger.isDebugEnabled() && ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
-                    logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-                }
-
             }catch (Exception e) {
                 logger.error("Exception in parser module: ",e);
                 if (e instanceof XDFException) {
@@ -416,6 +409,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
+        }
+
+        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+        //TODO: This is a crude way of checking. This need to be revisited.
+        if(
+            //logger.isDebugEnabled() &&
+                ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
+            logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
         }
         logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
         validateOutputDSCounts(inputDSCount);
