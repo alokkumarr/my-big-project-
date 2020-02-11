@@ -11,11 +11,13 @@ import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { CommonModuleTs, CommonModuleGlobal } from './common';
+
 import {
   AddTokenInterceptor,
   HandleErrorInterceptor,
   RefreshTokenInterceptor
 } from './common/interceptor';
+import { BrandingService } from './modules/admin/branding/branding.service';
 import { AnalyzeModuleGlobal } from './modules/analyze/analyze.global.module';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
@@ -39,7 +41,7 @@ const COMPONENTS = [
   MainPageComponent,
   DeleteDialogComponent
 ];
-const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
+const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }, BrandingService];
 
 const INTERCEPTORS = [
   { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },

@@ -13,8 +13,9 @@ import java.util.Map;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.CliHandler;
 import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
@@ -38,7 +39,7 @@ import sncr.xdf.context.XDFReturnCode;
  */
 public abstract class Component {
 
-  private static final Logger logger = Logger.getLogger(Component.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Component.class);
 
   protected String error;
   protected Context ctx;
@@ -84,24 +85,21 @@ public abstract class Component {
     int ret = initializeDataSets();
     if (ret == 0) {
       ret = execute();
-      logger.info("execute Return code = " + ret);
+      LOGGER.info("execute Return code = " + ret);
       if (ret == 0) {
         ret = move();
-        logger.debug("move Return code = " + ret);
+        LOGGER.debug("move Return code = " + ret);
         if (ret == 0) {
           ret = archive();
-          logger.debug("archive Return code = " + ret);
-          //          if (ret == 0) {
-          //          } else {
-          //          }
+          LOGGER.debug("archive Return code = " + ret);
         } else {
-          logger.error("Could not complete archive phase!");
+          LOGGER.error("Could not complete archive phase!");
         }
       } else {
-        logger.error("Could not complete execution phase!");
+        LOGGER.error("Could not complete execution phase!");
       }
     } else {
-      logger.error("Could not generate/retrieve metadata phase!");
+      LOGGER.error("Could not generate/retrieve metadata phase!");
     }
 
     // Run finalize only if all previous steps are successful
@@ -120,12 +118,12 @@ public abstract class Component {
         WithDataSetService mddl = (WithDataSetService) this;
         if (ctx.componentConfiguration.getInputs() != null
             && ctx.componentConfiguration.getInputs().size() > 0) {
-          logger.info("Extracting meta data");
+          LOGGER.info("Extracting meta data");
           dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
           inputDataSets = mddl.discoverInputDataSetsWithMetadata(dsaux);
           inputs = mddl.discoverDataParametersWithMetaData(dsaux);
-          logger.debug("Input datasets = " + inputDataSets);
-          logger.debug("Inputs = " + inputs);
+          LOGGER.debug("Input datasets = " + inputDataSets);
+          LOGGER.debug("Inputs = " + inputs);
           mdInputDataSetMap = md.loadExistingDataSets(ctx, inputDataSets);
           mdInputDataSetMap.forEach((id, ids) -> {
             try {
@@ -134,7 +132,7 @@ public abstract class Component {
               failed[0] = true;
               error = String.format("Could not add transformation"
                   + " consumer: %s to input dataset %s", transformationId, id);
-              logger.error(error, e);
+              LOGGER.error(error, e);
               return;
             }
           });
@@ -148,42 +146,42 @@ public abstract class Component {
             dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
           }
           outputDataSets = mddl.buildPathForOutputDataSets(dsaux);
-          logger.debug("OutputDatasets = " + outputDataSets);
+          LOGGER.debug("OutputDatasets = " + outputDataSets);
           outputs = mddl.buildPathForOutputs(dsaux);
-          logger.debug("Outputs = " + outputs);
+          LOGGER.debug("Outputs = " + outputs);
         }
 
         mdOutputDataSetMap = new HashMap<>();
         final int[] rc = {0};
 
-        logger.debug("Component configuration = " + ctx.componentConfiguration);
-        logger.debug("Output datasets = " + ctx.componentConfiguration.getOutputs()
+        LOGGER.debug("Component configuration = " + ctx.componentConfiguration);
+        LOGGER.debug("Output datasets = " + ctx.componentConfiguration.getOutputs()
             + " Length = " + ctx.componentConfiguration.getOutputs().size());
 
 
         ctx.componentConfiguration.getOutputs().forEach(o -> {
-          logger.debug("Add output object to data object repository: " + o.getDataSet());
+          LOGGER.debug("Add output object to data object repository: " + o.getDataSet());
 
           if (!mddl.discoverAndvalidateOutputDataSet(outputDataSets.get(o.getDataSet()))) {
             error = "Could not validate output dataset: " + o.getDataSet();
-            logger.error(error);
+            LOGGER.error(error);
             rc[0] = -1;
             return;
           }
 
           ctx.setStartTs();
-          logger.debug("Reading dataset details for " + outputDataSets.get(o.getDataSet()));
+          LOGGER.debug("Reading dataset details for " + outputDataSets.get(o.getDataSet()));
           JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()));
           if (ds == null) {
             error = "Could not create metadata for output dataset: " + o.getDataSet();
-            logger.error(error);
+            LOGGER.error(error);
             rc[0] = -1;
             return;
           }
-          logger.debug("Create/read DS and add it to Output object DS list");
+          LOGGER.debug("Create/read DS and add it to Output object DS list");
           JsonObject dsObj = ds.getAsJsonObject();
           String id = dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString();
-          logger.debug(String.format(
+          LOGGER.debug(String.format(
               "Add to output DataSet map document with ID: %s\n %s", id, ds.toString()));
 
           mdOutputDataSetMap.put(dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString())
@@ -191,18 +189,17 @@ public abstract class Component {
 
           String step = "Could not create activity log entry for DataSet: " + o.getDataSet();
           try {
-            logger.info("Generating audit log entry");
+            LOGGER.info("Generating audit log entry");
             JsonObject ale = als.generateDSAuditLogEntry(ctx, "INIT",
                 inputDataSets, outputDataSets);
             String aleId = als.createAuditLog(ctx, ale);
-            logger.debug("ALE ID = " + aleId + " ALE = " + ale);
+            LOGGER.debug("ALE ID = " + aleId + " ALE = " + ale);
 
             step = "Could not update metadata of DataSet: " + o.getDataSet();
             md.getDSStore().updateStatus(id, "INIT", ctx.startTs, null, aleId, ctx.batchID);
           } catch (Exception e) {
             error = step;
-            logger.error(error);
-            logger.error(e);
+            LOGGER.error("Error occurred for data sets {}", error);
             rc[0] = -1;
             return;
           }
@@ -216,7 +213,7 @@ public abstract class Component {
     } catch (Exception e) {
       error = "component initialization (input-discovery/output-preparation) exception: "
           + ExceptionUtils.getFullStackTrace(e);
-      logger.error(error);
+      LOGGER.error(error);
       return -1;
     }
   }
@@ -271,14 +268,17 @@ public abstract class Component {
       throw e;
     } catch (Exception e) {
       error = "Exception at component initialization " + e.getMessage();
-
+      LOGGER.error(error);
       throw e;
     }
   }
 
 
   /**
-   * Initialise component specific details.
+   * This method should not interact with any storage (hdfs, maprfs, es etc)
+   * Ideally should never be overwritten  and always executed from custom
+   * initialization functions. Initialise component specific details.
+   *
    * @param config Component Configuration
    * @param appId Application ID
    * @param batchId Batch ID (Irrelavant as of now)
@@ -286,37 +286,33 @@ public abstract class Component {
    * @return Result of init operation
    * @throws Exception Incase not able to read metastore.
    */
-  // From API
-  // This method should not interact with any storage (hdfs, maprfs, es etc)
-  // Ideally should never be overwritten
-  // and always executed from custom initialization functions
 
   public final int init(String config, String appId, String batchId, String xdfDataRootSys)
       throws Exception {
 
-    logger.trace("Configuration dump: \n" + config);
+    LOGGER.trace("Configuration dump: \n" + config);
     String metaDataLocation = xdfDataRootSys;
     ComponentConfiguration cfg = null;
     try {
       cfg = validateConfig(config);
-      logger.info("Component configuration = " + cfg);
+      LOGGER.info("Component configuration = " + cfg);
     } catch (Exception e) {
-      error = "Configuration is not valid, reason : " + e.getMessage();
-      logger.error(e);
+      error = "Configuration is not valid, reason : {}" + e.getMessage();
+      LOGGER.error(error);
 
       throw e;
     }
     if (cfg == null) {
       error = "Internal error: validation procedure returns null";
-      logger.error(error);
+      LOGGER.error(error);
 
       throw new Exception("Invalid configuration");
     }
     
-    logger.debug("Getting project metadata");
+    LOGGER.debug("Getting project metadata");
     ProjectStore prjStore = new ProjectStore(metaDataLocation); // maprfs:///var/sip ideally it should be maprfs:///var/sip/services/metadata
     JsonElement prj = prjStore.readProjectData(appId);
-    logger.debug("Project metadata for " + appId + " is " + prj);
+    LOGGER.debug("Project metadata for " + appId + " is " + prj);
 
     JsonObject prjJo = prj.getAsJsonObject();
     JsonElement plp;
@@ -350,7 +346,7 @@ public abstract class Component {
       ctx = new Context(componentName, batchId, appId, cfg);
       ctx.user = "N/A";
     } catch (Exception e) {
-      logger.error("Could not create context: ", e);
+      LOGGER.error("Could not create context: ", e);
       return -1;
     }
     ctx.fs = HFileOperations.getFileSystem();
@@ -370,7 +366,7 @@ public abstract class Component {
       als = new AuditLogService(md.getRoot());
     } catch (Exception e) {
       error = "Initialization of metadata services failed";
-      logger.error(error, e);
+      LOGGER.error(error, e);
       return -1;
     }
 
@@ -409,10 +405,10 @@ public abstract class Component {
         try {
             md.writeDLFSMeta(ctx);
             ctx.setFinishTS();
-            logger.info("Generating audit log entry");
+            LOGGER.info("Generating audit log entry");
             JsonObject ale = als.generateDSAuditLogEntry(ctx, status, inputDataSets, outputDataSets);
             String aleId = als.createAuditLog(ctx, ale);
-            logger.debug("ALE ID = " + aleId + " ALE = " + ale);
+            LOGGER.debug("ALE ID = " + aleId + " ALE = " + ale);
 
             mdOutputDataSetMap.forEach((id, ds) -> {
                 try {
@@ -445,31 +441,31 @@ public abstract class Component {
                       size = ctx.fs.getContentSummary(outputLocation).getSpaceConsumed();
                   }
 
-                    logger.trace("Extracted record count " + recordCount);
-                    logger.trace("Extracted size " + size);
+                    LOGGER.trace("Extracted record count " + recordCount);
+                    LOGGER.trace("Extracted size " + size);
 
                     //Extract schema
                     JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
                     if (schema != null) {
-                        logger.trace("Extracted schema: " + schema.toString());
+                        LOGGER.trace("Extracted schema: " + schema.toString());
                         md.updateDS(id, ctx, ds, schema, recordCount, size);
                     }
                 } catch (Exception e) {
                     error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
-                    logger.error(error);
-                    logger.error("Native exception: ", e);
+                    LOGGER.error(error);
+                    LOGGER.error("Native exception: ", e);
                     rc[0] = -1;
                     return;
                 }
             });
 
-            logger.debug("Transformation ID = " + transformationId +
+            LOGGER.debug("Transformation ID = " + transformationId +
                 " Audit log entry ID = " + aleId + " Batch ID = " + ctx.batchID);
             transformationMd.updateStatus(transformationId, status, ctx.startTs,
                 ctx.finishedTs, aleId, ctx.batchID);
         } catch (Exception e) {
             error = "Exception at job finalization: " + ExceptionUtils.getFullStackTrace(e);
-            logger.error(e);
+            LOGGER.error(error);
             return -1;
         }
         return rc[0];
@@ -496,19 +492,19 @@ public abstract class Component {
    */
   public static int startComponent(Component self, String dataLakeRoot,
                                    String config, String app, String batch) {
-    logger.debug(String.format("Component [%s] has been started...", self.componentName));
-    logger.info("Configuration: " + config);
-    logger.error("Configuration: " + config);
+    LOGGER.debug(String.format("Component [%s] has been started...", self.componentName));
+    LOGGER.info("Configuration: " + config);
+    LOGGER.error("Configuration: " + config);
 
     try {
       if (self.init(config, app, batch, dataLakeRoot) == 0) {
         return self.run();
       } else {
-        logger.error("Could not initialize component");
+        LOGGER.error("Could not initialize component");
         return -1;
       }
     } catch (Exception e) {
-      logger.error("Exception at start component: ", e);
+      LOGGER.error("Exception at start component: ", e);
       return -1;
     }
   }

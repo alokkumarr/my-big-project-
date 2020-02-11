@@ -165,5 +165,14 @@
       </div>
       <pre>{{ artifactColumn.formula }}</pre>
     </div>
+
+    <div *ngIf="isDataField && analysisType === 'chart'">
+      <custom-color-picker
+        [config]="colorPickerConfig"
+        [bgColor]="artifactColumn.seriesColor || '#ffffff'"
+        (change)="selectedColor($event)"
+      >
+      </custom-color-picker>
+    </div>
   </div>
 </mat-expansion-panel>

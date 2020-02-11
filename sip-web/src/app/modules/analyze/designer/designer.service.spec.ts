@@ -71,4 +71,30 @@ describe('Designer Service', () => {
       } as ArtifactColumnDSL)
     ).toEqual('SUM(def)');
   });
+
+  it('should return artifact column after adding series color ', () => {
+    const artifactCol = [
+      {
+        artifactName: 'name',
+        fields: [
+          {
+            aliasName: '',
+            columnName: 'string.keyword',
+            displayName: 'String',
+            filterEligible: true,
+            joinEligible: false,
+            name: 'string',
+            table: 'sample',
+            area: 'y',
+            type: 'string',
+            alias: ''
+          }
+        ]
+      }
+    ];
+    expect(
+      DesignerService.setSeriesColorForColumns(artifactCol)[0].fields[0]
+        .seriesColor
+    ).toBeTruthy();
+  });
 });

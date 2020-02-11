@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -63,8 +64,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -124,6 +125,7 @@ public class ExportServiceImpl implements ExportService {
   private static final String JOBGROUP = "jobGroup";
   private static final String EMAIL_LIST = "emailList";
   private static final String DELETE_EXPORT_FILE_CONST = "Deleting exported file.";
+  private static final String DOUBLE_QUOTE_ESCAPE = "\"";
 
   @PostConstruct
   public void init() {
@@ -170,7 +172,7 @@ public class ExportServiceImpl implements ExportService {
       url =
           storageProxyUrl
               + INTERNAL_PROXY_STOR_URL
-              + executionId
+              + analysisId
               + "/executions/data?page=1&pageSize="
               + sizOfExport
               + "&analysisType="
@@ -202,7 +204,7 @@ public class ExportServiceImpl implements ExportService {
     Object dispatchBean = request.getBody();
 
     logger.debug("Dispatch Bean = {}", dispatchBean);
-    ExportBean exportBean = setExportBeanProps(dispatchBean);
+    ExportBean exportBean = setExportBeanProps(dispatchBean,analysisId);
     logger.debug("Export Bean = {}", exportBean);
 
     String recipients = null;
@@ -236,25 +238,23 @@ public class ExportServiceImpl implements ExportService {
     }
   }
 
-  public ExportBean setExportBeanProps(Object dispatchBean) {
+  public ExportBean setExportBeanProps(Object dispatchBean, String analysisId) {
 
     ExportBean exportBean = new ExportBean();
+    Analysis analysis = getAnalysis(analysisId);
+    exportBean.setAnalysis(analysis);
     // presetting the variables, as their presence will determine which URLs to process
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
       if (((LinkedHashMap) dispatchBean).get("fileType") != null) {
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
       }
-      exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-      String reportName =
-          ExportUtils.prepareReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-      exportBean.setReportName(reportName);
+      exportBean.setReportName(analysis.getName());
+      exportBean.setReportDesc(analysis.getDescription());
       exportBean.setPublishDate(
           String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
       exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
       // consider default format as csv if file type is not provided.
-      String fileName =
-          ExportUtils.prepareFileName(
-              String.valueOf(((LinkedHashMap) dispatchBean).get("name")), exportBean.getFileType());
+      String fileName = ExportUtils.prepareFileName(analysis.getName(), exportBean.getFileType());
       if (exportBean.getFileType() == null || exportBean.getFileType().isEmpty()) {
         exportBean.setFileType(DEFAULT_FILE_TYPE);
       }
@@ -301,6 +301,9 @@ public class ExportServiceImpl implements ExportService {
     logger.trace("data size size to stream to csv report:{}", data.size());
     logger.trace("recordsTolimit:{}", recordsTolimit);
     logger.trace("recordsToSkip:{}", recordsToSkip);
+    logger.trace("Column Header = " + columnHeader);
+    logger.trace("Export bean header = " + StringUtils.join(exportBean.getColumnHeader(), ", "));
+    
     if (data == null || data.size() == 0) {
       logger.info("No data to export");
       return;
@@ -312,9 +315,11 @@ public class ExportServiceImpl implements ExportService {
             line -> {
               try {
                 if (line instanceof LinkedHashMap) {
+                  logger.trace("Line = " + line);
                   String[] header = null;
                   if (exportBean.getColumnHeader() == null
                       || exportBean.getColumnHeader().length == 0) {
+                    logger.trace("Export header is null");
                     Object[] obj;
                     if (columnHeader != null && !columnHeader.isEmpty()) {
                       obj = columnHeader.keySet().toArray();
@@ -327,7 +332,13 @@ public class ExportServiceImpl implements ExportService {
                     } else {
                       header = Arrays.copyOf(obj, obj.length, String[].class);
                     }
+
+                    logger.trace("Header = " + StringUtils.join(header, ", "));
                     exportBean.setColumnHeader(header);
+
+                    logger.trace(
+                        "Export bean after setting = "
+                            + StringUtils.join(exportBean.getColumnHeader(), ", "));
                     osw.write(
                         Arrays.stream(header)
                             .map(
@@ -338,37 +349,96 @@ public class ExportServiceImpl implements ExportService {
                                               && columnHeader.get(i) != null
                                           ? columnHeader.get(i)
                                           : i;
-                                  return "\"" + colHeader + "\"";
+                                  return DOUBLE_QUOTE_ESCAPE + colHeader + DOUBLE_QUOTE_ESCAPE;
                                 })
                             .collect(Collectors.joining(",")));
                     osw.write("\n");
-                    osw.write(
-                        Arrays.stream(exportBean.getColumnHeader())
-                            .map(
-                                val -> {
-                                  if (((LinkedHashMap) line).get(val) == null) {
-                                    return "null";
-                                  }
-                                  return "\"" + ((LinkedHashMap) line).get(val) + "\"";
-                                })
-                            .collect(Collectors.joining(",")));
+
+                    if (columnHeader == null || columnHeader.isEmpty()) {
+                      osw.write(
+                          Arrays.stream(exportBean.getColumnHeader())
+                              .map(
+                                  val -> {
+                                    if (((LinkedHashMap) line).get(val) == null) {
+                                      return "null";
+                                    }
+                                    return "\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                  })
+                              .collect(Collectors.joining(",")));
+                    } else {
+                      osw.write(
+                          columnHeader.entrySet().stream()
+                              .map(
+                                  entry -> {
+                                    String key = entry.getKey();
+                                    String value = entry.getValue();
+
+                                    LinkedHashMap<String, Object> linkedHashMap =
+                                        (LinkedHashMap) line;
+                                    LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
+                                        ExportUtils.convert(linkedHashMap);
+
+                                    if (linkedCaseInsensitiveMap.get(key) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(key)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else if (linkedCaseInsensitiveMap.get(value) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(value)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else {
+                                      return "null";
+                                    }
+                                  })
+                              .collect(Collectors.joining(",")));
+                    }
+
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Header for csv file: {}", header);
                   } else {
                     // ideally we shouldn't be using collectors but it's a single row so it
                     // won't hamper memory consumption
-                    osw.write(
-                        Arrays.stream(exportBean.getColumnHeader())
-                            .map(
-                                val -> {
-                                  String value;
-                                  if (((LinkedHashMap) line).get(val) == null) {
-                                    return "null";
-                                  }
-                                  value = "\"" + ((LinkedHashMap) line).get(val) + "\"";
-                                  return value;
-                                })
-                            .collect(Collectors.joining(",")));
+
+                    logger.trace("Export header is not null");
+
+                    if (columnHeader == null || columnHeader.isEmpty()) {
+                      osw.write(
+                          Arrays.stream(exportBean.getColumnHeader())
+                              .map(
+                                  val -> {
+                                    if (((LinkedHashMap) line).get(val) == null) {
+                                      return "null";
+                                    }
+                                    return "\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                  })
+                              .collect(Collectors.joining(",")));
+                    } else {
+                      osw.write(
+                          columnHeader.entrySet().stream()
+                              .map(
+                                  entry -> {
+                                    String key = entry.getKey();
+                                    String value = entry.getValue();
+
+                                    LinkedHashMap<String, Object> linkedHashMap =
+                                        (LinkedHashMap) line;
+                                    LinkedCaseInsensitiveMap<Object> linkedCaseInsensitiveMap =
+                                        ExportUtils.convert(linkedHashMap);
+
+                                    if (linkedCaseInsensitiveMap.get(key) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(key)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else if (linkedCaseInsensitiveMap.get(value) != null) {
+                                      return DOUBLE_QUOTE_ESCAPE
+                                          + linkedCaseInsensitiveMap.get(value)
+                                          + DOUBLE_QUOTE_ESCAPE;
+                                    } else {
+                                      return "null";
+                                    }
+                                  })
+                              .collect(Collectors.joining(",")));
+                    }
                     osw.write(System.getProperty("line.separator"));
                   }
                 }
@@ -725,7 +795,6 @@ public class ExportServiceImpl implements ExportService {
     // create a directory with unique name in published location.
     final String dispatchFileName = filePath(null, userFileName);
     exportBean.setFileName(dispatchFileName);
-    exportBean.setAnalysis(getAnalysis(analysisId));
     Map<DispatchType, Long> sizeMap = new HashMap<>();
 
     if (!StringUtils.isEmpty(recipients)) {
@@ -1088,9 +1157,7 @@ public class ExportServiceImpl implements ExportService {
     if ( !(StringUtils.isEmpty(recipients))
         || !(StringUtils.isEmpty(s3))
         || !StringUtils.isEmpty(ftp)) {
-      final Analysis analysis = getAnalysis(analysisId);
-      ExportBean exportBean = setExportBeanProps(dispatchBean);
-      exportBean.setAnalysis(analysis);
+      ExportBean exportBean = setExportBeanProps(dispatchBean, analysisId);
       String userFileName = exportBean.getFileName();
       logger.trace("File name: {}",userFileName);
       logger.debug("dispatchBean for Pivot: {}", dispatchBean);

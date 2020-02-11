@@ -18,7 +18,7 @@ public abstract class BaseEvent {
                        required = true,
                        access = "public",
                        dataType = "string")
-    public String  app_key;
+    private String  app_key;
 
     @ApiModelProperty(
             value = "device_id",
@@ -28,7 +28,7 @@ public abstract class BaseEvent {
             access = "public",
             hidden = true,
             dataType = "string")
-    public String  device_id;
+    private String  device_id;
 
     @ApiModelProperty(
             value = "begin_session",
@@ -36,7 +36,7 @@ public abstract class BaseEvent {
             notes = "Should provide value 1 to indicate session start",
             access = "public",
             dataType = "string")
-    public String  begin_session;
+    private String  begin_session;
 
     @ApiModelProperty(
             value = "session_duration",
@@ -44,7 +44,7 @@ public abstract class BaseEvent {
             notes = "provides session duration in seconds, can be used as heartbeat to update current sessions duration, recommended time every 60 seconds",
             access = "public",
             dataType = "string")
-    public String  session_duration;
+    private String  session_duration;
 
     @ApiModelProperty(
             name = "End Session Indicator",
@@ -52,7 +52,7 @@ public abstract class BaseEvent {
             notes = "Should provide value 1 to indicate session end",
             access = "public",
             dataType = "string")
-    public String  end_session;
+    private String  end_session;
 
     @ApiModelProperty(
             value = "ip_address",
@@ -60,7 +60,7 @@ public abstract class BaseEvent {
             notes = "(optional, can only be used with begin_session) IP address of user to determine user location, if not provided, countly will try to establish ip address based on connection data",
             access = "public",
             dataType = "string")
-    public String  ip_address;
+    private String  ip_address;
 
     @ApiModelProperty(
             value = "timestamp",
@@ -68,7 +68,7 @@ public abstract class BaseEvent {
             notes = "(optional) 10 digit UTC timestamp for recording past data",
             access = "public",
             dataType = "string")
-    public String  timestamp;
+    private String  timestamp;
 
     @ApiModelProperty(
             value = "hour",
@@ -76,7 +76,7 @@ public abstract class BaseEvent {
             notes = "(optional) current user local hour (0 - 23)",
             access = "public",
             dataType = "integer")
-    public String  hour;
+    private String  hour;
 
     @ApiModelProperty(
             value = "dow",
@@ -92,7 +92,7 @@ public abstract class BaseEvent {
             notes = "(optional) For country you only need to provide ISO standard two letter country code",
             access = "public",
             dataType = "string")
-    public String  country_code;
+    private String  country_code;
 
     @ApiModelProperty(
             value = "city",
@@ -100,7 +100,7 @@ public abstract class BaseEvent {
             notes = "(optional) Name of the user's city",
             access = "public",
             dataType = "string")
-    public String  city;
+    private String  city;
 
     @ApiModelProperty(
             value = "location",
@@ -109,7 +109,7 @@ public abstract class BaseEvent {
             access = "public",
             dataType = "string")
 
-    public String  location;
+    private String  location;
 
     @ApiModelProperty(
             value = "old_device_id",
@@ -117,9 +117,9 @@ public abstract class BaseEvent {
             notes = "(optional) provide when changing device ID, so server would merge the data",
             access = "public",
             dataType = "string")
-    public String  old_device_id;
+    private String  old_device_id;
 
-    public String  sdk_version;
+    private String  sdk_version;
 
     public String toString(){
        return

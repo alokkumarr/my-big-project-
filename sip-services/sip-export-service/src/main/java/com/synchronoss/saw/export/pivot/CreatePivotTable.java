@@ -103,7 +103,7 @@ public class CreatePivotTable {
       fileOut.close();
       logger.debug(this.getClass().getName() + " createPivot ends");
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("Error while building the pivot sheet : {}", e.getMessage());
     }
   }
 

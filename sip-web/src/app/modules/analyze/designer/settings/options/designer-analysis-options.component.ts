@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+
 import * as flatMap from 'lodash/flatMap';
 
 import { ArtifactColumn, DesignerChangeEvent } from '../../types';
@@ -18,7 +19,7 @@ export class DesignerAnalysisOptionsComponent {
   @Input() chartTitle: string;
   @Input('sipQuery') set setArtifacts(sipQuery: QueryDSL) {
     this.sipQuery = sipQuery;
-    this.selectedColumns = flatMap(sipQuery.artifacts, x => x.fields);
+    this.selectedColumns = flatMap(this.sipQuery.artifacts, x => x.fields);
   }
 
   public sipQuery: QueryDSL;

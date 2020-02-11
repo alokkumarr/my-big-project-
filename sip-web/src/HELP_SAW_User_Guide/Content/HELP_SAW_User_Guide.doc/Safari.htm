@@ -17,34 +17,32 @@
         <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../Resources/TableStyles/DFTableStyle.css" rel="stylesheet" data-mc-stylesheet-type="table" /><title>1.2 About this Document</title>
         <link href="../Resources/Stylesheets/saw_user_guide_DRAFT_11192018_01b.doc.css" rel="stylesheet" />
-        <script src="../../Resources/Scripts/custom.modernizr.js" type="text/javascript">
-        </script>
         <script src="../../Resources/Scripts/jquery.min.js" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.config.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.config.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" type="text/javascript">
+        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/plugins.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/plugins.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/MadCapAll.js" type="text/javascript">
+        <script src="../../Resources/Scripts/MadCapAll.js" defer="defer" type="text/javascript">
         </script>
     </head>
     <body>
         <div class="foundation-wrap off-canvas-wrapper">
             <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper="">
-                <aside class="off-canvas position-right" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
+                <aside class="off-canvas position-right" role="navigation" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
                     <ul class="off-canvas-accordion vertical menu off-canvas-list" data-accordion-menu="" data-mc-back-link="Back" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="True" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True">
                     </ul>
                 </aside>
                 <div class="off-canvas-content inner-wrap" data-off-canvas-content="">
                     <div data-sticky-container="" class="title-bar-container">
-                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true">
+                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true"><a class="skip-to-content fluid-skip showOnFocus" href="#">Skip To Main Content</a>
                             <div class="middle title-bar-section outer-row clearfix">
                                 <div class="menu-icon-container relative clearfix">
-                                    <button class="menu-icon" data-toggle="offCanvas"><span></span>
+                                    <button class="menu-icon" aria-label="Show Navigation Panel" data-toggle="offCanvas"><span></span>
                                     </button>
                                 </div>
                             </div>
@@ -61,18 +59,21 @@
                                     <div class="nav-search row">
                                         <form class="search" action="#">
                                             <div class="search-bar search-bar-container needs-pie">
-                                                <input class="search-field needs-pie" type="search" placeholder="Search" />
-                                                <div class="search-filter-wrapper">
-                                                    <div class="search-filter">
-                                                        <div class="search-filter-content">
-                                                            <ul>
-                                                                <li>All Files</li>
-                                                            </ul>
-                                                        </div>
+                                                <input class="search-field needs-pie" type="search" aria-label="Search Field" placeholder="Search" />
+                                                <div class="search-filter-wrapper"><span class="invisible-label" id="search-filters-label">Filter: </span>
+                                                    <div class="search-filter" aria-haspopup="true" aria-controls="sf-content" aria-expanded="false" aria-label="Search Filter" title="All Files" role="button" tabindex="0">
+                                                    </div>
+                                                    <div class="search-filter-content" id="sf-content">
+                                                        <ul>
+                                                            <li>
+                                                                <button class="mc-dropdown-item" aria-labelledby="search-filters-label filterSelectorLabel-00001"><span id="filterSelectorLabel-00001">All Files</span>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                                 <div class="search-submit-wrapper" dir="ltr">
-                                                    <div class="search-submit" title="Search">
+                                                    <div class="search-submit" title="Search" role="button" tabindex="0"><span class="invisible-label">Submit Search</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -82,142 +83,143 @@
                             </div>
                         </nav>
                     </div>
-                    <section class="main-section">
+                    <div class="main-section">
                         <div class="row outer-row sidenav-layout">
-                            <div class="sidenav-wrapper">
+                            <nav class="sidenav-wrapper">
                                 <div class="sidenav-container">
                                     <ul class="off-canvas-accordion vertical menu sidenav" data-accordion-menu="" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu accordion-menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="False" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True" data-mc-side-nav-menu="True">
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="body-container" data-mc-content-body="True">
-                                <h2 class="Heading2"><a name="_Toc530387604"></a>1.2 About this Document</h2>
-                                <p>&#160;</p>
-                                <p>The SAW User Guide references and utilizes several icons that are present in the application and icons utilized in the instructions.&#160; To assist you in becoming familiar the following is the list of those present in the SAW application (refer to <a href="Table ICONS and Symbols in.htm#_Ref529521214" class="ParaTextOnly MCXref xref xrefParaTextOnly">Table 2&#160; ICONS and Symbols in SAW</a>) and those frequently used as instruction throughout the user guide (refer to <a href="Table ICONS within the User.htm#_Ref529521256" class="ParaTextOnly MCXref xref xrefParaTextOnly">Table 3&#160; ICONS within the User Guide</a>):</p>
-                                <p class="Normalbulletedlist">&#160;</p>
-                                <table style="border-left-style: solid;border-left-width: 1px;border-right-style: solid;border-right-width: 1px;border-top-style: solid;border-top-width: 1px;border-bottom-style: solid;border-bottom-width: 1px;mc-table-style: url('../Resources/TableStyles/DFTableStyle.css');margin-left: auto;margin-right: auto;caption-side: top;" class="TableStyle-Basic" cellspacing="0">
-                                    <caption style="color: #1e90ff;"><span style="font-size: 9pt; font-style: italic; color: #1e90ff;">Table 2 Icons and Symbols in SAW</span>
-                                    </caption>
-                                    <col style="width: 143px;" class="Column-Column1">
-                                    </col>
-                                    <col style="width: 721px;" class="Column-Column1">
-                                    </col>
-                                    <thead>
-                                        <tr class="Head-Header1">
-                                            <th style="font-family: Calibri;font-size: 11pt;font-weight: normal;background-color: #87ceeb;" class="HeadE-Column1-Header1">
-                                                <p class="TableColumnhdr"><b>Icon</b>
-                                                </p>
-                                            </th>
-                                            <th style="font-family: Calibri;font-size: 11pt;font-weight: normal;background-color: #87ceeb;" class="HeadD-Column1-Header1">
-                                                <p class="TableColumnhdr"><b>Description</b>
-                                                </p>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/Role ICON.png">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">
-                                                <p class="TableText">‘Account Settings’ icon, located in the upper right corner of the screen.  Varies in the letter and color depending on the user.</p>
-                                            </td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/Menu Icon.png">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">
-                                                <p class="TableText">‘Menu’ icon, click to open a menu of links that are available to access. </p>
-                                            </td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyB-Column1-Body1">
-                                                <img src="../Resources/Images/Edit Icon.png">
-                                                </img>
-                                            </td>
-                                            <td class="BodyA-Column1-Body1">
-                                                <p class="TableText">‘Edit’ icon.  Populates a screen to edit information.</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <p>&#160;</p>
-                                <table style="mc-table-style: url('../Resources/TableStyles/DFTableStyle.css');margin-left: auto;margin-right: auto;caption-side: top;" class="TableStyle-Basic" cellspacing="0">
-                                    <caption><span style="font-size: 9pt; color: #6495ed; font-style: italic;">Table 3 Icons Used in Online Help</span>
-                                    </caption>
-                                    <col style="width: 122px;" class="Column-Column1">
-                                    </col>
-                                    <col style="width: 743px;" class="Column-Column1">
-                                    </col>
-                                    <thead>
-                                        <tr class="Head-Header1">
-                                            <th style="font-family: Calibri;font-size: 11pt;background-color: #87ceeb;font-weight: bold;" class="HeadE-Column1-Header1">Icon</th>
-                                            <th style="font-family: Calibri;font-size: 11pt;background-color: #87ceeb;font-weight: bold;" class="HeadD-Column1-Header1">Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/Stop.png">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">Important information.  Stop and read this is to bring something to your attention.</td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/Instructions.jpg">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">Instructions</td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/Info Available.jpg">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">Information that is available for your reference</td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/New Note_38x41.png" style="width: 38;height: 41;">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">A note is written for emphasis</td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/Additional accompaniments_38x39.jpg" style="width: 38;height: 39;">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">Additional accompaniments to this document</td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyE-Column1-Body1">
-                                                <img src="../Resources/Images/Under Construction_44x44.jpg" style="width: 44;height: 44;">
-                                                </img>
-                                            </td>
-                                            <td class="BodyD-Column1-Body1">The area of the document is still awaiting additional information and is therefore still under construction</td>
-                                        </tr>
-                                        <tr class="Body-Body1">
-                                            <td style="text-align: center;" class="BodyB-Column1-Body1">
-                                                <img src="../Resources/Images/step number circle.png">
-                                                </img>
-                                            </td>
-                                            <td class="BodyA-Column1-Body1">Step number from instructions.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <p>&#160;</p>
-                                <p>&#160;</p>
+                            </nav>
+                            <div class="body-container">
+                                <div id="mc-main-content" role="main" data-mc-content-body="True">
+                                    <h2 class="Heading2"><a name="_Toc530387604"></a>1.2 About this Document</h2>
+                                    <p>&#160;</p>
+                                    <p>The SAW User Guide references and utilizes several icons that are present in the application and icons utilized in the instructions.&#160; To assist you in becoming familiar the following is the list of those present in the SAW application (refer to <a href="Table ICONS and Symbols in.htm#_Ref529521214" class="ParaTextOnly MCXref xref xrefParaTextOnly">Table 2&#160; ICONS and Symbols in SAW</a>) and those frequently used as instruction throughout the user guide (refer to <a href="Table ICONS within the User.htm#_Ref529521256" class="ParaTextOnly MCXref xref xrefParaTextOnly">Table 3&#160; ICONS within the User Guide</a>):</p>
+                                    <p class="Normalbulletedlist">&#160;</p>
+                                    <table style="border-left-style: solid;border-left-width: 1px;border-right-style: solid;border-right-width: 1px;border-top-style: solid;border-top-width: 1px;border-bottom-style: solid;border-bottom-width: 1px;mc-table-style: url('../Resources/TableStyles/DFTableStyle.css');margin-left: auto;margin-right: auto;caption-side: top;" class="TableStyle-Basic" cellspacing="0">
+                                        <caption style="color: #1e90ff;"><span style="font-size: 9pt; font-style: italic; color: #1e90ff;">Table 2 Icons and Symbols in SAW</span>
+                                        </caption>
+                                        <col style="width: 143px;" class="Column-Column1">
+                                        </col>
+                                        <col style="width: 721px;" class="Column-Column1">
+                                        </col>
+                                        <thead>
+                                            <tr class="Head-Header1">
+                                                <th style="font-family: Calibri;font-size: 11pt;font-weight: normal;background-color: #87ceeb;" class="HeadE-Column1-Header1">
+                                                    <p class="TableColumnhdr"><b>Icon</b>
+                                                    </p>
+                                                </th>
+                                                <th style="font-family: Calibri;font-size: 11pt;font-weight: normal;background-color: #87ceeb;" class="HeadD-Column1-Header1">
+                                                    <p class="TableColumnhdr"><b>Description</b>
+                                                    </p>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/Role ICON.png">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">
+                                                    <p class="TableText">‘Account Settings’ icon, located in the upper right corner of the screen.  Varies in the letter and color depending on the user.</p>
+                                                </td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/Menu Icon.png">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">
+                                                    <p class="TableText">‘Menu’ icon, click to open a menu of links that are available to access. </p>
+                                                </td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyB-Column1-Body1">
+                                                    <img src="../Resources/Images/Edit Icon.png">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyA-Column1-Body1">
+                                                    <p class="TableText">‘Edit’ icon.  Populates a screen to edit information.</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>&#160;</p>
+                                    <table style="mc-table-style: url('../Resources/TableStyles/DFTableStyle.css');margin-left: auto;margin-right: auto;caption-side: top;" class="TableStyle-Basic" cellspacing="0">
+                                        <caption><span style="font-size: 9pt; color: #6495ed; font-style: italic;">Table 3 Icons Used in Online Help</span>
+                                        </caption>
+                                        <col style="width: 122px;" class="Column-Column1">
+                                        </col>
+                                        <col style="width: 743px;" class="Column-Column1">
+                                        </col>
+                                        <thead>
+                                            <tr class="Head-Header1">
+                                                <th style="font-family: Calibri;font-size: 11pt;background-color: #87ceeb;font-weight: bold;" class="HeadE-Column1-Header1">Icon</th>
+                                                <th style="font-family: Calibri;font-size: 11pt;background-color: #87ceeb;font-weight: bold;" class="HeadD-Column1-Header1">Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/Stop.png">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">Important information.  Stop and read this is to bring something to your attention.</td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/Instructions.jpg">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">Instructions</td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/Info Available.jpg">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">Information that is available for your reference</td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/New Note_38x41.png" style="width: 38;height: 41;">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">A note is written for emphasis</td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/Additional accompaniments_38x39.jpg" style="width: 38;height: 39;">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">Additional accompaniments to this document</td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyE-Column1-Body1">
+                                                    <img src="../Resources/Images/Under Construction_44x44.jpg" style="width: 44;height: 44;">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyD-Column1-Body1">The area of the document is still awaiting additional information and is therefore still under construction</td>
+                                            </tr>
+                                            <tr class="Body-Body1">
+                                                <td style="text-align: center;" class="BodyB-Column1-Body1">
+                                                    <img src="../Resources/Images/step number circle.png">
+                                                    </img>
+                                                </td>
+                                                <td class="BodyA-Column1-Body1">Step number from instructions.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>&#160;</p>
+                                    <p>&#160;</p>
+                                </div>
                             </div>
                         </div>
-                    </section><a data-close="true"></a>
+                    </div><a data-close="true"></a>
                 </div>
             </div>
-            <script>/* <![CDATA[ */$(document).foundation();/* ]]> */</script>
         </div>
     </body>
 </html>
