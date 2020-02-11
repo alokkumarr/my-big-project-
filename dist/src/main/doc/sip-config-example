@@ -177,6 +177,7 @@ sip-host2
 # Properties for inactivating user after max unsuccessful login attempts.
 sip_maxUnsuccessfulLoginAttemptAllowed=5
 sip_user_lockingTime_mins=5
+sip_id3_url=https://flying-kraken.id3.uat.cloud.synchronoss.net
 
 #
 # Outgoing email configuration

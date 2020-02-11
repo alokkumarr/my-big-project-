@@ -34,7 +34,7 @@ export class DataSecurityService {
 
   getFiltersFor(group: string): Observable<DSKFilterGroup> {
     return (<Observable<DSKSecurityGroup>>(
-      this.getRequest(`auth/admin/dsk-security-groups/${group}`)
+      this.getRequest(`auth/admin/v1/dsk-security-groups/${group}`)
     )).pipe(map(data => data.dskAttributes));
   }
 
@@ -120,7 +120,7 @@ export class DataSecurityService {
   }
 
   updateDskFiltersForGroup(groupId: string, filters: DSKFilterGroup) {
-    const path = `auth/admin/dsk-security-groups/${groupId}`;
+    const path = `auth/admin/v1/dsk-security-groups/${groupId}`;
     return this.putrequest(path, filters);
   }
 

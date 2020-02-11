@@ -60,11 +60,17 @@
         [disabled]="analysis?.designerEdit"
         e2e="e2e-designer-btn"
       >
-        <mat-icon fontIcon="icon-designer-mode"></mat-icon>
+        <mat-icon
+          style="line-height: 24px; vertical-align: middle; height: 24px; width: 24px;"
+          fontIcon="icon-designer-mode"
+        ></mat-icon>
         <ng-container i18n>Designer</ng-container>
       </mat-button-toggle>
       <mat-button-toggle [value]="true" e2e="e2e-query-btn">
-        <mat-icon fontIcon="icon-query-mode"></mat-icon>
+        <mat-icon
+          style="line-height: 24px; vertical-align: middle; height: 24px; width: 24px;"
+          fontIcon="icon-query-mode"
+        ></mat-icon>
         <ng-container i18n>Query</ng-container>
       </mat-button-toggle>
     </mat-button-toggle-group>

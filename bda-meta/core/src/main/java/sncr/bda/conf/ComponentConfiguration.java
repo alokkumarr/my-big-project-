@@ -112,6 +112,10 @@ public class ComponentConfiguration {
     @Expose
     private Object zero;
 
+    @SerializedName("isErrorHandlingEnabled")
+    @Expose
+    private boolean isErrorHandlingEnabled;
+
     /**
      * No args constructor for use in serialization
      * 
@@ -460,6 +464,15 @@ public class ComponentConfiguration {
         this.zero = zero;
     }
 
+
+    public boolean isErrorHandlingEnabled() {
+        return isErrorHandlingEnabled;
+    }
+
+    public void setErrorHandlingEnabled(boolean errorHandlingEnabled) {
+        isErrorHandlingEnabled = errorHandlingEnabled;
+    }
+
     public ComponentConfiguration withZero(Object zero) {
         this.zero = zero;
         return this;
@@ -485,6 +498,7 @@ public class ComponentConfiguration {
                 .append(dbLoader)
                 .append(analyzer)
                 .append(zero)
+                .append(isErrorHandlingEnabled)
                 .toHashCode();
     }
 
@@ -510,6 +524,7 @@ public class ComponentConfiguration {
                 .append(dbLoader, rhs.dbLoader)
                 .append(analyzer, rhs.analyzer)
                 .append(zero, rhs.zero)
+                .append(isErrorHandlingEnabled, rhs.isErrorHandlingEnabled)
                 .isEquals();
     }
 
