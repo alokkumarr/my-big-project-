@@ -10,7 +10,12 @@ spring:
       max-request-size: 25MB
       max-file-size: 25MB
       file-size-threshold: 2KB
-
+logging:
+  level:
+    org.springframework: INFO
+    com.synchronoss.saw.workbench: DEBUG
+    com.synchronoss.bda: DEBUG
+    org.apache.http.client: INFO
 server:
   address: localhost
   port: 9701
@@ -49,8 +54,7 @@ connector : http
 workbench:
         project-key: "workbench"
         project-path: "/workbench"
-        project-root: 
-
+        project-root: "maprfs:///var/sip"
         preview-limit: 100
         livy-uri: "http://sip-mapr:8998/"
         storage-uri: ${connector}://localhost:9800

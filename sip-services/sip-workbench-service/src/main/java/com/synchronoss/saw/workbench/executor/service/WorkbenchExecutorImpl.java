@@ -165,13 +165,13 @@ public class WorkbenchExecutorImpl implements WorkbenchExecutor {
 	@Override
 	public ObjectNode createPreview(String id, String location, int previewLimit, String previewsTablePath,
 			String project, String name) throws Exception {
+		// String id = UUID.randomUUID().toString();
+		// String location = createDatasetDirectory(project,
+		// MetadataBase.DEFAULT_CATALOG, name);
 
-		logger.debug("###### Sending create preview request to workbench-executor######");
-		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.CREATE_PREVIEW.toString(),
+		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.CREATE_PREVIEW.toString(),
 				id, location, previewLimit, previewsTablePath, project, name);
 		queueManager.sendWorkbenchMessageToStream(recordContent);
-		
-		logger.debug("###### Create preview request sent to workbench-executor######");
 
 		return null;
 	}

@@ -35,7 +35,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.dsMetadata.asOfNow.status === 'SUCCESS') {
       this.previewStatus = 'queued';
-      this.triggerPreview();
+      this.getPreview();
     } else {
       this.previewStatus = 'failed';
     }
@@ -46,7 +46,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
       !isUndefined(this.timerSubscription) &&
       !this.timerSubscription.isStopped
     ) {
-      this.stopPolling();
+     // this.stopPolling();
     }
     this.workBench.removeDataFromLS('dsMetadata');
   }
@@ -61,16 +61,16 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
       .subscribe(data => {
         this.previewStatus = 'queued';
         if (!isUndefined(data.id)) {
-          this.startPolling(data.id);
+          //this.startPolling(data.id);
         }
       });
   }
 
-  getPreview(id) {
-    this.workBench.getDatasetPreviewData(id).subscribe(data => {
+  getPreview() {
+    this.workBench.retrievePreview(this.dsMetadata.system.name).subscribe(data => {
       this.previewStatus = data.status;
       if (this.previewStatus === 'success') {
-        this.previewData = data.rows;
+        this.previewData = JSON.parse(data.rows);
         setTimeout(() => {
           this.dataGrid.instance.refresh();
         });
@@ -89,7 +89,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   startPolling(id) {
     this.timer = timer(0, this.interval);
     this.timerSubscription = this.timer.subscribe(() => {
-      this.getPreview(id);
+      //this.getPreview(id);
     });
     this.poll = true;
   }

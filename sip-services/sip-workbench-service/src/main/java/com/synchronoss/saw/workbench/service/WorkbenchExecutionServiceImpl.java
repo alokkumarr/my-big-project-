@@ -1,40 +1,61 @@
 package com.synchronoss.saw.workbench.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.parquet.example.data.Group;
+import org.apache.parquet.hadoop.ParquetReader;
+import org.apache.parquet.hadoop.example.GroupReadSupport;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.joda.time.DateTime;
-import org.ojai.Document;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
-import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
+import com.synchronoss.saw.workbench.SparkConfig;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutor;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorImpl;
 
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.xdf.context.ComponentServices;
+import sncr.xdf.context.NGContext;
+import sncr.xdf.services.NGContextServices;
 
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
   private final ObjectMapper mapper = new ObjectMapper();
+  
+  
 
   @Value("${workbench.project-key}")
   @NotNull
@@ -56,13 +77,14 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private String previewsTablePath;
   
-
-
   @Autowired
   WorkbenchExecutor executor;
   
-  
-  
+  @Autowired
+  SparkConf sparkConf;
+
+ 
+
   @PostConstruct
   private void init() throws Exception {
 	  log.info("#### Inside Post Construct ####");
@@ -109,7 +131,13 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     String project, String name, String component, String cfg) throws Exception {
 	  
 	  
+	System.out.print("Checking logger level...");
+	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
+	logger4j.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
+	System.out.print("Logger level set to debug");
 	
+	//org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+	//logger.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
 	
 	
     log.debug("Executing dataset transformation starts here ");
@@ -129,18 +157,25 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
     String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 
-   
+    NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
+    contextServices.initContext();
+
+    contextServices.registerOutputDataSet();
+
+    NGContext workBenchcontext = contextServices.getNgctx();
+
+    workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
     executor.executeJob(project, name, component, cfg);
     
     //String project, String name, String component, String cfg
     //client.submit(new WorkbenchExecuteJob(workBenchcontext));
-    /*ObjectNode root = mapper.createObjectNode();
+    ObjectNode root = mapper.createObjectNode();
     ArrayNode ids = root.putArray("outputDatasetIds");
     for (String id: workBenchcontext.registeredOutputDSIds) {
       ids.add(id);
-    }*/
+    }
     log.info("Executing dataset transformation ends here ");
-    return null;
+    return root;
   }
 
   /**
@@ -170,8 +205,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    * Also used for simply viewing the contents of an existing dataset.
    */
   @Override
-  public ObjectNode createPreview(String project, String name) throws Exception {
-
+  public ObjectNode preview(String project, String name) throws Exception {
     log.info("Creating dataset transformation preview");
     /* Get physical location of dataset */
     DataSetStore dss = new DataSetStore(metastoreBase);
@@ -186,40 +220,135 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
       throw new RuntimeException("Unhandled dataset status: " + status);
     }
     String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
-    
-    
+    /* Submit job to Livy for reading out preview data */
+//    WorkbenchClient client = getWorkbenchClient();
     String id = UUID.randomUUID().toString();
+    WorkbenchExecutor service = new WorkbenchExecutorImpl();
     
-    /**
-     * Send preview request to Workbench-executor
-     */
-    executor.createPreview(id, location, previewLimit, previewsTablePath, project, name);
-    
-   
+    service.createPreview(id, location, previewLimit, id, project, name);
+    //service.preview(id, location, previewLimit, id, project, name);
+    //client.submit(new WorkbenchPreviewJob(id, location, previewLimit, previewsTablePath),
+     //   () -> handlePreviewFailure(id));
+    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "queued");
+    preview.insert();
     /*
      * Return generated preview ID to client to be used for retrieving preview data
      */
     ObjectNode root = mapper.createObjectNode();
     root.put("id", id);
-	
     return root;
   }
 
- 
+  private void handlePreviewFailure(String previewId) {
+    log.error("Creating preview failed");
+    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, previewId, "failed");
+    preview.insert();
+  }
 
   @Override
-  public ObjectNode getPreview(String previewId) throws Exception {
-	    log.debug("######Getting dataset transformation preview for previewId"+ previewId);
-	    /* Locate the preview data in MapR-DB */
-	    Table table = MapRDB.getTable(previewsTablePath);
-	    Document doc = table.findById(previewId);
-	    log.debug("document retrived ????"+ doc);
-	    /* Return the preview data */
-	    if (doc == null) {
-	    	log.debug("######### document not generated yet");
-	      return null;
-	    }
-	    JsonNode json = mapper.readTree(doc.toString());
-	    return (ObjectNode) json;
-	  }
+  public ObjectNode getPreview(String project, String name) throws Exception {
+    log.info("Getting dataset transformation preview");
+    /* Locate the preview data in MapR-DB */
+   // Table table = MapRDB.getTable(previewsTablePath);
+   // Document doc = table.findById(previewId);
+    /* Return the preview data */
+  //  if (doc == null) {
+  //    return null;
+   // }
+    log.info("Project ::"+project);
+    log.info("Name ::"+name);
+    String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+    log.info("location ::"+ location);
+    String jsonData = getDataset(location);
+    log.info("#### Extracted DATA ######"+ jsonData);
+    ObjectNode root = mapper.createObjectNode();
+    root.put("status", "success");
+    root.put("rows", jsonData);
+    //JsonNode json = mapper.readTree(jsonData);
+    return root;
+  }
+  
+  
+  public  String getDataset(String location){
+	  log.info("Inside getDataset ####");
+		
+		 
+		 
+		    try {
+		    	SparkConfig sparkConfig = new SparkConfig();
+				 SparkSession session = SparkSession
+				            .builder()
+				            .config(sparkConf)
+				            .getOrCreate();
+				 
+				 log.info("Spark config completed ####"+ session);
+				 
+		    	log.info("Inside try ####");
+		    	FileStatus[] files = HFileOperations.getFilesStatus(location);
+		    	log.info("Retrived hadoop files.... ####");
+		    	
+		    	for(FileStatus file: files) {
+		    		log.info("######### File Path ::"+ file.getPath());
+		    		log.info("######### File Name ::"+ file.getPath().getName());
+		    		String fileName = file.getPath().getName();
+		    		
+		    		if(fileName.endsWith(".parquet")){
+		    			log.info("##### reading file ::"+ file.getPath().toString());
+		    			
+		    			
+		    			
+		    			
+					try {
+						/**
+						 * GroupReadSupport readSupport = new GroupReadSupport();
+						 * 
+						 * ParquetReader<Group> parquetReader = ParquetReader.builder( new
+						 * GroupReadSupport(), file.getPath()).build(); // ParquetReader<GenericRecord>
+						 * parquetReader = builder.withConf(conf).build();
+						 * //ParquetReader<GenericRecord> reader =
+						 * AvroParquetReader.<GenericRecord>builder(file.getPath()).build();
+						 * log.info("reader instantiated"+ parquetReader); nextRecord =
+						 * parquetReader.read(); log.info("Next record ####"+ nextRecord);
+						 */
+
+						Dataset<Row> parquetFileDF = session.read().parquet(file.getPath().toString());
+
+						List<String> list = parquetFileDF.toJSON().collectAsList();
+						List<Map<String, Object>> result = new ArrayList<>();
+						Map<String, Object> map = new HashMap<>();
+						for (String s : list) {
+
+							map = mapper.readValue(s, new TypeReference<Map<String, String>>() {
+							});
+							result.add(map);
+						}
+						//JSONArray array  = new JSONArray(result);
+						String array = mapper.writeValueAsString(result);
+						// ParquetReader<GenericData.Record> reader = null;
+						//JSONObject json = new JSONObject(map);
+						log.debug("JSON ::"+ array.toString());
+						return array;
+					} catch (Exception e) {
+						log.error("#######ERROR reading file "+ file.getPath() + e.getMessage());
+						e.printStackTrace();
+					}
+		    			break;
+		    		}
+		    	}
+		    	log.info("#### outside of payload inside try ::");
+		    	
+		    	
+		      
+		    } catch (Exception e) {
+		    	e.printStackTrace();
+		      /*
+		       * Handle exception thrown by Spark for example when dataset is empty
+		       */
+		      log.debug("Error while loading dataset, returning no rows");
+		      return null;
+		    }
+		    
+		    log.info("#### outside of payload end of method ::");
+		    return null;
+	}
 }

@@ -53,7 +53,7 @@
 			<groupId>com.mapr.hadoop</groupId>
 			<artifactId>maprfs</artifactId>
 			<version>${mapr.core.version}-mapr</version>
-			<scope>provided</scope>
+			
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -174,28 +174,74 @@
 			<artifactId>commons-io</artifactId>
 			<version>${common.io}</version>
 		</dependency>
-
 		
+
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf</artifactId>
+			<version>${revision}</version>
+			<exclusions>
+
+				<!--Exclude the xdf-esloader lib to resolve conflict with hadoop-es lib. -->
+				<exclusion>
+					<groupId>com.synchronoss.bda</groupId>
+					<artifactId>xdf-esloader</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.elasticsearch</groupId>
+					<artifactId>elasticsearch-spark-${scala.version.exclude}</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-component</artifactId>
+			<version>${revision}</version>
+
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-ext</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-sql</artifactId>
+			<version>${revision}</version>
+
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf-parser</artifactId>
+			<version>${revision}</version>
+
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_${scala.major.version}</artifactId>
+			<version>2.3.2.0-mapr-1901</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_${scala.major.version}</artifactId>
+			<version>2.3.2.0-mapr-1901</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+           		<groupId>org.apache.spark</groupId>
+			<artifactId>spark-yarn_2.11</artifactId>
+			<version>2.3.2.0-mapr-1901</version>
+			<scope>provided</scope>
+		
+		
+		</dependency>
 		<dependency>
 			<groupId>com.mapr.hadoop</groupId>
 			<artifactId>maprfs</artifactId>
 			<version>${mapr.core.version}-mapr</version>
 			<scope>provided</scope>
-			<exclusions>
-                             <exclusion>
-                                     <groupId>org.slf4j</groupId>
-                                     <artifactId>slf4j-log4j12</artifactId>
-                             </exclusion>
-                             <exclusion>
-                                     <groupId>log4j</groupId>
-                                     <artifactId>log4j</artifactId>
-                             </exclusion>
-                             <exclusion>
-                                     <groupId>commons-logging</groupId>
-                                     <artifactId>commons-logging</artifactId>
-                             </exclusion>
-                     </exclusions>
-			
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -298,6 +344,42 @@
 				<goal>single</goal> </goals> <configuration> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> 
 				</descriptorRefs> </configuration> </execution> </executions> </plugin -->
 			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.0.0</version>
+				
+				<configuration>
+				<archive>
+      				<manifest>
+        				<mainClass>com.synchronoss.saw.workbench.SAWWorkBenchServiceApplication</mainClass>
+      					</manifest>
+   				 </archive>
+					<tarLongFileMode>posix</tarLongFileMode>
+					<outputDirectory>${project.basedir}/target</outputDirectory>
+					
+					<!-- Assembly plugin 3: Build Jar with dependencies -->
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+					<descriptors>
+						<descriptor>${project.basedir}/assembly.xml</descriptor>
+					</descriptors>
+					
+					</configuration>
+					</execution>
+					
+				</executions>
+			</plugin>
+			
+			
+			<plugin>
 				<groupId>de.dentrassi.maven</groupId>
 				<artifactId>rpm</artifactId>
 				<version>0.10.0</version>
@@ -318,6 +400,13 @@
 								<entry>
 									<name>/opt/bda/saw-workbench-service/conf</name>
 									<directory>true</directory>
+								</entry>
+								
+								<entry>
+									<name>/opt/bda/saw-workbench-service/lib</name>
+									<collect>
+										<from>target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib</from>
+									</collect>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>

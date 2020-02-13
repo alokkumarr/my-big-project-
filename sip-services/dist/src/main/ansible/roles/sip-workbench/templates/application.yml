@@ -89,5 +89,25 @@ workbench:
         preview-limit: {{ saw_workbench_preview_limit | default('100') }}
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
         storage-uri: ${connector}://localhost:9800
+        app-name: workbench-executor
 metastore:
     base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"
+    
+spark:
+  master: yarn
+  executor.memory: "2G"
+  cores.max: "2"
+  executor.cores: "2"
+  driver.memory: "2G"
+  hadoop.yarn.resourcemanager.hostname: sip-mapr
+  yarn.jars: "/opt/mapr/spark/spark-2.3.2/jars"
+  yarn.archive: "/opt/bda/saw-workbench-service/spark.zip"
+  executor.instances: "1"
+  driver.port: 
+  driver.host: 
+  driver.bindAddress: 
+  driver.blockManager.port: 
+  sql.inMemoryColumnarStorage.compressed: true
+  sql.inMemoryColumnarStorage.batchSize: 20 
+  sql.caseSensitive: false
+  ui.enabled: false
