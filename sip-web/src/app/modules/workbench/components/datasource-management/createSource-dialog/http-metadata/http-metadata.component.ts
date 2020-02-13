@@ -233,22 +233,24 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
   generateHeaderAutoCompleteFilter(headerControl: FormGroup) {
     // Gets form control for header field name (key) to attach
     // change listener to.
-    const headerFieldControl = headerControl.get('key');
-    this.filteredHeaderFields.push(
-      headerFieldControl.valueChanges.pipe(
-        startWith(headerFieldControl.value),
-        map(value => this.filterHeaderFields(value))
-      )
-    );
+    setTimeout(() => {
+      const headerFieldControl = headerControl.get('key');
+      this.filteredHeaderFields.push(
+        headerFieldControl.valueChanges.pipe(
+          startWith(headerFieldControl.value),
+          map(value => this.filterHeaderFields(value))
+        )
+      );
 
-    // Same deal with header field value.
-    const headerValueControl = headerControl.get('value');
-    this.filteredHeaderValues.push(
-      headerValueControl.valueChanges.pipe(
-        startWith(headerValueControl.value),
-        map(value => this.filterValueFields(value))
-      )
-    );
+      // Same deal with header field value.
+      const headerValueControl = headerControl.get('value');
+      this.filteredHeaderValues.push(
+        headerValueControl.valueChanges.pipe(
+          startWith(headerValueControl.value),
+          map(value => this.filterValueFields(value))
+        )
+      );
+    }, 100);
   }
 
   isRequired(fieldName: string): boolean {
