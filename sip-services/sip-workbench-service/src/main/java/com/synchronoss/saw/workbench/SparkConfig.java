@@ -1,6 +1,7 @@
 package com.synchronoss.saw.workbench;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +116,7 @@ public class SparkConfig {
 
 	@Bean
 	public JavaSparkContext sc() {
-	JavaSparkContext jsc = new  JavaSparkContext(conf());
+	JavaSparkContext jsc = new  JavaSparkContext(SparkContext.getOrCreate(conf()));
 	logger.debug("#### Setting librarires as class path for spark context ######");
     jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.core-4.jar");
     jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.xdf-core-4.jar");
