@@ -4,13 +4,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.log4j.Logger;
+
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
@@ -22,18 +24,25 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** Created by skbm0001 on 30/1/2018. */
+/**
+ * Created by skbm0001 on 30/1/2018.
+ */
 public class ESHttpClient {
 
-  private static final Logger logger = Logger.getLogger(ESHttpClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ESHttpClient.class);
   private List<String> hosts = new ArrayList<>();
-  private ChallengeResponse authentication = null;
+
   private ESConfig esConfig;
+  private static final String HTTP = "http://";
+  private static final String HTTPS = "https://";
+  private ChallengeResponse authentication = null;
 
   public ESHttpClient(String host, String user, String password) {
-    if (!host.toLowerCase().startsWith("http://") && !host.toLowerCase().startsWith("https://")) {
-      this.hosts.add("http://" + host);
+    if (!host.toLowerCase().startsWith(HTTP) && !host.toLowerCase().startsWith(HTTPS)) {
+      this.hosts.add(HTTP + host);
     } else {
       this.hosts.add(host);
     }
@@ -43,7 +52,7 @@ public class ESHttpClient {
       authentication = new ChallengeResponse(scheme, user, password);
   }
 
-  public ESHttpClient(ESConfig config) throws Exception {
+  public ESHttpClient(ESConfig config) {
     List<String> esNodes = config.getEsHosts();
     int port = config.getEsPort() == 0 ? 9200 : config.getEsPort();
     String user = config.getEsUser();
@@ -55,47 +64,41 @@ public class ESHttpClient {
             .parallelStream()
             .map(
                 host -> {
-                  String tempHost = null;
-                  if (!host.toLowerCase().startsWith("http://")
-                      && !host.toLowerCase().startsWith("https://")) {
-                    if (config.isEsSslEnabled()) {
-                      tempHost = "https://" + host + ":" + port;
-                    } else {
-                      tempHost = "http://" + host + ":" + port;
-                    }
+                  String tempHost;
+                  if (!host.toLowerCase().startsWith(HTTPS) && config.isEsSslEnabled()) {
+                    tempHost = HTTPS + host + ":" + port;
+                  } else if (!host.toLowerCase().startsWith(HTTP)) {
+                    tempHost = HTTP + host + ":" + port;
                   } else {
                     tempHost = host + ":" + port;
                   }
-
                   return tempHost;
                 })
             .collect(Collectors.toList());
-
-    logger.debug("Hosts = " + this.hosts);
-
+    LOGGER.debug("Hosts : {}", this.hosts);
     ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
     if (user != null && pwd != null) authentication = new ChallengeResponse(scheme, user, pwd);
   }
 
-  private String get(String url) throws Exception {
+  private String get(String url) {
     String retval = null;
-
     for (String host : this.hosts) {
-      logger.debug("Trying " + host);
+      LOGGER.debug("Trying {}", host);
       String fullUrl = host + url;
       try {
         ClientResource cr = getClientResource(fullUrl);
-        cr.get();
-
-        if (cr.getStatus().isSuccess()) {
-          retval = cr.getResponseEntity().getText();
-        } else {
-          logger.error(cr.getStatus());
+        if (cr != null) {
+          cr.get();
+          if (cr.getStatus().isSuccess()) {
+            retval = cr.getResponseEntity().getText();
+          } else {
+            LOGGER.error("Error occurred : {}", cr.getStatus());
+          }
         }
         return retval;
       } catch (Exception exception) {
-        logger.warn("Unable to reach " + host);
-        logger.warn(exception);
+        LOGGER.warn("Unable to reach {}", host);
+        LOGGER.warn("Exception occured  {}", exception);
       }
     }
 
@@ -104,17 +107,17 @@ public class ESHttpClient {
 
   private boolean head(String url) {
     for (String host : this.hosts) {
-      logger.debug("Trying " + host);
+      LOGGER.debug("Trying : {}", host);
       String fullUrl = host + url;
-      logger.debug("URL = " + fullUrl);
-
-      try {
-        ClientResource cr = getClientResource(fullUrl);
+      LOGGER.debug("URL : {}", fullUrl);
+      ClientResource cr = getClientResource(fullUrl);
+      if (cr != null) {
         cr.head();
-        return cr.getStatus().isSuccess();
-      } catch (ResourceException exception) {
-        logger.warn("Unable to reach " + host);
-        logger.warn(exception);
+        if (cr.getStatus().isSuccess()) {
+          return cr.getStatus().isSuccess();
+        } else {
+          return false;
+        }
       }
     }
     return false;
@@ -122,17 +125,18 @@ public class ESHttpClient {
 
   private boolean delete(String url) {
     for (String host : hosts) {
-      logger.debug("Trying " + host);
+      LOGGER.debug("Trying {}", host);
       String fullUrl = host + url;
-      logger.debug("URL = " + fullUrl);
-
+      LOGGER.debug("URL = {}", fullUrl);
       try {
         ClientResource cr = getClientResource(fullUrl);
-        cr.delete();
-        return cr.getStatus().isSuccess();
+        if (cr != null) {
+          cr.delete();
+          return cr.getStatus().isSuccess();
+        }
       } catch (ResourceException exception) {
-        logger.warn("Unable to reach " + host);
-        logger.warn(exception);
+        LOGGER.warn("Unable to reach: {}", host);
+        LOGGER.warn("Warning occurred while deleting : {}", exception);
       }
     }
 
@@ -142,25 +146,24 @@ public class ESHttpClient {
   private boolean put(String url, String body) {
     for (String host : hosts) {
       String fullUrl = host + url;
-      logger.debug("URL = " + fullUrl);
+      LOGGER.debug("URL = {}", fullUrl);
 
       try {
         ClientResource cr = getClientResource(fullUrl);
-
-        // Specify Content-Type is application/json
-        StringRepresentation jsonData = new StringRepresentation(body);
-        jsonData.setMediaType(MediaType.APPLICATION_JSON);
-
-        cr.put(jsonData);
-        if (!cr.getStatus().isSuccess()) {
-          logger.error(cr.getStatus().getDescription());
-          return false;
-        } else {
-          return true;
+        if (cr != null) {
+          StringRepresentation jsonData = new StringRepresentation(body);
+          jsonData.setMediaType(MediaType.APPLICATION_JSON);
+          cr.put(jsonData);
+          if (!cr.getStatus().isSuccess()) {
+            LOGGER.error(cr.getStatus().getDescription());
+            return false;
+          } else {
+            return true;
+          }
         }
       } catch (ResourceException exception) {
-        logger.warn("Unable to reach " + host);
-        logger.warn(exception);
+        LOGGER.warn("Unable to reach: {}", host);
+        LOGGER.warn("Warning", exception);
       }
     }
 
@@ -172,19 +175,18 @@ public class ESHttpClient {
       String fullUrl = host + url;
       try {
         ClientResource cr = getClientResource(fullUrl);
-        logger.debug("Full URL = " + fullUrl + ". Data = " + body);
-
-        // Specify Content-Type is application/json
-        StringRepresentation jsonData = new StringRepresentation(body);
-        jsonData.setMediaType(MediaType.APPLICATION_JSON);
-        cr.post(jsonData);
-        return cr.getStatus().isSuccess();
+        LOGGER.debug("Full URL = {}  . Data = {}", fullUrl, body);
+        if (cr != null) {
+          StringRepresentation jsonData = new StringRepresentation(body);
+          jsonData.setMediaType(MediaType.APPLICATION_JSON);
+          cr.post(jsonData);
+          return cr.getStatus().isSuccess();
+        }
       } catch (ResourceException exception) {
-        logger.warn("Unable to reach " + host);
-        logger.warn(exception);
+        LOGGER.warn("Unable to reach {}", host);
+        LOGGER.warn("Warning occurred while creating : {}", exception);
       }
     }
-
     return false;
   }
 
@@ -196,18 +198,20 @@ public class ESHttpClient {
    */
   private ClientResource getClientResource(String fullUrl) {
     ClientResource cr = null;
-    logger.debug("Inside getClientResource starts here.");
-    logger.debug("esConfig.isEsSslEnabled(): " + esConfig.isEsSslEnabled());
-    if (esConfig.isEsSslEnabled()) {
+    LOGGER.debug("Inside getClientResource starts here.");
+    if (esConfig != null && esConfig.isEsSslEnabled()) {
+      LOGGER.debug("esConfig.isEsSslEnabled(): {}", esConfig.isEsSslEnabled());
       Client client = new Client(new Context(), Protocol.HTTPS);
       Series<Parameter> parameters = client.getContext().getParameters();
       URL url = null;
       try {
         url = new URL(esConfig.getKeyStorePath());
       } catch (MalformedURLException e) {
-        logger.error("Exception occurred while accesing the key store path: " + e);
+        LOGGER.error("Exception occurred while accesing the key store path: {}", e);
       }
-      parameters.add("truststorePath", url.getPath());
+      if (url != null) {
+        parameters.add("truststorePath", url.getPath());
+      }
       parameters.add("truststorePassword", esConfig.getStorePassword());
       parameters.add("truststoreType", "JKS");
       cr = new ClientResource(fullUrl);
@@ -217,12 +221,12 @@ public class ESHttpClient {
       cr = new ClientResource(fullUrl);
       if (authentication != null) cr.setChallengeResponse(authentication);
     }
-    logger.debug("Inside getClientResource ends here.");
+    LOGGER.debug("Inside getClientResource ends here.");
     return cr;
   }
 
   public String esClusterVersion() throws Exception {
-    logger.debug("Getting cluster version");
+    LOGGER.debug("Getting cluster version");
     String response = get("");
     if (response == null) {
       throw new Exception("Cant obtain version.");
@@ -245,7 +249,7 @@ public class ESHttpClient {
 
   public int esIndexStructure(String idx, String type, Map<String, String> mapping)
       throws Exception {
-    logger.debug("Getting ES index structure");
+    LOGGER.debug("Getting ES index structure");
     String mappingString = get("/" + idx + "/_mapping/" + type);
     JsonObject mappingJson;
     try {
@@ -293,27 +297,29 @@ public class ESHttpClient {
    * @return Total number of records in the index/alias
    */
   public long getRecordCount(String index) throws Exception {
-    logger.debug("Getting record count");
+    LOGGER.debug("Getting record count");
     long count = 0;
-
     String countURL = "/" + index + "/_count";
-
     String response = get(countURL);
-
-    logger.debug("Response = " + response);
-
+    LOGGER.debug("Response = {}", response);
     if (response != null && response.length() != 0) {
-      // Extract count
       JsonObject responseObject = new JsonParser().parse(response).getAsJsonObject();
-
       count = responseObject.get("count").getAsLong();
     }
-
     return count;
   }
 
-  public boolean esIndexExists(String idx) throws Exception {
-    return head("/" + idx);
+  public boolean esIndexExists(String idx) {
+    boolean isIndexExist;
+    try {
+      head("/" + idx);
+      isIndexExist = true;
+    } catch (ResourceException ex) {
+      isIndexExist = false;
+      LOGGER.warn("Index : {} does not exist in the ES nodes cluster.", idx);
+      LOGGER.warn(ex.getMessage());
+    }
+    return isIndexExist;
   }
 
   // Check if index type exists
@@ -334,18 +340,11 @@ public class ESHttpClient {
     return put("/" + idx, mapping);
   }
 
-  public boolean esMappingCreate(String idx, String mappingName, String mapping) throws Exception {
-    /*
-        mapping must contain only mapping properties,
-        not whole index definition
-        PUT twitter/_mapping/user
-        {
-            "properties": {
-                "name": { "type": "text" }
-            }
-         }
-    */
-
+  /*
+    mapping must contain only mapping properties,
+    not whole index definition
+  */
+  public boolean esMappingCreate(String idx, String mappingName, String mapping) {
     return put("/" + idx + "/_mapping/" + mappingName, mapping);
   }
 
@@ -359,18 +358,18 @@ public class ESHttpClient {
     for (String s : idx) {
       // Check if index participates in any alias
       int aliasParticipation = esIndexAliasParticipation(s);
-      logger.debug("Alias Participation = " + aliasParticipation);
+      LOGGER.debug("Alias Participation = {}", aliasParticipation);
       if (aliasParticipation == 0) {
         // This index is not attached to any alias - delete it
-        logger.debug("Safe deleting index " + s);
+        LOGGER.debug("Safe deleting index " + s);
         esIndexDelete(s);
       }
     }
   }
 
   // Returns number of aliases for given index
-  public int esIndexAliasParticipation(String idx) throws Exception {
-    logger.debug("Getting ES alias count");
+  public int esIndexAliasParticipation(String idx) {
+    LOGGER.debug("Getting ES alias count");
     String aliases = get("/" + idx + "/_alias");
     if (aliases == null) {
       return -1;
@@ -391,20 +390,16 @@ public class ESHttpClient {
       aliasesJson = null;
     }
 
-    List<String> aliasList = new ArrayList<>();
     if (aliasesJson != null) {
-      for (Map.Entry<String, JsonElement> e : aliasesJson.entrySet()) {
-        String aliasName = e.getKey();
-
-        aliasList.add(aliasName);
-      }
+      Set<Map.Entry<String, JsonElement>> aliasSet = aliasesJson.entrySet();
+      List<String> aliasList = aliasSet.stream().map(Map.Entry::getKey).collect(Collectors.toList());
       return aliasList.size();
     }
     return 0;
   }
 
   // Add index to alias
-  public boolean esIndexAddAlias(String alias, String... idx) throws Exception {
+  public boolean esIndexAddAlias(String alias, String... idx) {
     String addAlias = "{ \"actions\" : [";
     String sequence = null;
     for (String s : idx) {
@@ -416,16 +411,16 @@ public class ESHttpClient {
     return post("/_aliases", addAlias);
   }
 
-  public boolean esAliasExists(String alias) throws Exception {
+  public boolean esAliasExists(String alias) {
     return head("/_alias/" + alias);
   }
 
   // Return list of indexes with the given alias
-  public List<String> esAliasListIndices(String alias) throws Exception {
-    logger.debug("Getting list of indexes for the alias " + alias);
+  public List<String> esAliasListIndices(String alias) {
+    LOGGER.debug("Getting list of indexes for the alias : {}", alias);
     List<String> retval = new ArrayList<>();
     String aliasStr = get("/_alias/" + alias);
-    if (aliasStr == null) return null;
+    if (aliasStr == null) return retval;
     JsonObject indexJson;
     try {
       // Try to parse and access mapping section of ES JSON
@@ -441,47 +436,26 @@ public class ESHttpClient {
     return retval;
   }
 
-  public boolean esIndexRemoveAlias(String alias, String... indices) throws Exception {
+  public boolean esIndexRemoveAlias(String alias, String... indices) {
     String actions = generateActionObject(alias, indices);
 
-    logger.debug("Actions = " + actions);
+    LOGGER.debug("Actions = {}", actions);
     return post("/_aliases", actions);
   }
 
   public String generateActionObject(String alias, String... indices) {
     JsonObject actionsObject = new JsonObject();
-
     JsonArray actionsArray = new JsonArray();
-
     for (String index : indices) {
       JsonObject actionItem = new JsonObject();
-
       JsonObject aliasObject = new JsonObject();
       aliasObject.addProperty("index", index);
       aliasObject.addProperty("alias", alias);
-
       actionItem.add("remove", aliasObject);
-
       actionsArray.add(actionItem);
     }
 
     actionsObject.add("actions", actionsArray);
-
     return actionsObject.toString();
   }
-
-//    public static void main(String[] a) throws Exception {
-//        ESHttpClient c = new ESHttpClient("es5.sncrbda.dev.cloud.synchronoss.net", "datauser", "datauser");
-//        System.out.println(c.esClusterVersion());
-//        Map<String, String> mapping = new HashMap<>();
-//        if (c.esIndexStructure("idx_xdf_test", "test_type", mapping) > 0){
-//            System.out.println(mapping);
-//        }
-//
-//        String idx_def =
-//                "{'settings':{'number_of_shards':1},'mappings':{'test_type':{"
-//                        + "'properties':{ 'field1':{ 'type':'string'}, 'field2':{ 'type':'date'} "
-//                        + "}}}}";
-//        c.esIndexCreate("idx_xdf_test_new", idx_def.replace("'", "\""));
-//    }
 }
