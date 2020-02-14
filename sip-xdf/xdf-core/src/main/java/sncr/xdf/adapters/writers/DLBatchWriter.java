@@ -130,12 +130,6 @@ public class DLBatchWriter {
             
             logger.debug("########### Partiton logic invoking format #########"+ format);
             
-            if(format.equals("parquet")) {
-            	format = "csv";
-            	logger.debug("########### changing format to csv #########"+ format);
-            	
-            }
-            
             // Create flat structure/compact files - no key file definitions provided
             switch (format){
                 case "parquet":
