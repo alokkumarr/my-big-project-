@@ -12,6 +12,7 @@ import {
   DetailForm,
   CHANNEL_OPERATION
 } from '../../../models/workbench.interface';
+import { timeout } from 'q';
 
 @Component({
   selector: 'createsource-dialog',
@@ -47,9 +48,12 @@ export class CreateSourceDialogComponent {
       this.selectedSource = this.channelData.channelType;
     }
     this.createForm();
-    if (isUndefined(this.channelData.length)) {
-      this.firstStep.patchValue(this.channelData);
-    }
+    // Wait for form creation for e2e to fire.
+    setTimeout(() => {
+      if (isUndefined(this.channelData.length)) {
+        this.firstStep.patchValue(this.channelData);
+      }
+    }, 100);
   }
 
   get isDetailsFormValid() {
