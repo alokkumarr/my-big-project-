@@ -86,9 +86,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       ...take(DEFAULT_CHART_COLORS, 11),
       ...ADDITIONAL_PRESET_COLORS
     ];
-    if (this.isDataField) {
-      set(this.colorPickerConfig, 'bgColor', this.artifactColumn.seriesColor);
-    }
     set(this.colorPickerConfig, 'presetColors', presetColors);
     set(this.colorPickerConfig, 'iscustomStyleNeeded', true);
   }

@@ -54,12 +54,12 @@ public class DskGroupPayload {
     this.groupName = groupName;
   }
 
-  @JsonProperty("description")
+  @JsonProperty("groupDescription")
   public String getGroupDescription() {
     return groupDescription;
   }
 
-  @JsonProperty("description")
+  @JsonProperty("groupDescription")
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
   }

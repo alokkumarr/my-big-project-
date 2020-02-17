@@ -56,10 +56,6 @@ import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
-import com.synchronoss.bda.sip.dsk.DskGroupPayload;
-import com.synchronoss.bda.sip.dsk.SipDskAttribute;
-import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
-import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.utils.Privileges;
@@ -80,7 +76,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
@@ -94,12 +89,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.util.StringUtils;
@@ -263,9 +255,9 @@ public class SecurityController {
 				it.remove();
 			}
 			if (!validity) {
+				response.setStatus(HttpStatus.UNAUTHORIZED.value());
 				return new LoginResponse(validity, "Token has expired. Please re-login");
 			} else {
-
 				logger.info("Ticket will be created..");
 				logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
 
@@ -353,7 +345,7 @@ public class SecurityController {
 
 	/**
 	 * This method will be Deprecated since its uses user input as ticket Id.
-     * Logout ticketid should be extracted from token see method {@link #logout(String)}
+     * Logout ticketid should be extracted from token see method }
 	 * @param ticketID
 	 * @return
 	 */
@@ -914,333 +906,6 @@ public class SecurityController {
             // Here we are sending two different Objects, one in case of Success and another object is returned in case of
             // Error. This change has to be retained else all other REST API has to unified since we are following this convention.
         }
-    }
-
-
-    @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
-    @ApiOperation(value="Add DSK security group")
-		@ResponseBody
-    public DskGroupPayload addDskGroup(HttpServletRequest request, HttpServletResponse response,
-        @ApiParam(value="DSK group details")
-        @RequestBody
-        DskGroupPayload dskGroupPayload) {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-
-      Long customerId = Long.valueOf(ticket.getCustID());
-      String createdBy = ticket.getUserFullName();
-      RoleType roleType = ticket.getRoleType();
-
-      if (roleType != RoleType.ADMIN) {
-          DskGroupPayload payload = new DskGroupPayload();
-          logger.error("Invalid user");
-          response.setStatus(HttpStatus.UNAUTHORIZED.value());
-          payload.setValid(false);
-          payload.setMessage(ServerResponseMessages.ADD_GROUPS_WITH_NON_ADMIN_ROLE);
-
-          return payload;
-      }
-
-      DskGroupPayload responsePayload = null;
-      Long securityGroupSysId = null;
-      try {
-          String securityGroupName = dskGroupPayload.getGroupName();
-          String securityGroupDescription = dskGroupPayload.getGroupDescription();
-          SipDskAttribute dskAttribute = dskGroupPayload.getDskAttributes();
-
-          SecurityGroups securityGroup = new SecurityGroups();
-
-          if (securityGroupName == null || securityGroupName.length() == 0) {
-              responsePayload = new DskGroupPayload();
-
-              responsePayload.setValid(false);
-              responsePayload.setMessage("Group name is mandatory");
-              response.setStatus(HttpStatus.BAD_REQUEST.value());
-
-              return responsePayload;
-          }
-
-          if (dskAttribute == null) {
-              responsePayload = new DskGroupPayload();
-
-              responsePayload.setValid(false);
-              responsePayload.setMessage("DSK attributes are mandatory");
-
-              response.setStatus(HttpStatus.BAD_REQUEST.value());
-
-              return responsePayload;
-          }
-          securityGroup.setSecurityGroupName(securityGroupName);
-          securityGroup.setDescription(securityGroupDescription);
-
-          DskValidity dskValidity =
-              dataSecurityKeyRepository.addSecurityGroups(securityGroup,createdBy,customerId);
-
-          securityGroupSysId = dskValidity.getGroupId();
-
-          if (securityGroupSysId == null) {
-              responsePayload = new DskGroupPayload();
-              logger.error("Error occurred: {}", dskValidity.getError());
-              response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-              responsePayload.setValid(false);
-              responsePayload.setMessage(dskValidity.getError());
-
-              return responsePayload;
-          }
-
-          // Prepare the list og attribute models. This will also validate for missing attributes.
-          List<SipDskAttributeModel> attributeModelList = dataSecurityKeyRepository.
-              prepareDskAttributeModelList(securityGroupSysId, dskAttribute, Optional.empty());
-          Valid valid = dataSecurityKeyRepository
-              .addDskGroupAttributeModelAndValues(securityGroupSysId, attributeModelList);
-
-          if (valid.getValid() == true) {
-              responsePayload =
-                  dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
-
-              responsePayload.setValid(true);
-          } else {
-              responsePayload = new DskGroupPayload();
-
-              responsePayload.setValid(false);
-              responsePayload.setMessage(valid.getError());
-
-              if (securityGroupSysId != null) {
-                  dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
-              }
-
-              response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-          }
-
-      } catch (Exception ex) {
-
-          if (securityGroupSysId != null) {
-              dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
-          }
-          responsePayload = new DskGroupPayload();
-          responsePayload.setValid(false);
-          response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-          responsePayload.setMessage("Error occurred: " + ex.getMessage());
-      }
-
-      return responsePayload;
-    }
-
-    @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.GET)
-    @ApiOperation(value="Fetch security group details for a customer")
-		@ResponseBody
-    public Object getAllSecGroupDetailsForCustomer(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) {
-        List<DskGroupPayload> payload = null;
-
-        Ticket ticket = SipCommonUtils.getTicket(request);
-
-        Long customerId = Long.valueOf(ticket.getCustID());
-        RoleType roleType = ticket.getRoleType();
-
-        if (roleType != RoleType.ADMIN) {
-            Valid valid = new Valid();
-            logger.error("Invalid user");
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            valid.setValid(false);
-            valid.setValidityMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-            return valid;
-        }
-
-        try {
-            payload = dataSecurityKeyRepository.fetchAllDskGroupForCustomer(customerId);
-        } catch (Exception ex) {
-            logger.error("Error occurred while fetching security group details: "
-                + ex.getMessage(), ex);
-
-            Valid valid = new Valid();
-            valid.setValidityMessage(ex.getMessage());
-            valid.setValid(false);
-
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        }
-
-        return payload;
-    }
-
-
-    @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.GET)
-    @ApiOperation(value="Fetch security group details for a given security group id")
-		@ResponseBody
-    public DskGroupPayload getSecurityGroupDetails (
-        @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
-        HttpServletRequest request,
-        HttpServletResponse response) {
-        DskGroupPayload payload;
-
-        Ticket ticket = SipCommonUtils.getTicket(request);
-
-        RoleType roleType = ticket.getRoleType();
-
-        if (roleType != RoleType.ADMIN) {
-            payload = new DskGroupPayload();
-            logger.error("Invalid user");
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            payload.setValid(false);
-            payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-            return payload;
-        }
-
-
-        try {
-            Long customerId = Long.valueOf(ticket.getCustID());
-            payload = dataSecurityKeyRepository
-                .fetchDskGroupAttributeModel(securityGroupSysId, customerId);
-            return payload;
-        } catch (Exception ex) {
-            payload = new DskGroupPayload();
-            payload.setValid(false);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            payload.setMessage("Error occurred: " + ex.getMessage());
-
-            return payload;
-        }
-
-    }
-
-    @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.DELETE)
-    @ApiOperation(value = "Delete security group attributes")
-		@ResponseBody
-    public Valid deleteSecurityGroupAttributeModel (
-        @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
-        HttpServletRequest request,
-        HttpServletResponse response) {
-
-        Ticket ticket = SipCommonUtils.getTicket(request);
-        RoleType roleType = ticket.getRoleType();
-
-        Valid valid;
-        if (roleType != RoleType.ADMIN) {
-            valid = new Valid();
-            logger.error("Invalid user");
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            valid.setValid(false);
-            valid.setValidityMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-
-            return valid;
-        }
-
-        try {
-
-            Long customerId = Long.valueOf(ticket.getCustID());
-
-            valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
-
-            if (valid.getValid()) {
-                // If the deletion of security group attributes is successful, delete the security group
-                // also
-                valid = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
-            }
-        } catch (Exception ex) {
-            valid = new Valid();
-            valid.setValid(false);
-            valid.setError(ex.getMessage());
-            valid.setValidityMessage("Error occurred while deleting security group");
-        }
-
-        return valid;
-    }
-
-    @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
-    @ApiOperation(value="Update security group attributes")
-		@ResponseBody
-    public DskGroupPayload updateSecurityGroupAttributeModel (
-        @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        @ApiParam(value="New attributes for the security group")
-        @RequestBody SipDskAttribute sipDskAttributes) {
-        DskGroupPayload payload = null;
-
-        Ticket ticket = SipCommonUtils.getTicket(request);
-        Long customerId = Long.valueOf(ticket.getCustID());
-
-        RoleType roleType = ticket.getRoleType();
-
-        if (roleType != RoleType.ADMIN) {
-            payload = new DskGroupPayload();
-            logger.error("Invalid user");
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            payload.setValid(false);
-            payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
-
-            return payload;
-        }
-
-        try {
-
-            if (sipDskAttributes == null) {
-                payload = new DskGroupPayload();
-
-                payload.setValid(false);
-                payload.setMessage("Invalid request");
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-
-                return payload;
-            }
-
-            Valid valid = dataSecurityKeyRepository
-                .validateCustomerForSecGroup(securityGroupSysId, customerId);
-
-
-            if (!valid.getValid()) {
-                payload = new DskGroupPayload();
-
-                payload.setValid(false);
-                payload.setMessage(valid.getValidityMessage());
-
-                return payload;
-            }
-
-      List<SipDskAttributeModel> dskAttributeModelList =
-          dataSecurityKeyRepository.prepareDskAttributeModelList(
-              securityGroupSysId, sipDskAttributes, Optional.empty());
-            // Delete the existing security group attributes
-            valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
-
-            if (valid.getValid()) {
-                // Add the new security group attributes
-                logger.info("Deleted existing DSK attributes");
-                valid = dataSecurityKeyRepository
-                    .addDskGroupAttributeModelAndValues(securityGroupSysId, dskAttributeModelList);
-
-                if (valid.getValid()) {
-                    logger.info("DSK attributes updated successfully");
-
-                    payload = dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
-                    payload.setValid(true);
-                } else {
-                    logger.error("Error occurred: {}", valid.getError());
-                    payload = new DskGroupPayload();
-
-                    payload.setValid(false);
-                    payload.setMessage("Unable to update the dsk attributes");
-                }
-
-            } else {
-                logger.error("Error occurred: {}", valid.getError());
-                payload = new DskGroupPayload();
-
-                payload.setValid(false);
-                payload.setMessage("Unable to update the dsk attributes");
-            }
-            // Fetch the attributes and return
-        } catch (Exception ex) {
-            logger.error("Error occurred while updating the security group attributes: " + ex.getMessage(), ex);
-
-            payload = new DskGroupPayload();
-            payload.setValid(false);
-            payload.setMessage(ex.getMessage());
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-        }
-
-        return payload;
     }
 
     /**

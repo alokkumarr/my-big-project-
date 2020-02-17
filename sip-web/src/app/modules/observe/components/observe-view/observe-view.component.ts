@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
 import * as Bowser from 'bowser';
 import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as isEmpty from 'lodash/isEmpty';
@@ -51,7 +51,8 @@ export class ObserveViewComponent implements OnDestroy {
     download: false
   };
   @ViewChild('filterSidenav', { static: true }) sidenav: MatSidenav;
-  @ViewChild('downloadContainer', { static: true }) downloadContainer: ElementRef;
+  @ViewChild('downloadContainer', { static: true })
+  downloadContainer: ElementRef;
   hasKPIs = false;
 
   constructor(
@@ -324,11 +325,11 @@ export class ObserveViewComponent implements OnDestroy {
     };
     const headers = new HttpHeaders(skipToastHeader);
     return this.observe.getDashboard(this.dashboardId, { headers }).pipe(
-      map((data: Dashboard) => {
+      tap(data => {
         this.dashboard = data;
         this.loadPrivileges();
         this.checkForKPIs();
-        return data;
+        this.filters.lastAnalysisFilters = data.filters;
       }),
       catchError(error => {
         if (

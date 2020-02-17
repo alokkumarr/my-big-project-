@@ -73,9 +73,15 @@ public interface UserRepository {
   Long getCustomerSysid(String customerCode);
   Long getSecurityGroupSysid(String dskGroup,Long customerSysId);
   Long getRoleSysId(String roleName,Long customerSysId);
-  UserDetails getUser(String masterLoginId, Long customerSysId);
+
+    Valid updateUserDetails(UserDetails userDetails, String createdBy);
+
+    UserDetails getUser(String masterLoginId, Long customerSysId);
   Valid addUserDetails(UserDetails userDetails, String masterLoginId);
-  List<UserDetails> getUsersDetailList(Long customerId);
+
+    UserDetails getUserbyId(long userSysId, Long customerSysId);
+
+    List<UserDetails> getUsersDetailList(Long customerId);
   boolean getRoleStatus(Long roleId);
   DskDetails getUserById(String masterLoginId);
 }

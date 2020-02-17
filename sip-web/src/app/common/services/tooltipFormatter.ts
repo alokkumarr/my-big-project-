@@ -45,7 +45,7 @@ function getXValue(point, fields, chartType) {
   const hasGroupBy = Boolean(g);
 
   if (chartType === 'chart_scale') {
-    return point.name;
+    return point.name || point.x;
   }
 
   if (chartType === 'pie') {
