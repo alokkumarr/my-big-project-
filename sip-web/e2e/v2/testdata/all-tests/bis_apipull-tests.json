@@ -445,18 +445,18 @@
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
-          "testConnectivityMessage": "Connection Status = 201",
+          "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "POST",
           "headers": null,
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/doAuthenticate",
           "body": {
-            "title": "post title",
-            "body": "this is new post"
+            "masterLoginId": "sawadmin@TenantA.com",
+            "password": "Sawsyncnewuser1!"
           },
           "status": 1
         },
@@ -468,10 +468,10 @@
           "queryParams": null,
           "endPoint": "/posts",
           "body": {
-            "title": "post title",
-            "body": "this is new post"
+            "masterLoginId": "sawadmin@TenantA.com",
+            "password": "Sawsyncnewuser1!"
           },
-          "testConnectivityMessage": "Connection Status = 201"
+          "testConnectivityMessage": "Connection Status = 200"
         },
         "description": "Admin should be able to create and delete an api pull route with POST"
       },
@@ -611,18 +611,18 @@
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
-          "testConnectivityMessage": "Connection Status = 201",
+          "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "POST",
           "headers": null,
           "queryParams": null,
           "endPoint": "/posts",
           "body": {
-            "title": "post title",
-            "body": "this is new post"
+            "masterLoginId": "sawadmin@TenantA.com",
+            "password": "Sawsyncnewuser1!"
           },
           "status": 1
         },
@@ -632,12 +632,12 @@
           "method": "POST",
           "headers": null,
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/doAuthenticate",
           "body": {
-            "title": "post title",
-            "body": "this is new post"
+            "masterLoginId": "sawadmin@TenantA.com",
+            "password": "Sawsyncnewuser1!"
           },
-          "testConnectivityMessage": "Connection Status = 201"
+          "testConnectivityMessage": "Connection Status = 200"
         },
         "description": "Admin should be able to schedule an api pull route with POST"
       }
