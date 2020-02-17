@@ -1,6 +1,10 @@
 'use strict';
 const logger = require('../conf/logger')(__filename);
 const commonFunctions = require('./utils/commonFunctions');
+const ExecutePage = require('../pages/ExecutePage');
+const AnalyzePage = require('../pages/AnalyzePage');
+const executePage = new ExecutePage();
+const analyzePage = new AnalyzePage();
 
 class SchedulePage {
   constructor() {
@@ -565,6 +569,113 @@ class SchedulePage {
     this.selectYearlySecondRowMinutes(minutes);
     this.clickOnYearlySecondRowTimeStamp();
     this.selectYearlySecondRowTimeStamp(timeStamp);
+  }
+
+  selectSchedule(scheduleType,data) {
+    switch (scheduleType) {
+      case 'Immediate':
+        this.ScheduleImmediately();
+        break;
+      case 'Hourly':
+        this.hourlySchedule(data.Hours, data.Minutes);
+        break;
+      case 'Daily-Everyday':
+        this.dailyEverydaySchedule(data.Days, data.Hours, data.Minutes, data.timeStamp);
+        break;
+      case 'Daily-EveryWeekDay':
+        this.dailyEveryWeekDaySchedule(data.Hours, data.Minutes, data.timeStamp);
+        break;
+      case 'Weekly':
+        this.weeklySchedule(data.dayName, data.Hours, data.Minutes, data.timeStamp);
+        break;
+      case 'Monthly-On The Day':
+        this.monthlyOnTheDaySchedule(data.monthlyDay, data.monthlyMonth, data.Hours, data.Minutes, data.timeStamp);
+        break;
+      case 'Monthly-On The Weeks':
+        this.monthlyOnTheWeeksSchedule(data.monthlyWeeks, data.monthlyDayName, data.everyMonth, data.Hours, data.Minutes, data.timeStamp);
+        break;
+      case 'Yearly-Every-Month':
+        this.yearlyEveryMonthSchedule(data.yearlyMonth, data.yearlyDays, data.Hours, data.Minutes, data.timeStamp);
+        break;
+      case 'Yearly-On-Week':
+        this.yearlyOnWeekSchedule(data.yearlyWeeks, data.yearlyDayName, data.yearlyMonth, data.Hours, data.Minutes, data.timeStamp);
+        break;
+      case 'removeSchedule':
+        this.hourlySchedule(data.Hours,data.Minutes);
+        break;
+    }
+  }
+
+  scheduleFromView(scheduleFrom,reportName) {
+    switch (scheduleFrom) {
+      case 'details':
+        analyzePage.clickOnAnalysisLink(reportName);
+        executePage.clickOnActionLink();
+        executePage.clickSchedule();
+        break;
+      case 'list':
+        analyzePage.goToView('list');
+        executePage.clickReportActionLink(reportName);
+        executePage.clickSchedule();
+        break;
+      case 'card':
+        executePage.clickReportActionLink(reportName);
+        executePage.clickSchedule();
+    }
+  }
+
+  verifyScheduledDetails(data,ReportName) {
+    switch (data.scheduleFrom) {
+      case 'details':
+        analyzePage.clickOnAnalysisLink(ReportName);
+        this.handleToastMessage();
+        executePage.clickOnActionLink();
+        executePage.clickOnDetails();
+        executePage.clickPreviousVersions();
+        executePage.verifyScheduleDetails();
+        executePage.closeActionMenu();
+        break;
+      case 'list':
+        this.handleToastMessage();
+        analyzePage.goToView('list');
+        analyzePage.verifyScheduledTimingsInListView(ReportName,data.scheduleTimings);
+        analyzePage.clickOnAnalysisLink(ReportName);
+        break;
+      case 'card':
+        this.handleToastMessage();
+        analyzePage.goToView('card');
+        analyzePage.verifyScheduledTimingsInCardView(ReportName,data.scheduleTimings);
+        analyzePage.clickOnAnalysisLink(ReportName);
+    }
+  }
+
+  removeScheduleTime() {
+      executePage.clickOnActionLink();
+      executePage.clickSchedule();
+      this.removeSchedule();
+  }
+
+  verifyRemovedScheduleDetails(data,reportName){
+    switch (data.scheduleFrom) {
+      case 'card':
+        analyzePage.verifyScheduledTimingsInCardView(reportName,data.emptySchedule);
+        analyzePage.clickOnAnalysisLink(reportName);
+        break;
+      case 'list':
+        analyzePage.goToView('list');
+        analyzePage.verifyScheduledTimingsInListView(reportName,data.blankSchedule);
+        analyzePage.clickOnAnalysisLink(reportName);
+        break;
+    }
+  }
+
+  deleteReport() {
+    this.handleToastMessage();
+    executePage.clickOnActionLink();
+    executePage.clickOnDelete();
+    executePage.confirmDelete();
+    analyzePage.verifyToastMessagePresent("Analysis deleted.");
+    analyzePage.verifyAnalysisDeleted();
   }
 }
 module.exports = SchedulePage;

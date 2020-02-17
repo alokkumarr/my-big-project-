@@ -13,12 +13,12 @@ const SchedulePage = require('../../pages/SchedulePage');
 const dataSets = require('../../helpers/data-generation/datasets');
 const moment = require('moment');
 
-describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
+describe('Executing Schedule tests from createSchedule.test.js', () => {
   let analysisId;
   let host;
   let token;
   beforeAll(() => {
-    logger.info('Starting Schedule tests...');
+    logger.info('Starting Schedule Test Cases...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -49,8 +49,8 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
   });
 
   using(
-    testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
-      ? testDataReader.testData['SCHEDULE-REPORT']['positiveTest']
+    testDataReader.testData['SCHEDULE-REPORT']['createSchedule']
+      ? testDataReader.testData['SCHEDULE-REPORT']['createSchedule']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -94,98 +94,18 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           executePage.closeDetails();
           schedulePage.handleToastMessage();
 
-          /*Select page need to schedule report*/
-          if(data.scheduleFrom === 'details') {
-            analyzePage.clickOnAnalysisLink(ReportName);
-            executePage.clickOnActionLink();
-            executePage.clickSchedule();
-          }else if (data.scheduleFrom === 'list'){
-            analyzePage.goToView('list');
-            executePage.clickReportActionLink(ReportName);
-            executePage.clickSchedule();
-          }else if (data.scheduleFrom === 'card'){
-            executePage.clickReportActionLink(ReportName);
-            executePage.clickSchedule();
-          }
-
-          const ScheduleType = data.scheduleType;
-            switch (ScheduleType) {
-              case 'Immediate':
-                schedulePage.ScheduleImmediately();
-                break;
-              case 'Hourly':
-                schedulePage.hourlySchedule(data.Hours,data.Minutes);
-                break;
-              case 'Daily-Everyday':
-                schedulePage.dailyEverydaySchedule(data.Days,data.Hours,data.Minutes,data.timeStamp);
-                break;
-              case 'Daily-EveryWeekDay':
-                schedulePage.dailyEveryWeekDaySchedule(data.Hours,data.Minutes,data.timeStamp);
-                break;
-              case 'Weekly':
-                schedulePage.weeklySchedule(data.dayName,data.Hours,data.Minutes,data.timeStamp);
-                break;
-              case 'Monthly-On The Day':
-                schedulePage.monthlyOnTheDaySchedule(data.monthlyDay,data.monthlyMonth,data.Hours,data.Minutes,data.timeStamp);
-                break;
-              case 'Monthly-On The Weeks':
-                schedulePage.monthlyOnTheWeeksSchedule(data.monthlyWeeks,data.monthlyDayName,data.everyMonth,data.Hours,data.Minutes,data.timeStamp);
-                break;
-              case 'Yearly-Every-Month':
-                schedulePage.yearlyEveryMonthSchedule(data.yearlyMonth,data.yearlyDays,data.Hours,data.Minutes,data.timeStamp);
-                break;
-              case 'Yearly-On-Week':
-                schedulePage.yearlyOnWeekSchedule(data.yearlyWeeks,data.yearlyDayName,data.yearlyMonth,data.Hours,data.Minutes,data.timeStamp);
-                break;
-              case 'removeSchedule':
-                schedulePage.hourlySchedule(data.Hours,data.Minutes);
-                break;
-            }
-
+          //schedule From list/card/Details
+          schedulePage.scheduleFromView(data.scheduleFrom,ReportName);
+          schedulePage.selectSchedule(data.scheduleType,data);
           schedulePage.setEmail(data.userEmail);
           schedulePage.scheduleReport();
 
-          if(data.scheduleFrom === 'card') {
-            schedulePage.handleToastMessage();
-            analyzePage.goToView('card');
-            analyzePage.verifyScheduledTimingsInCardView(ReportName,data.scheduleTimings);
-            analyzePage.clickOnAnalysisLink(ReportName);
-          } else if (data.scheduleFrom === 'list') {
-            schedulePage.handleToastMessage();
-            analyzePage.goToView('list');
-            analyzePage.verifyScheduledTimingsInListView(ReportName,data.scheduleTimings);
-            analyzePage.clickOnAnalysisLink(ReportName);
-          } else {
-            analyzePage.clickOnAnalysisLink(ReportName);
-            schedulePage.handleToastMessage();
-            executePage.clickOnActionLink();
-            executePage.clickOnDetails();
-            executePage.clickPreviousVersions();
-            executePage.verifyScheduleDetails();
-            executePage.closeActionMenu();
-          }
+          //verify Schedule Details from list/card
+          schedulePage.verifyScheduledDetails(data,ReportName);
 
-          if(ScheduleType==="removeSchedule") {
-            executePage.clickOnActionLink();
-            executePage.clickSchedule();
-            schedulePage.removeSchedule();
-            /*Verify Removed schedule*/
-            if(data.scheduleFrom === 'card') {
-              analyzePage.verifyScheduledTimingsInCardView(ReportName,data.noSchedule);
-              analyzePage.clickOnAnalysisLink(ReportName);
-            } else {
-              analyzePage.goToView('list');
-              analyzePage.verifyScheduledTimingsInListView(ReportName,data.blankSchedule);
-              analyzePage.clickOnAnalysisLink(ReportName);
-            }
-          }
           /*Delete the Report*/
-          schedulePage.handleToastMessage();
-          executePage.clickOnActionLink();
-          executePage.clickOnDelete();
-          executePage.confirmDelete();
-          analyzePage.verifyToastMessagePresent("Analysis deleted.");
-          analyzePage.verifyAnalysisDeleted();
+          schedulePage.deleteReport();
+
         } catch (e) {
           console.log(e);
         }
@@ -193,7 +113,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
         testId: id,
         data: data,
         feature: 'SCHEDULE-REPORT',
-        dataProvider: 'positiveTest'
+        dataProvider: 'createSchedule'
       };
     });
 
@@ -209,7 +129,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           const tables = data.tables;
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
-          const ReportDescription = `Schedule DL Report ${new Date().toString()}`;
+          const ReportDescription = `Schedule Report ${new Date().toString()}`;
           const analyzePage = new AnalyzePage();
           analyzePage.goToView('card');
 
@@ -275,11 +195,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           executePage.closeActionMenu();
 
           /*Delete the Report*/
-          executePage.clickOnActionLink();
-          executePage.clickOnDelete();
-          executePage.confirmDelete();
-          analyzePage.verifyToastMessagePresent("Analysis deleted.");
-          analyzePage.verifyAnalysisDeleted();
+          schedulePage.deleteReport();
         } catch (e) {
           console.log(e);
         }
@@ -290,4 +206,6 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
         dataProvider: 'negativeTest'
       };
     });
+
+
 });

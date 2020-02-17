@@ -81,7 +81,7 @@ class ExecutePage extends ConfirmationModel {
     this._navigateBackButton = element(by.css(`[fonticon="icon-arrow-left"]`));
     this._ScheduleButton = element(by.css(`[e2e="actions-menu-selector-schedule"]`));
     this._previousversionTab = element(by.cssContainingText('span','Previous Versions'));
-    this._scheduledInPreviousVersionTab = element(by.cssContainingText('td','scheduled'));
+    this._scheduledInPreviousVersionTab = element(by.xpath('//td[text()="scheduled"]'));
   }
 
   verifyTitle(title) {

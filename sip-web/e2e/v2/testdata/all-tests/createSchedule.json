@@ -1,6 +1,6 @@
 {
   "SCHEDULE-REPORT": {
-    "positiveTest": {
+    "createSchedule": {
       "SHDL01": {
         "suites": [
           "regression"
@@ -473,61 +473,11 @@
             ]
           }
         ]
-      },
-      "SHDL20": {
-          "suites": [
-            "regression"
-          ],
-          "user": "admin",
-          "userEmail": "admin@xyz.com",
-          "scheduleType": "removeSchedule",
-          "Hours": "0",
-          "Minutes": "2",
-          "scheduleFrom": "card",
-          "scheduleTimings": "Every 2 minutes",
-          "noSchedule": "No Schedule Set",
-          "blankSchedule": "",
-          "description": "admin should be able remove schedule from card view",
-          "tables": [
-            {
-              "name": "SALES",
-              "fields": [
-                "Integer",
-                "String",
-                "Date"
-              ]
-            }
-          ]
-        },
-        "SHDL21": {
-          "suites": [
-            "regression"
-          ],
-          "user": "admin",
-          "userEmail": "admin@xyz.com",
-          "scheduleType": "removeSchedule",
-          "Hours": "0",
-          "Minutes": "3",
-          "scheduleFrom": "list",
-          "scheduleTimings": "Every 3 minutes",
-          "noSchedule": "No Schedule Set",
-          "blankSchedule": "",
-          "description": "admin should be able remove schedule from list view",
-          "tables": [
-            {
-              "name": "PRODUCT",
-              "fields": [
-                "Integer_2",
-                "String_2",
-                "Date_2"
-              ]
-            }
-          ]
-        }
-      },
+      }
+    },
     "negativeTest": {
       "SHDL22": {
-        "suites": ["development"],
+        "suites": ["regression"],
         "user": "admin",
         "userEmail": "admin@xyz.com",
         "scheduleHours": "0",
