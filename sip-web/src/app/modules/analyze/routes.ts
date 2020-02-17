@@ -37,7 +37,7 @@ export const routes: Routes = [
           analyses: AnalysesResolver
         },
         component: AnalyzeViewComponent
-      }
+      },
       {
         path: '**',
         canActivate: [DefaultAnalyzeCategoryGuard]
