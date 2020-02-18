@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { NgxsModule } from '@ngxs/store';
 import { TreeModule } from 'angular-tree-component';
 import { RouterModule } from '@angular/router';
@@ -11,10 +11,13 @@ import { RoleService } from './role/role.service';
 import { PrivilegeService } from './privilege/privilege.service';
 import { ExportService } from './export/export.service';
 import { ImportService } from './import/import.service';
-import { UserAssignmentService } from './datasecurity/userassignment.service';
+import { DataSecurityService } from './datasecurity/datasecurity.service';
+import { AdminBrandingComponent } from './branding/branding.component';
+import { BrandingService } from './branding/branding.service';
 import { routes } from './routes';
 import { FormsModule } from '@angular/forms';
 import { AnalyzeService } from '../analyze/services/analyze.service';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 import { AdminState } from './state/admin.state';
 
@@ -59,6 +62,9 @@ import {
   LocalSearchService
 } from '../../common/services';
 import { IsAdminGuard, GoToDefaultAdminPageGuard } from './guards';
+import { DskFilterGroupComponent } from './datasecurity/dsk-filter-group/dsk-filter-group.component';
+import { DskFilterDialogComponent } from './datasecurity/dsk-filter-dialog/dsk-filter-dialog.component';
+import { DskFilterGroupViewComponent } from './datasecurity/dsk-filter-group-view/dsk-filter-group-view.component';
 
 const COMPONENTS = [
   AdminPageComponent,
@@ -70,6 +76,10 @@ const COMPONENTS = [
   PrivilegeEditorComponent,
   PrivilegeRowComponent,
   SecurityGroupComponent,
+  DskFilterDialogComponent,
+  DskFilterGroupComponent,
+  DskFilterGroupViewComponent,
+  AdminBrandingComponent,
   AddSecurityDialogComponent,
   DeleteDialogComponent,
   AddAttributeDialogComponent,
@@ -99,7 +109,8 @@ const SERVICES = [
   PrivilegeService,
   ExportService,
   ImportService,
-  UserAssignmentService,
+  DataSecurityService,
+  BrandingService,
   CategoryService,
   AnalyzeService
 ];
@@ -109,11 +120,13 @@ const SERVICES = [
     CommonModuleTs,
     FormsModule,
     TreeModule,
+    ColorPickerModule,
     NgxsModule.forFeature([AdminState, ExportPageState, AdminImportPageState])
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   providers: [...SERVICES, ...GUARDS],
-  exports: [AdminPageComponent]
+  exports: [AdminPageComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AdminModule {}

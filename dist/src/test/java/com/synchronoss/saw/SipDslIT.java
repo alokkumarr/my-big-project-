@@ -8,6 +8,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -19,6 +20,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,9 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 public class SipDslIT extends BaseIT {
   String analysisId = "f37cde24-b833-46ba-ae2d-42e286c3fc39";
@@ -40,14 +45,18 @@ public class SipDslIT extends BaseIT {
   protected JsonObject testDataForDl = null;
   protected JsonObject sipQueryDl = null;
   protected String customToken;
+  protected String tokenForNegativeCases;
   private static final String TENANT_A = "TenantA";
   private static final String TENANT_B = "TenantB";
   private static final String TENANT_C = "TenantC";
   private static final String CUSTOMER_CODE = "customerCode";
+  private static final String AUTHORIZATION = "Authorization";
+  private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
   @Before
   public void setUpData() throws JsonProcessingException {
     customToken = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
+    tokenForNegativeCases = authenticate("reviewer@synchronoss.com", "Sawsyncnewuser1!");
     testData = new JsonObject();
     testData.addProperty("type", "esReport");
     testData.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
@@ -59,9 +68,25 @@ public class SipDslIT extends BaseIT {
     testData.addProperty("createdBy", "sipadmin@synchronoss.com");
     testData.addProperty("modifiedTime", 1543921879);
     testData.addProperty("modifiedBy", "sipadmin@synchronoss.com");
-    testData.addProperty("category", "5");
     testData.addProperty("userId", 1);
     testData.addProperty("name", "Untitled Analysis");
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
+
+    Instant instant = Instant.now();
+    JsonObject analysis = new JsonObject();
+    analysis.addProperty("type", "esReport");
+    analysis.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
+    analysis.addProperty("id", analysisId);
+    analysis.addProperty(CUSTOMER_CODE, "SYNCHRONOSS");
+    analysis.addProperty("projectCode", "workbench");
+    analysis.addProperty("module", "ANALYZE");
+    analysis.addProperty("createdTime", instant.getEpochSecond());
+    analysis.addProperty("createdBy", "sipadmin@synchronoss.com");
+    analysis.addProperty("modifiedTime", instant.getEpochSecond());
+    analysis.addProperty("modifiedBy", "sipadmin@synchronoss.com");
+    analysis.addProperty("userId", 1);
+    analysis.addProperty("name", "Untitled Analysis");
+    testData.add("analysis", analysis);
 
     sipQuery = new JsonObject();
 
@@ -224,7 +249,6 @@ public class SipDslIT extends BaseIT {
     testDataForDl.addProperty("createdBy", "sipadmin@synchronoss.com");
     testDataForDl.addProperty("modifiedTime", 1543921879);
     testDataForDl.addProperty("modifiedBy", "sipadmin@synchronoss.com");
-    testDataForDl.addProperty("category", "5");
     testDataForDl.addProperty("userId", 1);
     testDataForDl.addProperty("designerEdit", false);
     JsonObject artifact1 = new JsonObject();
@@ -359,7 +383,7 @@ public class SipDslIT extends BaseIT {
     JsonNode jsonNode = objectMapper.readTree(testData.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post(
@@ -382,7 +406,7 @@ public class SipDslIT extends BaseIT {
     String testStringFilter = "string 1";
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -475,11 +499,11 @@ public class SipDslIT extends BaseIT {
   public void testCustomerCodeFilterWithDsk() throws IOException {
     // Add security group for TenantA customer.
     ObjectNode secGroup = mapper.createObjectNode();
-    secGroup.put("description", "TestDesc2");
-    secGroup.put("securityGroupName", "TestGroup2");
+    secGroup.put("description", "TestDesc5");
+    secGroup.put("securityGroupName", "TestGroup5");
     Response secGroupRes =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .contentType(ContentType.JSON)
             .body(secGroup)
             .when()
@@ -491,34 +515,43 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
+    logger.debug("security groupId : {}",groupSysId);
 
-    ObjectNode root = mapper.createObjectNode();
-    root.put("attributeName", "string");
-    root.put("value", "string 1");
+    ObjectNode dskAttValues = mapper.createObjectNode();
+    dskAttValues.put("booleanCriteria","AND");
+    ObjectNode dskValues = mapper.createObjectNode();
+    dskValues.put("columnName","string");
+    ArrayNode values = mapper.createArrayNode();
+    values.add("string 1");
+    ObjectNode model = mapper.createObjectNode();
+    model.put("operator","ISIN");
+    model.put("values",values);
+    dskValues.put("model",model);
+    ArrayNode booleanQuery = mapper.createArrayNode();
+    booleanQuery.add(dskValues);
+    dskAttValues.put("booleanQuery",booleanQuery);
+
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
+        .header(AUTHORIZATION, "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(root)
+        .body(dskAttValues)
         .when()
-        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+        .put("/security/auth/admin/v1/dsk-security-groups/" + groupSysId)
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
-
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
-        .body("TestGroup2")
+        .header(AUTHORIZATION, "Bearer " + customToken)
+        .body("TestGroup5")
         .when()
         .put("/security/auth/admin/users/" + 5 + "/security-group")
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
-
     JsonObject sipDsl = testData;
     sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
-
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("area", "x-axis");
@@ -528,9 +561,7 @@ public class SipDslIT extends BaseIT {
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
-
     JsonElement js = new JsonArray();
-
     sipDsl
         .get("sipQuery")
         .getAsJsonObject()
@@ -543,7 +574,6 @@ public class SipDslIT extends BaseIT {
         .set(1, field1);
     sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
     sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
-
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
     // Update token after applying DSK.
@@ -556,10 +586,8 @@ public class SipDslIT extends BaseIT {
     String validateCustCode = TENANT_A;
     Assert.assertEquals(data.get(0).get(CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
-
-    given(authSpec)
-        .body("TestGroup2")
-        .when()
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + customTok)
         .delete("/security/auth/admin/security-groups/" + groupSysId)
         .then()
         .assertThat()
@@ -570,10 +598,10 @@ public class SipDslIT extends BaseIT {
   public void testSipDslDataLakeExecute() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
-    String testStringFilter = "string 201";
+    String testStringFilter = "string 247";
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -587,9 +615,9 @@ public class SipDslIT extends BaseIT {
     ArrayNode data = a.withArray("data");
     Long countOfRows = a.get("totalRows").asLong();
     Assert.assertTrue(countOfRows > 0);
-    Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
+    Assert.assertEquals(data.get(0).get("String").asText(), testStringFilter);
     List<Map<String, String>> dataNode = response.getBody().path("data");
-    Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
+    Assert.assertEquals(dataNode.get(0).get("String"), testStringFilter);
   }
 
   @Test
@@ -600,12 +628,10 @@ public class SipDslIT extends BaseIT {
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("table", "sales");
-    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("alias", "SALES_" + CUSTOMER_CODE);
     field1.addProperty("columnName", CUSTOMER_CODE);
     field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
-    JsonArray artifactFields = new JsonArray();
-    artifactFields.add(field1);
 
     sipDsl
         .get("sipQuery")
@@ -618,7 +644,14 @@ public class SipDslIT extends BaseIT {
         .getAsJsonArray()
         .set(1, field1);
 
-    field1.addProperty("table", "product");
+    JsonObject field2 = new JsonObject();
+    field2.addProperty("dataField", CUSTOMER_CODE);
+    field2.addProperty("table", "product");
+    field2.addProperty("alias", "PRODUCT_" + CUSTOMER_CODE);
+    field2.addProperty("columnName", CUSTOMER_CODE);
+    field2.addProperty("displayName", CUSTOMER_CODE);
+    field2.addProperty("type", "string");
+    field2.addProperty("table", "product");
     sipDsl
         .get("sipQuery")
         .getAsJsonObject()
@@ -628,7 +661,7 @@ public class SipDslIT extends BaseIT {
         .getAsJsonObject()
         .get("fields")
         .getAsJsonArray()
-        .set(1, field1);
+        .set(1, field2);
 
     JsonElement js = new JsonArray();
 
@@ -639,7 +672,7 @@ public class SipDslIT extends BaseIT {
     JsonNode sipDslQuery = objectMapper.readTree(sipDsl.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .body(sipDslQuery)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -666,7 +699,7 @@ public class SipDslIT extends BaseIT {
 
     Response syncResponse =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(sipDslQuery)
             .when()
             .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -719,7 +752,7 @@ public class SipDslIT extends BaseIT {
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("table", "sales");
-    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("alias", "SALES_" + CUSTOMER_CODE);
     field1.addProperty("columnName", CUSTOMER_CODE);
     field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
@@ -764,7 +797,7 @@ public class SipDslIT extends BaseIT {
     secGroup.put("securityGroupName", "TestGroup2");
     Response secGroupRes =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .contentType(ContentType.JSON)
             .body(secGroup)
             .when()
@@ -776,23 +809,34 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
+    logger.debug("security groupId : {}",groupSysId);
 
-    ObjectNode root = mapper.createObjectNode();
-    root.put("attributeName", "string");
-    root.put("value", "string 1");
+    ObjectNode dskAttValues = mapper.createObjectNode();
+    dskAttValues.put("booleanCriteria","AND");
+    ObjectNode dskValues = mapper.createObjectNode();
+    dskValues.put("columnName","string");
+    ArrayNode values = mapper.createArrayNode();
+    values.add("string 1");
+    ObjectNode model = mapper.createObjectNode();
+    model.put("operator","ISIN");
+    model.put("values",values);
+    dskValues.put("model",model);
+    ArrayNode booleanQuery = mapper.createArrayNode();
+    booleanQuery.add(dskValues);
+    dskAttValues.put("booleanQuery",booleanQuery);
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
+        .header(AUTHORIZATION, "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(root)
+        .body(dskAttValues)
         .when()
-        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+        .put("/security/auth/admin/v1/dsk-security-groups/" + groupSysId)
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
 
     given(spec)
-        .header("Authorization", "Bearer " + customToken)
+        .header(AUTHORIZATION, "Bearer " + customToken)
         .body("TestGroup2")
         .when()
         .put("/security/auth/admin/users/" + 5 + "/security-group")
@@ -813,11 +857,10 @@ public class SipDslIT extends BaseIT {
     Assert.assertTrue(data.size() == 1);
     String validateCustCode = TENANT_A;
     Assert.assertEquals(data.get(0).get("SALES_" + CUSTOMER_CODE).asText(), validateCustCode);
-    Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
+    Assert.assertEquals(data.get(0).get("String").asText(), "string 1");
 
-    given(authSpec)
-        .body("TestGroup2")
-        .when()
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + customTok)
         .delete("/security/auth/admin/security-groups/" + groupSysId)
         .then()
         .assertThat()
@@ -825,8 +868,10 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
-  public void testScheduleForMultiTenancy() throws IOException, InterruptedException {
-    analysisId = createAnalysis(customToken);
+  public void testScheduleForMultiTenancy() throws IOException {
+    JsonObject data = testData;
+    data.addProperty("category", "46");
+    analysisId = createAnalysis(customToken, data);
 
     ObjectNode scheduleObj = scheduleData();
     scheduleObj.put("activeRadio", "currenttime");
@@ -838,12 +883,13 @@ public class SipDslIT extends BaseIT {
     scheduleObj.put("jobGroup", TENANT_A);
     scheduleObj.put("scheduleState", "new");
     scheduleObj.put("zip", false);
+    scheduleObj.put("categoryID", "46");
     String json = mapper.writeValueAsString(scheduleObj);
     createSchedule(json, customToken);
 
     Response executionResultForScheduled =
         given(spec)
-            .header("Authorization", "Bearer " + customToken)
+            .header(AUTHORIZATION, "Bearer " + customToken)
             .get("/sip/services/internal/proxy/storage/" + analysisId + "/lastExecutions/data")
             .then()
             .assertThat()
@@ -856,16 +902,20 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testCreateAnalysis() throws IOException {
-    analysisId = createAnalysis(token);
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testUpdateAnalysis() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .body(jsonNode)
         .when()
         .put("/sip/services/dslanalysis/" + analysisId)
@@ -874,7 +924,7 @@ public class SipDslIT extends BaseIT {
         .statusCode(200);
 
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -883,31 +933,39 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testGetAnalysis() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testGetAnalysisByCategory() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId + "?category=5")
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testDeleteAnalysis() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -916,24 +974,30 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testListExecutions() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/internal/proxy/storage/" + analysisId + "/executions")
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testLastExecutionsData() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, testData);
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get("/sip/services/internal/proxy/storage/" + analysisId + "/lastExecutions/data")
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
@@ -947,7 +1011,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -977,7 +1041,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1007,7 +1071,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1041,7 +1105,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1078,7 +1142,7 @@ public class SipDslIT extends BaseIT {
 
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payloadData)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1134,7 +1198,7 @@ public class SipDslIT extends BaseIT {
     JsonNode payload = preparePayloadForGroupInterval(groupInterval);
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(payload)
             .post(
                 "/sip/services/internal/proxy/storage/execute?id="
@@ -1227,7 +1291,7 @@ public class SipDslIT extends BaseIT {
     List<Map<String, String>> data = getLastExecutionsData(analysisId);
 
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
@@ -1282,10 +1346,12 @@ public class SipDslIT extends BaseIT {
    */
   public ObjectNode testCreateDlAnalysis() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/dslanalysis/")
@@ -1306,7 +1372,7 @@ public class SipDslIT extends BaseIT {
    */
   public List<Map<String, String>> getLastExecutionsData(String analysisId) throws IOException {
     return given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .get(
             "/sip/services/internal/proxy/storage/"
                 + analysisId
@@ -1322,7 +1388,7 @@ public class SipDslIT extends BaseIT {
   private void createSchedule(String json, String token) {
     given(spec)
         .filter(document("create-schedule", preprocessResponse(prettyPrint())))
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .body(json)
         .when()
         .post("/sip/services/scheduler/schedule")
@@ -1370,8 +1436,11 @@ public class SipDslIT extends BaseIT {
   void executeAnalysis(String analysisId) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    ObjectNode objectNode = (ObjectNode) jsonNode;
+    objectNode.put("id", analysisId);
+    objectNode.put("category", "5");
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .body(jsonNode)
         .when()
         .post("/sip/services/internal/proxy/storage/execute?executionType=publish&id=" + analysisId)
@@ -1487,8 +1556,11 @@ public class SipDslIT extends BaseIT {
    * @return Response Object
    */
   public Response execute(String custToken, JsonNode body) {
+    if (body.has("category")) {
+      ((ObjectNode) body).remove("category");
+    }
     return given(spec)
-        .header("Authorization", "Bearer " + custToken)
+        .header(AUTHORIZATION, "Bearer " + custToken)
         .body(body)
         .when()
         .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
@@ -1506,12 +1578,12 @@ public class SipDslIT extends BaseIT {
    * @return Analysis id
    * @throws IOException IoException
    */
-  public String createAnalysis(String token) throws IOException {
+  public String createAnalysis(String token, JsonObject data) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
     Response response =
         given(spec)
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, "Bearer " + token)
             .body(jsonNode)
             .when()
             .post("/sip/services/dslanalysis/")
@@ -1534,10 +1606,225 @@ public class SipDslIT extends BaseIT {
    */
   public void deleteAnalysis(String analysisId, String token) {
     given(spec)
-        .header("Authorization", "Bearer " + token)
+        .header(AUTHORIZATION, "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
         .statusCode(200);
+  }
+
+  @Test
+  public void testCreateAnalysisForUnauthorizedPermissions() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    data.addProperty("semanticId", "workbench::sample-elasticsearch");
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
+        .body(jsonNode)
+        .when()
+        .post("/sip/services/dslanalysis/")
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
+  }
+
+  @Test
+  public void testUpdateAnalysisForUnauthorizedPermissions() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    data.addProperty("semanticId", "workbench::sample-elasticsearch");
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+
+    jsonNode = objectMapper.readTree(data.toString());
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
+        .body(jsonNode)
+        .when()
+        .put("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
+  }
+
+  @Test
+  public void testDeleteAnalysisForUnauthorizedPermissions() {
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.NOT_FOUND.value());
+  }
+
+  @Test
+  public void testExecuteAnalysisForUnauthorizedPermissions() throws IOException {
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    data.addProperty("semanticId", "workbench::sample-elasticsearch");
+
+    ObjectNode upsertPrivilege = prepareDataForModifyingPrivilege();
+
+    // Remove Execute Privilege and test whether api responds with UNAUTHORIZED.
+    modifyPrivilege(upsertPrivilege);
+
+    tokenForNegativeCases = authenticate("reviewer@synchronoss.com", "Sawsyncnewuser1!");
+
+    JsonObject field1 = new JsonObject();
+    field1.addProperty("dataField", CUSTOMER_CODE);
+    field1.addProperty("area", "x-axis");
+    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("columnName", CUSTOMER_CODE + ".keyword");
+    field1.addProperty("displayName", CUSTOMER_CODE);
+    field1.addProperty("type", "string");
+    JsonArray artifactFields = new JsonArray();
+    artifactFields.add(field1);
+
+    JsonObject sipDsl = data;
+    JsonElement js = new JsonArray();
+    sipDsl
+        .get("sipQuery")
+        .getAsJsonObject()
+        .get("artifacts")
+        .getAsJsonArray()
+        .get(0)
+        .getAsJsonObject()
+        .get("fields")
+        .getAsJsonArray()
+        .set(1, field1);
+    sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
+    sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
+
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode body = mapper.readTree(sipDsl.toString());
+
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + tokenForNegativeCases)
+        .body(body)
+        .when()
+        .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
+
+    upsertPrivilege.put("privilegeCode", 37376);
+    upsertPrivilege.put("privilegeDesc", "View, Publish, Export");
+    ObjectNode subCatPriv = mapper.createObjectNode();
+    subCatPriv.put("privilegeCode", 45568);
+    subCatPriv.put("privilegeDesc", "View, Execute, Publish, Export");
+    subCatPriv.put("privilegeId", 8);
+    subCatPriv.put("subCategoryId", 4);
+    ArrayNode subCatNew = mapper.createArrayNode();
+    subCatNew.add(subCatPriv);
+    upsertPrivilege.put("subCategoriesPrivilege", subCatNew);
+
+    // Modify the privileges as original.
+    modifyPrivilege(upsertPrivilege);
+  }
+
+  /**
+   * Prepare dataset for modifying privileges to test different scenario's.
+   *
+   * @return ObjectNode
+   */
+  public ObjectNode prepareDataForModifyingPrivilege() {
+    ObjectNode upsertPrivilege = mapper.createObjectNode();
+    upsertPrivilege.put("categoryCode", "F0000000001");
+    upsertPrivilege.put("categoryId", 2);
+    upsertPrivilege.put("categoryName", "CANNED ANALYSIS");
+    upsertPrivilege.put("categoryType", "PARENT_F0000000001");
+    upsertPrivilege.put("customerId", 1);
+    upsertPrivilege.put("masterLoginId", "sawadmin@synchronoss.com");
+    upsertPrivilege.put("moduleId", 1);
+    upsertPrivilege.put("moduleName", "ANALYZE");
+    upsertPrivilege.put("privilegeCode", 45568);
+    upsertPrivilege.put("privilegeDesc", "View, Execute, Publish, Export");
+    upsertPrivilege.put("privilegeId", 8);
+    upsertPrivilege.put("productId", 1);
+    upsertPrivilege.put("productName", "SAW Demo");
+    upsertPrivilege.put("roleId", 4);
+    upsertPrivilege.put("roleName", "REVIEWER");
+    upsertPrivilege.put("subCategoryId", 4);
+    upsertPrivilege.put("subCategoryName", "OPTIMIZATION");
+
+    ObjectNode subCatPriv = mapper.createObjectNode();
+    subCatPriv.put("privilegeCode", 37376);
+    subCatPriv.put("privilegeDesc", "View, Publish, Export");
+    subCatPriv.put("privilegeId", 8);
+    subCatPriv.put("subCategoryId", 4);
+
+    ArrayNode subCat = mapper.createArrayNode();
+    subCat.add(subCatPriv);
+    upsertPrivilege.put("subCategoriesPrivilege", subCat);
+
+    return upsertPrivilege;
+  }
+
+  /**
+   * Call upsert api to modify the privileges.
+   *
+   * @param body Request body
+   */
+  public void modifyPrivilege(ObjectNode body) {
+    given(spec)
+        .contentType(ContentType.JSON)
+        .header(AUTHORIZATION, "Bearer " + token)
+        .body(body)
+        .when()
+        .post("/sip/security/auth/admin/cust/manage/privileges/upsert")
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testAggregatedFilter() throws IOException {
+    JsonObject dateFilter = new JsonObject();
+    dateFilter.addProperty("type", "date");
+    dateFilter.addProperty("artifactsName", "sample");
+    dateFilter.addProperty("isOptional", false);
+    dateFilter.addProperty("columnName", "date");
+    dateFilter.addProperty("isRuntimeFilter", false);
+    dateFilter.addProperty("isGlobalFilter", false);
+    JsonObject model = new JsonObject();
+    model.addProperty("preset", "LY");
+    dateFilter.add("model", model);
+    JsonArray filters = new JsonArray();
+    filters.add(dateFilter);
+    JsonObject data = testData;
+    data.get("sipQuery").getAsJsonObject().add("filters", filters);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
+    Response response1 = execute(token, jsonNode);
+    JsonNode responsedata = response1.getBody().as(ObjectNode.class).get("data");
+    Iterator<JsonNode> iterator = responsedata.elements();
+    int count = 0;
+    while (iterator.hasNext()) {
+      if (iterator.next().get("integer").asInt() > 500) {
+        count++;
+      }
+    }
+    JsonObject aggregatedFilter = new JsonObject();
+    aggregatedFilter.addProperty("type", "integer");
+    aggregatedFilter.addProperty("artifactsName", "sample");
+    aggregatedFilter.addProperty("isOptional", false);
+    aggregatedFilter.addProperty("columnName", "integer");
+    aggregatedFilter.addProperty("isRuntimeFilter", false);
+    aggregatedFilter.addProperty("isGlobalFilter", false);
+    aggregatedFilter.addProperty("aggregate", "avg");
+    aggregatedFilter.addProperty("isAggregationFilter", true);
+    JsonObject model1 = new JsonObject();
+    model1.addProperty("operator", "GTE");
+    model1.addProperty("value", 500);
+    aggregatedFilter.add("model", model1);
+    filters.add(aggregatedFilter);
+    data.get("sipQuery").getAsJsonObject().add("filters", filters);
+    JsonNode jsonNode2 = objectMapper.readTree(data.toString());
+    Response response12 = execute(token, jsonNode2);
+    Integer noOfRows = response12.getBody().as(ObjectNode.class).get("totalRows").asInt();
+    assertTrue(noOfRows == count);
   }
 }

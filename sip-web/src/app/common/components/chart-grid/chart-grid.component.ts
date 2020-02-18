@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import * as orderBy from 'lodash/orderBy';
@@ -6,10 +6,16 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
+import * as reverse from 'lodash/reverse';
 import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as set from 'lodash/set';
 import * as moment from 'moment';
 import { HeaderProgressService } from './../../../common/services';
-import { setReverseProperty } from './../../../common/utils/dataFlattener';
+import {
+  setReverseProperty,
+  shouldReverseChart
+} from './../../../common/utils/dataFlattener';
 
 import { ChartService } from '../../services';
 import {
@@ -17,7 +23,8 @@ import {
   AnalysisDSL,
   SqlBuilderChart,
   AnalysisChartDSL,
-  isDSLAnalysis
+  isDSLAnalysis,
+  ChartOptions
 } from '../../types';
 
 interface ReportGridField {
@@ -60,7 +67,7 @@ export const dataFieldToHuman = (dataFieldName: string) => {
   templateUrl: 'chart-grid.component.html',
   styleUrls: ['chart-grid.component.scss']
 })
-export class ChartGridComponent implements OnInit {
+export class ChartGridComponent {
   @Input() updater: BehaviorSubject<Object[]>;
   @Input() actionBus: Subject<Object[]>;
   @Input('analysis')
@@ -72,18 +79,23 @@ export class ChartGridComponent implements OnInit {
   set setData(data: any[]) {
     this._headerProgress.show();
     this.toggleToGrid = false;
-    this.updates = this.getChartUpdates(data, this.analysis);
+    const processedData = this.reverseDataIfNeeded(
+      this.analysis.sipQuery,
+      data
+    );
+    this.updates = this.getChartUpdates(processedData, this.analysis);
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
       this.updater.next(this.updates);
-      this.data = data;
+      this.data = processedData;
       this._headerProgress.hide();
     });
   }
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid: DxDataGridComponent;
 
   public analysis: AnalysisDSL;
-  public chartOptions: Object;
+  public chartOptions: ChartOptions;
   public toggleToGrid = false;
   public chartToggleData: any;
   public updates: any;
@@ -96,7 +108,12 @@ export class ChartGridComponent implements OnInit {
     this.customizeColumns = this.customizeColumns.bind(this);
   }
 
-  ngOnInit() {}
+  reverseDataIfNeeded(sipQuery, data) {
+    if (shouldReverseChart(sipQuery)) {
+      return reverse(data);
+    }
+    return data;
+  }
 
   customizeColumns(columns) {
     forEach(columns, (col: ReportGridField) => {
@@ -303,8 +320,7 @@ export class ChartGridComponent implements OnInit {
     const chartData = orderedData || data;
 
     this.chartToggleData = this.trimKeyword(chartData);
-
-    return [
+    const updates = [
       ...this._chartService.dataToChangeConfig(
         analysis.type === 'chart'
           ? (<AnalysisChartDSL>analysis).chartOptions.chartType
@@ -327,6 +343,18 @@ export class ChartGridComponent implements OnInit {
         data: this.getChartHeight()
       }
     ];
+    // Setting the series color if any present in updater obj.
+    const seriesData = find(updates, ({ path }) => {
+      return path === 'series';
+    });
+    const { fields } = analysis.sipQuery.artifacts[0];
+    forEach(fields, serie => {
+      const matchedObj = find(seriesData.data, ({ dataType, aggregate }) => {
+        return dataType === serie.type && aggregate === serie.aggregate;
+      });
+      set(matchedObj, 'color', serie.seriesColor);
+    });
+    return updates;
   }
 
   getChartHeight() {

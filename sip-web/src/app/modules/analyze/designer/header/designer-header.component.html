@@ -55,12 +55,22 @@
       [value]="isInQueryMode"
       [disabled]="analysis?.designerEdit"
     >
-      <mat-button-toggle [value]="false" [disabled]="analysis?.designerEdit">
-        <mat-icon fontIcon="icon-designer-mode"></mat-icon>
+      <mat-button-toggle
+        [value]="false"
+        [disabled]="analysis?.designerEdit"
+        e2e="e2e-designer-btn"
+      >
+        <mat-icon
+          style="line-height: 24px; vertical-align: middle; height: 24px; width: 24px;"
+          fontIcon="icon-designer-mode"
+        ></mat-icon>
         <ng-container i18n>Designer</ng-container>
       </mat-button-toggle>
-      <mat-button-toggle [value]="true">
-        <mat-icon fontIcon="icon-query-mode"></mat-icon>
+      <mat-button-toggle [value]="true" e2e="e2e-query-btn">
+        <mat-icon
+          style="line-height: 24px; vertical-align: middle; height: 24px; width: 24px;"
+          fontIcon="icon-query-mode"
+        ></mat-icon>
         <ng-container i18n>Query</ng-container>
       </mat-button-toggle>
     </mat-button-toggle-group>
@@ -73,11 +83,7 @@
         !isInQueryMode
       "
       [disabled]="!areMinRequirmentsMet"
-      [color]="
-        designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA
-          ? 'primary'
-          : ''
-      "
+      [color]="areMinRequirmentsMet ? 'primary' : ''"
       (click)="requestAction.emit('refresh')"
     >
       <span i18n>Refresh Data</span>

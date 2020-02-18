@@ -62,7 +62,7 @@ export const DASHBOARD_MODES = {
 })
 export class DashboardGridComponent
   implements OnInit, OnChanges, AfterViewInit, OnDestroy {
-  @ViewChild('gridster') gridster: GridsterComponent;
+  @ViewChild('gridster', { static: true }) gridster: GridsterComponent;
   @ViewChildren(ObserveChartComponent) charts: QueryList<ObserveChartComponent>;
 
   model: Dashboard;
@@ -86,6 +86,13 @@ export class DashboardGridComponent
   public dashboard: Array<GridsterItem> = [];
   public listeners: Array<Subscription> = [];
   public initialised = false;
+  private analysisPrivileges: Array<{
+    analysisId: string;
+    category: string;
+    accessPermission: boolean;
+    executePermission: boolean;
+    message: string;
+  }> = [];
 
   constructor(
     private observe: ObserveService,
@@ -235,7 +242,7 @@ export class DashboardGridComponent
 
     const dimensions = this.getDimensions(item);
     if (item.kpi) {
-      item.dimensions = {...dimensions};
+      item.dimensions = { ...dimensions };
       return;
     }
 
@@ -332,44 +339,39 @@ export class DashboardGridComponent
   onApplyGlobalFilters(filterGroup = {}) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
-      if (this.tileType(tile) !== 'analysis') {
+      if (this.tileType(tile) !== 'analysis' || !tile.analysis) {
         return;
       }
 
-      const gFilters = filterGroup[tile.analysis.semanticId] || [];
+      const gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
 
-      const filters = unionWith(
-        // Global filters are being ignored by backend. Set that property
-        // false to make them execute properly.
-        map(gFilters, f => {
-          if (f.model) {
-            f.isGlobalFilter = false;
-          }
-          return f;
-        }),
-
-        (tile.origAnalysis.sqlBuilder || tile.origAnalysis.sipQuery).filters,
+      let filters = unionWith(
+        gFilters,
+        tile.origAnalysis.sipQuery.filters,
         (gFilt, filt) =>
           (gFilt.tableName || gFilt.artifactsName) ===
             (filt.tableName || filt.artifactsName) &&
-          gFilt.columnName === filt.columnName
+          gFilt.columnName === filt.columnName &&
+          gFilt.isAggregationFilter === filt.isAggregationFilter &&
+          gFilt.isGlobalFilter === filt.isGlobalFilter &&
+          gFilt.isGlobalFilter
       );
 
-      if (tile.origAnalysis.sqlBuilder) {
-        const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
-        tile.analysis = {
-          ...tile.origAnalysis,
-          ...{ sqlBuilder },
-          _executeTile: true
-        };
-      } else {
-        const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters } };
-        tile.analysis = {
-          ...tile.origAnalysis,
-          ...{ sipQuery },
-          _executeTile: true
-        };
-      }
+      // Global filters are being ignored by backend. Set that property
+      // false to make them execute properly.
+      filters = map(filters, f => {
+        if (f.model) {
+          f.isGlobalFilter = false;
+        }
+        return f;
+      });
+
+      const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters } };
+      tile.analysis = {
+        ...tile.origAnalysis,
+        ...{ sipQuery },
+        _executeTile: true
+      };
 
       this.dashboard.splice(id, 1, { ...tile });
     });
@@ -381,12 +383,20 @@ export class DashboardGridComponent
     );
   }
 
-  initialiseDashboard() {
+  async initialiseDashboard() {
     if (!this.model || this.initialised) {
       return;
     }
 
     const tiles = get(this.model, 'tiles', []);
+
+    try {
+      this.analysisPrivileges = await this.observe.readAnalysesPrivileges(
+        tiles.filter(tile => tile.type === 'analysis').map(tile => tile.id)
+      );
+    } catch (err) {
+      this.analysisPrivileges = [];
+    }
 
     let length = tiles.length;
 
@@ -419,6 +429,21 @@ export class DashboardGridComponent
         return;
       }
 
+      const privilege = this.analysisPrivileges.find(
+        priv => priv.analysisId === tile.id
+      );
+      if (
+        privilege &&
+        (!privilege.accessPermission || !privilege.executePermission)
+      ) {
+        tile.errorMessage = privilege.category
+          ? 'You are not authorised to view this analysis.'
+          : 'This item could not be loaded. It may have been deleted.';
+        tile.success = false;
+        this.dashboard.push(tile);
+        tileLoaded();
+        return;
+      }
       this.observe.readAnalysis(tile.id).then(
         data => {
           if (isEmpty(data)) {
@@ -427,13 +452,20 @@ export class DashboardGridComponent
             tileLoaded();
           } else {
             tile.analysis =
-            data.type === 'map' ? this.fetchGeoAnalysis(data) : data;
+              data.type === 'map' ? this.fetchGeoAnalysis(data) : data;
             tile.success = true;
             this.addAnalysisTile(tile);
             tileLoaded();
             this.getDashboard.emit({ changed: true, dashboard: this.model });
             this.refreshTile(tile);
           }
+        },
+        err => {
+          tile.success = false;
+          tile.errorMessage =
+            'Something went wrong with this analysis. Try refreshing dashboard.';
+          this.dashboard.push(tile);
+          tileLoaded();
         }
       );
     });
@@ -563,7 +595,7 @@ export class DashboardGridComponent
             case 'remove':
               const tiles = filter(
                 this.dashboard,
-                tile => get(tile, 'analysis.id') === get(req, 'data.id')
+                tile => get(tile, 'analysis.id', tile.id) === get(req, 'data.id')
               );
               forEach(tiles, this.removeTile.bind(this));
               break;
@@ -595,6 +627,8 @@ export class DashboardGridComponent
       return 'kpi';
     } else if (tile.bullet) {
       return 'bullet';
+    } else if (tile.id) {
+      return 'analysis';
     }
 
     return 'custom';
@@ -617,7 +651,7 @@ export class DashboardGridComponent
       updatedAt: get(model, 'updatedAt', ''),
       tiles: map(this.dashboard, tile => ({
         type: this.tileType(tile),
-        id: get(tile, 'analysis.id', ''),
+        id: get(tile, 'analysis.id', get(tile, 'id', '')),
         x: tile.x,
         y: tile.y,
         cols: tile.cols,

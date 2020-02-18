@@ -10,6 +10,7 @@ import com.synchronoss.saw.semantic.service.SemanticServiceImpl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,6 +54,9 @@ public class SipSemanticControllerTest {
   public void createSemanticTestCase() throws Exception {
     Mockito.when(semanticService.addSemantic(Mockito.any(SemanticNode.class)))
         .thenReturn(responseCreatedObjectSemantic);
+    Mockito.when(semanticService.addDskToSipSecurity(Mockito.any(SemanticNode.class),
+        Mockito.any(HttpServletRequest.class)))
+        .thenReturn(true);
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.post("/internal/semantic/workbench/create")
             .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)

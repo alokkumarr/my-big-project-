@@ -16,6 +16,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Header = require('../../pages/components/Header');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing fork from menu option and delete chart tests from charts/forkFromCardViewDelete.test.js', () => {
   const categoryName = categories.analyses.name;
@@ -35,7 +36,11 @@ describe('Executing fork from menu option and delete chart tests from charts/for
   beforeAll(() => {
     logger.info('Starting charts/forkFromCardViewDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -52,7 +57,13 @@ describe('Executing fork from menu option and delete chart tests from charts/for
       }
       analyses.forEach(id => {
         logger.warn('deleting analysis with id: ' + id);
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.CHART);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          id,
+          Constants.CHART
+        );
       });
 
       commonFunctions.clearLocalStorage();
@@ -145,8 +156,10 @@ describe('Executing fork from menu option and delete chart tests from charts/for
         analyzePage.clickOnAnalysisLink(forkedName);
 
         executePage.verifyTitle(forkedName);
-        forkedAnalysisId = executePage.getAnalysisId();
 
+        executePage.getAnalysisId().then(id => {
+          forkedAnalysisId = id;
+        });
         executePage.clickOnActionLink();
         executePage.clickOnDetails();
         executePage.verifyDescription(forkedDescription);

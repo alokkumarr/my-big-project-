@@ -1,17 +1,19 @@
 import { Component } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  FormsModule
-} from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import 'hammerjs';
 import { MaterialModule } from '../../../../material.module';
 import { AddSecurityDialogComponent } from './add-security-dialog.component';
-import { UserAssignmentService } from './../userassignment.service';
-import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DataSecurityService } from '../datasecurity.service';
+import {
+  MatDialog,
+  MatDialogConfig,
+  MatDialogRef,
+  MAT_DIALOG_DATA
+} from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-const UserAssignmentServiceStub = {
+const DataSecurityServiceStub = {
   addSecurityGroup: () => {
     return new Promise(res => res({ data: {} }));
   }
@@ -29,16 +31,20 @@ describe('Create AddGroupDialogStubComponent', () => {
   let fixture: ComponentFixture<AddSecurityDialogComponent>;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MaterialModule,
+      imports: [
+        MaterialModule,
         ReactiveFormsModule,
         FormsModule,
-        BrowserAnimationsModule],
+        BrowserAnimationsModule
+      ],
       declarations: [AddSecurityDialogComponent, AddGroupDialogStubComponent],
-      providers: [{ provide: UserAssignmentService, useValue: UserAssignmentServiceStub },
-                  { provide: MatDialog, useValue: mockService },
-                  { provide: MatDialogRef, useValue: mockService },
-                  { provide: MAT_DIALOG_DATA, useValue: mockService },
-                  { provide: MatDialogConfig, useValue: mockService }]
+      providers: [
+        { provide: DataSecurityService, useValue: DataSecurityServiceStub },
+        { provide: MatDialog, useValue: mockService },
+        { provide: MatDialogRef, useValue: mockService },
+        { provide: MAT_DIALOG_DATA, useValue: mockService },
+        { provide: MatDialogConfig, useValue: mockService }
+      ]
     })
       .compileComponents()
       .then(() => {

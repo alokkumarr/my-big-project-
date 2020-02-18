@@ -1,8 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Filter, Artifact } from '../../types';
-import {
-  getFilterValue
-} from './../../../../analyze/consts';
+import { getFilterDisplayName } from './../../../../analyze/consts';
 import { AnalyzeService } from '../../../services/analyze.service';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
@@ -30,17 +28,11 @@ export class FilterChipsComponent {
   constructor(private analyzeService: AnalyzeService) {}
 
   getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName || filter.artifactsName][
-      filter.columnName
-    ];
+    return getFilterDisplayName(this.nameMap, filter);
   }
 
   onRemove(index) {
     this.remove.emit(index);
-  }
-
-  getFilterValue(filter: Filter) {
-    return getFilterValue(filter);
   }
 
   onRemoveAll() {

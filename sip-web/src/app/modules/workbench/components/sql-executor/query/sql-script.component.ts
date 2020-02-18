@@ -25,7 +25,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   @Output() onExecute = new EventEmitter<any>();
   @Output() onCreate = new EventEmitter<any>();
 
-  @ViewChild('editor') editor: AceEditorComponent;
+  @ViewChild('editor', { static: true }) editor: AceEditorComponent;
 
   public _artifacts: Array<any>;
   public query: string;

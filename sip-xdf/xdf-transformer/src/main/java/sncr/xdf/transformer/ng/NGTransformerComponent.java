@@ -21,7 +21,10 @@ import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.context.RequiredNamedParameters;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 /**
  * Created by srya0001 on 12/19/2017.
@@ -60,7 +63,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         logger.trace(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
-
     @Override
     protected int execute(){
         logger.debug("Processing NGTransformerComponent ......" );
@@ -80,22 +82,41 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                 try {
                     script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
-                    throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
+                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
                 }
             }
             logger.trace("Script to execute:\n" +  script);
 
 
 //2. Read input datasets
-
             Map<String, Dataset> dsMap = new HashMap();
-            if (!(ngctx.runningPipeLine)) {
+            long inputDSCount = 0;
+            if (ngctx.runningPipeLine) {
+                String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
+                Dataset ds = ngctx.datafileDFmap.get(transInKey);
+                if(ds == null) {
+                    throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+                }
+                inputDSCount = ds.count();
+                if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0) {
+                    throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
+                }
+            }else{
                 for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputs.entrySet()) {
                     Map<String, Object> desc = entry.getValue();
                     String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
                     String format = (String) desc.get(DataSetProperties.Format.name());
+                    String transInKey =  (String) desc.get(DataSetProperties.Name.name());
+                    if(!HFileOperations.getFileSystem().exists(new Path(loc))){
+                        throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+                    }
+                    if(ngctx.componentConfiguration.isErrorHandlingEnabled() && HFileOperations.getFileSystem().getContentSummary(new Path(loc)).getLength() == 0){
+                        inputDSCount = 0;
+                        throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
+                    }
                     Dataset ds = reader.readDataset(entry.getKey(), format, loc);
                     logger.trace("Added to DS map: " + entry.getKey());
+                    inputDSCount = ds.count();
                     dsMap.put(entry.getKey(), ds);
                 }
             }
@@ -169,13 +190,14 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     return -1;
                 }
             }
-
-
-        }
-        catch(Exception e){
-            logger.error("Exception in main transformer module: ", e);
-            error = e.getMessage();
-            return -1;
+            validateOutputDSCounts(inputDSCount);
+        } catch (Exception e) {
+            logger.error("Exception in main transformer module: ",e);
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
         }
         return 0;
     }
@@ -252,6 +274,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
         NGContextServices ngCtxSvc;
         CliHandler cli = new CliHandler();
+        NGTransformerComponent component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
 
             long start_time = System.currentTimeMillis();
@@ -262,22 +287,22 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices[] scs =
@@ -300,25 +325,17 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
             ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.trace(id)
             );
-            NGTransformerComponent component = new NGTransformerComponent(ngCtxSvc.getNgctx());
-            if (!component.initComponent(null))
-                System.exit(-1);
-            int rc = component.run();
-
-            long end_time = System.currentTimeMillis();
-            long difference = end_time-start_time;
-            logger.info("Transformer total time " + difference );
-
-            System.exit(rc);
-        } catch (Exception exception) {
-            logger.error("Exception while running transformer component"+ exception.getMessage());
-            System.exit(-1);
+            component = new NGTransformerComponent(ngCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                long end_time = System.currentTimeMillis();
+                long difference = end_time - start_time;
+                logger.info("Transformer total time " + difference);
+            }
+        }catch (Exception ex) {
+            exception = ex;
         }
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        System.exit(rc);
     }
-
 }
-
-
-
-
-

@@ -5,7 +5,9 @@ const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../conf/protractor.conf');
 
 const fluentWait = protractorConf.timeouts.fluentWait;
-
+const progressBar = element(
+  by.xpath(`//mat-progress-bar[contains(@class,'mat-progress-bar')]`)
+);
 module.exports = {
   waitFor: {
     elementToBeClickable: (element, wait = null) => {
@@ -44,7 +46,10 @@ module.exports = {
       );
     },
     textToBePresent: (element, value, wait = null) => {
-      return browser.wait(EC.textToBePresentInElement(element, value), wait ? wait : fluentWait);
+      return browser.wait(
+        EC.textToBePresentInElement(element, value),
+        wait ? wait : fluentWait
+      );
     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
@@ -116,8 +121,8 @@ module.exports = {
     stream.end();
   },
   getAnalysisIdFromUrl(url) {
-    let ulrParts = url.split('analyze/analysis/')[1];
-    return ulrParts.split('/')[0];
+    let urlParts = url.split('analyze/analysis/')[1];
+    return urlParts.split('/')[0];
   },
   slideHorizontally(element, x_axis) {
     browser
@@ -134,7 +139,9 @@ module.exports = {
     }, protractorConf.timeouts.fluentWait);
   },
   hasClass(element, cls) {
-    return element.getAttribute('class').then(classes => classes.split(' ').includes(cls));
+    return element
+      .getAttribute('class')
+      .then(classes => classes.split(' ').includes(cls));
   },
   clickOnElement(el) {
     browser.sleep(200);
@@ -147,7 +154,11 @@ module.exports = {
     browser.sleep(200);
   },
   fillInput(el, value) {
+    browser.waitForAngular();
+    this.waitFor.elementToBePresent(el);
     this.waitFor.elementToBeVisible(el);
+    browser.sleep(200);
+    el.clear();
     el.clear().sendKeys(value);
   },
   validateText(el, msg) {
@@ -156,14 +167,18 @@ module.exports = {
     });
   },
   getDashboardId() {
-    browser.getCurrentUrl().then(url => {
+    return browser.getCurrentUrl().then(url => {
       return url.split('=')[1];
     });
   },
   elementToBeClickableAndClickByMouseMove(element) {
     this.waitFor.elementToBePresent(element);
     this.waitFor.elementToBeVisible(element);
-    browser.wait(EC.elementToBeClickable(element), fluentWait, 'Element "' + element.locator() + '" is not clickable');
+    browser.wait(
+      EC.elementToBeClickable(element),
+      fluentWait,
+      'Element "' + element.locator() + '" is not clickable'
+    );
     browser
       .actions()
       .mouseMove(element)
@@ -174,5 +189,11 @@ module.exports = {
     el.getText().then(text => {
       expect(text.trim().toLowerCase()).not.toBeNull();
     });
+  },
+  waitForProgressBarToComplete(progressBarElement = null) {
+    browser.waitForAngular();
+    this.waitFor.elementToBeNotVisible(
+      progressBarElement ? progressBarElement : progressBar
+    );
   }
 };

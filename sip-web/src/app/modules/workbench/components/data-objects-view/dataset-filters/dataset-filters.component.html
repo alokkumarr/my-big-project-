@@ -1,0 +1,39 @@
+<div
+  class="filter"
+  fxLayout="column"
+  fxLayoutGap="10px"
+  fxLayoutAlign="space-around center"
+>
+  <mat-card class="mat-elevation-z3" style="width: 80%;">
+    <mat-card-content fxLayout="column" fxLayoutAlign="space-around center">
+      <div>
+        <dataset-string-filter
+          (typeFilterChange)="filterChange($event)"
+          [typeFilterList]="categoryType"
+          [resetFilters]="isFilterSelected()"
+        >
+        </dataset-string-filter>
+      </div>
+    </mat-card-content>
+    <mat-card-actions fxLayout="row" fxLayoutGap="12px">
+      <button
+        fxFlex
+        mat-stroked-button
+        color="warn"
+        (click)="applyOrResetFilters('reset')"
+        [disabled]="isFilterSelected()"
+      >
+        Reset
+      </button>
+      <button
+        fxFlex
+        mat-raised-button
+        color="primary"
+        (click)="applyOrResetFilters('apply')"
+        [disabled]="isFilterSelected()"
+      >
+        Apply
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

@@ -23,18 +23,20 @@ import sncr.xdf.parser.NGParser;
 import sncr.xdf.services.NGContextServices;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.transformer.ng.NGTransformerComponent;
+import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import java.util.Optional;
 
 public class RTPSPipelineProcessor {
 
 	public RTPSPipelineProcessor() {
-
 	}
 
 	public RTPSPipelineProcessor(Dataset<Row> dataset) {
 		logger.debug("### creating parser with dataset ###");
 	    this.datafileDFmap = new HashMap<>();
 		this.datafileDFmap.put("DATA_STREAM", dataset.cache());
-		
 	}
 
 	public RTPSPipelineProcessor(List<Row> rowsList) {
@@ -50,103 +52,73 @@ public class RTPSPipelineProcessor {
 	String dataSetName = "";
 	String error;
 	String[] args;
-	
 
 	public void processDataWithDataFrame(JSONObject pipeLineConfig, Map<String, Object> pipelineParams, String type) {
-		
 		logger.info("###### Starting pipeline with dataset.....:) for event type "+ type);
-		Dataset<Row> dataset = this.datafileDFmap.get("DATA_STREAM");
-		logger.debug("###### Dataset display completed.....:)");
-		int ret = 0;
+		Dataset<Row> dataset = null;
+		int rc = 0;
 		int pipeLinStartIndex = 0;
 		JSONArray pipeline = null;
 		JSONObject rtaConfig = null;
 		Object config = null;
 		JSONObject jsonConfig = null;
-
 		try {
-			config =  pipeLineConfig.get("pipeline");
-			if( config instanceof JSONObject) {
-				
-				 jsonConfig = (JSONObject)config;
-				rtaConfig = (JSONObject)jsonConfig.get("rta");
-			    logger.debug("### Pipeline config in RTPS pipeline ::"+ rtaConfig);
-			} else if( config instanceof JSONArray){
-				 pipeline = (JSONArray)config;
-				 
-				 logger.debug("### Pipeline config in RTPS pipeline ::"+ pipeLineConfig);
-			}
-			
-			
-			
-			logger.debug("###### rta config "+ rtaConfig);
-    		
-    		
-    		if(rtaConfig ==null){
-    			logger.info("is Multiple doesnt exists ::");
-				logger.debug("### Pipeline configuration retrived successfully starting processing");
-				
-				/**
-				 * If single pipeline, then need not process
-				 * first pipeline entry i.e rtps
-				 */
-				pipeLinStartIndex = 1;
-				
-    		} else {
-    			logger.info("is Multiple  exists ::");
-    			 pipeline = (JSONArray) jsonConfig.get(type);
-    			logger.debug("#######pipeline"  + pipeline);
-    			
-    			
-    		}
-			
-			
-	
-			
-			if(pipeline == null) {
-				logger.error("####No pipeline defined for event type "+ type);
-			} else {
-				
-				for (int i = pipeLinStartIndex; i < pipeline.size(); i++) {
-					logger.info("### Pipeline starting from ::"+ pipeLinStartIndex);
-					JSONObject pipeObj = (JSONObject) pipeline.get(i);
-					
-					String component = pipeObj.get("component").toString();
-					boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-					logger.debug("######## Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
-					
-					logger.debug("######## Config   ---> " + pipeObj.get("configuration").toString() );
-					
-					logger.debug("######## Params   ---> " + pipelineParams );
-					
-					
-					switch (component) {
-
-					case "parser":
-						ret = processParser(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-
-					case "transformer":
-						ret = processTransformer(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-
-					case "sql":
-						ret = processSQL(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-
-					case "esloader":
-						ret = processESLoader(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-					}
-				}
-				
-			} 
-		}catch (Exception e) {
-			logger.error("XDFDataProcessor:processData() Exception is : " + e.getMessage() + "\n");
-			//System.exit(ret);
-		
-		}
-			
+            dataset = this.datafileDFmap.get("DATA_STREAM");
+            logger.debug("###### Dataset display completed.....:" + dataset);
+            config = pipeLineConfig.get("pipeline");
+            if (config instanceof JSONObject) {
+                jsonConfig = (JSONObject) config;
+                rtaConfig = (JSONObject) jsonConfig.get("rta");
+                logger.debug("### Pipeline config in RTPS pipeline ::" + rtaConfig);
+            } else if (config instanceof JSONArray) {
+                pipeline = (JSONArray) config;
+                logger.debug("### Pipeline config in RTPS pipeline ::" + pipeLineConfig);
+            }
+            logger.debug("###### rta config " + rtaConfig);
+            if (rtaConfig == null) {
+                logger.info("is Multiple doesnt exists ::");
+                logger.debug("### Pipeline configuration retrived successfully starting processing");
+                /**
+                 * If single pipeline, then need not process
+                 * first pipeline entry i.e rtps
+                 */
+                pipeLinStartIndex = 1;
+            } else {
+                logger.info("is Multiple  exists ::");
+                pipeline = (JSONArray) jsonConfig.get(type);
+                logger.debug("#######pipeline" + pipeline);
+            }
+            if (pipeline == null) {
+                logger.error("####No pipeline defined for event type " + type);
+            } else {
+                for (int i = pipeLinStartIndex; i < pipeline.size() && rc == 0; i++) {
+                    logger.info("### Pipeline starting from ::" + pipeLinStartIndex);
+                    JSONObject pipeObj = (JSONObject) pipeline.get(i);
+                    String component = pipeObj.get("component").toString();
+                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+                    logger.debug("######## Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
+                    logger.debug("######## Config   ---> " + pipeObj.get("configuration").toString());
+                    logger.debug("######## Params   ---> " + pipelineParams);
+                    switch (component) {
+                        case "parser":
+                            rc = processParser(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                        case "transformer":
+                            rc = processTransformer(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                        case "sql":
+                            rc = processSQL(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                        case "esloader":
+                            rc = processESLoader(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                    }
+                }
+            }
+        }catch(Exception e){
+            logger.error("XDFDataProcessor:processData() Exception is : " + e.getMessage() + "\n");
+            //System.exit(rc);
+        }
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception {
@@ -155,30 +127,31 @@ public class RTPSPipelineProcessor {
 		return config;
 	}
 
-
 	public int processParser(Map<String, Object> parameters, String configPath, boolean persistFlag) {
 		logger.debug("###### Starting parser in pipe line with dataset.....updated");
-		int ret = 0;
+        NGParser component = null;
+        int rc= 0;
+        Exception exception = null;
 		try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
@@ -210,60 +183,53 @@ public class RTPSPipelineProcessor {
 			ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 			ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
-			NGParser component = null;
-
 			Dataset dataset = datafileDFmap.get("DATA_STREAM");
 			logger.debug("######Retrived dataset and passing to parser #####");
 			component = new NGParser(ngParserCtxSvc.getNgctx(),  dataset, true);
-
 			logger.debug("######Starting init component #####");
-			if (!component.initComponent(null)) {
-				logger.error("Unable to initialize Parser component");
-				return 1;
-			}
-
-			ret = component.run();
-
-			if (ret != 0) {
-				error = "Could not complete Parser component " + "entry";
-				throw new Exception(error);
-			}
-			 datafileDFmap.putAll(ngParserCtxSvc.getNgctx().datafileDFmap);
-			//datafileDFmap.put(parserKey,
-				//	ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
-			//dataSetName = parserKey;
-			 logger.debug("End Of Parser Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
-		} catch (Exception e) {
-			logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
-			//System.exit(-1);
-		}
-		return ret;
+            if (component.initComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    datafileDFmap.putAll(ngParserCtxSvc.getNgctx().datafileDFmap);
+                    //datafileDFmap.put(parserKey,
+                    //	ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
+                    //dataSetName = parserKey;
+                    logger.debug("End Of Parser Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
+                }
+            }
+        }catch (Exception ex) {
+            logger.error("RTPSPipelineProcessor:processParser() Exception is : ",ex);
+            exception = ex;
+        }
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        return rc;
 	}
 
 
 	public int processTransformer(Map<String, Object> parameters, String configPath, boolean persistFlag) {
-		int ret = 0;
+        NGTransformerComponent component = null;
+        int rc= 0;
+        Exception exception = null;
 		try {
-
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices[] scs = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
@@ -292,58 +258,54 @@ public class RTPSPipelineProcessor {
 			//ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
 			//ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey, datafileDFmap.get(dataSetName));
 			//logger.debug("dataset count in transformer ::" + datafileDFmap.get(dataSetName).count());
-			
 
-			NGTransformerComponent tcomponent = new NGTransformerComponent(ngTransformerCtxSvc.getNgctx());
+			component = new NGTransformerComponent(ngTransformerCtxSvc.getNgctx());
+            if (component.initTransformerComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    datafileDFmap.putAll(ngTransformerCtxSvc.getNgctx().datafileDFmap);
+                    //datafileDFmap = new HashMap<>();
+                    //.put(transOutKey,
+                    //		ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
+                    //dataSetName = transOutKey;
 
-			if (!tcomponent.initTransformerComponent(null))
-				System.exit(-1);
-
-			ret = tcomponent.run();
-
-			if (ret != 0) {
-				error = "Could not complete Transformer component " + "entry";
-				throw new Exception(error);
-			}
-			datafileDFmap.putAll(ngTransformerCtxSvc.getNgctx().datafileDFmap);
-			//datafileDFmap = new HashMap<>();
-			//.put(transOutKey,
-			//		ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
-			//dataSetName = transOutKey;
-
-			logger.debug("End Of Transformer Component ==>  dataSetName  & size " + datafileDFmap.keySet() + ","
-					+ datafileDFmap.size() + "\n");
-
-		} catch (Exception e) {
-			logger.debug("XDFDataProcessor:processTransformer() Exception is : " + e + "\n");
-			//System.exit(-1);
-		}
-		return ret;
+                    logger.debug("End Of Transformer Component ==>  dataSetName  & size " + datafileDFmap.keySet() + ","
+                        + datafileDFmap.size() + "\n");
+                }
+            }
+        }catch (Exception ex) {
+            logger.error("RTPSPipelineProcessor:processTransformer() Exception is : ",ex);
+            exception = ex;
+        }
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        return rc;
 	}
 
 	public int processSQL(Map<String, Object> parameters, String configPath, boolean persistFlag) {
-		int ret = 0;
+        NGSQLComponent component = null;
+        int rc= 0;
+        Exception exception = null;
 		try {
 
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices[] sqlcs = {
@@ -373,61 +335,59 @@ public class RTPSPipelineProcessor {
 			//ngSQLCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
 			ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; // TRANS_out
 			ngSQLCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
+			logger.debug("##### Begining to prcess SQL######");
+			datafileDFmap.forEach((k,v)->{
+				logger.info("#########Table Name:: "+ k);
+				v.show();
+			});
 			//ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey, datafileDFmap.get(dataSetName)); // TRANS_OUT
 			ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 			ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
 			ngSQLCtxSvc.getNgctx().pipeComponentName = "sql";
 
-			NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
-
-			if (!sqlcomponent.initComponent(null))
-				System.exit(-1);
-
-			ret = sqlcomponent.run();
-
-			if (ret != 0) {
-				error = "Could not complete SQL component " + "entry";
-				logger.error(error);
-				throw new Exception(error);
-			}
-
-			//datafileDFmap.put(sqlOutKey, ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
-			dataSetName = sqlOutKey;
-			datafileDFmap.putAll(ngSQLCtxSvc.getNgctx().datafileDFmap);
-			logger.debug(
-					"End Of SQL Component ==>  dataSetName  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size() + "\n");
-
-		} catch (Exception e) {
-			logger.debug("XDFDataProcessor:processSQL() Exception is : " + e + "\n");
-			//System.exit(-1);
-		}
-		return ret;
+			component = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    //datafileDFmap.put(sqlOutKey, ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
+                    dataSetName = sqlOutKey;
+                    datafileDFmap.putAll(ngSQLCtxSvc.getNgctx().datafileDFmap);
+                    logger.debug(
+                        "End Of SQL Component ==>  dataSetName  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size() + "\n");
+                }
+            }
+        }catch (Exception ex) {
+            logger.error("RTPSPipelineProcessor:processSQL() Exception is : ",ex);
+            exception = ex;
+        }
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        return rc;
 	}
 
 	public int processESLoader(Map<String, Object> parameters, String configPath, boolean persistFlag) {
-		int ret = 0;
-
+        NGESLoaderComponent component = null;
+        int rc= 0;
+        Exception exception = null;
 		try {
-
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices[] escs = { ComponentServices.Project, ComponentServices.TransformationMetadata,
@@ -453,26 +413,19 @@ public class RTPSPipelineProcessor {
 			//ngESCtxSvc.getNgctx().datafileDFmap.put(dataSetInKey, datafileDFmap.get(dataSetName));
 			ngESCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 
-			NGESLoaderComponent esloader = new NGESLoaderComponent(ngESCtxSvc.getNgctx());
-
-			if (!esloader.initComponent(null))
-				System.exit(-1);
-			ret = esloader.run();
-
-			if (ret != 0) {
-				error = "Could not complete ESLoader component " + "entry";
-				throw new Exception(error);
-			}
-
-			logger.debug("End Of ESLoader Component ==>  dataSetName  & size " + ngESCtxSvc.getNgctx().dataSetName + ","
-					+ ngESCtxSvc.getNgctx().datafileDFmap.size() + "\n");
-
-		} catch (Exception e) {
-			logger.debug("XDFDataProcessor:processESLoader() Exception is : " + e + "\n");
-			//System.exit(-1);
-		}
-		return ret;
+            component = new NGESLoaderComponent(ngESCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                if (rc == 0) {
+                    logger.debug("End Of ESLoader Component ==>  dataSetName  & size " + ngESCtxSvc.getNgctx().dataSetName + ","
+                        + ngESCtxSvc.getNgctx().datafileDFmap.size() + "\n");
+                }
+            }
+        }catch (Exception ex) {
+            logger.error("RTPSPipelineProcessor:processESLoader() Exception is : ",ex);
+            exception = ex;
+        }
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        return rc;
 	}
-
-
 }

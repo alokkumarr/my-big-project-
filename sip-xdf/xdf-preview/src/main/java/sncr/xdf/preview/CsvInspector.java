@@ -12,6 +12,8 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.core.file.HFileOperations;
 
 import java.io.BufferedWriter;
@@ -25,7 +27,7 @@ import java.util.Scanner;
 
 public class CsvInspector {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(CsvInspector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsvInspector.class);
 
     private CsvParserSettings settings;
     private CsvParser parser;
@@ -43,19 +45,17 @@ public class CsvInspector {
             String cnf =  new Scanner(new File(args[0])).useDelimiter("\\Z").next();
             CsvInspector parser = new CsvInspector(cnf, "");
             parser.parseSomeLines();
-            //parser.printResults();
             String str = parser.toJson();
             BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\projects\\tools\\result.json"));
             writer.write(str);
             writer.close();
         } catch(Exception e){
-            System.out.println("Exception :" + e.getMessage());
-            e.printStackTrace();
+            LOGGER.info("Exception : {}", e.getMessage());
         }
 
-        System.out.println("Total memory : " + Runtime.getRuntime().totalMemory());
-        System.out.println("Free memory  : " + Runtime.getRuntime().freeMemory());
-        System.out.println("Max memory   : " + Runtime.getRuntime().maxMemory());
+        LOGGER.info("Total memory : " + Runtime.getRuntime().totalMemory());
+        LOGGER.info("Free memory  : " + Runtime.getRuntime().freeMemory());
+        LOGGER.info("Max memory   : " + Runtime.getRuntime().maxMemory());
 
         System.exit(0);
     }
@@ -77,7 +77,7 @@ public class CsvInspector {
             // We have to choose one file to inspect
             this.path = getFilePath(tmp);
 
-            logger.info("\nInspecting " + this.path);
+            LOGGER.info("\nInspecting {}", this.path);
 
 
             String lineSeparator = getSetting(inspectorSettings, "lineSeparator", "\\n");
@@ -135,7 +135,7 @@ public class CsvInspector {
                     }
                 }
             } catch (IOException e) {
-
+                LOGGER.error("Error occurred for connection {}", e.getMessage());
             }
         return null;
     }

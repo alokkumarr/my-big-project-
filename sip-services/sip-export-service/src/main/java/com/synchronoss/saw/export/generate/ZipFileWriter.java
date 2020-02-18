@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-
-
 public class ZipFileWriter {
 	private static final Logger logger = LoggerFactory.getLogger(ZipFileWriter.class);
 	
@@ -29,8 +27,7 @@ public class ZipFileWriter {
             logger.debug("zip file name here :"+ "ZIP : " + inputFile.getAbsolutePath());
         }
         catch( IOException e) {
-            e.printStackTrace();
-            logger.error("writeZip :",e);
+            logger.error("writeZip : {}",e);
         }
 
         byte[] inputBuffer = new byte[ BUF_SIZE];
@@ -48,19 +45,8 @@ public class ZipFileWriter {
             zipOutputStream.close();
         }
         catch( IOException e) {
-            e.printStackTrace();
-            logger.error("read/write zip :",e);
+            logger.error("read/write zip : {}",e);
         }
         logger.debug("ZipFileWriter - writeZip - END");
     }
-
-	/**
-	 * @param args
-	 */
-	/*public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-		writeZip(new File("D://pubReports//Email test_2012-08-21_10_45.csv"));
-	}*/
-
 }

@@ -9,6 +9,8 @@ import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.JaninoTransform;
 import sncr.xdf.context.NGContext;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.context.XDFReturnCode;
 
 import java.util.Map;
 
@@ -44,7 +46,6 @@ public class NGJaninoExecutor extends NGExecutor{
 
 
     public void execute(Map<String, Dataset> dsMap) throws Exception {
-
         Dataset ds = dsMap.get(inDataSetName);
         JavaRDD transformationResult = transformation(ds.toJavaRDD()).cache();
         logger.debug("Intermediate result, transformation count  = " + transformationResult.count());
@@ -55,10 +56,8 @@ public class NGJaninoExecutor extends NGExecutor{
     }
 
     public void executeSingleProcessor(NGContext ngctx) throws Exception {
-
         Map<String, Dataset> dsMap = ngctx.datafileDFmap;
         Dataset ds = dsMap.get(ngctx.dataSetName);
-
         JavaRDD transformationResult = transformation(ds.toJavaRDD()).cache();
         logger.debug("Intermediate result, transformation count  = " + transformationResult.count());
 
@@ -66,6 +65,4 @@ public class NGJaninoExecutor extends NGExecutor{
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
         createFinalDS(df.cache());
     }
-
-
 }

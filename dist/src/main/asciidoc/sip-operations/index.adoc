@@ -340,6 +340,16 @@ XDF-NG batch pipeline can be configured as below.
 	
 ==== Configuring XDF-RTPS
 
+  XDF-RTA can be run as a systemctl service as it continuously listens
+  to messages. Follow below steps to create systemctl service
+
+  1. Create a systemctl service by referring to 
+  'sip-xdf/xdf/bin/templates/xdf-rta.service.template'.
+  
+  2. Add execute-component command with arguments in the service.
+  
+  3. Use systemctl commands to start/stop/restart or check status of rta service.
+
   RTPS gets installed as part of XDF-NG. If RTPS is configured as one of the
   component in pipeline, then RTA service gets started when pipeline is
   triggered. RTA service starts listening to real time data and executes
@@ -973,6 +983,25 @@ curl -X PUT \
   -d '{ "max_result_window" : 300000 }'
 ----
 
+=== MapR Table Size Setting
+Mapr supports default max row size of table `32768KB`. Size can be
+checked with the below MapR cli command:
+----
+maprcli config load -json | grep mfs.db.max.rowsize.kb
+----
+
+If the users tries to execute/query Analysis more data (> 32MB) and
+tries to save in the table, table will throw an error like:
+
+`ERROR com.mapr.fs.Inode - checkAndReplaceOrDelete() on
+'<Table name >'
+ failed with error: Argument list too long (7).`
+
+Below is the command to increase the size of mapr table:
+----
+maprcli config save -values {"mfs.db.max.rowsize.kb":"128000"}
+----
+
 === General guideline for ElasticSearch script support
 
 SIP is using custom scripting of ElasticSearch to build and evaluate
@@ -1180,6 +1209,7 @@ Features of spring boot shell:
             stacktrace: Display the full stacktrace of the last error.
     Saw Security Shell
             onboard-customer: Onboard the customer
+            auto-execution: Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page
     shell:>
 
 
@@ -1249,6 +1279,49 @@ Note : A parameter containing a space in between can be enclosed in either singl
 
         Ex : onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z --JV 1 --FC 0
 
+== Turning Auto Execution ON/OFF (Charts, Pivots and ES Reports)
+
+We can utilise customer_onboard.sh script in order to execute the
+command with current environment setup.
+
+    cd /opt/bda/saw-security/bin/
+    bash customer_onboard.sh
+
+Features of spring boot shell:
+
+. Type in "help" and it will show you all the available commands
+
+. Tab based auto completion is supported.
+
+To Enable/Disable auto Execution for analysis, type "help auto-execution" and it will show all required parameters that the command accepts.
+
+    shell:>help auto-execution
+
+    NAME
+    	auto-execution - Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page
+
+    SYNOPSYS
+    	auto-execution [--C] string  [--F] integer
+
+    OPTIONS
+    	--C  string
+    		Customer-Code
+    		[Mandatory]
+
+    	--F  integer
+    		 Active Status Indicator flag
+    		 [Optional, DefaultValue : 1]
+
+Run the "auto-execution" command with required parameters stated as above.
+
+The below is one such example to call auto-execution with its
+required parameters.
+
+
+    shell:>auto-execution --C SNCR0001 --F 1
+
+NOTE : If the configuration is not present in the system, the command adds a new configuration. If its already present, the corresponding entries will be updated based on the input.
+
 ==  SIP SSO Authentication
 
 SIP supports external systems to authenticate users (single
@@ -1273,6 +1346,7 @@ SIP supports *exporting* reports and pivots:
 . from UI
 . to email
 . to ftp/sftp servers
+. to S3 Bucket
 
 In sip-config, we can configure how many number of rows we want to
 extract for all the reports / pivots:
@@ -1283,6 +1357,7 @@ extract for all the reports / pivots:
 saw_ui_export_size=10000
 saw_email_export_size=50000
 saw_ftp_export_size=1000000
+saw_s3_export_size=1000000
 ----
 
 SIP reports are exported chunks of rows, we can configure how many
@@ -1363,3 +1438,66 @@ server entry per customer is required to have a unique alias entry
 which gets presented in front end.
 
 NOTE: Please make sure to put minified JSON in configuration file.
+
+=== S3 Bucket configuration for the
+
+SIP supports exporting of pivots and reports to S3 Bucket.
+By default an empty configuration is installed in
+`/opt/bda/saw-export-service/conf/S3-details.json` file on SIP nodes.
+
+The contents of this configuration can be changed using `sip-config`.
+An example configuration has been included in config file.
+
+.sip-config
+----
+# S3 JSON config
+# (Do not split this into multiple lines)
+# s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "Analysis", "accessKey": "AKIAJ******4AECBVQ", "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz", "type": "s3"}]}'
+----
+
+Example contents (in pretty format):
+
+.S3-details.json
+[source, json]
+----
+{
+  "s3List": [
+    {
+      "customerCode": "SYNCHRONOSS",
+      "alias": "xdftest1",
+      "bucketName": "xdftest",
+      "region": "us-east-1",
+      "outputLocation": "Analysis",
+      "accessKey": "AKIAJ******4AECBVQ",
+      "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz",
+      "type": "s3"
+    },
+    {
+      "customerCode": "TenantA",
+      "alias": "test1",
+      "bucketName": "test1",
+      "region": "us-east-1",
+      "outputLocation": "Analysis",
+      "accessKey": "AKIAJ******4AECBVQ",
+      "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz",
+      "cannedAcl": "BucketOwnerFullControl",
+      "type": "s3"
+    }
+  ]
+}
+----
+
+In above example, `customerName` is the unique identifier given at
+the time of onboarding customer. Note that based on this unique
+identifier, customers are differentiated. Each S3 bucket
+is required to have unique entry which gets presented to front
+end, this is maintained by means of `alias` entry. *Note* that each
+Bucket entry per customer is required to have a unique alias entry
+which gets presented in front end.
+
+S3 canned ACLs supported with write permission can be
+configured in S3-details.json file , SIP Supported List of canned ACLs List
+
+   1) "cannedAcl": "BucketOwnerFullControl"
+   2) "cannedAcl": "PublicReadWrite",
+   3) "cannedAcl": "LogDeliveryWrite"

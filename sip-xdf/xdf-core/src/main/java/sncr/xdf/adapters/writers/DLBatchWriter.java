@@ -84,8 +84,10 @@ public class DLBatchWriter {
             logger.debug("Clean up temp location: " + tempLocation);
             HFileOperations.deleteEnt(tempLocation);
         }
+        //TODO:: SIP-9791 Sampling is disabled then why is the dataLocation dependent on produceSample? Commenting this code & revisit this logic
 
-        String dataLocation = (produceSample)? tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR : tempLocation;
+        //String dataLocation = (produceSample)? tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR : tempLocation;
+        String dataLocation = tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR;
         logger.trace("baseWrite:dataLocation:destination :" + dataLocation);
         //TODO:: Fix BDA Meta
         String sampleLocation = tempLocation + Path.SEPARATOR + "sample";
@@ -97,8 +99,12 @@ public class DLBatchWriter {
 
         // This can be an empty collection in case FLAT partition
         // is requested or key definitions omited in configuration file
-
-//        DS.show(4);
+        /**
+         * SIP-9791 - Enable dataset.show() statement only when debug logging is enabled
+         */
+        if(logger.isDebugEnabled()){
+            DS.show(4);
+        }
 
         scala.collection.immutable.Seq<String> partitionKeysList = null;
         if (keys != null)

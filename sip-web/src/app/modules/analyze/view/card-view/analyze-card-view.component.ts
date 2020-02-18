@@ -12,5 +12,6 @@ export class AnalyzeCardViewComponent {
   @Input() analysisType: string;
   @Input() highlightTerm: string;
   @Input() cronJobs: any;
+  @Input() category;
   constructor() {}
 }

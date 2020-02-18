@@ -6,8 +6,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.2.RELEASE</version>
-		<relativePath/>
+    <version>2.1.0.RELEASE</version>
+    <!--TODO:spring boot version is not upgraded to 2.1.5,because there is some dependency with elastic search in 2.1.5,
+       so once elastic search upgrade is done, we have to upgrade spring boot version to 2.1.5
+      -->
+    <relativePath/>
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>

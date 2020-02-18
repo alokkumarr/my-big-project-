@@ -285,6 +285,14 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', {})));
   }
 
+  /** GET filtered datasets from the server */
+  getFilteredDatasets(payload): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/datasets/search`;
+    return this.http
+      .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.

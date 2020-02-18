@@ -14,6 +14,7 @@ import com.synchronoss.saw.semantic.service.SemanticService;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.IOException;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,9 @@ public class SipSemanticController {
   public SemanticNode addSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @RequestBody SemanticNode requestBody,
-      @RequestHeader Map<String, String> headers)
+      @RequestHeader Map<String, String> headers,
+      HttpServletRequest request
+  )
       throws SipJsonMissingException {
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
@@ -68,6 +71,12 @@ public class SipSemanticController {
       responseObjectFuture = semanticService.addSemantic(requestBody);
       logger.trace(
           "Semantic entity created : {}", objectMapper.writeValueAsString(responseObjectFuture));
+
+      Boolean status = semanticService.addDskToSipSecurity(requestBody, request);
+
+      if (!status) {
+        throw new SipCreateEntityException("Adding dsk to sip security failed");
+      }
     } catch (SipCreateEntityException | JsonProcessingException ex) {
       throw new SipCreateEntityException("Problem on the storage while creating an entity");
     }
@@ -109,8 +118,10 @@ public class SipSemanticController {
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "Id", required = true) String id, @RequestBody SemanticNode requestBody,
-      @RequestHeader Map<String, String> headers) throws SipJsonMissingException {
+      @PathVariable(name = "id", required = true) String id, @RequestBody SemanticNode requestBody,
+      @RequestHeader Map<String, String> headers,
+      HttpServletRequest request
+  ) throws SipJsonMissingException {
     logger.trace("Request Body to update a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -120,6 +131,12 @@ public class SipSemanticController {
       responseObjectFuture = semanticService.updateSemantic(requestBody, headers);
       logger.trace("Semantic updateded successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
+
+      Boolean status = semanticService.updateDskInSipSecurity(requestBody, request);
+
+      if (!status) {
+        throw new SipCreateEntityException("Updating dsk to sip security failed");
+      }
     } catch (SipUpdateEntityException | JsonProcessingException ex) {
       throw new SipUpdateEntityException("Problem on the storage while creating an entity");
     }
@@ -134,7 +151,8 @@ public class SipSemanticController {
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode deleteSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "id", required = true) String id)
+      @PathVariable(name = "id", required = true) String id,
+      HttpServletRequest request)
       throws SipJsonMissingException {
     logger.trace("Request Body to delete a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;
@@ -147,6 +165,12 @@ public class SipSemanticController {
       logger.trace(
           "Semantic deleted successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
+
+      Boolean status = semanticService.deleteDskInSipSecurity(id, request);
+
+      if (status == false) {
+        throw new SipCreateEntityException("Deleting dsk to sip security failed");
+      }
     } catch (SipDeleteEntityException | JsonProcessingException ex) {
       throw new SipDeleteEntityException("Problem on the storage while creating an entity");
     }

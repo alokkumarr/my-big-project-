@@ -31,7 +31,12 @@ mail.from=CHANGEME # helpdesk@synchronoss.com
 mail.subject=CHANGEME # Request for Reset Password
 sso.secret.key=CHANGEME # SSO login JWT token.
 jwt.secret.key=CHANGEME # Secret key for jwt Token.
+id3.base.url=CHANGEME # ID3 URL
 
 #user properties
 user.maxUnsuccessfulLoginAttemptAllowed=CHANGEME
 user.lockingTime.mins=CHANGEME
+
+## MULTIPART (MultipartProperties)
+# Max file size.
+spring.servlet.multipart.max-file-size=CHANGEME

@@ -1,20 +1,24 @@
 package com.synchronoss.saw.export.generate;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.model.Field;
 
 public class ExportBean {
-	
+
 	private String fileName;
 	private String [] columnHeader = new String []{};
-	private String serverPathLocation;
 	private DataField.Type[] columnDataType;
 	private String reportName;
 	private String reportDesc;
 	private String publishDate;
 	private String createdBy;
 	private String fileType;
-	private Field.Type[] columnFieldDataType;
+  private Field.Type[] columnFieldDataType;
+  private Analysis analysis;
+  private Integer pageNo;
+  private Long lastExportedSize;
+  private Long lastExportLimit;
 
     /**
      *
@@ -31,7 +35,7 @@ public class ExportBean {
     public void setFileType(String fileType)   {
 	    this.fileType = fileType;
     }
-	
+
 	/**
 	 * @return the reportName
 	 */
@@ -79,11 +83,6 @@ public class ExportBean {
 		this.publishDate = publishDate;
 	}
 
-
-	public ExportBean() {
-		this.serverPathLocation = System.getProperty("custom.pubReports.root");;
-	}
-
 	/**
 	 *
 	 * @return
@@ -98,21 +97,6 @@ public class ExportBean {
 	 */
 	public void setColumnDataType(DataField.Type[] columnDataType) {
 		this.columnDataType = columnDataType;
-	}
-
-
-	/**
-	 * @return the serverPathLocation
-	 */
-	public String getServerPathLocation() {
-		return serverPathLocation;
-	}
-	
-	/**
-	 * @param serverPathLocation the serverPathLocation to set
-	 */
-	public void setServerPathLocation(String serverPathLocation) {
-		this.serverPathLocation = serverPathLocation;
 	}
 
 	/**
@@ -169,4 +153,43 @@ public class ExportBean {
 	public void setColumnFieldDataType(Field.Type[] columnFieldDataType) {
 		this.columnFieldDataType = columnFieldDataType;
 	}
+
+    /**
+     * @return the sipQuery
+     */
+    public Analysis getAnalysis() {
+        return analysis;
+    }
+
+    /**
+     * @param analysis  to set
+     */
+    public void setAnalysis(Analysis analysis) {
+        this.analysis = analysis;
+    }
+
+
+    public Integer getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(Integer pageNo) {
+        this.pageNo = pageNo;
+    }
+
+    public Long getLastExportedSize() {
+        return lastExportedSize;
+    }
+
+    public void setLastExportedSize(Long lastExportedSize) {
+        this.lastExportedSize = lastExportedSize;
+    }
+
+    public Long getLastExportLimit() {
+        return lastExportLimit;
+    }
+
+    public void setLastExportLimit(Long lastExportLimit) {
+        this.lastExportLimit = lastExportLimit;
+    }
 }

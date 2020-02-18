@@ -4,6 +4,11 @@ import { DesignerService } from '../../designer.service';
 import { SingleTableDesignerLayoutComponent } from './single-table-designer-layout.component';
 import { IsAnalysisTypePipe } from '../../../../../common/pipes/is-analysis-type.pipe';
 
+const dummyEvent = {
+  subject: 'seriesColorChange',
+  data: '#123456'
+};
+
 describe('Single Table Layout Designer', () => {
   let fixture: ComponentFixture<SingleTableDesignerLayoutComponent>;
   let component: SingleTableDesignerLayoutComponent;
@@ -30,5 +35,12 @@ describe('Single Table Layout Designer', () => {
 
   it('should exist', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should change data option when series color is changed', () => {
+    component.changeDataOptions(dummyEvent);
+    component.change.subscribe(result => {
+      expect(result).toEqual(dummyEvent);
+    });
   });
 });

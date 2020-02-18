@@ -30,7 +30,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
   }
 
-  @ViewChild('dpGrid') dataGrid: DxDataGridComponent;
+  @ViewChild('dpGrid', { static: false }) dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     if (this.dsMetadata.asOfNow.status === 'SUCCESS') {

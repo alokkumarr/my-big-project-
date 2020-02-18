@@ -10,11 +10,11 @@
 		<version>2.0.5.RELEASE</version>
 		<relativePath></relativePath>
 	</parent>
-
 	<groupId>com.synchronoss.saw</groupId>
 	<artifactId>sip-workbench-service</artifactId>
 	<version>${revision}</version>
 	<name>sip-workbench-service</name>
+
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -14,37 +14,34 @@
         <link href="../../Skins/Fluid/Stylesheets/foundation.6.2.3.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Styles.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Tablet.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
-        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
-        <link href="../Resources/TableStyles/NewStyle.css" rel="stylesheet" data-mc-stylesheet-type="table" /><title>2.2. Log out of SAW</title>
+        <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>2.2. Log out of SAW</title>
         <link href="../Resources/Stylesheets/saw_user_guide_DRAFT_11192018_01b.doc.css" rel="stylesheet" />
-        <script src="../../Resources/Scripts/custom.modernizr.js" type="text/javascript">
-        </script>
         <script src="../../Resources/Scripts/jquery.min.js" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.config.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.config.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" type="text/javascript">
+        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/plugins.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/plugins.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/MadCapAll.js" type="text/javascript">
+        <script src="../../Resources/Scripts/MadCapAll.js" defer="defer" type="text/javascript">
         </script>
     </head>
     <body>
         <div class="foundation-wrap off-canvas-wrapper">
             <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper="">
-                <aside class="off-canvas position-right" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
+                <aside class="off-canvas position-right" role="navigation" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
                     <ul class="off-canvas-accordion vertical menu off-canvas-list" data-accordion-menu="" data-mc-back-link="Back" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="True" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True">
                     </ul>
                 </aside>
                 <div class="off-canvas-content inner-wrap" data-off-canvas-content="">
                     <div data-sticky-container="" class="title-bar-container">
-                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true">
+                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true"><a class="skip-to-content fluid-skip showOnFocus" href="#">Skip To Main Content</a>
                             <div class="middle title-bar-section outer-row clearfix">
                                 <div class="menu-icon-container relative clearfix">
-                                    <button class="menu-icon" data-toggle="offCanvas"><span></span>
+                                    <button class="menu-icon" aria-label="Show Navigation Panel" data-toggle="offCanvas"><span></span>
                                     </button>
                                 </div>
                             </div>
@@ -61,18 +58,21 @@
                                     <div class="nav-search row">
                                         <form class="search" action="#">
                                             <div class="search-bar search-bar-container needs-pie">
-                                                <input class="search-field needs-pie" type="search" placeholder="Search" />
-                                                <div class="search-filter-wrapper">
-                                                    <div class="search-filter">
-                                                        <div class="search-filter-content">
-                                                            <ul>
-                                                                <li>All Files</li>
-                                                            </ul>
-                                                        </div>
+                                                <input class="search-field needs-pie" type="search" aria-label="Search Field" placeholder="Search" />
+                                                <div class="search-filter-wrapper"><span class="invisible-label" id="search-filters-label">Filter: </span>
+                                                    <div class="search-filter" aria-haspopup="true" aria-controls="sf-content" aria-expanded="false" aria-label="Search Filter" title="All Files" role="button" tabindex="0">
+                                                    </div>
+                                                    <div class="search-filter-content" id="sf-content">
+                                                        <ul>
+                                                            <li>
+                                                                <button class="mc-dropdown-item" aria-labelledby="search-filters-label filterSelectorLabel-00001"><span id="filterSelectorLabel-00001">All Files</span>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                                 <div class="search-submit-wrapper" dir="ltr">
-                                                    <div class="search-submit" title="Search">
+                                                    <div class="search-submit" title="Search" role="button" tabindex="0"><span class="invisible-label">Submit Search</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -82,51 +82,39 @@
                             </div>
                         </nav>
                     </div>
-                    <section class="main-section">
+                    <div class="main-section">
                         <div class="row outer-row sidenav-layout">
-                            <div class="sidenav-wrapper">
+                            <nav class="sidenav-wrapper">
                                 <div class="sidenav-container">
                                     <ul class="off-canvas-accordion vertical menu sidenav" data-accordion-menu="" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu accordion-menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="False" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True" data-mc-side-nav-menu="True">
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="body-container" data-mc-content-body="True">
-                                <h2 class="Heading2" style="text-align: left;"><a name="_Toc530387607"></a><span class="span_2">2.2. </span>Log out of SAW</h2>
-                                <p>&#160;</p>
-                                <p>At the upper right corner of the screen select the <img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS and Symbols in_21x19.png" style="width: 21;height: 19;" /> ICON to access Account Settings.&#160; This icon differs (letter and color) depending on the&#160; user</p>
-                                <p>&#160;</p>
-                                <p><span class="HowtoChar">How to <a name="Log_Out_of_Saw"></a>Log Out of Saw</span>
-                                </p>
-                                <ol>
-                                    <li value="1">Click on the <img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS and Symbols in_21x19.png" style="width: 21;height: 19;" /> ICON from the upper right-hand corner of the screen</li>
-                                    <li value="2">Click on <b>Log Out</b></li>
-                                </ol>
-                                <p>&#160;</p>
-                                <p style="text-align: center;">
-                                    <img src="../Resources/Images/logout_selected_143x155.png" class="Picture" style="border-left-style: solid;border-left-width: 1pt;border-right-style: solid;border-right-width: 1pt;border-top-style: solid;border-top-width: 1pt;border-bottom-style: solid;border-bottom-width: 1pt;width: 143;height: 155;" />
-                                </p>
-                                <p class="Figure"><i style="color: #6495ed;">Figure 2 Logout and Account Setting for Admin</i> </p>
-                                <p class="Figure">&#160;</p>
-                                <table style="mc-table-style: url('../Resources/TableStyles/NewStyle.css');border-left-style: solid;border-left-width: 0px;border-left-color: #000000;border-right-style: solid;border-right-width: 0px;border-right-color: #000000;border-top-style: solid;border-top-width: 1pt;border-top-color: #000000;border-bottom-style: solid;border-bottom-width: 1pt;border-bottom-color: #000000;caption-side: top;" class="TableStyle-Basic" cellspacing="0">
-                                    <col style="width: 70px;" class="Column-Column1" />
-                                    <col class="Column-Column1" style="width: 928px;" />
-                                    <tbody>
-                                        <tr class="Body-Body1">
-                                            <td class="BodyB-Column1-Body1" style="text-align: center;">
-                                                <img src="../Resources/Images/New Note_40x43.png" style="width: 40;height: 43;" />
-                                            </td>
-                                            <td class="BodyA-Column1-Body1"><b>NOTE:</b>  The Account Settings selections for a Non-System Admin will appear without the ‘Admin’ as a choice for selection.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <p>&#160;</p>
-                                <p>&#160;</p>
+                            </nav>
+                            <div class="body-container">
+                                <div id="mc-main-content" role="main" data-mc-content-body="True">
+                                    <h2 class="Heading2" style="text-align: left;"><a name="_Toc530387607"></a><span class="span_2">2.2. </span>Log out of SAW</h2>
+                                    <p>&#160;</p>
+                                    <p>At the upper right corner of the screen select the <img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS and Symbols in_21x19.png" style="width: 21;height: 19;" /> ICON to access Account Settings.&#160; This icon differs (letter and color) depending on the&#160; user</p>
+                                    <p>&#160;</p>
+                                    <p><span class="HowtoChar">How to <a name="Log_Out_of_Saw"></a>Log Out of Saw</span>
+                                    </p>
+                                    <ol>
+                                        <li value="1">Click on the Account Setting<img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS and Symbols in_21x19.png" style="width: 21;height: 19;" /> ICON from the upper right-hand corner of the screen</li>
+                                        <li value="2">Click on <b>Log Out</b></li>
+                                    </ol>
+                                    <p>&#160;</p>
+                                    <p style="text-align: center;">
+                                        <img src="../Resources/Images/New Logout1.png" style="border-left-style: solid;border-left-width: 1px;border-left-color: ;border-right-style: solid;border-right-width: 1px;border-right-color: ;border-top-style: solid;border-top-width: 1px;border-top-color: ;border-bottom-style: solid;border-bottom-width: 1px;border-bottom-color: ;" />
+                                    </p>
+                                    <p class="Figure"><i style="color: #6495ed;">Figure 2 Log Out</i> </p>
+                                    <p>&#160;</p>
+                                    <p>&#160;</p>
+                                </div>
                             </div>
                         </div>
-                    </section><a data-close="true"></a>
+                    </div><a data-close="true"></a>
                 </div>
             </div>
-            <script>/* <![CDATA[ */$(document).foundation();/* ]]> */</script>
         </div>
     </body>
 </html>

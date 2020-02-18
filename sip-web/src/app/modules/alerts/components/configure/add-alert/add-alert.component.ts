@@ -55,7 +55,7 @@ const notificationsOptions = [
   styleUrls: ['./add-alert.component.scss']
 })
 export class AddAlertComponent implements OnInit, OnDestroy {
-  @ViewChild('addAlertStepper') addAlertStepper: MatStepper;
+  @ViewChild('addAlertStepper', { static: true }) addAlertStepper: MatStepper;
   alertDefFormGroup: FormGroup;
   alertMetricFormGroup: FormGroup;
   alertRuleFormGroup: FormGroup;

@@ -32,10 +32,12 @@ import {
   DxTextBoxModule,
   DxButtonModule,
   DxSliderModule,
-  DxTooltipModule
+  DxTooltipModule,
+  DxCheckBoxModule
 } from 'devextreme-angular';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 import { DndModule } from './dnd';
 import {
@@ -60,6 +62,7 @@ import {
   AccordionMenuLinkComponent
 } from './components/accordionMenu';
 import { SidenavComponent, SidenavMenuService } from './components/sidenav';
+import { BrandingLogoComponent } from './components/branding-logo/branding-logo.component';
 import { ErrorDetailComponent } from './components/error-detail';
 import { DataFormatDialogComponent } from './components/data-format-dialog';
 import { ConfirmDialogComponent } from './components/confirm-dialog';
@@ -83,6 +86,7 @@ import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-p
 import { ChartGridComponent } from './components/chart-grid';
 import { SSOAuthComponent } from './components/sso-auth/sso-auth.component';
 import { EmailListComponent } from './email-list';
+import { CustomColorPickerComponent } from './components/custom-color-picker';
 
 import { UChartModule } from './components/charts';
 import { MapBoxModule } from './map-box/map-box.module';
@@ -108,8 +112,10 @@ import {
   DynamicModuleService,
   CustomIconService,
   DndPubsubService,
-  CommonSemanticService
+  CommonSemanticService,
+  CookiesService
 } from './services';
+import { ShowPasswordDirective } from './directives/show-password.directive';
 
 const MODULES = [
   CommonModuleAngular4,
@@ -120,6 +126,7 @@ const MODULES = [
   DxButtonModule,
   DxSliderModule,
   DxTooltipModule,
+  DxCheckBoxModule,
   RouterModule,
   FormsModule,
   ReactiveFormsModule,
@@ -135,7 +142,8 @@ const MODULES = [
   OwlNativeDateTimeModule,
   UChartModule,
   ClickOutsideModule,
-  MapBoxModule
+  MapBoxModule,
+  ColorPickerModule
 ];
 
 const COMPONENTS = [
@@ -145,6 +153,7 @@ const COMPONENTS = [
   DataFormatDialogComponent,
   DateFormatDialogComponent,
   SidenavComponent,
+  BrandingLogoComponent,
   AccordionMenuComponent,
   AccordionMenuLinkComponent,
   SearchBoxComponent,
@@ -167,7 +176,8 @@ const COMPONENTS = [
   RemoteFolderSelectorComponent,
   CreatefolderDialogComponent,
   SSOAuthComponent,
-  EmailListComponent
+  EmailListComponent,
+  CustomColorPickerComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
@@ -175,7 +185,8 @@ const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
 const DIRECTIVES = [
   ClickToCopyDirective,
   E2eDirective,
-  JsPlumbEndpointDirective
+  JsPlumbEndpointDirective,
+  ShowPasswordDirective
 ];
 
 const SERVICES = [
@@ -196,7 +207,8 @@ const SERVICES = [
   WindowService,
   CustomIconService,
   DndPubsubService,
-  CommonSemanticService
+  CommonSemanticService,
+  CookiesService
 ];
 
 const INTERCEPTORS = [

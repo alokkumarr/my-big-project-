@@ -11,7 +11,7 @@ public class TableDescriptor {
     public String tableName;
     public boolean isTempTable = false;
     public boolean isTargetTable = false;
-    public int statementIndex = 0;
+    private int statementIndex = 0;
     public String format;
 
     public List<Integer> asReference = new ArrayList<>();

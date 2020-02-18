@@ -16,6 +16,9 @@ import * as unset from 'lodash/unset';
 import * as toLower from 'lodash/toLower';
 import * as toUpper from 'lodash/toUpper';
 import * as some from 'lodash/some';
+import * as split from 'lodash/split';
+import * as set from 'lodash/set';
+import * as flatMap from 'lodash/flatMap';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -42,11 +45,14 @@ import {
   DATE_TYPES,
   GEO_TYPES,
   DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ,
   DEFAULT_DATE_INTERVAL,
   DEFAULT_PIVOT_DATE_FORMAT,
   CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
+import { DATA_AXIS } from './consts';
+import { CHART_COLORS } from 'src/app/common/consts';
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
@@ -111,9 +117,9 @@ export class DesignerService {
     }
 
     const columnName = column.columnName || column.name;
-
+    const [trimmedColumnName] = split(columnName, '.');
     if (!!column.aggregate) {
-      return `${toLower(column.aggregate)}@@${toLower(columnName)}`;
+      return `${toLower(column.aggregate)}@@${toLower(trimmedColumnName)}`;
     }
 
     return columnName;
@@ -156,6 +162,11 @@ export class DesignerService {
 
     if (NUMBER_TYPES.includes(column.type)) {
       aggregates = AggregateChooserComponent.isAggregateEligible(analysisType);
+    } else if (column.type === 'string') {
+      aggregates = [
+        AGGREGATE_TYPES_OBJ['count'],
+        AGGREGATE_TYPES_OBJ['distinctcount']
+      ];
     }
 
     return fpPipe(
@@ -178,7 +189,10 @@ export class DesignerService {
     analysisType: string,
     analysisSubtype: string
   ) {
-    if (!NUMBER_TYPES.includes(column.type) || !!column.expression) {
+    const notNumberType = !NUMBER_TYPES.includes(column.type);
+    const notStringType = column.type !== 'string';
+    const hasExpression = Boolean(column.expression);
+    if ((notNumberType && notStringType) || hasExpression) {
       return !some(columns, col => col.columnName === column.columnName);
     }
     return (
@@ -189,6 +203,24 @@ export class DesignerService {
         analysisSubtype
       ).length > 0
     );
+  }
+
+  /**
+   *  Adjusting the default series color to newly selected column.
+   * Added a part of SIP-10225.
+   */
+  static setSeriesColorForColumns(sortedArtifacts) {
+    const selectedColumns = flatMap(sortedArtifacts, x => x.fields);
+    const dataColumn = fpFilter(
+      col => DATA_AXIS.includes(col.area) && !col.colorSetFromPicker
+    )(selectedColumns);
+
+    forEach(dataColumn, (col, index) => {
+      set(col, 'seriesColor', CHART_COLORS[index]);
+      set(col, 'colorSetFromPicker', false);
+    });
+
+    return sortedArtifacts;
   }
 
   constructor(private _analyzeService: AnalyzeService) {}
@@ -249,6 +281,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'aggregate');
     };
 
@@ -282,7 +315,6 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-
         artifactColumn.dataField = DesignerService.dataFieldFor(<
           ArtifactColumnDSL
         >artifactColumn);
@@ -293,7 +325,8 @@ export class DesignerService {
       artifactColumn.groupInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
-    const canAcceptDataType = canAcceptNumberType;
+    const canAcceptDataType = (column: ArtifactColumnChart) =>
+      canAcceptNumberType(column) || canAcceptStringType(column);
     const canAcceptInData = () => canAcceptDataType;
     const canAcceptRowType = canAcceptAnyType;
     const canAcceptInRow = maxAllowedDecorator(canAcceptRowType);
@@ -369,6 +402,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'geoRegion');
       unset(artifactColumn, 'aggregate');
     };
@@ -403,12 +437,11 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-
+        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
         artifactColumn.dataField = DesignerService.dataFieldFor(<
           ArtifactColumnDSL
         >artifactColumn);
       }
-      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
     };
 
     const canAcceptMetricType = canAcceptNumberType;
@@ -479,6 +512,7 @@ export class DesignerService {
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn['checked'] = false;
       artifactColumn.alias = '';
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'aggregate');
       unset(artifactColumn, 'comboType');
       unset(artifactColumn, 'limitType');
@@ -552,7 +586,8 @@ export class DesignerService {
       );
     };
 
-    const canAcceptMetricType = canAcceptNumberType;
+    const canAcceptMetricType = (column: ArtifactColumnChart) =>
+      canAcceptNumberType(column) || canAcceptStringType(column);
     const canAcceptInMetric = maxAllowedDecorator(
       canAcceptMetricType,
       metricRejectFn
