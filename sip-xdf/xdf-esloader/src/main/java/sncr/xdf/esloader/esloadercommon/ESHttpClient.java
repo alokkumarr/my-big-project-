@@ -320,7 +320,7 @@ public class ESHttpClient {
   // Only supported in ES 6.x
   public boolean esTypeExists(String idx, String type) throws Exception {
     String clusterVersion = esClusterVersion();
-    if (clusterVersion.startsWith("6.")) {
+    if (clusterVersion.startsWith("7.")) {
       return head("/" + idx + "/_mapping/" + type);
     } else {
       throw new Exception(
@@ -330,8 +330,14 @@ public class ESHttpClient {
   }
 
   // Create Index
-  public boolean esIndexCreate(String idx, String mapping) throws Exception {
-    return put("/" + idx, mapping);
+  public boolean esIndexCreate(String idx, String mapping, boolean esTypeExists) throws Exception {
+    boolean flag = false;
+    if (esTypeExists) {
+      flag = put("/" + idx+"?include_type_name=true", mapping);
+    } else {
+      flag = put("/" + idx, mapping);
+    }
+    return flag;
   }
 
   public boolean esMappingCreate(String idx, String mappingName, String mapping) throws Exception {
