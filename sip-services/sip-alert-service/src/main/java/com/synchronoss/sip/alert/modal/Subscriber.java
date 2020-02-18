@@ -80,4 +80,28 @@ public class Subscriber {
   public void setModifiedTime(Date modifiedTime) {
     this.modifiedTime = modifiedTime;
   }
+
+  @Override
+  public String toString() {
+    return "Subscriber{"
+        + "subscriberId='"
+        + subscriberId
+        + '\''
+        + ", alertRulesSysId='"
+        + alertRulesSysId
+        + '\''
+        + ", alertTriggerSysId='"
+        + alertTriggerSysId
+        + '\''
+        + ", email='"
+        + email
+        + '\''
+        + ", active="
+        + active
+        + ", createdTime="
+        + createdTime
+        + ", modifiedTime="
+        + modifiedTime
+        + '}';
+    }
 }

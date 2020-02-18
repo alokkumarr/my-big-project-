@@ -14,8 +14,10 @@ import com.synchronoss.sip.alert.modal.Notification;
 import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -72,6 +74,7 @@ public class AlertNotifier {
   private ObjectMapper objectMapper = new ObjectMapper();
 
   private RestTemplate restTemplate = null;
+
 
   /**
    * Send Alert notification.
@@ -137,7 +140,7 @@ public class AlertNotifier {
     notificationLog.setThresholdValue(alertRulesDetails.getThresholdValue());
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
-    Set<String> recipientsList =
+    List<String> recipientsList =
         getActiveSubscribers(
             alertRulesDetails.getNotification().getEmail().getRecipients(),
             alertRulesDetails.getAlertRulesSysId());
@@ -175,16 +178,18 @@ public class AlertNotifier {
     }
   }
 
-  private Set<String> getActiveSubscribers(Set<String> recipients, String alertRulesSysId) {
-    Set<Subscriber> subscribers = new HashSet<>();
+  private List<String> getActiveSubscribers(Set<String> recipients, String alertRulesSysId) {
+    List<String> recipientsList = new ArrayList<String>();
+    recipientsList.addAll(recipients);
+    List<Subscriber> subscribers = alertService.fetchInactiveSubscriberByAlertId(alertRulesSysId);
     subscribers.forEach(
         subscriber -> {
           if (subscriber.getActive() == Boolean.FALSE
-              && recipients.contains(subscriber.getEmail())) {
-            recipients.remove(subscriber.getEmail());
+              && recipientsList.contains(subscriber.getEmail())) {
+            recipientsList.remove(subscriber.getEmail());
           }
         });
-    return recipients;
+    return recipientsList;
   }
 
   /**

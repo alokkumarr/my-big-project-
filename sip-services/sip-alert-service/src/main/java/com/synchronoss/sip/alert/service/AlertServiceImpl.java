@@ -548,7 +548,7 @@ public class AlertServiceImpl implements AlertService {
     } else {
         // TODO: Remove subscriber id
       LOGGER.trace("Subscriber found");
-      subscriber.setSubscriberId(subscriber.get_id());
+     // subscriber.setSubscriberId(subscriber.get_id());
       subscriber.setActive(false);
       subscriber.setModifiedTime(new Date());
     }
@@ -581,7 +581,33 @@ public class AlertServiceImpl implements AlertService {
         return null;
   }
 
-  private Boolean createOrUpdateSubscriber(Subscriber subscriber) {
+  @Override
+  public List<Subscriber> fetchInactiveSubscriberByAlertId(String alertRuleSysId) {
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+
+    ObjectNode alertRuleNode = objectMapper.createObjectNode();
+    ObjectNode alertRuleEqNode = alertRuleNode.putObject(MaprConnection.EQ);
+    alertRuleEqNode.put("alertRulesSysId", alertRuleSysId);
+
+    arrayNode.add(alertRuleNode);
+
+    ObjectNode emailNode = objectMapper.createObjectNode();
+    ObjectNode emailEqNode = emailNode.putObject(MaprConnection.EQ);
+    emailEqNode.put("active", Boolean.FALSE);
+
+    arrayNode.add(emailNode);
+
+    String query = node.toString();
+    LOGGER.trace("Mapr query for alert subscriber:{}", query);
+    return connection.runMaprDbQueryWithFilter(query, null, null, null, Subscriber.class);
+  }
+
+  public Boolean createOrUpdateSubscriber(Subscriber subscriber) {
     Boolean status = true;
 
     MaprConnection connection = new MaprConnection(basePath, subscribersTable);

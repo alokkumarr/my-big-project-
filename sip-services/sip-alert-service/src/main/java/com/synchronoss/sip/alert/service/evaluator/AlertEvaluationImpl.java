@@ -17,6 +17,7 @@ import com.synchronoss.sip.alert.modal.AlertState;
 import com.synchronoss.sip.alert.modal.MonitoringType;
 import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.service.AlertNotifier;
+import com.synchronoss.sip.alert.service.AlertService;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
@@ -43,6 +44,8 @@ public class AlertEvaluationImpl implements AlertEvaluation {
   AlertNotifier alertNotifier;
   private RestTemplate restTemplate;
   @Autowired private RestUtil restUtil;
+
+  @Autowired AlertService alertService;
 
   @Value("${sip.service.metastore.base}")
   @NotNull
@@ -184,21 +187,22 @@ public class AlertEvaluationImpl implements AlertEvaluation {
         connection.update(alertResult.getAlertTriggerSysId(), alertResult);
         updateSubsriberStatusToActive(alertRuleDetails.getAlertRulesSysId());
         // saveAlertTriggerState();
-        List<Subscriber> subscribers = new ArrayList<>();
-        subscribers.stream().forEach(subscriber -> { });
       }
     }
   }
 
   private void updateSubsriberStatusToActive(String alertRulesSysId) {
 
-    List<Subscriber> subscribers = null;
-    subscribers.stream()
+    List<Subscriber> inActiveSubscribers =
+        alertService.fetchInactiveSubscriberByAlertId(alertRulesSysId);
+    inActiveSubscribers.stream()
         .forEach(
             subscriber -> {
-              if (!subscriber.getActive()) {
+              try {
                 subscriber.setActive(Boolean.TRUE);
-                // updatetrackerTable();
+                alertService.createOrUpdateSubscriber(subscriber);
+              } catch (Exception e) {
+                logger.error("error occured while update the subscriber status");
               }
             });
   }
