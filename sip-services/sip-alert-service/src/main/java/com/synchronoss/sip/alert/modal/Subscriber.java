@@ -103,5 +103,5 @@ public class Subscriber {
         + ", modifiedTime="
         + modifiedTime
         + '}';
-    }
+  }
 }
