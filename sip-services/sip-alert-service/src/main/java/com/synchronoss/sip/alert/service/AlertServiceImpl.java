@@ -30,6 +30,7 @@ import com.synchronoss.saw.model.Model.Preset;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
 
+import com.synchronoss.sip.alert.util.AlertUtils;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -64,11 +65,9 @@ public class AlertServiceImpl implements AlertService {
 
   private static final String ID = "id";
   private static final String NAME = "name";
-  private static final String START_TIME = "startTime";
   private static final String CREATED_TIME = "createdTime";
   private static final String DATE_FORMAT = "dd-MM-yyyy";
   private static final String CUSTOMER_CODE = "customerCode";
-  private static final String ALERT_RULE_SYS_ID = "alertRulesSysId";
 
   @Value("${sip.service.metastore.base}")
   @NotNull
@@ -310,13 +309,13 @@ public class AlertServiceImpl implements AlertService {
     AlertFilter customerFilter =
         new AlertFilter(CUSTOMER_CODE, ticket.getCustCode(), Type.STRING, Operator.EQ);
     AlertFilter filerByRuleId =
-        new AlertFilter(ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
+        new AlertFilter(AlertUtils.ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
     alertFilters.add(customerFilter);
     alertFilters.add(filerByRuleId);
     String query = getMaprQueryForFilter(alertFilters);
     List<AlertResult> alertResultLists =
         connection.runMaprDbQueryWithFilter(
-            query, pageNumber, pageSize, START_TIME, AlertResult.class);
+            query, pageNumber, pageSize, AlertUtils.START_TIME, AlertResult.class);
     Long noOfRecords = connection.runMapDbQueryForCount(query);
     alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
@@ -349,7 +348,7 @@ public class AlertServiceImpl implements AlertService {
     }
     if (sorts == null || sorts.isEmpty()) {
       sorts = new ArrayList<>();
-      Sort s = new Sort(START_TIME, SortOrder.DESC);
+      Sort s = new Sort(AlertUtils.START_TIME, SortOrder.DESC);
       sorts.add(s);
     }
     AlertFilter customerFilter =
@@ -471,7 +470,7 @@ public class AlertServiceImpl implements AlertService {
     alertFilters.add(customerFilter);
     if (alertRuleSysId != null) {
       AlertFilter filerByRuleId =
-          new AlertFilter(ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
+          new AlertFilter(AlertUtils.ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
       alertFilters.add(filerByRuleId);
     }
 
@@ -480,7 +479,7 @@ public class AlertServiceImpl implements AlertService {
     LOGGER.trace("Mapr Filter query for alert count:{}", query);
     List<AlertResult> result =
         connection.runMaprDbQueryWithFilter(
-            query, pageNumber, pageSize, START_TIME, AlertResult.class);
+            query, pageNumber, pageSize, AlertUtils.START_TIME, AlertResult.class);
     switch (alertCount.getGroupBy()) {
       case SEVERITY:
         return groupByseverity(result);
@@ -598,7 +597,7 @@ public class AlertServiceImpl implements AlertService {
           epochLte = getEpochFromDateTime(convertor.getLte());
         }
         ObjectNode innerNode = objectMapper.createObjectNode();
-        ArrayNode betweenValues = innerNode.putArray(START_TIME);
+        ArrayNode betweenValues = innerNode.putArray(AlertUtils.START_TIME);
         betweenValues.add(epochGte);
         betweenValues.add(epochLte);
         ObjectNode outerNode = objectMapper.createObjectNode();
