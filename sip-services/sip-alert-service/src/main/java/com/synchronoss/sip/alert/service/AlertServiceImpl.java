@@ -564,12 +564,6 @@ public class AlertServiceImpl implements AlertService {
     return status;
   }
 
-  @Override
-  public Boolean activateSubscriber(
-      String alertRulesSysId, String alertTriggerSysId, String email) {
-    throw new RuntimeException("Not implemented yet");
-  }
-
   public AlertSubscriberToken extractSubscriberToken(String tokenStr) {
       AlertSubscriberToken token = AlertUtils.parseSubscriberToken(tokenStr, subscriberSecretKey);
 

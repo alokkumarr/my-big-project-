@@ -8,8 +8,8 @@ import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
-import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import com.synchronoss.sip.alert.modal.Subscriber;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -72,8 +72,6 @@ public interface AlertService {
   String getReadableOperator(Operator operator);
 
   AlertSubscriberToken extractSubscriberToken(String token);
-
-  Boolean activateSubscriber(String alertRulesSysId, String alertTriggerSysId, String email);
 
   Boolean deactivateSubscriber(String alertRulesSysId, String alertTriggerSysId, String email);
 
