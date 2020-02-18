@@ -109,63 +109,6 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	
 	}
 	
-	private void setIfPathExists( SparkConf sparkConf,  String sparkProperty, Config cfg , String path) {
-	    logger.debug("Checking if configuration path exists: {}", path);
-	    if (cfg.hasPath(path)) {
-	      logger.debug("Configuration path found, so setting Spark property: {}", sparkProperty);
-	      sparkConf.set(sparkProperty, cfg.getString(path));
-	    } else {
-	      logger.debug("Configuration path not found");
-	    }
-	  }
-	
-
-	@Override
-	public ObjectNode createPreview(String id, String location, String previewLimit, String previewsTablePath, String project, String name) {
-	    Logger log = LoggerFactory.getLogger(getClass().getName());
-	    log.info("Starting preview job");
-	    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "success");
-	    DocumentBuilder document = preview.getDocumentBuilder();
-	    document.putNewArray("rows");
-	   //// SparkSession session = jobContext.sparkSession();
-	    Dataset<Row> dataset = getDataset(null, location); //replace spark session in place of null  @@Naresh
-	    if (dataset != null) {
-	      StructField[] fields = dataset.schema().fields();
-	      Iterator<Row> rows = dataset.limit(Integer.valueOf(previewLimit)).toLocalIterator();
-	      rows.forEachRemaining(
-	          (Row row) -> {
-	            document.addNewMap();
-	            for (int i = 0; i < row.size(); i++) {
-	              if (row.isNullAt(i)) {
-	                continue;
-	              }
-	              //String name = fields[i].name();
-	              DataType dataType = fields[i].dataType();
-	              if (dataType.equals(DataTypes.StringType)) {
-	                document.put(name, row.getString(i));
-	              } else if (dataType.equals(DataTypes.IntegerType)) {
-	                document.put(name, row.getInt(i));
-	              } else if (dataType.equals(DataTypes.LongType)) {
-	                document.put(name, row.getLong(i));
-	              } else if (dataType.equals(DataTypes.FloatType)) {
-	                document.put(name, row.getFloat(i));
-	              } else if (dataType.equals(DataTypes.DoubleType)) {
-	                document.put(name, row.getDouble(i));
-	              } else if (dataType.equals(DataTypes.TimestampType)) {
-	                document.put(name, row.getTimestamp(i).toString());
-	              } else {
-	                log.warn("Unhandled Spark data type: {}", dataType);
-	                document.put(name, row.get(i).toString());
-	              }
-	            }
-	            document.endMap();
-	          });
-	    }
-	    document.endArray();
-	    preview.insert();
-	    log.info("Finished preview job");
-	    return null;
-	  }
 	
 
 	private Dataset<Row> getDataset(SparkSession session, String location) {
@@ -181,12 +124,7 @@ public class WorkbenchJobServiceImpl implements WorkbenchJobService {
 	    }
 	  }
 
-	@Override
-	public ObjectNode showPreview(String id, String location, String previewLimit, String previewsTablePath,
-			String project, String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 	
 	
 	

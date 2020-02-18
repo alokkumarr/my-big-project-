@@ -151,7 +151,7 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 					        		  }
 					        		  break;
 					        		  
-				        		  case SHOW_PREVIEW:
+				        		  /*case SHOW_PREVIEW:
 
 					        		  if(content.length == 6) {
 					        			      String id= content[0];
@@ -165,7 +165,7 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 							    			  break;
 							    			  
 					        		  }
-					        		  break;
+					        		  break;*/
 								default:
 									break;
 				        		  }

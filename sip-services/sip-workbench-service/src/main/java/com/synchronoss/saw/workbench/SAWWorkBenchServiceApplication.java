@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 
-import com.synchronoss.saw.workbench.executor.listener.WorkbenchDLSession;
 
 import info.faljse.SDNotify.SDNotify;
 

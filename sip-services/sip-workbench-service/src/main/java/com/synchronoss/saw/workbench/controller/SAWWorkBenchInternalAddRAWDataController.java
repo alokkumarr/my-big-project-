@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import javax.servlet.ServletException;
 import javax.validation.constraints.NotNull;
+
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -346,7 +348,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public DataSet createRGeneratedDataSet(
-      @PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet)  throws Exception {
+      @PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet) throws JSONException, Exception {
     logger.trace("createRGeneratedDataSet starts here : ", dataSet.toString());
     DataSet returnData = sawWorkbenchService.createDataSet(dataSet, project);
     logger.trace("createRGeneratedDataSet ends here : ", returnData.toString());
