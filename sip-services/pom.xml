@@ -22,7 +22,7 @@
 		<!-- Versions of 3rd party dependencies  -->
 		<spark-version>2.3.2</spark-version>
 		<java.version>1.8</java.version>
-		<elasticsearch.version>7.6.0</elasticsearch.version>
+		<elasticsearch.version>7.5.0</elasticsearch.version>
 		<elasticsearch-spark.version>2.4.0</elasticsearch-spark.version>
 		<parquet.version>1.6.0</parquet.version>
 		<junit.version>4.6</junit.version>
