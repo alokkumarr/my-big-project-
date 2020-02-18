@@ -21,6 +21,7 @@ import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertSeverity;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
+import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import com.synchronoss.sip.alert.modal.MonitoringType;
 import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.service.evaluator.EvaluatorListener;
@@ -85,6 +86,10 @@ public class AlertServiceImpl implements AlertService {
   @Value("${sip.service.metastore.subscribersTable}")
   @NotNull
   private String subscribersTable;
+
+  @Value("${subscriber.secret.key}")
+  @NotNull
+  private String subscriberSecretKey;
 
   @Autowired EvaluatorListener evaluatorListener;
 
@@ -548,7 +553,6 @@ public class AlertServiceImpl implements AlertService {
     } else {
         // TODO: Remove subscriber id
       LOGGER.trace("Subscriber found");
-      subscriber.setSubscriberId(subscriber.get_id());
       subscriber.setActive(false);
       subscriber.setModifiedTime(new Date());
     }
@@ -564,6 +568,12 @@ public class AlertServiceImpl implements AlertService {
   public Boolean activateSubscriber(
       String alertRulesSysId, String alertTriggerSysId, String email) {
     throw new RuntimeException("Not implemented yet");
+  }
+
+  public AlertSubscriberToken extractSubscriberToken(String tokenStr) {
+      AlertSubscriberToken token = AlertUtils.parseSubscriberToken(tokenStr, subscriberSecretKey);
+
+      return token;
   }
 
   private Subscriber fetchSubscriberByAlertIdAndEmail(
