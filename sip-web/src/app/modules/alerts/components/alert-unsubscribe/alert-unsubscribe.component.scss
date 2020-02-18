@@ -1,15 +1,48 @@
-.align-center {
-  text-align: center;
-}
-
-.alert-unsubscribe-button {
-  background: #0077be;
-  color: white;
-}
-
-.alert-unsubscribe {
-  width: 80%;
-  height: 60px;
+:host {
+  background-color: #f3f5f8;
+  width: 100%;
   margin: 0 auto;
   background-size: contain;
+  position: fixed;
+
+  .alert-subscribe-login {
+    height: calc(100vh - 130px);
+    margin-left: 27%;
+  }
+
+  .alert-subscribe-notlogin {
+    height: calc(100vh - 70px);
+    margin-left: 27%;
+  }
+
+  .notLoggedIn {
+    height: 40px;
+  }
+
+  .alert-unsubscribe-content {
+    background: 0 0/cover no-repeat #fff;
+    width: 70%;
+    height: 100%;
+    padding: 10px;
+  }
+
+  .align-center {
+    width: 248px;
+    height: 102px;
+    margin-left: 23%;
+  }
+
+  .alert-unsubscribe-button {
+    background: #0077be;
+    color: white;
+  }
+
+  span {
+    padding-bottom: 20px;
+  }
+
+  .alert-details {
+    padding: 45px 0px 45px 0px;
+    font-size: 15px;
+  }
 }

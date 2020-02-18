@@ -1,22 +1,25 @@
-<div class="alert-unsubscribe">
-  <div *ngIf="!userLoggedIn">
-    <div class="company-logo align-center" style="margin-left: 72px;"></div>
-  </div>
-  <h1 e2e="Change-Password">Alert Unsubscription</h1>
-  <h3>
-    By Clicking on Un-Subscribe notifications generated from the following Alert will be disabled.
-  </h3>
-  <div fxLayout="column">
-    <span>Alert Name: </span>
-    <span>Sample Alert Name</span>
 
-    <span>Alert Description: </span>
-    <span>Sample Alert Desciption: </span>
-  </div>
+<div  [ngClass]="{'alert-subscribe-login': userLoggedIn, 'alert-subscribe-notlogin':!userLoggedIn }">
+  <div class="alert-unsubscribe-content">
+    <div class="company-logo align-center"></div>
+    <div class="content">
+      <div class="header">
+        <h1>Alert Unsubscription</h1>
+        <h3>
+          By Clicking on Un-Subscribe, notifications generated from the following Alert will be disabled.
+        </h3>
+      </div>
+      <div fxLayout="column" class="alert-details">
+        <!-- <span><b>E-Mail ID:</b> {{ parsedToken.AlertSubscriber.emailId }}</span> -->
+      <span><b>Alert Name:</b> {{ parsedToken.AlertSubscriber.alertRuleName }}</span>
+      <span><b>Alert Description:</b> {{ parsedToken.AlertSubscriber.alertRuleDescription }}</span>
+      </div>
 
-  <button (click)="unSubscribeAlert()" class ="alert-unsubscribe-button" mat-raised-button color="primary" i18n>
-      Un-Subscribe
-  </button>
-  <button mat-button i18n (click)="close()">Cancel</button>
+      <button (click)="unSubscribeAlert()" class ="alert-unsubscribe-button" mat-raised-button color="primary" i18n>
+          Un-Subscribe
+      </button>
+      <button mat-button i18n (click)="close()">Cancel</button>
+    </div>
+  </div>
 </div>
 

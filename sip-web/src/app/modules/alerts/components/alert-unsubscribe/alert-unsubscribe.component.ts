@@ -3,6 +3,7 @@ import { AlertUnsubscribeService } from './alert-unsubscribe.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JwtService } from './../../../../common/services/jwt.service';
 import { UserService } from './../../../../common/services/user.service';
+import { ToastService } from '../../../../common/services/toastMessage.service';
 
 @Component({
   selector: 'alert-unsubscribe',
@@ -11,32 +12,33 @@ import { UserService } from './../../../../common/services/user.service';
 })
 export class AlertUnsubscribe implements OnInit {
   userLoggedIn: boolean;
+  alertToken: string;
+  parsedToken: {};
 
   constructor(
     private _alertUnsubscribeService: AlertUnsubscribeService,
     private _jwtService: JwtService,
     private _userService: UserService,
     public _router: Router,
-    public _route: ActivatedRoute
+    public _route: ActivatedRoute,
+    public _toastMessage: ToastService,
   ) { }
 
   ngOnInit() {
     this.userLoggedIn = this._userService.isLoggedIn();
-    console.log(this.userLoggedIn);
     this._route.queryParams.subscribe(({ token }) => {
-      console.log({token});
-      console.log(this._jwtService.parseJWT(token));
+      this.parsedToken = this._jwtService.parseJWT(token);
+      this.alertToken = token;
     });
   }
 
   unSubscribeAlert() {
-    const token = 'token';
-    this._alertUnsubscribeService.unsubscribeAnAlert(token).subscribe(data => {
-      console.log(data);
+    this._alertUnsubscribeService.unsubscribeAnAlert(this.alertToken).subscribe(data => {
+      this._toastMessage.success(data);
     });
   }
 
   close() {
-    this._router.navigate([]);
+    this._router.navigate(['']);
   }
 }
