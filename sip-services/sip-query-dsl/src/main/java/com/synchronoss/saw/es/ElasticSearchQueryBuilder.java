@@ -51,7 +51,7 @@ public class ElasticSearchQueryBuilder {
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
   private static String appenderForGTLTE = "||/M";
-  protected String[] groupByFields;
+  private String[] groupByFields;
 
   public String[] getGroupByFields() {
     return groupByFields;
