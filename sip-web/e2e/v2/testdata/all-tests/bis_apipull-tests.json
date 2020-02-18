@@ -300,10 +300,10 @@
           "method": "POST",
           "headers": null,
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/doAuthenticate",
           "body": {
-            "title": "post title",
-            "body": "this is new post"
+            "masterLoginId": "sawadmin@TenantA.com",
+            "password": "Sawsyncnewuser1!"
           },
           "testConnectivityMessage": "Connection Status = 200"
         },
