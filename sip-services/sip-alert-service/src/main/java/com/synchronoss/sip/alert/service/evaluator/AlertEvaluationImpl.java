@@ -88,9 +88,6 @@ public class AlertEvaluationImpl implements AlertEvaluation {
                     alertRuleDetails.getAlertRulesSysId(),
                     getEpochFromDateTime(dynamicConverter.getGte())))) {
           logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
-          AlertResult alertResult = buildAlertResult(alertRuleDetails);
-          alertResult.setStartTime(requestTime);
-          alertResult.setSipQuery(sipQuery);
           List<?> alertResultList = evaluateAlertRules(sipQuery);
           List<Object> executionResultList = new ArrayList<>();
           ObjectMapper mapper = new ObjectMapper();
@@ -141,6 +138,9 @@ public class AlertEvaluationImpl implements AlertEvaluation {
                 });
             int executionSize = executionResultList.size();
             if (executionSize > 0 && alert.get()) {
+              AlertResult alertResult = buildAlertResult(alertRuleDetails, AlertState.ALARM);
+              alertResult.setStartTime(requestTime);
+              alertResult.setSipQuery(sipQuery);
               logger.trace(
                   "Threshold has reached for the alert rule id"
                       + alertRuleDetails.getAlertRulesSysId());
@@ -157,6 +157,8 @@ public class AlertEvaluationImpl implements AlertEvaluation {
               connection.insert(alertResult.getAlertTriggerSysId(), alertResult);
               logger.info("Sending Notification for Alert: " + alertRuleDetails.getAlertRuleName());
               alertNotifier.sendNotification(alertRuleDetails);
+            } else {
+              updateAlertResultAndSubscriptionStatus(alertRuleDetails);
             }
           }
         }
@@ -170,20 +172,35 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     return true;
   }
 
+  private void updateAlertResultAndSubscriptionStatus(
+      AlertRuleDetails alertRuleDetails) {
+    List<AlertResult> alertResultList =
+        getLastAlertResultByAlertRuleId(alertRuleDetails.getAlertRulesSysId());
+    if (alertResultList.size() > 0) {
+      AlertResult alertResult = alertResultList.get(0);
+      if (alertResult.getAlertState() == AlertState.ALARM) {
+        MaprConnection connection = new MaprConnection(basePath, alertResults);
+        alertResult.setAlertState(AlertState.OK);
+        connection.update(alertResult.getAlertTriggerSysId(), alertResult);
+       // saveAlertTriggerState();
+      }
+    }
+  }
+
   /**
    * This method builds alertresult from the alertruledetails.
    *
    * @param alertRuleDetails AlertRuleDetails
    * @return AlertResult
    */
-  private AlertResult buildAlertResult(AlertRuleDetails alertRuleDetails) {
+  private AlertResult buildAlertResult(AlertRuleDetails alertRuleDetails, AlertState alertState) {
     AlertResult alertResult = new AlertResult();
     alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
     alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
     alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
     alertResult.setAlertSeverity(alertRuleDetails.getAlertSeverity());
     alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
-    alertResult.setAlertState(AlertState.ALARM);
+    alertResult.setAlertState(alertState);
     alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
     alertResult.setOtherThresholdValue(alertRuleDetails.getOtherThresholdValue());
     alertResult.setOperator(alertRuleDetails.getOperator());
@@ -301,13 +318,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
    * @return list
    */
   public Boolean checkAlertResultBasedOnLastTrigger(String alertRuleId, Long lastTriggeredWindow) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    ObjectNode node = objectMapper.createObjectNode();
-    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
-    objectNode.put("alertRulesSysId", alertRuleId);
-    MaprConnection connection = new MaprConnection(basePath, alertResults);
-    List<AlertResult> alertResults =
-        connection.runMaprDbQueryWithFilter(node.toString(), 1, 1, "startTime", AlertResult.class);
+    List<AlertResult> alertResults = getLastAlertResultByAlertRuleId(alertRuleId);
     if (alertResults.size() > 0) {
       // Add one minute grace period to last trigger time for evaluation
       // in case alert Evaluation takes time.
@@ -315,5 +326,15 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     } else {
       return true;
     }
+  }
+
+  private List<AlertResult> getLastAlertResultByAlertRuleId(String alertRulesSysId) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put(AlertUtils.ALERT_RULE_SYS_ID, alertRulesSysId);
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
+    return connection.runMaprDbQueryWithFilter(
+        node.toString(), 1, 1, AlertUtils.START_TIME, AlertResult.class);
   }
 }

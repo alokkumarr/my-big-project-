@@ -5,12 +5,21 @@ import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.saw.model.Model.Operator;
 
+import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,6 +38,12 @@ public class AlertUtils {
 
   private static final String INVALID_TOKEN = "Invalid Token";
   private static final String ERROR_MESSAGE = "Error occurred while checking permission {}";
+  public static final String ALERT_RULE_SYS_ID = "alertRulesSysId";
+  public static final String START_TIME = "startTime";
+  public static final String ALERT_STATE = "alertState";
+  public static final String ALERT_UNSUBSCRIBE = "AlertUnsubscription";
+  public static final String ALERT_SUBSCRIBER = "AlertSubscriber";
+
   private static String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
 
@@ -260,6 +275,43 @@ public class AlertUtils {
     } catch (IOException ex) {
       LOGGER.error(ERROR_MESSAGE, ex);
       return errorMessage;
+    }
+  }
+
+  public static String getSubscriberToken(AlertSubscriberToken alertSubscriberToken, String secretKey) {
+    return Jwts.builder()
+        .setSubject(ALERT_UNSUBSCRIBE)
+        .claim(ALERT_SUBSCRIBER, alertSubscriberToken)
+        .setIssuedAt(new Date())
+        .signWith(SignatureAlgorithm.HS256, secretKey)
+        .compact();
+  }
+
+  public static AlertSubscriberToken parseSubscriberToken(String token, String secretKey) {
+    Claims ssoToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    // Check if the Token is valid
+    try {
+      Set<Entry<String, Object>> entrySet =
+          ((Map<String, Object>) ssoToken.get(ALERT_SUBSCRIBER)).entrySet();
+      String alertRulesSysId = null, alertTriggerSysId = null, emailId = null;
+      for (Map.Entry<String, Object> pair : entrySet) {
+        if (pair.getKey().equals("alertRulesSysId")) {
+          alertRulesSysId = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("alertRulesSysId")) {
+          alertTriggerSysId = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("emailId")) {
+          emailId = pair.getValue().toString();
+        }
+      }
+      AlertSubscriberToken alertSubscriberToken =
+          new AlertSubscriberToken(alertRulesSysId, alertTriggerSysId, emailId);
+      return alertSubscriberToken;
+    } catch (SignatureException signatureException) {
+      throw signatureException;
+    } catch (Exception exception) {
+      throw exception;
     }
   }
 }
