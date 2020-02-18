@@ -28,11 +28,13 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.ws.rs.QueryParam;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,23 +47,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/alerts")
 @ApiResponses(
     value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(
-            code = 403,
-            message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
+      @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+      @ApiResponse(code = 400, message = "Bad Request"),
+      @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+      @ApiResponse(
+          code = 403,
+          message = "Accessing the resource you were trying to reach is forbidden"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
     })
 public class SipAlertController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SipAlertController.class);
 
-  @Autowired
-  private AlertUtils utils;
-  @Autowired
-  private AlertService alertService;
+  @Autowired private AlertUtils utils;
+  @Autowired private AlertService alertService;
 
   private static final String ACCESS = "Access";
   private static final String VIEW_ALERT = "View Alerts";
@@ -73,8 +73,8 @@ public class SipAlertController {
   /**
    * create Alert API.
    *
-   * @param request          HttpServletRequest
-   * @param response         HttpServletResponse
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
    * @param alertRuleDetails Alert Rule Details definition
    * @return Alert
    */
@@ -118,8 +118,8 @@ public class SipAlertController {
   /**
    * update Alert API.
    *
-   * @param request          HttpServletRequest
-   * @param response         HttpServletResponse
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
    * @param alertRuleDetails AlertRuleDetails definition
    * @return Alert
    */
@@ -180,10 +180,10 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
-      @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+          @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize) {
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     Ticket ticket = SipCommonUtils.getTicket(request);
@@ -215,8 +215,7 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public String listAlertOperators(HttpServletRequest request,
-                                   HttpServletResponse response) {
+  public String listAlertOperators(HttpServletRequest request, HttpServletResponse response) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     if (ticket == null) {
       return utils.emptyTicketResponse(response);
@@ -261,7 +260,7 @@ public class SipAlertController {
   /**
    * List Alert rule API by category.
    *
-   * @param request  HttpServletRequest
+   * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return Alert List of alert rle details
    */
@@ -279,10 +278,10 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
-      @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+          @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize,
       @PathVariable(name = "categoryId") String categoryId) {
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
@@ -299,13 +298,12 @@ public class SipAlertController {
     }
 
     return alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket);
-
   }
 
   /**
    * GET Alert rule API for a alert rule id.
    *
-   * @param request  HttpServletRequest
+   * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return Alert
    */
@@ -342,7 +340,7 @@ public class SipAlertController {
   /**
    * Delete Alert rule API.
    *
-   * @param request  HttpServletRequest
+   * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return Alert
    */
@@ -386,7 +384,7 @@ public class SipAlertController {
   /**
    * List Alert states API by Alert Id.
    *
-   * @param request  HttpServletRequest
+   * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
@@ -405,10 +403,10 @@ public class SipAlertController {
       HttpServletResponse response,
       @PathVariable(name = "id") String id,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "25")
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           Integer pageSize) {
 
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
@@ -435,7 +433,7 @@ public class SipAlertController {
   /**
    * List Alert states API.
    *
-   * @param request  HttpServletRequest
+   * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
@@ -454,10 +452,10 @@ public class SipAlertController {
       HttpServletResponse response,
       @RequestBody Optional<AlertStatesFilter> alertStatesFilter,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "25")
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           Integer pageSize) {
 
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
@@ -471,14 +469,13 @@ public class SipAlertController {
       return utils.validatePermissionResponse(response, alertStatesResponse, ACCESS);
     }
 
-    return
-        alertService.listAlertStates(pageNumber, pageSize, ticket, alertStatesFilter);
+    return alertService.listAlertStates(pageNumber, pageSize, ticket, alertStatesFilter);
   }
 
   /**
    * List of alert count by date or severity based on request payload API.
    *
-   * @param request  HttpServletRequest
+   * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
@@ -497,13 +494,13 @@ public class SipAlertController {
       HttpServletResponse response,
       @RequestBody AlertCount alertCount,
       @ApiParam(value = "alert rule id", required = false)
-      @RequestParam(name = "alertRuleId", required = false)
+          @RequestParam(name = "alertRuleId", required = false)
           String alertRuleId,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
-      @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+          @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize) {
 
     List<AlertCountResponse> alertCountResponse = new ArrayList<>();
@@ -519,8 +516,7 @@ public class SipAlertController {
       if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
         LOGGER.error(String.format(UNAUTHORIZED, ACCESS));
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-        response.sendError(HttpStatus.SC_UNAUTHORIZED,
-            String.format(UNAUTHORIZED, ACCESS));
+        response.sendError(HttpStatus.SC_UNAUTHORIZED, String.format(UNAUTHORIZED, ACCESS));
         return alertCountResponse;
       }
 
@@ -535,7 +531,7 @@ public class SipAlertController {
   /**
    * List Attribute Values API.
    *
-   * @param request  HttpServletRequest
+   * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
@@ -568,8 +564,7 @@ public class SipAlertController {
 
       attributeValues = alertService.listAttribueValues(ticket);
     } catch (IOException ex) {
-      LOGGER.error("Error occurred while  fetching attribute values : {}",
-          ex.getMessage());
+      LOGGER.error("Error occurred while  fetching attribute values : {}", ex.getMessage());
     }
     return attributeValues;
   }
@@ -600,5 +595,53 @@ public class SipAlertController {
       return utils.validatePermissionResponse(response, ACCESS);
     }
     return alertService.retrieveMonitoringType(ticket);
+  }
+
+  /**
+   * Unsubscribe an email id.
+   *
+   * @param alertRulesSysId Alert Rule Id
+   * @param alertTriggerSysId Alert Trigger Id
+   * @param emailId Subscriber email id
+   * @return Status of unsubscribe
+   */
+  @ApiOperation(
+      value = "/subscriber/deactivate/{alertRulesSysId}/{alertTriggerSysId}/{emailId}",
+      response = String.class)
+  @RequestMapping(
+      value = "/subscriber/deactivate/{alertRulesSysId}/{alertTriggerSysId}/{emailId}",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  //    @GetMapping(value = "/alert/{alertId}/subscriber/{emailId}/deactivate")
+  public String deactivateSubscriber(
+      @PathVariable("alertRulesSysId") String alertRulesSysId,
+      @PathVariable("alertTriggerSysId") String alertTriggerSysId,
+      @PathVariable("emailId") String emailId,
+      @QueryParam("token") String token,
+      HttpServletRequest request,
+      HttpServletResponse response) {
+    String statusResponse = null;
+    if (alertRulesSysId == null || alertRulesSysId.length() == 0) {
+      // return invalid response
+    }
+
+    if (alertTriggerSysId == null || alertTriggerSysId.length() == 0) {
+      // return invalid response
+    }
+
+    if (emailId == null || emailId.length() == 0) {
+      // return invalid response
+    }
+
+    Boolean status = alertService.deactivateSubscriber(alertRulesSysId, alertTriggerSysId, emailId);
+
+    if (status == true) {
+      statusResponse = "Email unsubscribed successfully";
+    } else {
+      statusResponse = "Unable to unsubscribe";
+    }
+
+    return statusResponse;
   }
 }

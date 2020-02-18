@@ -68,4 +68,8 @@ public interface AlertService {
   String retrieveMonitoringType(Ticket ticket);
 
   String getReadableOperator(Operator operator);
+
+  Boolean activateSubscriber(String alertRulesSysId, String alertTriggerSysId, String email);
+
+  Boolean deactivateSubscriber(String alertRulesSysId, String alertTriggerSysId, String email);
 }

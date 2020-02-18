@@ -22,6 +22,7 @@ import com.synchronoss.sip.alert.modal.AlertSeverity;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.modal.MonitoringType;
+import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.service.evaluator.EvaluatorListener;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Field.Type;
@@ -82,8 +83,11 @@ public class AlertServiceImpl implements AlertService {
   @NotNull
   private String alertTriggerLog;
 
-  @Autowired
-  EvaluatorListener evaluatorListener;
+  @Value("${sip.service.metastore.subscribersTable}")
+  @NotNull
+  private String subscribersTable;
+
+  @Autowired EvaluatorListener evaluatorListener;
 
   @PostConstruct
   public void init() {
@@ -98,7 +102,7 @@ public class AlertServiceImpl implements AlertService {
   /**
    * Create Alert rule.
    *
-   * @param alert  Alert
+   * @param alert Alert
    * @param ticket Ticket
    * @return AlertRuleDetails
    */
@@ -122,8 +126,8 @@ public class AlertServiceImpl implements AlertService {
    * Update Alert Rule.
    *
    * @param alertRuleDetails AlertRuleDetails
-   * @param alertRuleId      alertRuleId
-   * @param ticket           Ticket
+   * @param alertRuleId alertRuleId
+   * @param ticket Ticket
    * @return AlertRuleDetails
    */
   @Override
@@ -145,9 +149,9 @@ public class AlertServiceImpl implements AlertService {
   /**
    * Fetch all available alerts for the customer.
    *
-   * @param ticket     Ticket Id
+   * @param ticket Ticket Id
    * @param pageNumber pageNumber
-   * @param pageSize   pageSize
+   * @param pageSize pageSize
    * @return AlertRuleResponse
    */
   @Override
@@ -171,7 +175,7 @@ public class AlertServiceImpl implements AlertService {
    * Delete Alert Rule.
    *
    * @param alertRuleId Alert rule Id
-   * @param ticket      Ticket
+   * @param ticket Ticket
    */
   @Override
   public Boolean deleteAlertRule(
@@ -184,7 +188,7 @@ public class AlertServiceImpl implements AlertService {
    * Get Alert Rule.
    *
    * @param alertRuleId Alert rule Id
-   * @param ticket      Ticket
+   * @param ticket Ticket
    * @return
    */
   @Override
@@ -209,8 +213,8 @@ public class AlertServiceImpl implements AlertService {
    *
    * @param categoryId Category Id
    * @param pageNumber pageNumber
-   * @param pageSize   pageSize
-   * @param ticket     Ticket
+   * @param pageSize pageSize
+   * @param ticket Ticket
    * @return
    */
   @Override
@@ -291,9 +295,9 @@ public class AlertServiceImpl implements AlertService {
    * Get alert state by alert ID.
    *
    * @param alertRuleSysId alertRuleSysId
-   * @param pageNumber     pageNumber
-   * @param pageSize       pageSize
-   * @param ticket         Ticket
+   * @param pageNumber pageNumber
+   * @param pageSize pageSize
+   * @param ticket Ticket
    * @return List of AlertStates
    */
   @Override
@@ -328,8 +332,8 @@ public class AlertServiceImpl implements AlertService {
    * Get list of pageable Alerts by time order and if specified filters by attributeValue.
    *
    * @param pageNumber pageNumber
-   * @param pageSize   pageSize
-   * @param ticket     Ticket
+   * @param pageSize pageSize
+   * @param ticket Ticket
    * @param alertState AlertStatesFilter
    * @return List of AlertStates, number of records.
    */
@@ -392,10 +396,10 @@ public class AlertServiceImpl implements AlertService {
         return "Not Equal To";
       case BTW:
         return "Between";
-      /**
-       * case SW: return "Start With"; case EW: return "End With"; case CONTAINS: return
-       * "Contains"; case ISIN: return "Is IN";
-       */
+        /**
+         * case SW: return "Start With"; case EW: return "End With"; case CONTAINS: return
+         * "Contains"; case ISIN: return "Is IN";
+         */
       default:
         return null;
     }
@@ -438,7 +442,7 @@ public class AlertServiceImpl implements AlertService {
         return "Aggregation Metrics";
       case CONTINUOUS_MONITORING:
         return "Continuous Monitoring";
-      /** case ROW_METRICS: return "Row Metrics"; */
+        /** case ROW_METRICS: return "Row Metrics"; */
       default:
         return null;
     }
@@ -447,11 +451,11 @@ public class AlertServiceImpl implements AlertService {
   /**
    * It returns alert count for each day based on the preset value.
    *
-   * @param alertCount     AlertCount
-   * @param pageNumber     pageNumber
-   * @param pageSize       pageSize
+   * @param alertCount AlertCount
+   * @param pageNumber pageNumber
+   * @param pageSize pageSize
    * @param alertRuleSysId alertRuleSysId
-   * @param ticket         Ticket
+   * @param ticket Ticket
    * @return AlertCountResponse
    */
   @Override
@@ -519,6 +523,100 @@ public class AlertServiceImpl implements AlertService {
       }
     }
     return elements.toString();
+  }
+
+  @Override
+  public Boolean deactivateSubscriber(
+      String alertRulesSysId, String alertTriggerSysId, String email) {
+    Boolean status;
+
+    Subscriber subscriber =
+        fetchSubscriberByAlertIdAndEmail(alertRulesSysId, alertTriggerSysId, email);
+
+
+    LOGGER.trace("Subscriber = " + subscriber);
+
+    if (subscriber == null) {
+      LOGGER.trace("Subscriber not found");
+      subscriber = new Subscriber();
+      subscriber.setSubscriberId(UUID.randomUUID().toString());
+
+      subscriber.setAlertRulesSysId(alertRulesSysId);
+      subscriber.setEmail(email);
+      subscriber.setActive(false);
+      subscriber.setCreatedTime(new Date());
+      subscriber.setModifiedTime(new Date());
+    } else {
+        // TODO: Remove subscriber id
+      LOGGER.trace("Subscriber found");
+      subscriber.setSubscriberId(subscriber.get_id());
+      subscriber.setActive(false);
+      subscriber.setModifiedTime(new Date());
+    }
+
+    LOGGER.trace("Subscriber ID = " + subscriber.getSubscriberId());
+
+    status = createOrUpdateSubscriber(subscriber);
+
+    return status;
+  }
+
+  @Override
+  public Boolean activateSubscriber(
+      String alertRulesSysId, String alertTriggerSysId, String email) {
+    throw new RuntimeException("Not implemented yet");
+  }
+
+  private Subscriber fetchSubscriberByAlertIdAndEmail(
+      String alertRuleSysId, String alertTriggerSysId, String email) {
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+
+    String query = prepareSubscriberQuery(alertRuleSysId, alertTriggerSysId, email);
+    LOGGER.trace("Mapr query for alert subscriber:{}", query);
+    List<Subscriber> result =
+        connection.runMaprDbQueryWithFilter(query, null, null, null, Subscriber.class);
+
+    if (result != null && result.size() != 0)
+        return result.get(0);
+    else
+        return null;
+  }
+
+  private Boolean createOrUpdateSubscriber(Subscriber subscriber) {
+    Boolean status = true;
+
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+    connection.insertOrUpdate(subscriber.getSubscriberId(), subscriber);
+
+    return status;
+  }
+
+  private String prepareSubscriberQuery(
+      String alertRuleSysId, String alertTriggerSysId, String email) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+
+    ObjectNode alertRuleNode = objectMapper.createObjectNode();
+    ObjectNode alertRuleEqNode = alertRuleNode.putObject(MaprConnection.EQ);
+    alertRuleEqNode.put("alertRulesSysId", alertRuleSysId);
+
+    arrayNode.add(alertRuleNode);
+
+//    ObjectNode alertTriggerNode = objectMapper.createObjectNode();
+//    ObjectNode alertTriggerEqNode = alertTriggerNode.putObject(MaprConnection.EQ);
+//    alertTriggerEqNode.put("alertTriggerSysId", alertTriggerSysId);
+//
+//    arrayNode.add(alertTriggerNode);
+
+    ObjectNode emailNode = objectMapper.createObjectNode();
+    ObjectNode emailEqNode = emailNode.putObject(MaprConnection.EQ);
+    emailEqNode.put("email", email);
+
+    arrayNode.add(emailNode);
+
+    return node.toString();
   }
 
   private List<AlertCountResponse> groupByseverity(List<AlertResult> list) {
