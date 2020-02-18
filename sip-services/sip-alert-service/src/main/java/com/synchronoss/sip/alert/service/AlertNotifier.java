@@ -11,9 +11,11 @@ import com.synchronoss.sip.alert.modal.AlertResult;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import com.synchronoss.sip.alert.modal.Notification;
+import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -75,15 +77,16 @@ public class AlertNotifier {
    * Send Alert notification.
    *
    * @param alertRule Alert Rule.
+   * @param alertTriggerSysId
    */
-  public void sendNotification(AlertRuleDetails alertRule) {
+  public void sendNotification(AlertRuleDetails alertRule, String alertTriggerSysId) {
     logger.info("Inside send notification method");
     try {
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
         Notification notification = alertRule.getNotification();
         if (notification != null && notification.getEmail() != null) {
-          sendMailNotification(alertRule);
+          sendMailNotification(alertRule,alertTriggerSysId);
         } else {
           String msg =
               "Notification mechanism is not configured for alertRule :"
@@ -125,8 +128,10 @@ public class AlertNotifier {
    * Sends email notification.
    *
    * @param alertRulesDetails AlertRulesDetails
+   * @param alertTriggerSysId
    */
-  public void sendMailNotification(AlertRuleDetails alertRulesDetails) {
+  public void sendMailNotification(AlertRuleDetails alertRulesDetails,
+      String alertTriggerSysId) {
     logger.info("sending email notification");
     AlertNotificationLog notificationLog = new AlertNotificationLog();
     notificationLog.setAlertRuleName(alertRulesDetails.getAlertRuleName());
@@ -143,8 +148,17 @@ public class AlertNotifier {
         recipientsList.stream()
             .forEach(
                 recipient -> {
-                    AlertSubscriberToken subscriber=new AlertSubscriberToken(alertRulesDetails.getAlertRulesSysId(),"",recipient);
-                 sendMail(alertRulesDetails, recipient, AlertUtils.getSubscriberToken(subscriber,secretKey));
+                  AlertSubscriberToken subscriber =
+                      new AlertSubscriberToken(
+                          alertRulesDetails.getAlertRulesSysId(),
+                          alertRulesDetails.getAlertRuleName(),
+                          alertRulesDetails.getAlertRuleDescription(),
+                          alertTriggerSysId,
+                          recipient);
+                  sendMail(
+                      alertRulesDetails,
+                      recipient,
+                      AlertUtils.getSubscriberToken(subscriber, secretKey));
                 });
         notificationLog.setNotifiedStatus(Boolean.TRUE);
       } else {
@@ -163,6 +177,14 @@ public class AlertNotifier {
   }
 
   private Set<String> getActiveSubscribers(Set<String> recipients, String alertRulesSysId) {
+    Set<Subscriber> subscribers = new HashSet<>();
+    subscribers.forEach(
+        subscriber -> {
+          if (subscriber.getActive() == Boolean.FALSE
+              && recipients.contains(subscriber.getEmail())) {
+            recipients.remove(subscriber.getEmail());
+          }
+        });
     return recipients;
   }
 

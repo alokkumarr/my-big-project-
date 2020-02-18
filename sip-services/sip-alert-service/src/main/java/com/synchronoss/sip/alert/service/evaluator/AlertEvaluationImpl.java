@@ -15,6 +15,7 @@ import com.synchronoss.sip.alert.modal.AlertResult;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.AlertState;
 import com.synchronoss.sip.alert.modal.MonitoringType;
+import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.service.AlertNotifier;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
@@ -156,7 +157,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
               }
               connection.insert(alertResult.getAlertTriggerSysId(), alertResult);
               logger.info("Sending Notification for Alert: " + alertRuleDetails.getAlertRuleName());
-              alertNotifier.sendNotification(alertRuleDetails);
+              alertNotifier.sendNotification(alertRuleDetails,alertResult.getAlertTriggerSysId());
             } else {
               updateAlertResultAndSubscriptionStatus(alertRuleDetails);
             }
@@ -172,8 +173,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     return true;
   }
 
-  private void updateAlertResultAndSubscriptionStatus(
-      AlertRuleDetails alertRuleDetails) {
+  private void updateAlertResultAndSubscriptionStatus(AlertRuleDetails alertRuleDetails) {
     List<AlertResult> alertResultList =
         getLastAlertResultByAlertRuleId(alertRuleDetails.getAlertRulesSysId());
     if (alertResultList.size() > 0) {
@@ -182,9 +182,25 @@ public class AlertEvaluationImpl implements AlertEvaluation {
         MaprConnection connection = new MaprConnection(basePath, alertResults);
         alertResult.setAlertState(AlertState.OK);
         connection.update(alertResult.getAlertTriggerSysId(), alertResult);
-       // saveAlertTriggerState();
+        updateSubsriberStatusToActive(alertRuleDetails.getAlertRulesSysId());
+        // saveAlertTriggerState();
+          List<Subscriber> subscribers=new ArrayList<>();
+          subscribers.stream().forEach(subscriber -> {
+
+          });
       }
     }
+  }
+
+  private void updateSubsriberStatusToActive(String alertRulesSysId) {
+
+      List<Subscriber> subscribers=null;
+      subscribers.stream().forEach(subscriber -> {
+          if(!subscriber.getActive()){
+              subscriber.setActive(Boolean.TRUE);
+              //updatetrackerTable();
+          }
+      });
   }
 
   /**
