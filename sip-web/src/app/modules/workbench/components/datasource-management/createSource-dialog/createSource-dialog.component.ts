@@ -47,12 +47,9 @@ export class CreateSourceDialogComponent {
       this.selectedSource = this.channelData.channelType;
     }
     this.createForm();
-    // Wait for form creation for e2e to fire.
-    setTimeout(() => {
-      if (isUndefined(this.channelData.length)) {
-        this.firstStep.patchValue(this.channelData);
-      }
-    }, 100);
+    if (isUndefined(this.channelData.length)) {
+      this.firstStep.patchValue(this.channelData);
+    }
   }
 
   get isDetailsFormValid() {
