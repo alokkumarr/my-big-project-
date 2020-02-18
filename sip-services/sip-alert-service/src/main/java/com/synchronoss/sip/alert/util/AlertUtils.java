@@ -292,9 +292,9 @@ public class AlertUtils {
   }
 
   public static AlertSubscriberToken parseSubscriberToken(String token, String secretKey) {
-    Claims ssoToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     // Check if the Token is valid
     try {
+      Claims ssoToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
       Set<Entry<String, Object>> entrySet =
           ((Map<String, Object>) ssoToken.get(ALERT_SUBSCRIBER)).entrySet();
       String alertRulesSysId = null,
@@ -306,7 +306,7 @@ public class AlertUtils {
         if (pair.getKey().equals("alertRulesSysId")) {
           alertRulesSysId = pair.getValue().toString();
         }
-        if (pair.getKey().equals("alertRulesSysId")) {
+        if (pair.getKey().equals("alertTriggerSysId")) {
           alertTriggerSysId = pair.getValue().toString();
         }
         if (pair.getKey().equals("emailId")) {
@@ -331,12 +331,12 @@ public class AlertUtils {
   }
 
    public static List<AlertResult> getLastAlertResultByAlertRuleId(
-      String alertRulesSysId, String basePath, String alertResults) {
+      String alertRulesSysId, String basePath, String alertResultsTable) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
     objectNode.put(ALERT_RULE_SYS_ID, alertRulesSysId);
-    MaprConnection connection = new MaprConnection(basePath, alertResults);
+    MaprConnection connection = new MaprConnection(basePath, alertResultsTable);
     return connection.runMaprDbQueryWithFilter(
         node.toString(), 1, 1, AlertUtils.START_TIME, AlertResult.class);
   }
