@@ -13,7 +13,7 @@ const SchedulePage = require('../../pages/SchedulePage');
 const dataSets = require('../../helpers/data-generation/datasets');
 const moment = require('moment');
 
-describe('Executing Schedule tests from createSchedule.test.js', () => {
+describe('Executing Schedule tests from createDeleteSchedule.test.js', () => {
   let analysisId;
   let host;
   let token;
@@ -49,8 +49,8 @@ describe('Executing Schedule tests from createSchedule.test.js', () => {
   });
 
   using(
-    testDataReader.testData['SCHEDULE-REPORT']['createSchedule']
-      ? testDataReader.testData['SCHEDULE-REPORT']['createSchedule']
+    testDataReader.testData['SCHEDULE-REPORT']['createDeleteSchedule']
+      ? testDataReader.testData['SCHEDULE-REPORT']['createDeleteSchedule']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -61,7 +61,7 @@ describe('Executing Schedule tests from createSchedule.test.js', () => {
           const tables = data.tables;
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
-          const ReportDescription = `Schedule DL Report ${new Date().toString()}`;
+          const ReportDescription = `Schedule DL/ES Report ${new Date().toString()}`;
           const analyzePage = new AnalyzePage();
           analyzePage.goToView('card');
 
@@ -69,7 +69,7 @@ describe('Executing Schedule tests from createSchedule.test.js', () => {
           analyzePage.clickOnAddAnalysisButton();
           analyzePage.clickOnAnalysisType(analysisType);
           analyzePage.clickOnNextButton();
-          analyzePage.clickOnDataPods(dataSets.report);
+          analyzePage.clickOnDataPods(dataSets[data.reportType]);
           analyzePage.clickOnCreateButton();
           const reportDesignerPage = new ReportDesignerPage();
           reportDesignerPage.clickOnReportFields(tables);
@@ -94,14 +94,20 @@ describe('Executing Schedule tests from createSchedule.test.js', () => {
           executePage.closeDetails();
           schedulePage.handleToastMessage();
 
-          //schedule From list/card/Details
+          //schedule From list/card/Details View
           schedulePage.scheduleFromView(data.scheduleFrom,ReportName);
           schedulePage.selectSchedule(data.scheduleType,data);
           schedulePage.setEmail(data.userEmail);
           schedulePage.scheduleReport();
 
-          //verify Schedule Details from list/card
+          //verify Schedule Details from list/card View
           schedulePage.verifyScheduledDetails(data,ReportName);
+
+          //remove Schedule
+          schedulePage.removeScheduleTime(data,ReportName);
+
+          //verify Removed Schedule details
+          schedulePage.verifyRemovedScheduleDetails(data,ReportName);
 
           /*Delete the Report*/
           schedulePage.deleteReport();
@@ -113,7 +119,7 @@ describe('Executing Schedule tests from createSchedule.test.js', () => {
         testId: id,
         data: data,
         feature: 'SCHEDULE-REPORT',
-        dataProvider: 'createSchedule'
+        dataProvider: 'createDeleteSchedule'
       };
     });
 

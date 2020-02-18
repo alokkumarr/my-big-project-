@@ -639,20 +639,23 @@ class SchedulePage {
         this.handleToastMessage();
         analyzePage.goToView('list');
         analyzePage.verifyScheduledTimingsInListView(ReportName,data.scheduleTimings);
-        analyzePage.clickOnAnalysisLink(ReportName);
         break;
       case 'card':
         this.handleToastMessage();
         analyzePage.goToView('card');
         analyzePage.verifyScheduledTimingsInCardView(ReportName,data.scheduleTimings);
-        analyzePage.clickOnAnalysisLink(ReportName);
     }
   }
 
-  removeScheduleTime() {
+  removeScheduleTime(data,reportName) {
+    if(data.scheduleType ==="Immediate") {
+      logger.debug('Cannot remove Immediate schedule');
+    }else {
+      analyzePage.clickOnAnalysisLink(reportName);
       executePage.clickOnActionLink();
       executePage.clickSchedule();
       this.removeSchedule();
+    }
   }
 
   verifyRemovedScheduleDetails(data,reportName){
