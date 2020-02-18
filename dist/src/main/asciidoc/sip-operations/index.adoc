@@ -157,6 +157,7 @@ to the below SIP environment configuration (`sip-config`).
     # saw_spark_yarn_resource_manager is optional parameter if we want to explicitly
     # define the resource manager for saw-executor if not configured in yarn-site.xml.
     saw_spark_yarn_resource_manager=sip-mapr
+    saw_workbench_lib_path=/opt/bda/saw-workbench-service/lib/
 
 Additional parameter added to control large file export from FTP/email dispatch.
 In case of any higher memory/CPU load on (saw-transport service/export service) server,

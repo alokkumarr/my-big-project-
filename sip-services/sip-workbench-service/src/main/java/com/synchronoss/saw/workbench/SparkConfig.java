@@ -73,6 +73,9 @@ public class SparkConfig {
 	
 	@Value("${spark.master}")
 	private String sparkMaster;
+	
+	@Value("${workbench.lib.path}")
+	private String libPath;
 
 	@Bean
 	public SparkConf conf() {
@@ -118,15 +121,15 @@ public class SparkConfig {
 	public JavaSparkContext sc() {
 	JavaSparkContext jsc = new  JavaSparkContext(SparkContext.getOrCreate(conf()));
 	logger.debug("#### Setting librarires as class path for spark context ######");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.core-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.xdf-core-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.xdf-parser-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.meta-api-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.xdf-data-profiler-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.xdf-preview-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.xdf-component-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.bda.xdf-ext-4.jar");
-    jsc.addJar("/opt/bda/saw-workbench-service/lib/com.synchronoss.saw.sip-workbench-service-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.core-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.xdf-core-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.xdf-parser-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.meta-api-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.xdf-data-profiler-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.xdf-preview-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.xdf-component-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.bda.xdf-ext-4.jar");
+    jsc.addJar(libPath + "com.synchronoss.saw.sip-workbench-service-4.jar");
     logger.debug("#### Manual class path settings completed!! ######");
     
     return jsc;
