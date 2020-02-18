@@ -1,10 +1,13 @@
 package com.synchronoss.sip.alert.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.saw.model.Model.Operator;
 
+import com.synchronoss.sip.alert.modal.AlertResult;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -30,6 +33,7 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import sncr.bda.base.MaprConnection;
 
 
 @Component
@@ -293,7 +297,11 @@ public class AlertUtils {
     try {
       Set<Entry<String, Object>> entrySet =
           ((Map<String, Object>) ssoToken.get(ALERT_SUBSCRIBER)).entrySet();
-      String alertRulesSysId = null, alertTriggerSysId = null, emailId = null;
+      String alertRulesSysId = null,
+          alertTriggerSysId = null,
+          emailId = null,
+          alertRuleName = null,
+          alertRuleDescription = null;
       for (Map.Entry<String, Object> pair : entrySet) {
         if (pair.getKey().equals("alertRulesSysId")) {
           alertRulesSysId = pair.getValue().toString();
@@ -304,14 +312,32 @@ public class AlertUtils {
         if (pair.getKey().equals("emailId")) {
           emailId = pair.getValue().toString();
         }
+        if (pair.getKey().equals("alertRuleName")) {
+          alertRuleName = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("alertRuleDescription")) {
+          alertRuleDescription = pair.getValue().toString();
+        }
       }
       AlertSubscriberToken alertSubscriberToken =
-          new AlertSubscriberToken(alertRulesSysId, alertTriggerSysId, emailId);
+          new AlertSubscriberToken(
+              alertRulesSysId, alertRuleName, alertRuleDescription, alertTriggerSysId, emailId);
       return alertSubscriberToken;
     } catch (SignatureException signatureException) {
       throw signatureException;
     } catch (Exception exception) {
       throw exception;
     }
+  }
+
+   public static List<AlertResult> getLastAlertResultByAlertRuleId(
+      String alertRulesSysId, String basePath, String alertResults) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put(ALERT_RULE_SYS_ID, alertRulesSysId);
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
+    return connection.runMaprDbQueryWithFilter(
+        node.toString(), 1, 1, AlertUtils.START_TIME, AlertResult.class);
   }
 }

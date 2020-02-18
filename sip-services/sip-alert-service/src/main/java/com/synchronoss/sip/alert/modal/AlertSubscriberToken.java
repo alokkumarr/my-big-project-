@@ -7,16 +7,38 @@ public class AlertSubscriberToken {
   @JsonProperty("alertRulesSysId")
   private String alertRulesSysId;
 
+  @JsonProperty("alertRuleName")
+  private String alertRuleName;
+
+  @JsonProperty("alertRuleDescription")
+  private String alertRuleDescription;
+
   @JsonProperty("alertTriggerSysId")
   private String alertTriggerSysId;
 
   @JsonProperty("emailId")
   private String emailId;
 
+  /** No args constructor for use in serialization. */
   public AlertSubscriberToken() {}
 
-  public AlertSubscriberToken(String alertRulesSysId, String alertTriggerSysId, String emailId) {
+  /**
+   * args constructor.
+   * @param alertRulesSysId rule id
+   * @param alertRuleName rule name
+   * @param alertRuleDescription rule description
+   * @param alertTriggerSysId trigger id
+   * @param emailId emailid
+   */
+  public AlertSubscriberToken(
+      String alertRulesSysId,
+      String alertRuleName,
+      String alertRuleDescription,
+      String alertTriggerSysId,
+      String emailId) {
     this.alertRulesSysId = alertRulesSysId;
+    this.alertRuleName = alertRuleName;
+    this.alertRuleDescription = alertRuleDescription;
     this.alertTriggerSysId = alertTriggerSysId;
     this.emailId = emailId;
   }
@@ -27,6 +49,22 @@ public class AlertSubscriberToken {
 
   public void setAlertRulesSysId(String alertRulesSysId) {
     this.alertRulesSysId = alertRulesSysId;
+  }
+
+  public String getAlertRuleName() {
+    return alertRuleName;
+  }
+
+  public void setAlertRuleName(String alertRuleName) {
+    this.alertRuleName = alertRuleName;
+  }
+
+  public String getAlertRuleDescription() {
+    return alertRuleDescription;
+  }
+
+  public void setAlertRuleDescription(String alertRuleDescription) {
+    this.alertRuleDescription = alertRuleDescription;
   }
 
   public String getAlertTriggerSysId() {

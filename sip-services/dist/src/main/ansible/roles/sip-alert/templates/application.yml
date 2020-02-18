@@ -47,6 +47,7 @@ sip:
       alertRulesTable: alertRulesMetadata
       alertResults: alertResults
       notificationTable: alertNotificationLog
+      subscribersTable: subscribers
 
     taskExecutor:
       maxPoolSize: 10
