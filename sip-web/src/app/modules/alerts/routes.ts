@@ -10,7 +10,7 @@ import {
   AlertsConfigurationComponent,
   AddAlertComponent
 } from './components/configure/index';
-
+import { AlertUnsubscribe } from './components/alert-unsubscribe/alert-unsubscribe.component';
 export const routes: Routes = [
   {
     path: '',
@@ -38,6 +38,15 @@ export const routes: Routes = [
         path: '',
         pathMatch: 'full',
         canActivate: [AlertRedirectGuard]
+      }
+    ]
+  }, {
+    path: '',
+    component: AlertsPageComponent,
+    children: [
+      {
+        path: 'unsubscribe',
+        component: AlertUnsubscribe
       }
     ]
   }
