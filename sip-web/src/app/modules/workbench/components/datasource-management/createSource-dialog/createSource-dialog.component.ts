@@ -12,7 +12,6 @@ import {
   DetailForm,
   CHANNEL_OPERATION
 } from '../../../models/workbench.interface';
-import { timeout } from 'q';
 
 @Component({
   selector: 'createsource-dialog',
