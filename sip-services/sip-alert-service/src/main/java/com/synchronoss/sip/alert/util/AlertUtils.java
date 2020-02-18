@@ -293,7 +293,11 @@ public class AlertUtils {
     try {
       Set<Entry<String, Object>> entrySet =
           ((Map<String, Object>) ssoToken.get(ALERT_SUBSCRIBER)).entrySet();
-      String alertRulesSysId = null, alertTriggerSysId = null, emailId = null;
+      String alertRulesSysId = null,
+          alertTriggerSysId = null,
+          emailId = null,
+          alertRuleName = null,
+          alertRuleDescription = null;
       for (Map.Entry<String, Object> pair : entrySet) {
         if (pair.getKey().equals("alertRulesSysId")) {
           alertRulesSysId = pair.getValue().toString();
@@ -304,9 +308,16 @@ public class AlertUtils {
         if (pair.getKey().equals("emailId")) {
           emailId = pair.getValue().toString();
         }
+        if (pair.getKey().equals("alertRuleName")) {
+          alertRuleName = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("alertRuleDescription")) {
+          alertRuleDescription = pair.getValue().toString();
+        }
       }
       AlertSubscriberToken alertSubscriberToken =
-          new AlertSubscriberToken(alertRulesSysId, alertTriggerSysId, emailId);
+          new AlertSubscriberToken(
+              alertRulesSysId, alertRuleName, alertRuleDescription, alertTriggerSysId, emailId);
       return alertSubscriberToken;
     } catch (SignatureException signatureException) {
       throw signatureException;

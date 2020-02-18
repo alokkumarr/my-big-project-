@@ -19,8 +19,17 @@ public class AlertSubscriberToken {
   @JsonProperty("emailId")
   private String emailId;
 
+  /** No args constructor for use in serialization. */
   public AlertSubscriberToken() {}
 
+  /**
+   * args constructor.
+   * @param alertRulesSysId rule id
+   * @param alertRuleName rule name
+   * @param alertRuleDescription rule description
+   * @param alertTriggerSysId trigger id
+   * @param emailId emailid
+   */
   public AlertSubscriberToken(
       String alertRulesSysId,
       String alertRuleName,

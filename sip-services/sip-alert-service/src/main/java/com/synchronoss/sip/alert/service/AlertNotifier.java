@@ -77,7 +77,7 @@ public class AlertNotifier {
    * Send Alert notification.
    *
    * @param alertRule Alert Rule.
-   * @param alertTriggerSysId
+   * @param alertTriggerSysId alertTriggerSysId
    */
   public void sendNotification(AlertRuleDetails alertRule, String alertTriggerSysId) {
     logger.info("Inside send notification method");
@@ -86,7 +86,7 @@ public class AlertNotifier {
       if (alertRule != null) {
         Notification notification = alertRule.getNotification();
         if (notification != null && notification.getEmail() != null) {
-          sendMailNotification(alertRule,alertTriggerSysId);
+          sendMailNotification(alertRule, alertTriggerSysId);
         } else {
           String msg =
               "Notification mechanism is not configured for alertRule :"
@@ -128,10 +128,9 @@ public class AlertNotifier {
    * Sends email notification.
    *
    * @param alertRulesDetails AlertRulesDetails
-   * @param alertTriggerSysId
+   * @param alertTriggerSysId alertTriggerSysId
    */
-  public void sendMailNotification(AlertRuleDetails alertRulesDetails,
-      String alertTriggerSysId) {
+  public void sendMailNotification(AlertRuleDetails alertRulesDetails, String alertTriggerSysId) {
     logger.info("sending email notification");
     AlertNotificationLog notificationLog = new AlertNotificationLog();
     notificationLog.setAlertRuleName(alertRulesDetails.getAlertRuleName());
@@ -194,11 +193,13 @@ public class AlertNotifier {
    * @param alertRulesDetails AlertRulesDetails
    * @return status of mail notification
    */
-  public boolean sendMail(AlertRuleDetails alertRulesDetails, String recipients,String subscriberToken) {
+  public boolean sendMail(
+      AlertRuleDetails alertRulesDetails, String recipients, String subscriberToken) {
     ObjectNode mailRequestPayload = objectMapper.createObjectNode();
     mailRequestPayload.put("recipients", recipients);
     mailRequestPayload.put("subject", mailSubject);
-    String preparedMailBody = prepareMailBody(alertRulesDetails, mailBody, alertDashboardPath,subscriberToken);
+    String preparedMailBody =
+        prepareMailBody(alertRulesDetails, mailBody, alertDashboardPath, subscriberToken);
     mailRequestPayload.put("content", preparedMailBody);
     String mailRequestBody = null;
     try {
@@ -224,11 +225,11 @@ public class AlertNotifier {
    * @param alertRulesDetails AlertRulesDetails
    * @param body mailbody
    * @param alertLink link for alert dashboard
-   * @param subscriberToken
+   * @param subscriberToken subscriberToken
    * @return prepared mail body
    */
-  public String prepareMailBody(AlertRuleDetails alertRulesDetails, String body, String alertLink,
-      String subscriberToken) {
+  public String prepareMailBody(
+      AlertRuleDetails alertRulesDetails, String body, String alertLink, String subscriberToken) {
     logger.debug("prepare mail body starts here :" + body);
     if (alertRulesDetails.getNotification().getEmail().getTemplate() != null) {
       // override the Body template if its configured for specific alerts.

@@ -184,23 +184,23 @@ public class AlertEvaluationImpl implements AlertEvaluation {
         connection.update(alertResult.getAlertTriggerSysId(), alertResult);
         updateSubsriberStatusToActive(alertRuleDetails.getAlertRulesSysId());
         // saveAlertTriggerState();
-          List<Subscriber> subscribers=new ArrayList<>();
-          subscribers.stream().forEach(subscriber -> {
-
-          });
+        List<Subscriber> subscribers = new ArrayList<>();
+        subscribers.stream().forEach(subscriber -> { });
       }
     }
   }
 
   private void updateSubsriberStatusToActive(String alertRulesSysId) {
 
-      List<Subscriber> subscribers=null;
-      subscribers.stream().forEach(subscriber -> {
-          if(!subscriber.getActive()){
-              subscriber.setActive(Boolean.TRUE);
-              //updatetrackerTable();
-          }
-      });
+    List<Subscriber> subscribers = null;
+    subscribers.stream()
+        .forEach(
+            subscriber -> {
+              if (!subscriber.getActive()) {
+                subscriber.setActive(Boolean.TRUE);
+                // updatetrackerTable();
+              }
+            });
   }
 
   /**
