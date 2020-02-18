@@ -10,6 +10,7 @@ import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
+import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import com.synchronoss.sip.alert.service.AlertService;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
@@ -600,39 +601,25 @@ public class SipAlertController {
   /**
    * Unsubscribe an email id.
    *
-   * @param alertRulesSysId Alert Rule Id
-   * @param alertTriggerSysId Alert Trigger Id
-   * @param emailId Subscriber email id
    * @return Status of unsubscribe
    */
-  @ApiOperation(
-      value = "/subscriber/deactivate/{alertRulesSysId}/{alertTriggerSysId}/{emailId}",
-      response = String.class)
+  @ApiOperation(value = "/subscriber/deactivate", response = String.class)
   @RequestMapping(
-      value = "/subscriber/deactivate/{alertRulesSysId}/{alertTriggerSysId}/{emailId}",
+      value = "/subscriber/deactivate",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  //    @GetMapping(value = "/alert/{alertId}/subscriber/{emailId}/deactivate")
   public String deactivateSubscriber(
-      @PathVariable("alertRulesSysId") String alertRulesSysId,
-      @PathVariable("alertTriggerSysId") String alertTriggerSysId,
-      @PathVariable("emailId") String emailId,
       @QueryParam("token") String token,
       HttpServletRequest request,
       HttpServletResponse response) {
     String statusResponse = null;
-    if (alertRulesSysId == null || alertRulesSysId.length() == 0) {
-      // return invalid response
-    }
 
-    if (alertTriggerSysId == null || alertTriggerSysId.length() == 0) {
-      // return invalid response
-    }
+    AlertSubscriberToken subscriberToken = alertService.extractSubscriberToken(token);
 
-    if (emailId == null || emailId.length() == 0) {
-      // return invalid response
-    }
+    String alertRulesSysId = subscriberToken.getAlertRulesSysId();
+    String alertTriggerSysId = subscriberToken.getAlertTriggerSysId();
+    String emailId = subscriberToken.getEmailId();
 
     Boolean status = alertService.deactivateSubscriber(alertRulesSysId, alertTriggerSysId, emailId);
 
