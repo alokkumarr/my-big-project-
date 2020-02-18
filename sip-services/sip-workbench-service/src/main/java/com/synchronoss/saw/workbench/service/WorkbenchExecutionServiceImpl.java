@@ -248,13 +248,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Override
   public ObjectNode getPreview(String project, String name) throws Exception {
     log.info("Getting dataset transformation preview");
-    /* Locate the preview data in MapR-DB */
-   // Table table = MapRDB.getTable(previewsTablePath);
-   // Document doc = table.findById(previewId);
-    /* Return the preview data */
-  //  if (doc == null) {
-  //    return null;
-   // }
     log.info("Project ::"+project);
     log.info("Name ::"+name);
     String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
@@ -264,91 +257,63 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     ObjectNode root = mapper.createObjectNode();
     root.put("status", "success");
     root.put("rows", jsonData);
-    //JsonNode json = mapper.readTree(jsonData);
     return root;
   }
   
   
-  public  String getDataset(String location){
-	  log.info("Inside getDataset ####");
-		
-		 
-		 
-		    try {
-		    	SparkConfig sparkConfig = new SparkConfig();
-				 SparkSession session = SparkSession
-				            .builder()
-				            .config(sparkConf)
-				            .getOrCreate();
-				 
-				 log.info("Spark config completed ####"+ session);
-				 
-		    	log.info("Inside try ####");
-		    	FileStatus[] files = HFileOperations.getFilesStatus(location);
-		    	log.info("Retrived hadoop files.... ####");
-		    	
-		    	for(FileStatus file: files) {
-		    		log.info("######### File Path ::"+ file.getPath());
-		    		log.info("######### File Name ::"+ file.getPath().getName());
-		    		String fileName = file.getPath().getName();
-		    		
-		    		if(fileName.endsWith(".parquet")){
-		    			log.info("##### reading file ::"+ file.getPath().toString());
-		    			
-		    			
-		    			
-		    			
-					try {
-						/**
-						 * GroupReadSupport readSupport = new GroupReadSupport();
-						 * 
-						 * ParquetReader<Group> parquetReader = ParquetReader.builder( new
-						 * GroupReadSupport(), file.getPath()).build(); // ParquetReader<GenericRecord>
-						 * parquetReader = builder.withConf(conf).build();
-						 * //ParquetReader<GenericRecord> reader =
-						 * AvroParquetReader.<GenericRecord>builder(file.getPath()).build();
-						 * log.info("reader instantiated"+ parquetReader); nextRecord =
-						 * parquetReader.read(); log.info("Next record ####"+ nextRecord);
-						 */
+	public String getDataset(String location) {
+		log.info("Inside getDataset ####");
+		SparkConfig sparkConfig = new SparkConfig();
+		SparkSession session = SparkSession.builder().config(sparkConf).getOrCreate();
 
-						Dataset<Row> parquetFileDF = session.read().parquet(file.getPath().toString());
+		log.info("Spark config completed ####" + session);
 
-						List<String> list = parquetFileDF.toJSON().collectAsList();
-						List<Map<String, Object>> result = new ArrayList<>();
-						Map<String, Object> map = new HashMap<>();
-						for (String s : list) {
+		log.info("Inside try ####");
+		FileStatus[] files = null;
+		try {
+			files = HFileOperations.getFilesStatus(location);
+		} catch (Exception exception) {
+			log.error("Error while reading hadoop file status"+ exception.getMessage());
+		}
+		log.info("Retrived hadoop files.... ####");
+		String contents = null;
+		for (FileStatus file : files) {
+			log.info("######### File Path ::" + file.getPath());
+			log.info("######### File Name ::" + file.getPath().getName());
+			String fileName = file.getPath().getName();
 
-							map = mapper.readValue(s, new TypeReference<Map<String, String>>() {
-							});
-							result.add(map);
-						}
-						//JSONArray array  = new JSONArray(result);
-						String array = mapper.writeValueAsString(result);
-						// ParquetReader<GenericData.Record> reader = null;
-						//JSONObject json = new JSONObject(map);
-						log.debug("JSON ::"+ array.toString());
-						return array;
-					} catch (Exception e) {
-						log.error("#######ERROR reading file "+ file.getPath() + e.getMessage());
-						e.printStackTrace();
+			if (fileName.endsWith(".parquet")) {
+				log.info("##### reading file ::" + file.getPath().toString());
+				try {
+
+					Dataset<Row> parquetFileDF = session.read().
+							parquet(file.getPath().toString());
+
+					List<String> list = parquetFileDF.
+							limit(previewLimit).toJSON().collectAsList();
+					log.info("############After applying limit dataset count ::"+ list.size());
+					List<Map<String, Object>> result = new ArrayList<>();
+					Map<String, Object> map = new HashMap<>();
+					for (String s : list) {
+
+						map = mapper.readValue(s, 
+								new TypeReference<Map<String, String>>() {
+						});
+						result.add(map);
 					}
-		    			break;
-		    		}
-		    	}
-		    	log.info("#### outside of payload inside try ::");
-		    	
-		    	
-		      
-		    } catch (Exception e) {
-		    	e.printStackTrace();
-		      /*
-		       * Handle exception thrown by Spark for example when dataset is empty
-		       */
-		      log.debug("Error while loading dataset, returning no rows");
-		      return null;
-		    }
-		    
-		    log.info("#### outside of payload end of method ::");
-		    return null;
+					contents = mapper.writeValueAsString(result);
+					log.debug("JSON ::" + contents.toString());
+					
+				} catch (Exception exception) {
+					log.error("#######ERROR reading file " 
+				        + file.getPath() + exception.getMessage());
+				}
+				// As we expect only one parquet file break from iteration
+				break;
+			}
+
+		}
+		log.info("#### outside of payload inside try ::");
+		return contents;
 	}
 }
