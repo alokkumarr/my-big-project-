@@ -40,7 +40,7 @@ export class AlertUnsubscribe implements OnInit {
   }
 
   unSubscribeAlert() {
-    this._alertUnsubscribeService.unsubscribeAnAlert(this.alertToken).subscribe(data => {
+    this._alertUnsubscribeService.unsubscribeAnAlert(this.alertToken).then(data => {
       this._toastMessage.success(data);
     });
   }
