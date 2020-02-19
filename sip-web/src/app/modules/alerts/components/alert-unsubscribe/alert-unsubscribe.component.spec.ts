@@ -13,9 +13,9 @@ class UserServiceStub {
   }
 }
 
-const alertDetails: {
-  alertId: '',
-  alertDesc: ''
+const alertDetailsStub = {
+  alertId: '1',
+  alertDesc: '123abc'
 }
 
 describe('AlertUnsubscribe', () => {
@@ -39,6 +39,7 @@ describe('AlertUnsubscribe', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AlertUnsubscribe);
     component = fixture.componentInstance;
+    component.alertDetails = alertDetailsStub;
     fixture.detectChanges();
   });
 

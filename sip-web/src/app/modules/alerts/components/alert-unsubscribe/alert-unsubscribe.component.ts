@@ -14,7 +14,7 @@ import * as get from 'lodash/get';
 export class AlertUnsubscribe implements OnInit {
   userLoggedIn: boolean;
   alertToken: string;
-  alertDetails: {
+  alertDetails = {
     alertId: '',
     alertDesc: ''
   };
