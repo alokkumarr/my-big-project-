@@ -59,7 +59,7 @@ workbench:
         livy-uri: "http://sip-mapr:8998/"
         storage-uri: ${connector}://localhost:9800
         app-name: SIP-workbench
-        workbench.lib.path: /opt/bda/saw-workbench-service/lib/
+        lib.path: /opt/bda/saw-workbench-service/lib/
 metastore:
     base: "maprfs:///var/sip"
     

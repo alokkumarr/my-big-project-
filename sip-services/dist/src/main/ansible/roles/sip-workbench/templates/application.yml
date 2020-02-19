@@ -90,7 +90,7 @@ workbench:
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
         storage-uri: ${connector}://localhost:9800
         app-name: workbench-executor
-        workbench.lib.path: "{{ saw_workbench_lib_path | default('/opt/bda/saw-workbench-service/lib/') }}"
+        lib.path: "{{ saw_workbench_lib_path | default('/opt/bda/saw-workbench-service/lib/') }}"
 metastore:
     base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"
 
