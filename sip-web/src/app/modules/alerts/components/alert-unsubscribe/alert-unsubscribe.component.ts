@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { JwtService } from './../../../../common/services/jwt.service';
 import { UserService } from './../../../../common/services/user.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
+import * as get from 'lodash/get';
 
 @Component({
   selector: 'alert-unsubscribe',
@@ -13,7 +14,10 @@ import { ToastService } from '../../../../common/services/toastMessage.service';
 export class AlertUnsubscribe implements OnInit {
   userLoggedIn: boolean;
   alertToken: string;
-  parsedToken: {};
+  alertDetails: {
+    alertId: '',
+    alertDesc: ''
+  };
 
   constructor(
     private _alertUnsubscribeService: AlertUnsubscribeService,
@@ -27,8 +31,11 @@ export class AlertUnsubscribe implements OnInit {
   ngOnInit() {
     this.userLoggedIn = this._userService.isLoggedIn();
     this._route.queryParams.subscribe(({ token }) => {
-      this.parsedToken = this._jwtService.parseJWT(token);
       this.alertToken = token;
+      this.alertDetails = {
+        alertId: get(this._jwtService.parseJWT(token), 'AlertSubscriber.alertRuleName') || '',
+        alertDesc: get(this._jwtService.parseJWT(token), 'AlertSubscriber.alertRuleDescription' || '')
+      }
     });
   }
 

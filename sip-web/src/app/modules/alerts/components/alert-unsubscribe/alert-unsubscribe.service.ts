@@ -9,8 +9,8 @@ export class AlertUnsubscribeService {
   unsubscribeAnAlert(token): Observable<any> {
     console.log(token);
     const url = AppConfig.api.url;
-
-    return this._http.get(`${url}/alerts/subscriber/deactivate?token=${token}`);
+    const endpoint = `${url}/alerts/subscriber/deactivate?token=${token}`;
+    return this._http.post(endpoint, {});
   }
 
 }
