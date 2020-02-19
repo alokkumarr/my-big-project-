@@ -11,6 +11,7 @@ import {
   AddAlertComponent
 } from './components/configure/index';
 import { AlertUnsubscribe } from './components/alert-unsubscribe/alert-unsubscribe.component';
+
 export const routes: Routes = [
   {
     path: '',

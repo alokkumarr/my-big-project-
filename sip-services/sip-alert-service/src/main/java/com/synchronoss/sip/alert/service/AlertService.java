@@ -73,8 +73,6 @@ public interface AlertService {
 
   AlertSubscriberToken extractSubscriberToken(String token);
 
-  Boolean activateSubscriber(String alertRulesSysId, String alertTriggerSysId, String email);
-
   Boolean deactivateSubscriber(String alertRulesSysId, String alertTriggerSysId, String email);
 
   List<Subscriber> fetchInactiveSubscriberByAlertId(String alertRuleSysId);

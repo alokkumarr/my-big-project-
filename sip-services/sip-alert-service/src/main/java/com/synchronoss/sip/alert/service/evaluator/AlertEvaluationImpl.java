@@ -40,8 +40,7 @@ import sncr.bda.base.MaprConnection;
 public class AlertEvaluationImpl implements AlertEvaluation {
 
   private static final Logger logger = LoggerFactory.getLogger(AlertEvaluationImpl.class);
-  @Autowired
-  AlertNotifier alertNotifier;
+  @Autowired AlertNotifier alertNotifier;
   private RestTemplate restTemplate;
   @Autowired private RestUtil restUtil;
 
@@ -160,7 +159,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
               }
               connection.insert(alertResult.getAlertTriggerSysId(), alertResult);
               logger.info("Sending Notification for Alert: " + alertRuleDetails.getAlertRuleName());
-              alertNotifier.sendNotification(alertRuleDetails,alertResult.getAlertTriggerSysId());
+              alertNotifier.sendNotification(alertRuleDetails, alertResult.getAlertTriggerSysId());
             } else {
               updateAlertResultAndSubscriptionStatus(alertRuleDetails);
             }
@@ -178,7 +177,8 @@ public class AlertEvaluationImpl implements AlertEvaluation {
 
   private void updateAlertResultAndSubscriptionStatus(AlertRuleDetails alertRuleDetails) {
     List<AlertResult> alertResultList =
-        getLastAlertResultByAlertRuleId(alertRuleDetails.getAlertRulesSysId());
+        AlertUtils.getLastAlertResultByAlertRuleId(
+            alertRuleDetails.getAlertRulesSysId(), basePath, alertResults);
     if (alertResultList.size() > 0) {
       AlertResult alertResult = alertResultList.get(0);
       if (alertResult.getAlertState() == AlertState.ALARM) {
@@ -338,23 +338,14 @@ public class AlertEvaluationImpl implements AlertEvaluation {
    * @return list
    */
   public Boolean checkAlertResultBasedOnLastTrigger(String alertRuleId, Long lastTriggeredWindow) {
-    List<AlertResult> alertResults = getLastAlertResultByAlertRuleId(alertRuleId);
-    if (alertResults.size() > 0) {
+    List<AlertResult> alertResultsList =
+        AlertUtils.getLastAlertResultByAlertRuleId(alertRuleId, basePath, alertResults);
+    if (alertResultsList.size() > 0) {
       // Add one minute grace period to last trigger time for evaluation
       // in case alert Evaluation takes time.
-      return (alertResults.get(0).getStartTime() <= lastTriggeredWindow + 60000) ? true : false;
+      return (alertResultsList.get(0).getStartTime() <= lastTriggeredWindow + 60000) ? true : false;
     } else {
       return true;
     }
-  }
-
-  private List<AlertResult> getLastAlertResultByAlertRuleId(String alertRulesSysId) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    ObjectNode node = objectMapper.createObjectNode();
-    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
-    objectNode.put(AlertUtils.ALERT_RULE_SYS_ID, alertRulesSysId);
-    MaprConnection connection = new MaprConnection(basePath, alertResults);
-    return connection.runMaprDbQueryWithFilter(
-        node.toString(), 1, 1, AlertUtils.START_TIME, AlertResult.class);
   }
 }

@@ -1,10 +1,13 @@
 package com.synchronoss.sip.alert.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.saw.model.Model.Operator;
 
+import com.synchronoss.sip.alert.modal.AlertResult;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -30,6 +33,7 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import sncr.bda.base.MaprConnection;
 
 
 @Component
@@ -288,9 +292,9 @@ public class AlertUtils {
   }
 
   public static AlertSubscriberToken parseSubscriberToken(String token, String secretKey) {
-    Claims ssoToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     // Check if the Token is valid
     try {
+      Claims ssoToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
       Set<Entry<String, Object>> entrySet =
           ((Map<String, Object>) ssoToken.get(ALERT_SUBSCRIBER)).entrySet();
       String alertRulesSysId = null,
@@ -302,7 +306,7 @@ public class AlertUtils {
         if (pair.getKey().equals("alertRulesSysId")) {
           alertRulesSysId = pair.getValue().toString();
         }
-        if (pair.getKey().equals("alertRulesSysId")) {
+        if (pair.getKey().equals("alertTriggerSysId")) {
           alertTriggerSysId = pair.getValue().toString();
         }
         if (pair.getKey().equals("emailId")) {
@@ -324,5 +328,16 @@ public class AlertUtils {
     } catch (Exception exception) {
       throw exception;
     }
+  }
+
+   public static List<AlertResult> getLastAlertResultByAlertRuleId(
+      String alertRulesSysId, String basePath, String alertResultsTable) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put(ALERT_RULE_SYS_ID, alertRulesSysId);
+    MaprConnection connection = new MaprConnection(basePath, alertResultsTable);
+    return connection.runMaprDbQueryWithFilter(
+        node.toString(), 1, 1, AlertUtils.START_TIME, AlertResult.class);
   }
 }

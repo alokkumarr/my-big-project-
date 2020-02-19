@@ -81,7 +81,7 @@ public class AlertServiceImpl implements AlertService {
 
   @Value("${sip.service.metastore.alertResults}")
   @NotNull
-  private String alertTriggerLog;
+  private String alertResults;
 
   @Value("${sip.service.metastore.subscribersTable}")
   @NotNull
@@ -97,7 +97,7 @@ public class AlertServiceImpl implements AlertService {
   public void init() {
     try {
       MaprConnection alertRuleTableConnection = new MaprConnection(basePath, alertRulesMetadata);
-      MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertTriggerLog);
+      MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertResults);
     } catch (OjaiException e) {
       LOGGER.error("Error occurred while setup tables {}", e);
     }
@@ -311,7 +311,7 @@ public class AlertServiceImpl implements AlertService {
       Integer pageSize,
       Ticket ticket) {
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
     LOGGER.info("Inside states:");
 
     List<AlertFilter> alertFilters = new ArrayList<>();
@@ -365,7 +365,7 @@ public class AlertServiceImpl implements AlertService {
     alertFilters.add(customerFilter);
     query = getMaprQueryForFilter(alertFilters);
     LOGGER.trace("Mapr Query for the filter:{}", query);
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
     List<AlertResult> alertResultLists =
         connection.runMaprDbQuery(query, pageNumber, pageSize, sorts, AlertResult.class);
     Long noOfRecords = connection.runMapDbQueryForCount(query);
@@ -484,7 +484,7 @@ public class AlertServiceImpl implements AlertService {
     }
 
     String query = getMaprQueryForFilter(alertFilters);
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
     LOGGER.trace("Mapr Filter query for alert count:{}", query);
     List<AlertResult> result =
         connection.runMaprDbQueryWithFilter(
@@ -534,9 +534,25 @@ public class AlertServiceImpl implements AlertService {
       String alertRulesSysId, String alertTriggerSysId, String email) {
     Boolean status;
 
-    Subscriber subscriber =
-        fetchSubscriberByAlertIdAndEmail(alertRulesSysId, alertTriggerSysId, email);
+    List<AlertResult> alertResultList =
+        AlertUtils.getLastAlertResultByAlertRuleId(alertRulesSysId, basePath, alertResults);
 
+    if (alertResultList != null && alertResultList.size() != 0) {
+      String lastAlertTrigger = alertResultList.get(0).getAlertTriggerSysId();
+
+      LOGGER.trace("Alert Trigger sys id = " + alertTriggerSysId);
+      LOGGER.trace("Last alert trigger = {}", lastAlertTrigger);
+
+      if (!lastAlertTrigger.equals(alertTriggerSysId)) {
+        // in case there is a mismatch in the incoming trigger ID and last trigger ID,
+        // throw error here
+        throw new SipAlertRunTimeExceptions("Alert trigger ID is invalid");
+      }
+    }
+
+
+    Subscriber subscriber =
+        fetchSubscriberByAlertIdAndEmail(alertRulesSysId, email);
 
     LOGGER.trace("Subscriber = " + subscriber);
 
@@ -551,7 +567,6 @@ public class AlertServiceImpl implements AlertService {
       subscriber.setCreatedTime(new Date());
       subscriber.setModifiedTime(new Date());
     } else {
-        // TODO: Remove subscriber id
       LOGGER.trace("Subscriber found");
       subscriber.setActive(false);
       subscriber.setModifiedTime(new Date());
@@ -564,31 +579,23 @@ public class AlertServiceImpl implements AlertService {
     return status;
   }
 
-  @Override
-  public Boolean activateSubscriber(
-      String alertRulesSysId, String alertTriggerSysId, String email) {
-    throw new RuntimeException("Not implemented yet");
-  }
-
   public AlertSubscriberToken extractSubscriberToken(String tokenStr) {
-      AlertSubscriberToken token = AlertUtils.parseSubscriberToken(tokenStr, subscriberSecretKey);
+    AlertSubscriberToken token = AlertUtils.parseSubscriberToken(tokenStr, subscriberSecretKey);
 
-      return token;
+    return token;
   }
 
   private Subscriber fetchSubscriberByAlertIdAndEmail(
-      String alertRuleSysId, String alertTriggerSysId, String email) {
+      String alertRuleSysId, String email) {
     MaprConnection connection = new MaprConnection(basePath, subscribersTable);
 
-    String query = prepareSubscriberQuery(alertRuleSysId, alertTriggerSysId, email);
+    String query = prepareSubscriberQuery(alertRuleSysId, email);
     LOGGER.trace("Mapr query for alert subscriber:{}", query);
     List<Subscriber> result =
         connection.runMaprDbQueryWithFilter(query, null, null, null, Subscriber.class);
 
-    if (result != null && result.size() != 0)
-        return result.get(0);
-    else
-        return null;
+    if (result != null && result.size() != 0) return result.get(0);
+    else return null;
   }
 
   @Override
@@ -627,7 +634,7 @@ public class AlertServiceImpl implements AlertService {
   }
 
   private String prepareSubscriberQuery(
-      String alertRuleSysId, String alertTriggerSysId, String email) {
+      String alertRuleSysId, String email) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
 
@@ -638,12 +645,6 @@ public class AlertServiceImpl implements AlertService {
     alertRuleEqNode.put("alertRulesSysId", alertRuleSysId);
 
     arrayNode.add(alertRuleNode);
-
-//    ObjectNode alertTriggerNode = objectMapper.createObjectNode();
-//    ObjectNode alertTriggerEqNode = alertTriggerNode.putObject(MaprConnection.EQ);
-//    alertTriggerEqNode.put("alertTriggerSysId", alertTriggerSysId);
-//
-//    arrayNode.add(alertTriggerNode);
 
     ObjectNode emailNode = objectMapper.createObjectNode();
     ObjectNode emailEqNode = emailNode.putObject(MaprConnection.EQ);

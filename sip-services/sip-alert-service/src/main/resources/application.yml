@@ -23,9 +23,9 @@ sip:
     index: 0
     alert:
       dashborad:
-        url: http://<hostname>.sncrbda.dev.cloud.synchronoss.net/sip/web/#/alerts/view
+        url: http://<hostname>/sip/web/#/alerts/view
       unsubscribe:
-        url: http://<hostname>/alerts/unsubscribe?rhc=%s
+        url: http://<hostname>/sip/services/alerts/subscriber/deactivate?token=%s
       mail:
         body: "Hello  </br> Below alert has created for configured Alert Rule:  $alertRuleName .</br>Alert Name: $alertRuleName </br>Alert Description: $alertRuleDescription </br>Category: $category </br>Metric Threshold: $thresholdValue </br>Attribute Name: $attributeName </br>Attribute Value: $attributeValue </br>Lookback Period: $lookbackPeriod</br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br> <a href= $unsubscribeLink>click here to unsubscribe </a> </br></br>Regards,<br>Synchronoss Analytics Team </br>"
         subject: "Alert Notification"
@@ -47,6 +47,7 @@ sip:
     max-number-of-alert-per-rules: 10000
   ssl:
     enable: false
+
 subscriber:
     secret:
       key : "900jrYTKR1FWFgQjMMuA"
