@@ -538,9 +538,8 @@ public class AlertServiceImpl implements AlertService {
         AlertUtils.getLastAlertResultByAlertRuleId(alertRulesSysId, basePath, alertResults);
 
     if (alertResultList == null || alertResultList.size() == 0) {
-        throw new SipAlertRunTimeExceptions("Alert trigger ID is invalid");
-    }
-    else {
+      throw new SipAlertRunTimeExceptions("Alert trigger ID is invalid");
+    } else {
       String lastAlertTrigger = alertResultList.get(0).getAlertTriggerSysId();
 
       LOGGER.trace("Alert Trigger sys id = " + alertTriggerSysId);
@@ -553,9 +552,7 @@ public class AlertServiceImpl implements AlertService {
       }
     }
 
-
-    Optional<Subscriber> subscriberObj =
-        fetchSubscriberByAlertIdAndEmail(alertRulesSysId, email);
+    Optional<Subscriber> subscriberObj = fetchSubscriberByAlertIdAndEmail(alertRulesSysId, email);
 
     Subscriber subscriber = null;
     if (!subscriberObj.isPresent()) {
@@ -598,10 +595,8 @@ public class AlertServiceImpl implements AlertService {
     List<Subscriber> result =
         connection.runMaprDbQueryWithFilter(query, null, null, null, Subscriber.class);
 
-    if (result != null && result.size() != 0)
-      return Optional.of(result.get(0));
-    else
-      return Optional.empty();
+    if (result != null && result.size() != 0) return Optional.of(result.get(0));
+    else return Optional.empty();
   }
 
   @Override
@@ -639,8 +634,7 @@ public class AlertServiceImpl implements AlertService {
     return status;
   }
 
-  private String prepareSubscriberQuery(
-      String alertRuleSysId, String email) {
+  private String prepareSubscriberQuery(String alertRuleSysId, String email) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
 

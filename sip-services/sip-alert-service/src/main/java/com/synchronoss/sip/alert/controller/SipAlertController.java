@@ -606,7 +606,7 @@ public class SipAlertController {
   @ApiOperation(value = "/subscriber/deactivate", response = String.class)
   @RequestMapping(
       value = "/subscriber/deactivate",
-      method = RequestMethod.GET,
+      method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public String deactivateSubscriber(
