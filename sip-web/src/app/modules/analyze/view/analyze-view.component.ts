@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { LocalStorageService } from 'angular-2-local-storage';
 import { Store } from '@ngxs/store';
 import * as findIndex from 'lodash/findIndex';
 import * as reduce from 'lodash/reduce';
 import * as values from 'lodash/values';
-
+import * as isEmpty from 'lodash/isEmpty';
 import { JwtService } from '../../../common/services';
 import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
@@ -44,7 +43,6 @@ export class AnalyzeViewComponent implements OnInit {
   public cronJobs: any;
   public LIST_VIEW = 'list';
   public CARD_VIEW = 'card';
-  public analysisId: string;
   public canUserCreate: boolean;
   public viewMode = this.LIST_VIEW;
   public privileges = {
@@ -68,7 +66,6 @@ export class AnalyzeViewComponent implements OnInit {
     public _analyzeService: AnalyzeService,
     public _router: Router,
     public _route: ActivatedRoute,
-    public _localStorage: LocalStorageService,
     public _jwt: JwtService,
     public _localSearch: LocalSearchService,
     public _toastMessage: ToastService,
@@ -95,23 +92,29 @@ export class AnalyzeViewComponent implements OnInit {
     this._route.params.subscribe(params => {
       this.onParamsChange(params);
     });
-    const savedView = <string>this._localStorage.get(VIEW_KEY);
+    const savedView = <string>localStorage.getItem(VIEW_KEY);
     this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView)
       ? savedView
       : this.LIST_VIEW;
   }
 
   onParamsChange(params) {
-    this.analysisId = params.id;
-    this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
-      subCategoryId: this.analysisId
+    this.subCategoryId = params.id;
+    const subCategoryId = this.subCategoryId;
+    const privilegeName = 'CREATE';
+    const hasPrivilegeForCurrentFolder = this._jwt.hasPrivilege(privilegeName, {
+      subCategoryId
     });
-
+    const hasPrivilegeForDraftsFolder = this._jwt.hasPrivilegeForDraftsFolder(
+      privilegeName
+    );
+    this.canUserCreate =
+      hasPrivilegeForCurrentFolder && hasPrivilegeForDraftsFolder;
     this.categoryName = this._analyzeService
-      .getCategory(this.analysisId)
+      .getCategory(this.subCategoryId)
       .then(category => category.name);
 
-    this.getCronJobs(this.analysisId);
+    this.getCronJobs(this.subCategoryId);
   }
 
   onAction(event: AnalyzeViewActionEvent) {
@@ -119,7 +122,7 @@ export class AnalyzeViewComponent implements OnInit {
       case 'fork': {
         const { analysis, requestExecution } = event;
         if (analysis) {
-          this.loadAnalyses(this.analysisId).then(() => {
+          this.loadAnalyses(this.subCategoryId).then(() => {
             if (requestExecution) {
               this._executeService.executeAnalysis(
                 analysis,
@@ -160,7 +163,7 @@ export class AnalyzeViewComponent implements OnInit {
 
   onViewChange(view) {
     this.viewMode = view;
-    this._localStorage.set(VIEW_KEY, view);
+    localStorage.setItem(VIEW_KEY, view);
   }
 
   onAnalysisTypeChange(type) {
@@ -204,6 +207,10 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   openNewAnalysisModal() {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    if (isEmpty(metrics)) {
+      return false;
+    }
     this.store.dispatch(new CommonLoadAllMetrics());
     this.store
       .select(state => state.common.metrics)
@@ -220,7 +227,7 @@ export class AnalyzeViewComponent implements OnInit {
             autoFocus: false,
             data: {
               metrics,
-              id: this.analysisId
+              id: this.subCategoryId
             }
           } as MatDialogConfig)
           .afterClosed()
@@ -230,7 +237,7 @@ export class AnalyzeViewComponent implements OnInit {
             }
             const { analysis, requestExecution } = event;
             if (analysis) {
-              this.loadAnalyses(this.analysisId).then(() => {
+              this.loadAnalyses(this.subCategoryId).then(() => {
                 if (requestExecution) {
                   this._executeService.executeAnalysis(
                     analysis,
@@ -248,10 +255,10 @@ export class AnalyzeViewComponent implements OnInit {
     this.filteredAnalyses = [...this.analyses];
   }
 
-  loadAnalyses(analysisId) {
+  loadAnalyses(subCategoryId) {
     return this.store
       .dispatch(new CommonLoadAllMetrics())
-      .pipe(switchMap(() => this._analyzeService.getAnalysesFor(analysisId)))
+      .pipe(switchMap(() => this._analyzeService.getAnalysesFor(subCategoryId)))
       .toPromise()
       .then(this.prepareLoadedAnalyses.bind(this));
   }

@@ -16,7 +16,7 @@ public class Valid implements Serializable {
 	 */
 	private static final long serialVersionUID = -6682525829922872306L;
 	
-	private Boolean valid;
+	private boolean valid;
 	private String validityMessage;
 	private String error;
 	
@@ -38,7 +38,7 @@ public class Valid implements Serializable {
 	public void setValidityMessage(String validityMessage) {
 		this.validityMessage = validityMessage;
 	}
-	
-	
+
+
 
 }

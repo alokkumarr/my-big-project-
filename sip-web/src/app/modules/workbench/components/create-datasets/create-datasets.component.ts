@@ -1,12 +1,11 @@
 import { MatDialog } from '@angular/material';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import * as isUndefined from 'lodash/isUndefined';
-
+import * as cloneDeep from 'lodash/cloneDeep';
 import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs';
 
 import { ParserPreviewComponent } from './parser-preview/parser-preview.component';
@@ -14,6 +13,8 @@ import { DatasetDetailsComponent } from './dataset-details/dataset-details.compo
 import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog.component';
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
+import { isUnique } from 'src/app/common/validators';
+import { DS_NAME_PATTERN, DS_NAME_PATTERN_HINT_ERROR } from '../../consts';
 
 @Component({
   selector: 'create-datasets',
@@ -33,7 +34,9 @@ export class CreateDatasetsComponent implements OnInit {
   public parserConf: any; // tslint:disable-line
   public nameFormGroup: FormGroup;
   public selectedIndex = 0;
-  public folNamePattern = '[A-Za-z0-9]+';
+  public listOfDS: any[] = [];
+  public folNamePattern = cloneDeep(DS_NAME_PATTERN);
+  public dsNameHintAndError = cloneDeep(DS_NAME_PATTERN_HINT_ERROR);
 
   constructor(
     public router: Router,
@@ -42,27 +45,33 @@ export class CreateDatasetsComponent implements OnInit {
     public notify: ToastService
   ) {}
 
-  @ViewChild('previewComponent')
+  @ViewChild('previewComponent', { static: false })
   public previewComponent: ParserPreviewComponent;
-  @ViewChild('detailsComponent')
+  @ViewChild('detailsComponent', { static: true })
   public detailsComponent: DatasetDetailsComponent;
 
   ngOnInit() {
     this.csvConfig = cloneDeep(CSV_CONFIG);
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
-      nameControl: new FormControl('', [
-        Validators.required,
-        Validators.pattern(this.folNamePattern),
-        Validators.minLength(3),
-        Validators.maxLength(25)
-      ]),
+      nameControl: new FormControl(
+        '',
+        Validators.compose([
+          Validators.required,
+          Validators.pattern(this.folNamePattern),
+          Validators.minLength(3),
+          Validators.maxLength(25)
+        ]),
+        isUnique(this.doesDSNameExist.bind(this), val => val, '')
+      ),
       descControl: new FormControl('', [
         Validators.required,
         Validators.minLength(5),
         Validators.maxLength(99)
       ])
     });
+
+    this.getListOfDatasets();
   }
 
   stepChanged(event) {
@@ -151,5 +160,31 @@ export class CreateDatasetsComponent implements OnInit {
 
   backtoLists() {
     this.router.navigate(['workbench', 'dataobjects']);
+  }
+
+  /**
+   * Convert the dataset name to uppercase.
+   * Added as part of SIP-9001.
+   */
+  changedToUppercase(event) {
+    this.nameFormGroup.patchValue({
+      nameControl: event.target.value.toUpperCase()
+    });
+  }
+
+  getListOfDatasets() {
+    this.workBench.getDatasets().subscribe((data: any[]) => {
+      this.listOfDS = data.map(res => {
+        return res.system.name;
+      });
+    });
+  }
+
+  /**
+   *
+   * @param name Provides DS name in NameFormGroup.
+   */
+  doesDSNameExist(name: string): Observable<boolean> {
+    return of(this.listOfDS.includes(name));
   }
 }

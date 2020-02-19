@@ -1,6 +1,11 @@
 <mat-toolbar>
   <mat-toolbar-row fxLayoutGap="5px">
-    <button (click)="goBack()" mat-icon-button style="margin-right: 10px;">
+    <button
+      e2e="e2e-back-btn"
+      (click)="goBack()"
+      mat-icon-button
+      style="margin-right: 10px;"
+    >
       <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
     </button>
     <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center">
@@ -41,7 +46,7 @@
   [showColumnLines]="false"
   [paging]="paging"
   [remoteOperations]="remoteOperations"
-  [height]="'calc(100% - 40px)'"
+  [height]="'calc(100% - 150px)'"
   [rowAlternationEnabled]="true"
   rowTemplate="logTableRowTemplate"
   e2e="job-logs-container"

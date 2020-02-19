@@ -43,8 +43,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.Optional;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -86,8 +90,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private JavaRDD<Row> rejectedDataCollector;
     private JavaRDD<Row> acceptedDataCollector;
-    
+
     private boolean isRealTime;
+    private long inputDSCount = 0;
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
@@ -122,7 +127,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 	@SuppressWarnings("unchecked")
 	@Override
     protected int execute(){
-		
+
 		
 		logger.debug(":::: parser execute   :::"+ ngctx.componentConfiguration.getParser());
         int retval = 0;
@@ -166,19 +171,31 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 					}
 				}
 
-				FileSystem fs = HFileOperations.getFileSystem();
-				FileStatus[] files = fs.globStatus(new Path(sourcePath));
-
-				if (files.length <= 0) {
-					return 0;
-				}
-
-			} catch (Exception e) {
-				logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
-				logger.error(e.getMessage());
-			} 
+                FileSystem fs = HFileOperations.getFileSystem();
+                logger.debug("Input Source Path = " + sourcePath);
+                Path inputPath = new Path(sourcePath);
+                FileStatus[] files = fs.globStatus(inputPath);
+                if(files != null && files.length == 1 && files[0].isDirectory()){
+                    logger.debug("Files length = 1 and is a directory");
+                    // If so - we have to process all the files inside - create the mask
+                    sourcePath += Path.SEPARATOR + "*";
+                    // ... and query content
+                    files = fs.globStatus(new Path(sourcePath));
+                }
+                if(files == null || files.length == 0){
+                    logger.debug("No files exist. files = " + files);
+                    throw new XDFException(XDFReturnCode.FILE_NOT_FOUND, "parser input file - " +  sourcePath);
+                }
+            } catch (Exception e) {
+                if (e instanceof XDFException) {
+                    throw ((XDFException)e);
+                }else {
+                    String error = "Error while deletion of outputDataSetLocation " + outputDataSetLocation;
+                    logger.error(error);
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e, error);
+                }
+            }
 		}
-
 		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
 			logger.debug("format csv");
 			
@@ -209,7 +226,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             // Output data set
             if (ngctx.outputDataSets.size() == 0) {
                 logger.error("Output dataset not defined");
-                return -1;
+                 return -1;
             }
 
             logger.debug("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
@@ -286,7 +303,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
 
                         ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-                        logger.debug("####### end of parser after caching "+ outputDS.count());
+                        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+                        //TODO: This is a crude way of checking. This need to be revisited.
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("####### end of parser after caching " + outputDS.count());
+                        }
                     }
                     else {
                         outputColumns =
@@ -322,19 +343,16 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         logger.warn("Unable to write rejected data");
                     }
                 }
-
-            }catch (IOException e){
-                logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
-                retval =  -1;
-            } catch (Exception e) {
-                logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
-                retval =  -1;
+            }catch (Exception e) {
+                logger.error("Exception in parser module: ",e);
+                if (e instanceof XDFException) {
+                    throw ((XDFException)e);
+                }else {
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+                }
             }
-            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-
-            logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
-
-        } else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.JSON))
+        }
+		else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
@@ -342,58 +360,66 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
 
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
-             inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
-
-            logger.debug("RECORD COUNT IS " + inputDataset.count());
-
-            
-            this.recCounter.setValue(inputDataset.count());
+            inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
+            inputDSCount = inputDataset.count();
+            this.recCounter.setValue(inputDSCount);
+            //This will throw an error if Dataset is Empty
+            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
+                throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
+            }
 
             commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
 
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
-            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-            logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
-         } else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))    {
-        
+         }
+		else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
+		{
+            NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
+            Dataset<Row> inputDataset = null;
 
-                NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
-                Dataset<Row> inputDataset = null;
-                
-                if (inputDataFrame != null) {
-    				inputDataset = inputDataFrame;
-    			} else {
-    				inputDataset = parquetFileParser.parseInput(sourcePath);
-    			}
-                this.recCounter.setValue(inputDataset.count());
-
-                commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
-
-                ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
-                    outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
-                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-                logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
-            } else if(this.inputDataFrame != null) {
-
-
-                inputDataFrame.show();
-                this.recCounter.setValue(inputDataFrame.count());
-
-                commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
-
-                ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
-                    outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
-
-                logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
-            
-            	
-            	
+            if (inputDataFrame != null) {
+                inputDataset = inputDataFrame;
+            } else {
+                inputDataset = parquetFileParser.parseInput(sourcePath);
+            }
+            inputDSCount = inputDataset.count();
+            this.recCounter.setValue(inputDSCount);
+            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
+                throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
 
+            commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
+
+            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+		}
+		else if(this.inputDataFrame != null)
+		{
+            inputDataFrame.show();
+            inputDSCount = inputDataFrame.count();
+            this.recCounter.setValue(inputDSCount);
+            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
+                throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
+            }
+            commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+
+            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
+        }
+
+        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+        //TODO: This is a crude way of checking. This need to be revisited.
+        if(
+            //logger.isDebugEnabled() &&
+                ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
+            logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+        }
+        logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
+        validateOutputDSCounts(inputDSCount);
         return retval;
     }
 	
@@ -403,11 +429,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
         sncr.bda.conf.Parser parserProps = compConf.getParser();
         if (parserProps == null) {
-            throw new XDFException( XDFException.ErrorCodes.InvalidConfFile);
+            throw new XDFException( XDFReturnCode.INVALID_CONF_FILE);
         }
 
         if(parserProps.getFile() == null || parserProps.getFile().length() == 0){
-            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+            throw new XDFException(XDFReturnCode.INVALID_CONF_FILE);
         }
 
         return compConf;
@@ -476,6 +502,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(sourcePath, outputNOF);
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
+        inputDSCount = rdd.count();
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
+            throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
+        }
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
@@ -560,6 +590,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 }
             }
         }
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
+            throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
+        }
         return 0;
     }
 
@@ -571,105 +604,108 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
                 .textFile(file.toString(), 1);
 
-
-        JavaRDD<Row> parseRdd = rdd
+        JavaRDD<String> rddWithoutHeader = rdd
                 // Add line numbers
                 .zipWithIndex()
                 // Filter out header based on line number
                 .filter(new HeaderFilter(headerSize))
                 // Get rid of file numbers
-                .keys()
-                .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                    quoteEscapeChar, '\'', recCounter, errCounter));
-
-        
-     // Create output dataset
-        JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
-        logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
-        JavaRDD<Row> outputRdd = getOutputData(parseRdd);
+                .keys();
+        long rddCount = rddWithoutHeader.count();
+        logger.info("RDD Count is : " + rddCount);
         int rc = 0;
-        scala.collection.Seq<Column> outputColumns = null;
-        if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
-        {
-            outputColumns =
-                scala.collection.JavaConversions.asScalaBuffer(
-                    createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+        if(!ngctx.componentConfiguration.isErrorHandlingEnabled() || rddCount > 0) {
+            inputDSCount += rddCount;
+            JavaRDD<Row> parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
+                quoteEscapeChar, '\'', recCounter, errCounter));
+            // Create output dataset
+            JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
+            logger.debug("####### Rejected RDD COUNT:: " + rejectedRdd.count());
+            JavaRDD<Row> outputRdd = getOutputData(parseRdd);
+            scala.collection.Seq<Column> outputColumns = null;
+            if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0) {
+                outputColumns =
+                    scala.collection.JavaConversions.asScalaBuffer(
+                        createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
 
-            Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+                Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
-            logger.debug("Output rdd length = " + recCounter.value() +"\n");
-            logger.debug("Rejected rdd length = " + errCounter.value() +"\n");
-            logger.debug("Dest dir for file " + file + " = " + destDir +"\n");
+                logger.debug("Output rdd length = " + recCounter.value() + "\n");
+                logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
+                logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
 
-        rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
-            logger.debug("************************************** Dest dir for file " + file + " = " + destDir +"\n");
+                rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
+                logger.debug("************************************** Dest dir for file " + file + " = " + destDir + "\n");
 
 
-            logger.debug("Write dataset status = " + rc);
-        }
-        else {
+                logger.debug("Write dataset status = " + rc);
+            } else {
 
-            outputColumns =
-                scala.collection.JavaConversions.asScalaBuffer(
-                    createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
+                outputColumns =
+                    scala.collection.JavaConversions.asScalaBuffer(
+                        createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
 
-            Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+                Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
-            Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
+                Map<String, String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
 
-            Dataset filterOutputDS = null;
-            Dataset renameOutputDS = df;
+                Dataset filterOutputDS = null;
+                Dataset renameOutputDS = df;
 
-            for (Map.Entry<String, String> e : columnRenameList.entrySet()) {
-                String origin = e.getKey();
-                String destination = e.getValue();
-                filterOutputDS = renameOutputDS.withColumnRenamed(origin,destination);
-                renameOutputDS = filterOutputDS;
+                for (Map.Entry<String, String> e : columnRenameList.entrySet()) {
+                    String origin = e.getKey();
+                    String destination = e.getValue();
+                    filterOutputDS = renameOutputDS.withColumnRenamed(origin, destination);
+                    renameOutputDS = filterOutputDS;
+                }
+
+                logger.debug("Output rdd length = " + recCounter.value() + "\n");
+                logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
+                logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
+
+                logger.debug("************************************** Dest dir for file " + file + " = " + destDir + "\n");
+
+                filterOutputDS.printSchema();
+                filterOutputDS.show(5);
+
+                rc = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, destDir.toString(), "append");
+
+                logger.debug("Write dataset status = " + rc);
             }
 
-            logger.debug("Output rdd length = " + recCounter.value() +"\n");
-            logger.debug("Rejected rdd length = " + errCounter.value() +"\n");
-            logger.debug("Dest dir for file " + file + " = " + destDir +"\n");
 
-            logger.debug("************************************** Dest dir for file " + file + " = " + destDir +"\n");
-
-            filterOutputDS.printSchema();
-            filterOutputDS.show(5);
-
-            rc = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, destDir.toString(), "append");
+            //Filter out Accepted Data
+            collectAcceptedData(parseRdd, outputRdd);
 
             logger.debug("Write dataset status = " + rc);
+
+            //Filter out Rejected Data
+            collectRejectedData(parseRdd, outputRdd);
         }
-
-
-        //Filter out Accepted Data
-        collectAcceptedData(parseRdd,outputRdd);
-
-        logger.debug("Write dataset status = " + rc);
-
-        //Filter out Rejected Data
-        collectRejectedData(parseRdd, outputRdd);
         return rc;
     }
     
     private int parseDataFrame(Dataset<String> dataFrame, Path destDir){
-    	JavaRDD<String> rdd = dataFrame.rdd().toJavaRDD();
         logger.debug("parsing dataframe starts here");
         logger.debug("Headersize is: " + headerSize);
-    	JavaRDD<Row> parseRdd = null;
+        JavaRDD<String> rdd = dataFrame.rdd().toJavaRDD();
+        JavaRDD<String> rddWithoutHeader = null;
     	if (headerSize >= 1) {
-			parseRdd = rdd
+            rddWithoutHeader = rdd
 					// Add line numbers
 					.zipWithIndex()
 					// Filter out header based on line number
 					.filter(new HeaderFilter(headerSize))
 					// Get rid of file numbers
-					.keys().map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-							quoteEscapeChar, '\'', recCounter, errCounter));
+					.keys();
 		} else {
-			parseRdd = rdd.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-					'\'', recCounter, errCounter));
+            rddWithoutHeader = rdd;
 		}
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && rddWithoutHeader.count() == 0){
+            throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
+        }
+        JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
+            '\'', recCounter, errCounter));
 	    // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(
@@ -705,9 +741,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             } else {
                 acceptedDataCollector = acceptedDataCollector.union(acceptedRdd);
             }
-            
-            
-            logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
+
+
+             //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+             //TODO: This is a crude way of checking. This need to be revisited.
+            if(logger.isDebugEnabled()) {
+                logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
+            }
 
         } catch (Exception exception) {
             logger.error(exception);
@@ -926,9 +966,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
 
     public static void main(String[] args) {
-
         NGContextServices ngCtxSvc;
         CliHandler cli = new CliHandler();
+        NGParser component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
             long start_time = System.currentTimeMillis();
 
@@ -938,22 +980,22 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices pcs[] = {
@@ -971,21 +1013,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.warn(id)
             );
             logger.warn(ngCtxSvc.getNgctx().toString());
-            NGParser component = new NGParser(ngCtxSvc.getNgctx());
-            if (!component.initComponent(null))
-                System.exit(-1);
-            int rc = component.run();
-
-            long end_time = System.currentTimeMillis();
-            long difference = end_time-start_time;
-            logger.info("Parser total time " + difference );
-            System.exit(rc);
-        } catch (Exception e) {
-        	logger.error("Exception is : " + e + "\n");
-            System.exit(-1);
+            component = new NGParser(ngCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                long end_time = System.currentTimeMillis();
+                long difference = end_time - start_time;
+                logger.info("Parser total time " + difference);
+            }
+        }catch (Exception ex) {
+            exception = ex;
         }
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        System.exit(rc);
     }
-    
     
     private static List<Column> createParserOutputFieldList(List<OutputFieldsList> outputs){
 

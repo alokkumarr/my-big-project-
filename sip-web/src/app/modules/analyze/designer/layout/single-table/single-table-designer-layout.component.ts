@@ -8,7 +8,7 @@ import * as get from 'lodash/get';
 import { Artifact, DesignerChangeEvent, Sort, Filter } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
-import { QueryDSL } from 'src/app/models';
+import { QueryDSL, ArtifactColumn } from 'src/app/models';
 import { DesignerService } from '../../designer.service';
 
 // the delay needed to animate opening and closing the sidemenus
@@ -56,6 +56,7 @@ export class SingleTableDesignerLayoutComponent {
     {}
   );
   public config: PerfectScrollbarConfigInterface = {};
+  public artifactCol: ArtifactColumn;
 
   constructor(
     breakpointObserver: BreakpointObserver,
@@ -126,5 +127,12 @@ export class SingleTableDesignerLayoutComponent {
       case 'pivot':
         return 'icon-pivot';
     }
+  }
+
+  changeDataOptions(event) {
+    if (event.subject === 'seriesColorChange') {
+      this.artifactCol = event.data;
+    }
+    this.change.emit(event);
   }
 }

@@ -28,6 +28,7 @@ public enum DataSetProperties {
         modifiedBy("modifiedBy"),
         Description("description"),
         UserData("userdata"),
+        DataSource("dataSource"),
         Id("_id"),
         Status("status"),
         Project("project"),

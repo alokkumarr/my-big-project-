@@ -198,6 +198,98 @@ public class ApiPullServiceImpl extends SipPluginContract {
     StringBuffer connectionLogs = new StringBuffer();
 
     logger.info("Inside connectChannel");
+    Optional<BisChannelEntity> bisChannelEntity = this.findChannelById(entityId);
+
+    if (!bisChannelEntity.isPresent()) {
+      throw new SipNestedRuntimeException(
+          "Unable to extract channel information for channel id: " + entityId);
+    }
+
+    BisChannelEntity channelEntity = bisChannelEntity.get();
+
+    String channelMetadataStr = channelEntity.getChannelMetadata();
+
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
+    Gson gson = gsonBuilder.create();
+
+    ApiChannelMetadata apiChannelMetadata =
+        gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+
+    SipApiRequest apiRequest = new SipApiRequest();
+
+    String hostName = apiChannelMetadata.getHostAddress();
+    Integer port = apiChannelMetadata.getPort();
+
+    String httpMethodStr = apiChannelMetadata.getHttpMethod().toString();
+    if (httpMethodStr != null) {
+      HttpMethod method = HttpMethod.fromValue(httpMethodStr);
+
+      apiRequest.setHttpMethod(method);
+    }
+
+    String apiEndPoint = apiChannelMetadata.getApiEndPoint();
+
+    String url = generateUrl(hostName, port, apiEndPoint);
+
+    apiRequest.setUrl(url);
+
+    List<QueryParameter> queryParameters = apiChannelMetadata.getQueryParameters();
+
+    if (queryParameters != null && !queryParameters.isEmpty()) {
+      apiRequest.setQueryParameters(queryParameters);
+    }
+
+    List<HeaderParameter> headerParameters = apiChannelMetadata.getHeaderParameters();
+
+    if (headerParameters != null && !headerParameters.isEmpty()) {
+      apiRequest.setHeaderParameters(headerParameters);
+    }
+
+    if (httpMethodStr.equalsIgnoreCase(HttpMethod.POST.toString())) {
+      Object bodyParamsObj = apiChannelMetadata.getBodyParameters();
+
+      LinkedHashMap<String, Object> bodyParamMap = (LinkedHashMap<String, Object>) bodyParamsObj;
+
+      logger.debug(bodyParamMap.toString());
+      BodyParameters bodyParameters = new BodyParameters();
+
+      bodyParameters.setContent(bodyParamMap.get("content"));
+
+      logger.debug("Body Parameter = " + bodyParameters);
+
+      apiRequest.setBodyParameters(bodyParameters);
+    }
+
+    try {
+      SipHttpClient sipHttpClient = new SipHttpClient();
+
+      connectionLogs.append("Connecting to ").append(url).append("\n");
+      SipApiResponse response = sipHttpClient.execute(apiRequest);
+
+      connectionLogs.append("Fetching data from ").append(url).append("\n");
+      HttpStatus httpStatus = response.getHttpStatus();
+      logger.info("Http Status = " + httpStatus);
+
+      connectionLogs.append("Connection Status = " + httpStatus).append("\n");
+
+      Object content = response.getResponseBody();
+
+      if (content != null && content.toString().length() != 0) {
+        connectionLogs
+            .append("Content Length: ")
+            .append(content.toString().length())
+            .append(" bytes")
+            .append("\n");
+      }
+
+    } catch (RestClientException exception) {
+      throw new SipNestedRuntimeException("Unsupported content type text/html;charset=UTF-8");
+    } catch (Exception exception) {
+      logger.error("Exception caught");
+      throw new SipNestedRuntimeException(exception.getMessage(), exception);
+    }
 
     return connectionLogs.toString();
   }
@@ -561,7 +653,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
   /** This method executes actual file transfer used by worker threads. */
   @Override
   public void executeFileTransfer(
-      String logId, Long jobId, Long channelId, Long routeId, String fileName) {
+      String logId, Long jobId, Long channelId, Long routeId, String fileName,
+      Optional<String> destinationDirPath) {
     logger.info("Inside executeFileTransfer");
     sipLogService.upsertInProgressStatus(logId);
     BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);

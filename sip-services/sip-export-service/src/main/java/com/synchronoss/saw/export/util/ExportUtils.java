@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export.util;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.model.Artifact;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +37,6 @@ public class ExportUtils {
   private static final Logger logger = LoggerFactory.getLogger(ExportUtils.class);
 
   private static final String HOST = "Host";
-  private static final String NAME = "name";
   private static final String AUTHORIZATION = "Authorization";
   private static final String FILE_TYPE = "fileType";
   private static final String DESCRIPTION = "description";
@@ -46,7 +47,9 @@ public class ExportUtils {
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
   private static final String DEFAULT_FILE_TYPE = "csv";
 
+  private static final String ANALYSIS_TYPE_DL_REPORT = "report";
 
+  private ExportUtils() {}
   /**
    * Create Request header with common properties
    *
@@ -65,33 +68,51 @@ public class ExportUtils {
   /**
    * Method to provide column header exact GUI sequence
    *
-   * @param sipQuery query of field from sip query
+   * @param analysis Analysis definition
    * @return
    */
-  public static Map<String, String> buildColumnHeaderMap(SipQuery sipQuery) {
+  public static Map<String, String> buildColumnHeaderMap(Analysis analysis) {
+    logger.trace("Building column header map for analysis " + analysis);
+    SipQuery sipQuery = analysis.getSipQuery();
     boolean haveDLQuery = sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty();
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
-    for (Artifact artifact : sipQuery.getArtifacts()) {
-      String artifactName = artifact.getArtifactsName();
-      artifact.getFields().forEach(field -> {
-        // This is added to fix SIP-8811 customer Code column issue on DL report
-        if (haveDLQuery && artifactName != null && CUSTOMER_CODE.matches(field.getColumnName())) {
-          field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
+    if (ANALYSIS_TYPE_DL_REPORT.equals(analysis.getType())) {
+      logger.trace("DL Report found");
+      if (analysis.getDesignerEdit() != null && !analysis.getDesignerEdit()) {
+        for (Artifact artifact : sipQuery.getArtifacts()) {
+          String artifactName = artifact.getArtifactsName();
+          artifact
+              .getFields()
+              .forEach(
+                  field -> {
+                    // This is added to fix SIP-8811 customer Code column issue on DL report
+                    if (haveDLQuery
+                        && artifactName != null
+                        && CUSTOMER_CODE.matches(field.getColumnName())) {
+                      field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
+                    }
+                    fields.add(field);
+                  });
         }
-        fields.add(field);
-      });
+      }
+    } else {
+      for (Artifact artifact : sipQuery.getArtifacts()) {
+        fields.addAll(artifact.getFields());
+      }
     }
 
-
+    logger.trace("Fields length = " + fields.size() + ", fields = " + fields);
     Map<String, String> header = new LinkedHashMap();
     if (!fields.isEmpty()) {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
           String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
+
           if (aliasName == null && !StringUtils.isEmpty(field.getDisplayName())) {
             aliasName = field.getDisplayName().trim();
           }
+          logger.trace("Alias name=" + aliasName);
           // look for DL report
           if (haveDLQuery) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
@@ -124,6 +145,8 @@ public class ExportUtils {
         }
       }
     }
+
+    logger.trace("Header = " + header);
     return header;
   }
 
@@ -148,9 +171,9 @@ public class ExportUtils {
         zos.write(readBuffer, 0, amountRead);
         written += amountRead;
       }
-      logger.info("Written " + written + " bytes to " + zipFileName);
+      logger.info(String.format("Written %s, bytes to %s ", written, zipFileName));
     } catch (Exception e) {
-      logger.error("Error while writing to zip: " + e.getMessage());
+      logger.error("Error while writing to zip: {}", e.getMessage());
     } finally {
       zos.closeEntry();
       zos.close();
@@ -171,7 +194,7 @@ public class ExportUtils {
       serviceUtils.deleteFile(sourceFile, true);
       return true;
     } catch (IOException e) {
-      logger.error("Error deleting File : " + sourceFile);
+      logger.error("Error deleting File : {}", sourceFile);
       logger.error(e.getMessage());
       return false;
     }
@@ -228,5 +251,12 @@ public class ExportUtils {
 
   public static String prepareReportName(String name) {
     return name.replaceAll("[\\\\]", "");
+  }
+
+  public static LinkedCaseInsensitiveMap<Object> convert(LinkedHashMap<String, Object> linkedHashMap) {
+    LinkedCaseInsensitiveMap<Object> caseInsensitiveMap = new LinkedCaseInsensitiveMap<>();
+    caseInsensitiveMap.putAll(linkedHashMap);
+
+    return caseInsensitiveMap;
   }
 }

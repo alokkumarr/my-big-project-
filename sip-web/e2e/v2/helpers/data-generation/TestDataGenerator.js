@@ -51,8 +51,14 @@ class TestDataGenerator {
       'generate roles for user'
     );
 
-    roles.admin.roleId = adminHelper.getRoleIdByRoleName(rolesListWithAdmin, roles.admin.roleName);
-    roles.userOne.roleId = adminHelper.getRoleIdByRoleName(rolesListWithUser, roles.userOne.roleName);
+    roles.admin.roleId = adminHelper.getRoleIdByRoleName(
+      rolesListWithAdmin,
+      roles.admin.roleName
+    );
+    roles.userOne.roleId = adminHelper.getRoleIdByRoleName(
+      rolesListWithUser,
+      roles.userOne.roleName
+    );
 
     // Generate users
     utils.validApiCall(
@@ -213,7 +219,8 @@ class TestDataGenerator {
         productId,
         users.anyUser.email
       ),
-      'generatePrivilege for ' + JSON.stringify(createSubCategories.createAnalysis)
+      'generatePrivilege for ' +
+        JSON.stringify(createSubCategories.createAnalysis)
     );
 
     //Generate privileges for User
@@ -244,7 +251,8 @@ class TestDataGenerator {
         productId,
         users.anyUser.email
       ),
-      'generatePrivilege userOne with ' + JSON.stringify(createSubCategories.createAnalysis)
+      'generatePrivilege userOne with ' +
+        JSON.stringify(createSubCategories.createAnalysis)
     );
 
     // Generate analyses
@@ -258,31 +266,39 @@ class TestDataGenerator {
     let description = `Column Chart created by e2e under sub category: ${new Date()}`;
     let analysisType = Constants.CHART;
     let subType = 'column';
+    let newToken = APICommonHelpers.generateToken(
+      apiUrl,
+      users.admin.loginId,
+      users.anyUser.password
+    );
 
     // Create charts for different sub categories
+    const include = ['all', 'create', 'multiple'];
     for (let [name, subCategory] of Object.entries(subCategories)) {
-      utils.validApiCall(
-        analysisHelper.createAnalysis(
-          apiUrl,
-          token,
-          name,
-          description,
-          analysisType,
-          subType,
-          dataSets.pivotChart,
-          null,
-          subCategory,
-          semanticId
-        ),
-        'createAnalysis: for ' + subCategory
-      );
+      if (include.includes(name)) {
+        utils.validApiCall(
+          analysisHelper.createAnalysis(
+            apiUrl,
+            newToken,
+            name,
+            description,
+            analysisType,
+            subType,
+            dataSets.pivotChart,
+            null,
+            subCategory,
+            semanticId
+          ),
+          'createAnalysis: for ' + subCategory
+        );
+      }
     }
 
     // Generate chart for create analysis sub category
     utils.validApiCall(
       analysisHelper.createAnalysis(
         apiUrl,
-        token,
+        newToken,
         name,
         description,
         analysisType,
@@ -338,7 +354,8 @@ class TestDataGenerator {
         users.anyUser.email,
         2
       ),
-      'generatePrivilege for admin with ' + createSubCategories.observeSubCategory
+      'generatePrivilege for admin with ' +
+        createSubCategories.observeSubCategory
     );
 
     utils.validApiCall(
@@ -353,7 +370,8 @@ class TestDataGenerator {
         users.anyUser.email,
         2
       ),
-      'generatePrivilege for user with ' + createSubCategories.observeSubCategory
+      'generatePrivilege for user with ' +
+        createSubCategories.observeSubCategory
     );
     // Workbench section
     // Add all privilege to Data Ingestion Service category with sub cat  Channel Management to workbench moduleId =4
@@ -367,7 +385,7 @@ class TestDataGenerator {
         productId,
         customerId,
         users.anyUser.email,
-        4
+        Constants.MODULE_ID.WORKBENCH
       ),
       'generateCategory for ' + categories.workbench
     );
@@ -382,7 +400,7 @@ class TestDataGenerator {
         productId,
         customerId,
         users.anyUser.email,
-        4
+        Constants.MODULE_ID.WORKBENCH
       ),
       'generateSubCategory for ' + createSubCategories.workbenchSubCategory
     );
@@ -397,10 +415,43 @@ class TestDataGenerator {
         token,
         productId,
         users.anyUser.email,
-        4
+        Constants.MODULE_ID.WORKBENCH
       ),
-      'generatePrivilege for admin with ' + createSubCategories.workbenchSubCategory
+      'generatePrivilege for admin with ' +
+        createSubCategories.workbenchSubCategory
     );
+
+    // generate prvivilege for alert module --only for admin start
+    utils.validApiCall(
+      adminHelper.generatePrivilege(
+        apiUrl,
+        privileges.view,
+        roles.admin,
+        categories.alertDefault,
+        createSubCategories.alertView,
+        token,
+        productId,
+        users.anyUser.email,
+        Constants.MODULE_ID.ALERT
+      ),
+      'generatePrivilege for admin with ' + createSubCategories.alertView
+    );
+
+    utils.validApiCall(
+      adminHelper.generatePrivilege(
+        apiUrl,
+        privileges.view,
+        roles.admin,
+        categories.alertDefault,
+        createSubCategories.alertCreate,
+        token,
+        productId,
+        users.anyUser.email,
+        Constants.MODULE_ID.ALERT
+      ),
+      'generatePrivilege for admin with ' + createSubCategories.alertCreate
+    );
+    // generate prvivilege for alert module --only for admin done
   }
 }
 

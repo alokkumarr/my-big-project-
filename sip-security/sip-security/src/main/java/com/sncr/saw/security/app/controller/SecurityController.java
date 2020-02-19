@@ -1,18 +1,19 @@
-/**
- * 
- */
 package com.sncr.saw.security.app.controller;
+
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
+import com.sncr.saw.security.app.model.response.CustomerBrandResponse;
 import com.sncr.saw.security.app.properties.NSSOProperties;
+import com.sncr.saw.security.app.repository.CustomerRepository;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.SecurityService;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
@@ -28,6 +29,7 @@ import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.UserPreferences;
 import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.repo.BrandDetails;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
@@ -54,13 +56,21 @@ import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
-import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.Privileges;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -75,59 +85,61 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- * @author gsan0003
- *
- */
+
 @RestController
 @RequestMapping("/sip-security")
+@Api(value="sip-security", description = "SIP Security APIs")
 public class SecurityController {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
-	@Autowired
+  @Autowired
+  private TicketHelper tHelper;
+  @Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private NSSOProperties nSSOProperties;
-
-    @Autowired
-    private TicketHelper tHelper;
-
+  @Autowired
+  private SecurityService securityService;
 	@Autowired
-	SSORequestHandler ssoRequestHandler;
-
+	private SSORequestHandler ssoRequestHandler;
 	@Autowired
-    PreferenceRepository preferenceRepository;
-
+	private CustomerRepository customerRepository;
 	@Autowired
-    DataSecurityKeyRepository dataSecurityKeyRepository;
+  private PreferenceRepository preferenceRepository;
+	@Autowired
+  private DataSecurityKeyRepository dataSecurityKeyRepository;
+
 
 	private final ObjectMapper mapper = new ObjectMapper();
-
-    private final String AdminRole = "ADMIN";
-
-    private final String ALERTS = "ALERTS";
+  private final static String AdminRole = "ADMIN";
+  private final static String ALERTS = "ALERTS";
+  private final static String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
 		logger.info("Ticket will be created..");
-		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+		logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 		Ticket ticket = new Ticket();
 		User user = null;
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
@@ -153,7 +165,7 @@ public class SecurityController {
 				}
 			} else if (isAccountLocked) {
         ticket.setValidityReason(
-            String.format("Account has been locked!!, Please try after sometime"));
+            "Account has been locked!!, Please try after sometime");
             } else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}
@@ -180,7 +192,7 @@ public class SecurityController {
 	}
 
 	   @RequestMapping(value = "/auth/customer/details", method = RequestMethod.POST)
-	    public UserCustomerMetaData getCustomerDetailsbyUser(@RequestHeader("Authorization") String token) {
+	    public UserCustomerMetaData getCustomerDetailsbyUser(HttpServletResponse response, @RequestHeader("Authorization") String token) {
 	        logger.info("Authenticating & getting the customerDetails starts here");
 	        token = token.replaceAll("Bearer", "").trim();
 	        UserCustomerMetaData userRelatedMetaData = new UserCustomerMetaData();
@@ -204,9 +216,11 @@ public class SecurityController {
 	        } catch (DataAccessException de) {
 	            logger.error("Exception occured creating ticket ", de, null);
 	            userRelatedMetaData.setValid(false);
+	            setUnauthorized(response);
 	        } catch (Exception e) {
 	            logger.error("Exception occured creating ticket ", e);
 	            userRelatedMetaData.setValid(false);
+              setUnauthorized(response);
 	        }
 	        logger.info("Authenticating & getting the customerDetails ends here");
 	        return userRelatedMetaData;
@@ -223,64 +237,71 @@ public class SecurityController {
 	}
 
 	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
-	public LoginResponse accessToken(@RequestBody String rToken) throws ServletException {
-
-		Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
-		// Check if the refresh Token is valid
-		Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
+	public LoginResponse accessToken(@RequestBody String rToken, HttpServletResponse response) throws ServletException {
 		Boolean validity = false;
-		String masterLoginId = null;
-		while (it.hasNext()) {
-			Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
-			if (pair.getKey().equals("validUpto")) {
-				validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
+		try {
+			Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
+			// Check if the refresh Token is valid
+			Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
+			String masterLoginId = null;
+			while (it.hasNext()) {
+				Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+				if (pair.getKey().equals("validUpto")) {
+					validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
+				}
+				if (pair.getKey().equals("masterLoginId")) {
+					masterLoginId = pair.getValue().toString();
+				}
+				it.remove();
 			}
-			if (pair.getKey().equals("masterLoginId")) {
-				masterLoginId = pair.getValue().toString();
+			if (!validity) {
+				response.setStatus(HttpStatus.UNAUTHORIZED.value());
+				return new LoginResponse(validity, "Token has expired. Please re-login");
+			} else {
+				logger.info("Ticket will be created..");
+				logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+
+				Ticket ticket = null;
+				User user = null;
+				ticket = new Ticket();
+				ticket.setMasterLoginId(masterLoginId);
+				RefreshToken newRToken = null;
+				try {
+					user = new User();
+					user.setMasterLoginId(masterLoginId);
+					user.setValidMins((nSSOProperties.getValidityMins() != null
+							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
+					ticket = tHelper.createTicket(user, false);
+					newRToken = new RefreshToken();
+					newRToken.setValid(true);
+					newRToken.setMasterLoginId(masterLoginId);
+					newRToken
+							.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
+									? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
+				} catch (DataAccessException de) {
+					logger.error("Exception occured creating ticket ", de, null);
+					ticket.setValidityReason("Database error. Please contact server Administrator.");
+					ticket.setValid(false);
+					ticket.setError(de.getMessage());
+					return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
+							.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+				} catch (Exception e) {
+					logger.error("Exception occured creating ticket ", e, null);
+					return null;
+				}
+
+				ticket.setValid(true);
+				return new LoginResponse(
+						Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
+								.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
+						Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
+								.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 			}
-			it.remove();
-		}
-		if (!validity) {
-			return new LoginResponse(validity, "Token has expired. Please re-login");
-		} else {
 
-			logger.info("Ticket will be created..");
-			logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
-
-			Ticket ticket = null;
-			User user = null;
-			ticket = new Ticket();
-			ticket.setMasterLoginId(masterLoginId);
-			ticket.setValid(false);
-			RefreshToken newRToken = null;
-			try {
-				user = new User();
-				user.setMasterLoginId(masterLoginId);
-				user.setValidMins((nSSOProperties.getValidityMins() != null
-						? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
-				ticket = tHelper.createTicket(user, false);
-				newRToken = new RefreshToken();
-				newRToken.setValid(true);
-				newRToken.setMasterLoginId(masterLoginId);
-				newRToken
-						.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
-								? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
-			} catch (DataAccessException de) {
-				logger.error("Exception occured creating ticket ", de, null);
-				ticket.setValidityReason("Database error. Please contact server Administrator.");
-				ticket.setError(de.getMessage());
-				return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-						.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
-			} catch (Exception e) {
-				logger.error("Exception occured creating ticket ", e, null);
-				return null;
-			}
-
-			return new LoginResponse(
-					Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
-							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
-					Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
-							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+		}catch (Exception ex) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			logger.error("Error occurred while validating the ticket : {}", ex.getMessage());
+			return new LoginResponse(validity, UNAUTHORIZED_USER);
 		}
 	}
 
@@ -288,7 +309,7 @@ public class SecurityController {
 	public LoginResponse getDefaults(@RequestBody LoginDetails loginDetails) {
 
 		logger.info("Ticket will be created..");
-		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+		logger.info("Token Expiry : {}", nSSOProperties.getValidityMins());
 
 		Ticket ticket = null;
 		User user = null;
@@ -324,7 +345,7 @@ public class SecurityController {
 
 	/**
 	 * This method will be Deprecated since its uses user input as ticket Id.
-     * Logout ticketid should be extracted from token see method {@link #logout(String)}
+     * Logout ticketid should be extracted from token see method }
 	 * @param ticketID
 	 * @return
 	 */
@@ -335,29 +356,37 @@ public class SecurityController {
 		try {
 			return gson.toJson(tHelper.logout(ticketID));
 		} catch (DataAccessException de) {
+			logger.error("Error while logout {}", de);
 			return de.getMessage();
 		}
 	}
 
-    /**
-     *
-     * @return
-     */
-    @RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
-    public String logout(@RequestHeader("Authorization") String token) {
-        token = token.replaceAll("Bearer", "").trim();
-        Ticket ticket = null;
-        try {
-             ticket = TokenParser.retrieveTicket(token);
-        } catch (IOException e) {
-            logger.error("Error occurred while parsing the Token");
-        }
-        try {
-            return tHelper.logout(ticket.getTicketId());
-        } catch (DataAccessException de) {
-            return de.getMessage();
-        }
-    }
+	/**
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
+	public String logout(@RequestHeader("Authorization") String token, HttpServletRequest request,
+			HttpServletResponse response) {
+		Gson gson = new Gson();
+		if (StringUtils.isEmpty(token) || request == null) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return gson.toJson("Invalid Token");
+		}
+		Ticket ticket = SipCommonUtils.getTicket(request);
+		Boolean validity =
+				ticket != null && ticket.getValidUpto() != null ? ticket.getValidUpto() > (new Date()
+						.getTime()) : false;
+		if (!validity) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return gson.toJson("Token has expired. Please re-login");
+		}
+
+		try {
+			return gson.toJson(tHelper.logout(ticket.getTicketId()));
+		} catch (DataAccessException de) {
+			return gson.toJson("Error occurred while logging out! Contact ADMIN!!");
+		}
+	}
 
 	/**
 	 *
@@ -365,7 +394,7 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/changePassword", method = RequestMethod.POST)
-	public Valid changePassword(@RequestBody ChangePasswordDetails changePasswordDetails) {
+	public Valid changePassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ChangePasswordDetails changePasswordDetails) {
 		Valid valid = new Valid();
 		valid.setValid(false);
 		String oldPass = changePasswordDetails.getOldPassword();
@@ -373,7 +402,14 @@ public class SecurityController {
 		String cnfNewPass = changePasswordDetails.getCnfNewPassword();
 		String loginId = changePasswordDetails.getMasterLoginId();
 		String message = null;
-		if (!cnfNewPass.equals(newPass)) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    if (ticket != null && !ticket.getMasterLoginId().equalsIgnoreCase(loginId)) {
+      valid.setValidityMessage(UNAUTHORIZED_USER);
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      return valid;
+    }
+
+    if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
 			valid.setValidityMessage(message);
 			valid.setValid(false);
@@ -390,17 +426,18 @@ public class SecurityController {
 		if (message == null && valid.getValid()) {
 			try {
 				message = userRepository.changePassword(loginId, newPass, oldPass);
-				if (message != null && message.equals("Password Successfully Changed.")) {
+				if ("Password Successfully Changed.".equals(message)) {
 					valid.setValid(true);
                     valid.setValidityMessage(message);
                     return valid;
-				} else if (message.equals("Value provided for old Password did not match.")) {
+				} else if ("Value provided for old Password did not match.".equals(message)) {
 				    valid.setValid(false);
 				    valid.setValidityMessage(message);
 				    return valid;
                 }
 
 			} catch (DataAccessException de) {
+				logger.error("Database error. Please contact server Administrator. {}", de);
 				valid.setValidityMessage("Database error. Please contact server Administrator.");
 				valid.setError(de.getMessage());
 				return valid;
@@ -422,10 +459,10 @@ public class SecurityController {
 		String message = null;
 		try {
 			String eMail = userRepository.getUserEmailId(resetPwdDtls.getMasterLoginId());
-			if (eMail.equals("Invalid")) {
+			if ("Invalid".equals(eMail)) {
 				logger.error("Invalid user Id, Unable to perform Reset Password Process. error message:", null, null);
 				message = "Invalid user Id";
-			} else if (eMail.equals("no email")) {
+			} else if ("no email".equals(eMail)) {
 				logger.error("Email Id is not configured for the User", null, null);
 				message = "Email Id is not configured for the User";
 			} else {
@@ -434,19 +471,15 @@ public class SecurityController {
 				userRepository.insertResetPasswordDtls(resetPwdDtls.getMasterLoginId(), randomString, createdTime,
 						createdTime + (24 * 60 * 60 * 1000));
 				String resetpwdlk = resetPwdDtls.getProductUrl();
-				// resetpwdlk = resetpwdlk+"/vfyRstPwd?rhc="+randomString;
 				resetpwdlk = resetpwdlk + "?rhc=" + randomString;
 				message = sendResetMail(resetPwdDtls.getMasterLoginId(), eMail, resetpwdlk, createdTime);
 				if (message == null) {
 					valid.setValid(true);
-					message = "Mail sent successfully to " + eMail;// + ".
-																	// Requesting
-																	// user is "
-																	// +
-																	// resetPwdDtls.getMasterLoginId();
+					message = "Mail sent successfully to " + eMail;
 				}
 			}
 		} catch (DataAccessException de) {
+			logger.error("Database error. Please contact server Administrator. {}", de);
 			valid.setValidityMessage("Database error. Please contact server Administrator.");
 			valid.setError(de.getMessage());
 			return valid;
@@ -463,13 +496,14 @@ public class SecurityController {
 	@RequestMapping(value = "/vfyRstPwd", method = RequestMethod.POST)
 	public ResetValid vfyRstPwd(@RequestBody RandomHashcode randomHashcode) {
 		// P2: handle expired password scenario
-		ResetValid rv = null;
+		ResetValid rv = new ResetValid();
 		try {
 			rv = userRepository.validateResetPasswordDtls(randomHashcode.getRhc());
 		} catch (DataAccessException de) {
 			rv.setValid(false);
 			rv.setValidityReason("Database error. Please contact server Administrator.");
 			rv.setError(de.getMessage());
+			logger.error("Database error. Please contact server Administrator. {}", de);
 			return rv;
 		}
 		return rv;
@@ -479,12 +513,9 @@ public class SecurityController {
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 		Properties mailProperties = new Properties();
-		// mailProperties.put("mail.smtp.auth", auth);
-		// mailProperties.put("mail.smtp.starttls.enable", starttls);
 		mailSender.setJavaMailProperties(mailProperties);
 		mailSender.setHost(nSSOProperties.getMailHost());
 		mailSender.setPort(nSSOProperties.getMailPort());
-		// mailSender.setProtocol(protocol);
 
 		mailSender.setUsername(nSSOProperties.getMailUserName());
 		if (nSSOProperties.getMailPassword().length != 0) {
@@ -798,10 +829,11 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/fetch", method = RequestMethod.POST)
-	public UsersList getUsers(@RequestBody Long customerId) {
+	public UsersList getUsers(HttpServletRequest request, @RequestBody Long customerId) {
 		UsersList userList = new UsersList();
 		try {
-			if (customerId != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, customerId)) {
 				userList.setUsers(userRepository.getUsers(customerId));
 				userList.setValid(true);
 			} else {
@@ -818,18 +850,26 @@ public class SecurityController {
 		return userList;
 	}
 
-    /**
-     * Fetches all the security Group Names
-     * @return List of group names
-     */
-	@RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.GET)
-        public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,HttpServletResponse response) {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
-        Long custId = Long.valueOf(extractValuesFromToken[1]);
-	    List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
-	    return groupNames;
-    }
+	/**
+	 * Fetches all the security Group Names
+	 *
+	 * @return List of group names
+	 */
+	@RequestMapping(value = "/auth/admin/security-groups", method = RequestMethod.GET)
+	@ResponseBody
+	public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,
+			HttpServletResponse response) {
+		Ticket ticket = SipCommonUtils.getTicket(request);
+		Long custId = Long.valueOf(ticket.getCustID());
+		RoleType roleType = ticket.getRoleType();
+		if (roleType != RoleType.ADMIN) {
+			response
+					.setStatus(HttpStatus.UNAUTHORIZED.value());
+			return new ArrayList<>();
+		}
+		List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
+		return groupNames;
+	}
 
     /**
      * Adding newly security Group Name to SEC_GROUP.
@@ -837,6 +877,7 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.POST)
+		@ResponseBody
     public Object addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
@@ -873,30 +914,43 @@ public class SecurityController {
      * @return Valid obj containing Boolean, success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
+		@ResponseBody
     public Object updateSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        Long custId = Long.valueOf(extractValuesFromToken[1]);
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            Valid valid = new Valid();
-            response.setStatus(400);
+			Ticket ticket = SipCommonUtils.getTicket(request);
+			Long custId = Long.valueOf(ticket.getCustID());
+			RoleType roleType = ticket.getRoleType();
+			Valid valid;
+
+        if (roleType != RoleType.ADMIN) {
+            valid = new Valid();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.MODIFY_GROUP_WITH_NON_ADMIN_ROLE);
             return valid;
         }
+			valid = dataSecurityKeyRepository
+					.validateCustomerForSecGroup(securityGroupId, custId);
+			if (!valid.getValid()) {
+				valid = new Valid();
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				valid.setValid(false);
+				valid.setValidityMessage(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				valid.setError(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				return valid;
+			}
+
         DskValidity dskValidity = dataSecurityKeyRepository.updateSecurityGroups(securityGroupId,oldNewGroups,custId);
-        if (dskValidity.getValid().booleanValue() == true)  {
+        if (dskValidity.getValid().booleanValue())  {
             return dskValidity;
         }
         else {
-            Valid valid = new Valid();
-            response.setStatus(400);
-            valid.setValid(false);
-            valid.setValidityMessage(dskValidity.getValidityMessage());
-            valid.setError(dskValidity.getError());
-            return valid;
+					valid = new Valid();
+					response.setStatus(HttpStatus.BAD_REQUEST.value());
+					valid.setValid(false);
+					valid.setValidityMessage(dskValidity.getValidityMessage());
+					valid.setError(dskValidity.getError());
+					return valid;
         }
     }
 
@@ -906,24 +960,36 @@ public class SecurityController {
      * @return Valid obj containing Boolean and success/failure msg
      */
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}",method = RequestMethod.DELETE)
+		@ResponseBody
     public Valid deleteSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        String roleType = extractValuesFromToken[3];
-        if (!roleType.equalsIgnoreCase(AdminRole)) {
-            Valid valid = new Valid();
-            response.setStatus(400);
+			Ticket ticket = SipCommonUtils.getTicket(request);
+			Long custId = Long.valueOf(ticket.getCustID());
+			RoleType roleType = ticket.getRoleType();
+			Valid valid;
+        if (roleType != RoleType.ADMIN) {
+            valid = new Valid();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.DELETE_GROUP_WITH_NON_ADMIN_ROLE);
             return valid;
         }
+			valid = dataSecurityKeyRepository
+					.validateCustomerForSecGroup(securityGroupId, custId);
+			if (!valid.getValid()) {
+				valid = new Valid();
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				valid.setValid(false);
+				valid.setValidityMessage(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				valid.setError(ServerResponseMessages.SEC_GRP_DOESNOT_EXIST);
+				return valid;
+			}
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupId);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
-            response.setStatus(400);
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return dskValidity;
         }
     }
@@ -948,7 +1014,7 @@ public class SecurityController {
         }
         Valid dskValidity = dataSecurityKeyRepository.addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
 
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -976,7 +1042,7 @@ public class SecurityController {
             return valid;
         }
         Valid dskValidity = dataSecurityKeyRepository.updateAttributeValues(securityGroupId,attributeValues);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1017,7 +1083,7 @@ public class SecurityController {
         dskList.add(0,securityGroupId.toString());
         dskList.add(1,attributeName);
         Valid dskValidity = dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(dskList);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1046,7 +1112,7 @@ public class SecurityController {
             return valid;
         }
         Valid dskValidity = dataSecurityKeyRepository.updateUser(securityGroupName,userSysId,custId);
-        if ( dskValidity.getValid().booleanValue() == true )    {
+        if ( dskValidity.getValid().booleanValue())    {
             return dskValidity;
         }
         else {
@@ -1077,26 +1143,41 @@ public class SecurityController {
 	    return dataSecurityKeyRepository.getAllUserAssignments(custId);
     }
 
+  /**
+   * @param user
+   * @return
+   */
+  @ApiOperation(
+      value = " create User API ",
+      nickname = "CreateUser",
+      notes = "",
+      response = UsersList.class)
+  @RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
+  public UsersList addUser(HttpServletRequest request,
+      HttpServletResponse httpServletResponse,
+      @ApiParam(value = "Authorization token") @RequestHeader("Authorization") String authToken,
+      @ApiParam(value = "User details to store", required = true) @RequestBody User user) {
+    String[] valuesFromToken =
+        JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
 
+    String masterLoginId = valuesFromToken[4];
+    UsersList userList = new UsersList();
+    Valid valid;
+    try {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
+        userList= securityService.validateUserDetails(user);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return userList;
+        }
 
-    /**
-	 *
-	 * @param user
-	 * @return
-	 */
-	@RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
-	public UsersList addUser(@RequestBody User user) {
-		UsersList userList = new UsersList();
-		Valid valid = null;
-
-		try {
-			if (user != null) {
-			    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
-                userList.setValid(validity.getValid());
-                userList.setValidityMessage(validity.getValidityMessage());
+        Valid validity = PasswordValidation.validatePassword(user.getPassword(), user.getMasterLoginId());
+        userList.setValid(validity.getValid());
+        userList.setValidityMessage(validity.getValidityMessage());
 
 				if (userList.getValid()) {
-					valid = userRepository.addUser(user);
+					valid = userRepository.addUser(user,masterLoginId);
 					if (valid.getValid()) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
 						userList.setValid(true);
@@ -1125,12 +1206,17 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
-	public UsersList updateUser(@RequestBody User user) {
-		UsersList userList = new UsersList();
-		Valid valid = null;
-        int validPatternCnt= 0;
+	public UsersList updateUser(HttpServletRequest request,HttpServletResponse servletResponse,@RequestBody User user) {
+		UsersList userList = null;
+        userList = securityService.validateUserDetails(user);
+        if (userList != null && userList.getValid() != null && !userList.getValid()) {
+            servletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return userList;
+        }
+        Valid valid = null;
 		try {
-			if (user != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (user != null && securityService.haveValidCustomerId(ticket, user.getCustomerId())) {
 				userList.setValid(true);
 				if (user.getPassword() != null) {
 				    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
@@ -1168,11 +1254,12 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/delete", method = RequestMethod.POST)
-	public UsersList deleteUser(@RequestBody DeleteUser deleteUser) {
+	public UsersList deleteUser(HttpServletRequest request, @RequestBody DeleteUser deleteUser) {
 		UsersList userList = new UsersList();
 		try {
-			if (deleteUser.getUserId() != null && deleteUser.getCustomerId() != null
-					&& deleteUser.getMasterLoginId() != null) {
+			Ticket ticket = SipCommonUtils.getTicket(request);
+      if (deleteUser.getUserId() != null && deleteUser.getCustomerId() != null && deleteUser.getMasterLoginId() != null
+          && securityService.haveValidCustomerId(ticket, deleteUser.getCustomerId())) {
 				if (userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId())) {
 					userList.setUsers(userRepository.getUsers(deleteUser.getCustomerId()));
 					userList.setValid(true);
@@ -1200,10 +1287,11 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/list", method = RequestMethod.POST)
-	public RolesDropDownList getRoles(@RequestBody Long customerId) {
+	public RolesDropDownList getRoles(HttpServletRequest request, @RequestBody Long customerId) {
 		RolesDropDownList roles = new RolesDropDownList();
 		try {
-			if (customerId != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (customerId != null && securityService.haveValidCustomerId(ticket, customerId)) {
 				roles.setRoles(userRepository.getRolesDropDownList(customerId));
 				roles.setValid(true);
 			} else {
@@ -1226,10 +1314,11 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/fetch", method = RequestMethod.POST)
-	public RolesList getRolesDetails(@RequestBody Long customerId) {
+	public RolesList getRolesDetails(HttpServletRequest request, @RequestBody Long customerId) {
 		RolesList roleList = new RolesList();
 		try {
-			if (customerId != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (customerId != null && securityService.haveValidCustomerId(ticket, customerId)) {
 				roleList.setRoles(userRepository.getRoles(customerId));
 				roleList.setValid(true);
 			} else {
@@ -1274,11 +1363,12 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/add", method = RequestMethod.POST)
-	public RolesList addRole(@RequestBody RoleDetails role) {
+	public RolesList addRole(HttpServletRequest request, @RequestBody RoleDetails role) {
 		RolesList roleList = new RolesList();
 		Valid valid = null;
 		try {
-			if (role != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (role != null && securityService.haveValidCustomerId(ticket, role.getCustSysId())) {
 				valid = userRepository.addRole(role);
 				if (valid.getValid()) {
 					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
@@ -1307,12 +1397,13 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/delete", method = RequestMethod.POST)
-	public RolesList deleteUser(@RequestBody DeleteRole deleteRole) {
+	public RolesList deleteUser(HttpServletRequest request, @RequestBody DeleteRole deleteRole) {
 		RolesList roleList = new RolesList();
 		roleList.setValid(true);
 		try {
-			if (deleteRole.getRoleId() != null && deleteRole.getCustomerId() != null
-					&& deleteRole.getMasterLoginId() != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (deleteRole.getRoleId() != null && deleteRole.getCustomerId() != null && deleteRole.getMasterLoginId() != null
+          && securityService.haveValidCustomerId(ticket, deleteRole.getCustomerId())) {
 				if (userRepository.checkUserExists(deleteRole.getRoleId())) {
 					roleList.setValid(false);
 					roleList.setValidityMessage("Role could not be deleted as User(s) exists in this role.");
@@ -1347,11 +1438,12 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/edit", method = RequestMethod.POST)
-	public RolesList editRole(@RequestBody RoleDetails role) {
+	public RolesList editRole(HttpServletRequest request, @RequestBody RoleDetails role) {
 		RolesList roleList = new RolesList();
 		Valid valid = null;
 		try {
-			if (role != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (role != null && securityService.haveValidCustomerId(ticket, role.getCustSysId())) {
 				valid = userRepository.updateRole(role);
 				if (valid.getValid()) {
 					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
@@ -1380,10 +1472,11 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/privileges/fetch", method = RequestMethod.POST)
-	public PrivilegesList getPrivileges(@RequestBody Long customerId) {
+	public PrivilegesList getPrivileges(HttpServletRequest request, @RequestBody Long customerId) {
 		PrivilegesList privList = new PrivilegesList();
 		try {
-			if (customerId != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (customerId != null && securityService.haveValidCustomerId(ticket, customerId)) {
 				privList.setPrivileges(userRepository.getPrivileges(customerId));
 				privList.setValid(true);
 			} else {
@@ -1407,11 +1500,17 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/products/list", method = RequestMethod.POST)
-	public ProductDropDownList getProductsList(@RequestBody Long customerId) {
+	public ProductDropDownList getProductsList(HttpServletRequest request, @RequestBody Long customerId) {
 		ProductDropDownList products = new ProductDropDownList();
 		try {
-			products.setProducts(userRepository.getProductsDropDownList(customerId));
-			products.setValid(true);
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (customerId != null && securityService.haveValidCustomerId(ticket, customerId)) {
+        products.setProducts(userRepository.getProductsDropDownList(customerId));
+        products.setValid(true);
+      } else {
+        products.setValid(false);
+        products.setError("Customer Id not matched, please correct customer id");
+      }
 		} catch (Exception e) {
 			products.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1428,11 +1527,17 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/modules/list", method = RequestMethod.POST)
-	public ModuleDropDownList getModulesList(@RequestBody CustProdModule cpm) {
+	public ModuleDropDownList getModulesList(HttpServletRequest request, @RequestBody CustProdModule cpm) {
 		ModuleDropDownList modules = new ModuleDropDownList();
 		try {
-			modules.setModules(userRepository.getModulesDropDownList(cpm.getCustomerId(), cpm.getProductId()));
-			modules.setValid(true);
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, cpm.getCustomerId())) {
+        modules.setModules(userRepository.getModulesDropDownList(cpm.getCustomerId(), cpm.getProductId()));
+        modules.setValid(true);
+      } else {
+        modules.setError("Customer Id not matched, please correct customer id.");
+        modules.setValid(false);
+      }
 		} catch (Exception e) {
 			modules.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1444,17 +1549,22 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 * Fetch category by customer product and module
 	 * @param cpm
 	 * @return
 	 */
-	
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/list", method = RequestMethod.POST)
-	public CategoryList getcategoriesList(@RequestBody  CustProdModule cpm) {
+	public CategoryList getcategoriesList(HttpServletRequest request, @RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
 		try {
-			categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(), false));
-			categories.setValid(true);
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, cpm.getCustomerId())) {
+        categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(), false));
+        categories.setValid(true);
+      } else {
+        categories.setError("Customer Id not matched, please correct customer id.");
+        categories.setValid(true);
+      }
 		} catch (Exception e) {
 			categories.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1464,19 +1574,24 @@ public class SecurityController {
 		}
 		return categories;
 	}
-	
+
 	/**
-	 * 
-	 * @param cpsm
+	 * Fetch sub categories by customer product and module
+   * @param cpsm
 	 * @return
 	 */
-	
 	@RequestMapping(value = "/auth/admin/cust/manage/subCategoriesWithPrivilege/list", method = RequestMethod.POST)
-	public SubCategoryWithPrivilegeList getSubCategoriesList(@RequestBody CustomerProductSubModule cpsm) {
+	public SubCategoryWithPrivilegeList getSubCategoriesList(HttpServletRequest request, @RequestBody CustomerProductSubModule cpsm) {
 		SubCategoryWithPrivilegeList subcategories = new SubCategoryWithPrivilegeList();
 		try {
-			subcategories.setSubCategories(userRepository.getSubCategoriesWithPrivilege(cpsm));
-			subcategories.setValid(true);
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, cpsm.getCustomerId())) {
+        subcategories.setSubCategories(userRepository.getSubCategoriesWithPrivilege(cpsm));
+        subcategories.setValid(true);
+      } else {
+        subcategories.setError("Customer Id not matched, please correct customer id.");
+        subcategories.setValid(false);
+      }
 		} catch (Exception e) {
 			subcategories.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1486,18 +1601,19 @@ public class SecurityController {
 		}
 		return subcategories;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param addPrivilegeDetails
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/privileges/upsert", method = RequestMethod.POST)
-	public PrivilegesList addPrivilege(@RequestBody AddPrivilegeDetails addPrivilegeDetails) {
+	public PrivilegesList addPrivilege(HttpServletRequest request, @RequestBody AddPrivilegeDetails addPrivilegeDetails) {
 		PrivilegesList privList = new PrivilegesList();
 		Valid valid = null;
 		try {
-			if (addPrivilegeDetails != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (addPrivilegeDetails != null && securityService.haveValidCustomerId(ticket, addPrivilegeDetails.getCustomerId())) {
 				valid = userRepository.upsertPrivilege(addPrivilegeDetails);
 				if (valid.getValid()) {
 					privList.setPrivileges(userRepository.getPrivileges(addPrivilegeDetails.getCustomerId()));
@@ -1519,18 +1635,19 @@ public class SecurityController {
 		}
 		return privList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param privilege
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/privileges/edit", method = RequestMethod.POST)
-	public PrivilegesList updatePrivilege(@RequestBody PrivilegeDetails privilege) {
+	public PrivilegesList updatePrivilege(HttpServletRequest request, @RequestBody PrivilegeDetails privilege) {
 		PrivilegesList privList = new PrivilegesList();
 		Valid valid = null;
 		try {
-			if (privilege != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (privilege != null && securityService.haveValidCustomerId(ticket, privilege.getCustomerId())) {
 				valid = userRepository.updatePrivilege(privilege);
 				if (valid.getValid()) {
 					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
@@ -1554,15 +1671,16 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param privilege
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/privileges/delete", method = RequestMethod.POST)
-	public PrivilegesList deletePrivilege(@RequestBody DeletePrivilege privilege) {
+	public PrivilegesList deletePrivilege(HttpServletRequest request, @RequestBody DeletePrivilege privilege) {
 		PrivilegesList privList = new PrivilegesList();
 		try {
-			if (privilege != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (privilege != null && securityService.haveValidCustomerId(ticket, privilege.getCustomerId())) {
 				if (userRepository.deletePrivilege(privilege.getPrivilegeId())) {
 					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
 					privList.setValid(true);
@@ -1583,17 +1701,18 @@ public class SecurityController {
 		}
 		return privList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param customerId
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/fetch", method = RequestMethod.POST)
-	public CategoryList getCategories(@RequestBody Long customerId) {
+	public CategoryList getCategories(HttpServletRequest request, @RequestBody Long customerId) {
 		CategoryList catList = new CategoryList();
 		try {
-			if (customerId != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (customerId != null && securityService.haveValidCustomerId(ticket, customerId)) {
 				catList.setCategories(userRepository.getCategories(customerId));
 				catList.setValid(true);
 			} else {
@@ -1610,18 +1729,19 @@ public class SecurityController {
 
 		return catList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/add", method = RequestMethod.POST)
-	public CategoryList addCategories(@RequestBody CategoryDetails category) {
+	public CategoryList addCategories(HttpServletRequest request, @RequestBody CategoryDetails category) {
 		CategoryList catList = new CategoryList();
 		Valid valid = null;
 		try {
-			if (category != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (category != null && securityService.haveValidCustomerId(ticket, category.getCustomerId())) {
 			 if(!userRepository.checkIsModulePresent(category.getModuleId(),ALERTS)){
 				if (!userRepository.checkCatExists(category)) {
 					valid = userRepository.addCategory(category);
@@ -1654,19 +1774,25 @@ public class SecurityController {
 		}
 		return catList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param cpm
 	 * @return
 	 */
-	
+
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/parent/list", method = RequestMethod.POST)
-	public CategoryList getcategoriesOnlyList(@RequestBody  CustProdModule cpm) {
+	public CategoryList getcategoriesOnlyList(HttpServletRequest request, @RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
 		try {
-			categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(),true));
-			categories.setValid(true);
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, cpm.getCustomerId())) {
+        categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(),true));
+        categories.setValid(true);
+      } else {
+		    categories.setError("Customer Id not matched, please correct customer id.");
+        categories.setValid(false);
+      }
 		} catch (Exception e) {
 			categories.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1676,25 +1802,29 @@ public class SecurityController {
 		}
 		return categories;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/delete", method = RequestMethod.POST)
-	public CategoryList deleteCategories(@RequestBody DeleteCategory category) {
+	public CategoryList deleteCategories(HttpServletRequest request, @RequestBody DeleteCategory category) {
 		CategoryList catList = new CategoryList();
 		try {
-
-			if (userRepository.deleteCategory(category.getCategoryId())) {
-				catList.setCategories(userRepository.getCategories(category.getCustomerId()));
-				catList.setValid(true);
-			} else {
-				catList.setValid(false);
-				catList.setValidityMessage("Category could not be deleted. ");
-			}
-
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, category.getCustomerId())) {
+        if (userRepository.deleteCategory(category.getCategoryId())) {
+          catList.setCategories(userRepository.getCategories(category.getCustomerId()));
+          catList.setValid(true);
+        } else {
+          catList.setValid(false);
+          catList.setValidityMessage("Category could not be deleted. ");
+        }
+      } else {
+        catList.setValid(false);
+        catList.setValidityMessage("Customer Id not matched, please correct customer id.");
+      }
 		} catch (Exception e) {
 			catList.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1706,22 +1836,27 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/subcategories/delete", method = RequestMethod.POST)
-	public CategoryList deleteSubCategories(@RequestBody DeleteCategory category) {
+	public CategoryList deleteSubCategories(HttpServletRequest request, @RequestBody DeleteCategory category) {
 		CategoryList catList = new CategoryList();
 		try {
-			if (userRepository.deleteCategory(category.getCategoryId())) {
-				catList.setSubCategories(userRepository.getSubCategories(category.getCustomerId(), category.getCategoryCode()));
-				catList.setValid(true);
-			} else {
-				catList.setValid(false);
-				catList.setValidityMessage("Category could not be deleted. ");
-			}
-
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, category.getCustomerId())) {
+        if (userRepository.deleteCategory(category.getCategoryId())) {
+          catList.setSubCategories(userRepository.getSubCategories(category.getCustomerId(), category.getCategoryCode()));
+          catList.setValid(true);
+        } else {
+          catList.setValid(false);
+          catList.setValidityMessage("Category could not be deleted. ");
+        }
+      } else {
+        catList.setValid(false);
+        catList.setValidityMessage("Customer Id not matched, please correct customer id.");
+      }
 		} catch (Exception e) {
 			catList.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1733,34 +1868,39 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/edit", method = RequestMethod.POST)
-	public CategoryList updateCategories(@RequestBody CategoryDetails category) {
+	public CategoryList updateCategories(HttpServletRequest request, @RequestBody CategoryDetails category) {
 		CategoryList catList = new CategoryList();
 		Valid valid = new Valid();
 		try {
-			if (category.isIscatNameChanged() && userRepository.checkCatExists(category)) {
-				catList.setValid(false);
-				catList.setValidityMessage(
-						"Category Name already exists for this Customer Product Module Combination. ");
-			} else if (userRepository.checkSubCatExists(category)) {
-				catList.setValid(false);
-				catList.setValidityMessage(
-						"Sub Category Name already exists for this Customer Product Module Category Combination. ");
-			} else {
-				valid = userRepository.updateCategory(category);
-				if (valid.getValid()) {
-					catList.setCategories(userRepository.getCategories(category.getCustomerId()));
-					catList.setValid(true);
-				} else {
-					catList.setValid(false);
-					catList.setValidityMessage("Category could not be edited. ");
-				}
-			}
-
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (securityService.haveValidCustomerId(ticket, category.getCustomerId())) {
+        if (category.isIscatNameChanged() && userRepository.checkCatExists(category)) {
+          catList.setValid(false);
+          catList.setValidityMessage(
+              "Category Name already exists for this Customer Product Module Combination. ");
+        } else if (userRepository.checkSubCatExists(category)) {
+          catList.setValid(false);
+          catList.setValidityMessage(
+              "Sub Category Name already exists for this Customer Product Module Category Combination. ");
+        } else {
+          valid = userRepository.updateCategory(category);
+          if (valid.getValid()) {
+            catList.setCategories(userRepository.getCategories(category.getCustomerId()));
+            catList.setValid(true);
+          } else {
+            catList.setValid(false);
+            catList.setValidityMessage("Category could not be edited. ");
+          }
+        }
+      } else {
+        catList.setValid(false);
+        catList.setValidityMessage("Customer Id not matched, please correct customer id.");
+      }
 		} catch (Exception e) {
 			catList.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1772,18 +1912,34 @@ public class SecurityController {
 	}
 
     /**
-     *
      * @return
      */
 	@RequestMapping(value= "/auth/user/preferences/upsert", method = RequestMethod.POST)
-    public Object addUserPreferences(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Preference> preferenceList) {
+    public UserPreferences addUserPreferences(HttpServletRequest request, HttpServletResponse response,
+																							@RequestBody List<Preference> preferenceList) {
 	    UserPreferences userPreferences = new UserPreferences();
-	    String jwtToken = JWTUtils.getToken(request);
-	    String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        userPreferences.setUserID(extractValuesFromToken[0]);
-        userPreferences.setCustomerID(extractValuesFromToken[1]);
-        userPreferences.setPreferences(preferenceList);
-        return preferenceRepository.upsertPreferences(userPreferences);
+			try {
+				Ticket ticket = SipCommonUtils.getTicket(request);
+				userPreferences.setUserID(ticket.getUserId().toString());
+				userPreferences.setCustomerID(ticket.getCustID());
+				Preference preference = preferenceList.stream().
+						filter(p -> "defaultDashboardCategory".equalsIgnoreCase(p.getPreferenceName())).findFirst().get();
+				Long categoryId = preference != null && preference.getPreferenceValue() != null ?
+						Long.valueOf(preference.getPreferenceValue()) : 0L;
+
+				if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.CREATE)) {
+					userPreferences.setPreferences(preferenceList);
+					userPreferences = preferenceRepository.upsertPreferences(userPreferences);
+				} else {
+					userPreferences.setMessage(UNAUTHORIZED_USER);
+					response.setStatus(HttpStatus.UNAUTHORIZED.value());
+					response.sendError(HttpStatus.UNAUTHORIZED.value(),UNAUTHORIZED_USER);
+				}
+			}catch (Exception ex) {
+				userPreferences.setMessage("Please contact server Administrator" + ex.getMessage());
+				logger.error("Please contact server Administrator {}", ex);
+			}
+			return userPreferences;
     }
 
     /**
@@ -1791,19 +1947,36 @@ public class SecurityController {
      * @return
      */
     @RequestMapping(value= "/auth/user/preferences/delete", method = RequestMethod.POST)
-    public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
+    public UserPreferences deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
                                         @RequestBody List<Preference> preferenceList,
                                         @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
         UserPreferences userPreferences = new UserPreferences();
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        userPreferences.setUserID(extractValuesFromToken[0]);
-        userPreferences.setCustomerID(extractValuesFromToken[1]);
-        userPreferences.setPreferences(preferenceList);
-        if (inactivateAll!=null && inactivateAll)
-            return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
-        else
-            return preferenceRepository.deletePreferences(userPreferences,false);
+				try {
+					Ticket ticket = SipCommonUtils.getTicket(request);
+					userPreferences.setUserID(ticket.getUserId().toString());
+					userPreferences.setCustomerID(ticket.getCustID());
+					Preference preference = preferenceList.stream().
+							filter(p -> "defaultDashboardCategory".equalsIgnoreCase(p.getPreferenceName())).findFirst().get();
+					Long categoryId = preference != null && preference.getPreferenceValue() != null ?
+							Long.valueOf(preference.getPreferenceValue()) : 0L;
+
+					if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.DELETE)) {
+						userPreferences.setPreferences(preferenceList);
+						if (inactivateAll!=null && inactivateAll) {
+							return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
+						} else {
+							return preferenceRepository.deletePreferences(userPreferences,false);
+						}
+					} else {
+						userPreferences.setMessage(UNAUTHORIZED_USER);
+						response.setStatus(HttpStatus.UNAUTHORIZED.value());
+						response.sendError(HttpStatus.UNAUTHORIZED.value(),	UNAUTHORIZED_USER);
+					}
+				}catch (Exception ex) {
+					userPreferences.setMessage("Please contact server Administrator" + ex.getMessage());
+					logger.error("Please contact server Administrator {}", ex);
+				}
+			return userPreferences;
     }
 
     /**
@@ -1816,4 +1989,164 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
+
+  @ApiOperation(value = "Create customer brand",
+      nickname = "createCustomerBrand",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
+      method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse createCustomerBrand(@RequestParam("brandColor") String brandColor,
+                                                   @RequestParam(value = "brandLogo", required = false) MultipartFile file,
+                                                   HttpServletRequest request,
+                                                   HttpServletResponse response) {
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      brandResponse.setMessage("No Customer exit for branding.");
+      return brandResponse;
+    }
+
+    if (file == null || brandColor == null) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+      return brandResponse;
+    }
+    Valid valid = new Valid();
+    try {
+      byte[] brandLogo = file.getBytes();
+      valid = customerRepository.upsertCustomerBrand(customerId, brandColor, brandLogo);
+      brandResponse.setBrandColor(brandColor);
+      brandResponse.setBrandImage(brandLogo);
+      // build final response for the user
+      if (valid.getValid()) {
+        brandResponse.setMessage("Brand details are updated successfully.");
+      } else {
+        brandResponse.setMessage("Operation failed for brand upsert.");
+				response.setStatus(HttpStatus.FORBIDDEN.value());
+      }
+    }catch (IOException ex) {
+      logger.error("Error while adding the branding details.");
+			response.setStatus(HttpStatus.FORBIDDEN.value());
+    }
+    return brandResponse;
+  }
+
+
+  @ApiOperation(value = "Fetch customer branding details.",
+      nickname = "fetchBrandDetails",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/user/cust/brand",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+
+
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage("No Customer exit for branding.");
+      return brandResponse;
+    }
+
+    // Try to determine file's logo details
+    try {
+      BrandDetails brandDetails = customerRepository.fetchCustomerBrand(customerId);
+      if (brandDetails != null) {
+        brandResponse.setBrandColor(brandDetails.getBrandColor());
+        Blob blob = brandDetails.getBrandLogo();
+        brandResponse.setBrandImage(blob.getBytes(1,(int)blob.length()));
+        brandResponse.setMessage("Brand details are fetched.");
+      }
+    } catch (Exception ex) {
+      String error = "Could not determine logo location.";
+      logger.error(error);
+      brandResponse.setMessage(error);
+    }
+    return brandResponse;
+  }
+
+  @ApiOperation(value = "Delete customer branding details.",
+      nickname = "deleteBrandDetails",
+      notes = "",
+      response = CustomerBrandResponse.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+          @ApiResponse(code = 400, message = "Bad request"),
+          @ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
+      method = RequestMethod.DELETE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse deleteBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+
+
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the delete operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage("No Customer exist for branding.");
+      return brandResponse;
+    }
+
+    // Try to determine file's logo location
+    try {
+      boolean brandDetailsCleared = customerRepository.deleteCustomerBrand(customerId);
+      if (brandDetailsCleared) {
+        brandResponse.setMessage("Brand details are cleared.");
+      }
+    } catch (Exception ex) {
+      String error = "Could not determine logo location.";
+      logger.error(error);
+      brandResponse.setMessage(error);
+    }
+    return brandResponse;
+  }
+
+  private void setUnauthorized(HttpServletResponse response) {
+    try {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, UNAUTHORIZED_USER);
+    } catch (IOException ex) {
+      logger.error("Error while validating user.");
+    }
+  }
+
 }

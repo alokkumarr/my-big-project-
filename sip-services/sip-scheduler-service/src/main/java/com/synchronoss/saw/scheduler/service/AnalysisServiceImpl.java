@@ -143,7 +143,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   private String[] fetchLatestFinishedTime(String analysisId) {
     logger.debug("New dsl analysis start here..");
-    String url = proxyAnalysisUrl + "/{analysisId}/executions";
+    String url = proxyAnalysisUrl + "/{analysisId}/executions?internalCall=true";
     logger.debug("proxyAnalysisUrl :" + proxyAnalysisUrl);
     try {
       HttpHeaders headers = new HttpHeaders();
@@ -183,7 +183,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   @Override
   public void executeDslAnalysis(String analysisId, String userId) {
-    String dslUrl = metadataAnalysisUrl + "/" + analysisId;
+    String dslUrl = metadataAnalysisUrl + "/" + analysisId +"?internalCall=true";
     logger.trace("URL for request body : ", dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
@@ -191,12 +191,12 @@ public class AnalysisServiceImpl implements AnalysisService {
     logger.trace("Analysis request body : ", analysisResponse.getAnalysis());
 
     String url = proxyAnalysisUrl
-          + "/execute?id="
-          + analysisId
-          + "&size="
-          + dispatchRowLimit
-          + "&executionType=scheduled"
-          + "&userId="+ userId;
+        + "/execute?id="
+        + analysisId
+        + "&size="
+        + dispatchRowLimit
+        + "&executionType=scheduled"
+        + "&userId="+ userId;
 
     logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(analysis);

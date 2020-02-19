@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
 import * as Bowser from 'bowser';
 import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as isEmpty from 'lodash/isEmpty';
@@ -50,8 +50,9 @@ export class ObserveViewComponent implements OnDestroy {
     edit: false,
     download: false
   };
-  @ViewChild('filterSidenav') sidenav: MatSidenav;
-  @ViewChild('downloadContainer') downloadContainer: ElementRef;
+  @ViewChild('filterSidenav', { static: true }) sidenav: MatSidenav;
+  @ViewChild('downloadContainer', { static: true })
+  downloadContainer: ElementRef;
   hasKPIs = false;
 
   constructor(
@@ -210,6 +211,10 @@ export class ObserveViewComponent implements OnDestroy {
             {
               key: PREFERENCES.DEFAULT_DASHBOARD,
               value: dashboardId
+            },
+            {
+              key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
+              value: this.subCategoryId
             }
           ],
           true
@@ -320,11 +325,11 @@ export class ObserveViewComponent implements OnDestroy {
     };
     const headers = new HttpHeaders(skipToastHeader);
     return this.observe.getDashboard(this.dashboardId, { headers }).pipe(
-      map((data: Dashboard) => {
+      tap(data => {
         this.dashboard = data;
         this.loadPrivileges();
         this.checkForKPIs();
-        return data;
+        this.filters.lastAnalysisFilters = data.filters;
       }),
       catchError(error => {
         if (

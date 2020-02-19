@@ -58,7 +58,8 @@ import {
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
-  DesignerUpdateAggregateInSorts
+  DesignerUpdateAggregateInSorts,
+  DesignerCheckAggregateFilterSupport
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -128,19 +129,16 @@ export class DesignerState {
     /* If this is a report, and query is present, we can request data */
     if (analysis.type === 'report' && !!sipQuery.query) {
       return true;
-    } else {
-      /* Else, there should be at least one field selected in artifacts */
-      return (
-        (
-          fpFlatMap(
-            artifact => artifact.fields,
-            get(state, 'analysis.sipQuery.artifacts')
-          ) || []
-        ).length > 0
-      );
     }
-
-    return false;
+    /* Else, there should be at least one field selected in artifacts */
+    return (
+      (
+        fpFlatMap(
+          artifact => artifact.fields,
+          get(state, 'analysis.sipQuery.artifacts')
+        ) || []
+      ).length > 0
+    );
   }
 
   @Selector()
@@ -170,6 +168,11 @@ export class DesignerState {
   @Selector()
   static analysis(state: DesignerStateModel) {
     return state.analysis;
+  }
+
+  @Selector()
+  static analysisFilters(state: DesignerStateModel) {
+    return get(state.analysis, 'sipQuery.filters', []);
   }
 
   @Selector()
@@ -264,30 +267,27 @@ export class DesignerState {
       return patchState({});
     }
 
-    const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
-      field => {
-        const fieldName = artifactColumn.dataField ? 'dataField' : 'columnName';
-        return (
-          toLower(field[fieldName]) === toLower(artifactColumn[fieldName]) &&
-          /* If a field is added to more than one area (say, x axis and group by),
-             then we need to know exactly which area the user removed the field from.
-          */
-          (fieldArea ? field.area === fieldArea : true)
-        );
-      }
+    const artifactColumnIndex = findIndex(
+      artifacts[artifactIndex].fields,
+      ({ columnName, dataField, area }) =>
+        artifactColumn.dataField
+          ? dataField === artifactColumn.dataField
+          : columnName === artifactColumn.columnName &&
+            area === artifactColumn.area
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
-    const sortedArtifacts = filter(
+    let sortedArtifacts = filter(
       artifacts,
       artifact => !isEmpty(artifact.fields)
     );
 
     // if sort is applied for the field that is removed, remove sort from SIPQUERY
-    const sorts = filter(sipQuery.sorts, sort =>
-      sort.columnName !== artifactColumn.columnName
+    const sorts = filter(
+      sipQuery.sorts,
+      sort => sort.columnName !== artifactColumn.columnName
     );
-
+    sortedArtifacts = DesignerService.setSeriesColorForColumns(sortedArtifacts);
     patchState({
       analysis: {
         ...analysis,
@@ -365,7 +365,6 @@ export class DesignerState {
         adapter.marker ===
         artifacts[artifactIndex].fields[artifactColumnIndex].area
     );
-
     // In case of reports, there's no concept of group adapters. Check for that here.
     if (targetAdapterIndex >= 0) {
       const targetAdapter = groupAdapters[targetAdapterIndex];
@@ -393,6 +392,42 @@ export class DesignerState {
     });
   }
 
+  @Action(DesignerCheckAggregateFilterSupport)
+  checkAggregateFilterSupport({
+    getState,
+    dispatch
+  }: StateContext<DesignerStateModel>) {
+    const { analysis } = getState();
+    const isReport = ['report', 'esReport'].includes(analysis.type);
+    if (!isReport) {
+      return;
+    }
+
+    const allFields: ArtifactColumnDSL[] = fpFlatMap(
+      artifact => artifact.fields || [],
+      get(analysis, 'sipQuery.artifacts', [])
+    );
+
+    /* If selected artifacts has an aggregated field, no need to do anything. */
+    if (allFields.some(field => !!field.aggregate)) {
+      return;
+    }
+
+    /* Otherwise, remove aggregation filters. We don't support aggregation
+       filters in reports if no aggregated field is present */
+    const analysisFilters = get(analysis, 'sipQuery.filters', []);
+    const hasAggregationFilters = analysisFilters.find(
+      f => f.isAggregationFilter
+    );
+    if (hasAggregationFilters) {
+      return dispatch(
+        new DesignerUpdateFilters(
+          analysisFilters.filter(f => !f.isAggregationFilter)
+        )
+      );
+    }
+  }
+
   @Action(DesignerApplyChangesToArtifactColumns)
   reorderArtifactColumns({
     getState,
@@ -406,14 +441,18 @@ export class DesignerState {
     const areaIndexMap = fpPipe(
       fpFlatMap(adapter => adapter.artifactColumns),
       fpReduce((accumulator, artifactColumn) => {
-        accumulator[artifactColumn.columnName] = artifactColumn.areaIndex;
+        const { dataField, columnName, area } = artifactColumn;
+        const key = dataField || `${columnName}:${area}`;
+        accumulator[key] = artifactColumn.areaIndex;
         return accumulator;
       }, {})
     )(groupAdapters);
 
     forEach(artifacts, artifact => {
       forEach(artifact.fields, field => {
-        field.areaIndex = areaIndexMap[field.columnName];
+        const { dataField, columnName, area } = field;
+        const key = dataField || `${columnName}:${area}`;
+        field.areaIndex = areaIndexMap[key];
       });
     });
 
@@ -702,6 +741,9 @@ export class DesignerState {
 
     adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
+    if (get(artifactColumn, 'area') !== 'data' && analysis.type === 'pivot') {
+      delete artifactColumn.aggregate;
+    }
     patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerAddArtifactColumn(artifactColumn));
   }
@@ -713,13 +755,19 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
+    if (analysis.type === 'map' && artifactColumn.expression) {
+      /* For some reason aggregate is getting addded for derived metric only for maps.
+      Quick fix but need to evaluate root cause. This is seen even in
+      previous version */
+      delete artifactColumn.aggregate;
+    }
     let artifacts = sipQuery.artifacts;
     const isDateType = DATE_TYPES.includes(artifactColumn.type);
     const fillMissingDataWithZeros =
       analysis.type === 'chart' && artifactColumn.type === 'date';
 
     /* If analysis is chart and this is a date field, assign a default
-      groupInterval. For pivots, use dateInterval if available */
+      groupInterval. For pivots, use dateInterval if available .*/
     const groupInterval = { groupInterval: null };
 
     if (artifactColumn.type === 'date') {
@@ -737,7 +785,6 @@ export class DesignerState {
           break;
       }
     }
-
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
 
@@ -792,7 +839,7 @@ export class DesignerState {
     remove(sipQuery.artifacts, artifact => {
       return isEmpty(artifact.fields);
     });
-
+    artifacts = DesignerService.setSeriesColorForColumns(artifacts);
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
@@ -825,11 +872,7 @@ export class DesignerState {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
     const column = adapter.artifactColumns[columnIndex];
-    adapter.reverseTransform(column);
     groupAdapters[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // const updatedGroupAdapters = produce(groupAdapters, draft => {
-    //   draft[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // });
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
@@ -866,17 +909,17 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    filters.forEach(filter => {
-      filter.artifactsName = filter.tableName;
+    filters.forEach(filt => {
+      filt.artifactsName = filt.tableName || filt.artifactsName;
       if (
-        filter.type === 'date' &&
-        !filter.isRuntimeFilter &&
-        !filter.isGlobalFilter &&
-        filter.model.preset === CUSTOM_DATE_PRESET_VALUE
+        filt.type === 'date' &&
+        !filt.isRuntimeFilter &&
+        !filt.isGlobalFilter &&
+        filt.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
-        filter.model = {
-          gte: filter.model.gte,
-          lte: filter.model.lte,
+        filt.model = {
+          gte: filt.model.gte,
+          lte: filt.model.lte,
           format: 'yyyy-MM-dd HH:mm:ss',
           preset: CUSTOM_DATE_PRESET_VALUE
         };

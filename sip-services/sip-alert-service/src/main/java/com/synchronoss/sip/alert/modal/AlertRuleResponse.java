@@ -6,6 +6,7 @@ public class AlertRuleResponse {
 
   private List<AlertRuleDetails> alertRuleDetailsList;
   private Long numberOfRecords;
+  private String message;
 
   /**
    * Gets alertRuleDetailsList.
@@ -33,5 +34,19 @@ public class AlertRuleResponse {
   /** Sets numberOfRecords. */
   public void setNumberOfRecords(Long numberOfRecords) {
     this.numberOfRecords = numberOfRecords;
+  }
+
+  /**
+   * Gets message.
+   *
+   * @return value of message
+   */
+  public String getMessage() {
+    return message;
+  }
+
+  /** Sets message. */
+  public void setMessage(String message) {
+    this.message = message;
   }
 }

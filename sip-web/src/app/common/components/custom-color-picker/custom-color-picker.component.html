@@ -1,0 +1,32 @@
+<div fxLayout="row" fxLayoutAlign="start center">
+  <label fxFlex i18n class="color-picker-label">{{ config.labelText }}</label>
+  <input
+    readonly
+    #colorPickerInput
+    fxFlex="15"
+    class="color-choser"
+    [style.background]="config.bgColor"
+    [(colorPicker)]="config.bgColor"
+    [cpPosition]="config.position"
+    [cpWidth]="config.width"
+    [cpHeight]="config.height"
+    [cpDialogDisplay]="config.display"
+    [cpColorMode]="config.mode"
+    [cpOKButton]="config.okButton"
+    [cpOKButtonClass]="config.okButtonClass"
+    [cpOKButtonText]="config.oKButtonText"
+    [cpCancelButton]="config.cancelButton"
+    [cpCancelButtonClass]="config.cancelButtonClass"
+    [cpCancelButtonText]="config.cancelButtonText"
+    [cpIgnoredElements]="config.ignoreHTMLElements"
+    [cpPositionOffset]="config.positionOffset"
+    [cpPositionRelativeToArrow]="config.positionRelativeToArrow"
+    [cpSaveClickOutside]="config.saveOnClickOutside"
+    [cpPresetLabel]="config.presetColorLabel"
+    [cpPresetColors]="config.presetColors"
+    [cpAlphaChannel]="config.alphaChannel"
+    [cpPositionRelativeToArrow]="config.relativeToArrow"
+    (colorPickerChange)="colorEvent$.next($event)"
+    (cpToggleChange)="toggleEvent$.next($event)"
+  />
+</div>

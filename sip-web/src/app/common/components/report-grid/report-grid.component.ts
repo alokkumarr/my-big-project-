@@ -11,8 +11,10 @@ import {
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpPickBy from 'lodash/fp/pickBy';
 import * as fpMap from 'lodash/fp/map';
-import * as reduce from 'lodash/reduce';
+import * as fpMapValues from 'lodash/fp/mapValues';
+import * as fpReduce from 'lodash/fp/reduce';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
@@ -32,8 +34,7 @@ import * as isEqual from 'lodash/isEqual';
 import {
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
-  ES_REPORTS_DATE_FORMATS,
-  TABLE_CUSTCODE_COLUMNNAME
+  ES_REPORTS_DATE_FORMATS
 } from '../../consts';
 
 import {
@@ -46,7 +47,7 @@ import { DATE_TYPES, NUMBER_TYPES } from '../../consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
 import { flattenReportData } from '../../../common/utils/dataFlattener';
-import { ArtifactDSL } from 'src/app/models';
+import { ArtifactDSL, AnalysisDSL } from 'src/app/models';
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -73,6 +74,40 @@ interface ReportGridField {
 const DEFAULT_PAGE_SIZE = 25;
 const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
 
+/**
+ * Checks the artifacts if there are more than one fields with same
+ * column name, and returns an object with those column names
+ * for easy lookup.
+ *
+ * @param {ArtifactDSL[]} artifacts
+ * @returns {{[columnName: string]: boolean}}
+ * @memberof ReportGridComponent
+ */
+export const findDuplicateColumns = (
+  artifacts: ArtifactDSL[]
+): { [columnName: string]: boolean } => {
+  return fpPipe(
+    /* Flatten fields from all tables in one array */
+    fpFlatMap(artifact => artifact.fields),
+
+    /* Create an object with each column name assigned
+         to number of times it occurs */
+    fpReduce((result, field) => {
+      const caption = field.alias || field.columnName;
+      result[caption] = result[caption] || 0;
+      result[caption]++;
+      return result;
+    }, {}),
+
+    /* Find column names which occur more than once */
+    fpPickBy(repetition => repetition > 1),
+
+    /* We don't need the number of occurences, just the column
+         names. So replace the number of occurences with true */
+    fpMapValues(() => true)
+  )(artifacts);
+};
+
 @Component({
   selector: 'report-grid-upgraded',
   templateUrl: './report-grid.component.html',
@@ -81,17 +116,27 @@ const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
 export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
+  analysis: AnalysisDSL;
   private listeners: Array<Subscription> = [];
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
   @Input() query: string;
   @Input() isInQueryMode;
-  @Input() analysis;
+  @Input('analysis') set _analysis(analysis: AnalysisDSL) {
+    if (!analysis) {
+      return;
+    }
+    this.analysis = analysis;
+
+    this.duplicateColumns = findDuplicateColumns(
+      this.analysis.sipQuery.artifacts
+    );
+  }
   @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
-    this.sorts = reduce(
-      sorts,
+    this.sorts = fpReduce(
       (acc, sort, index) => {
         const reportGirdSort: ReportGridSort = {
           order: sort.order,
@@ -100,11 +145,12 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         acc[sort.columnName] = reportGirdSort;
         return acc;
       },
-      {}
+      {},
+      sorts
     );
   }
   @Input('artifacts')
-  set setArtifactColumns(artifacts: Artifact[]) {
+  set setArtifactColumns(artifacts: ArtifactDSL[]) {
     if (!artifacts) {
       this.artifacts = null;
       this.columns = null;
@@ -120,6 +166,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
+    this.duplicateColumns = findDuplicateColumns(this.artifacts);
     this.columns = this.artifacts2Columns(this.artifacts);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
@@ -184,8 +231,9 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     totalCount: number;
   }>;
 
+  public duplicateColumns: { [columnName: string]: boolean } = {};
   public sorts: {};
-  public artifacts: Artifact[];
+  public artifacts: ArtifactDSL[];
   public pageSize: number = DEFAULT_PAGE_SIZE;
   public isColumnChooserListenerSet = false;
   public onLoadPanelShowing: Function;
@@ -381,13 +429,32 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     });
   }
 
-  renameColumn({ payload, changeColumnProp }: ReportGridField) {
+  /**
+   * Renames the column and updates caption of the cell.
+   *
+   * @param {ReportGridField} { payload, changeColumnProp }
+   * @param {number} columnIndex
+   * @memberof ReportGridComponent
+   */
+  renameColumn(
+    { payload, changeColumnProp }: ReportGridField,
+    columnIndex: number
+  ) {
     this.getNewDataThroughDialog(
       AliasRenameDialogComponent,
       { alias: payload.alias || '' },
       alias => {
         changeColumnProp('alias', alias);
-        this.change.emit({ subject: 'alias' });
+        payload.alias = alias;
+        this.dataGrid.instance.columnOption(
+          columnIndex,
+          'caption',
+          alias || payload.displayName
+        );
+        this.change.emit({
+          subject: 'alias',
+          column: payload
+        });
       }
     );
   }
@@ -438,7 +505,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       });
   }
 
-  artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
+  artifacts2Columns(artifacts: ArtifactDSL[]): ReportGridField[] {
     return fpPipe(
       fpFlatMap(
         (artifact: Artifact | ArtifactDSL) =>
@@ -515,16 +582,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     };
   }
 
-  checkForCustCode(columnName, table) {
-    return columnName === TABLE_CUSTCODE_COLUMNNAME &&
-      this.analysis.type === 'report'
-      ? `${table}_${columnName}`
-      : columnName;
-  }
-
   getDataField(column: ArtifactColumnReport) {
-    const parts = split(column.columnName, '.');
-    return this.checkForCustCode(parts[0], column.table);
+    return column.alias && this.analysis.type === 'report'
+      ? column.alias
+      : split(column.columnName, '.')[0];
   }
 
   queryColumns2Columns(queryColumns): ReportGridField[] {

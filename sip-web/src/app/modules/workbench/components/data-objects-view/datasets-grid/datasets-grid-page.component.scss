@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   width: 100%;
@@ -16,7 +16,7 @@
 
 .btn-card2 {
   background-color: #636363 !important;
-  color: #FFF !important;
+  color: #fff !important;
   padding: 2px 15px;
 }
 
@@ -26,13 +26,13 @@
 }
 
 .parquet {
-  background-image: url('/assets/img/maprE.png');
+  background-image: url('src/assets/img/maprE.png');
   background-size: contain;
   background-repeat: no-repeat;
 }
 
 .es {
-  background-image: url('/assets/svg/elastic.svg');
+  background-image: url('src/assets/svg/elastic.svg');
 }
 
 .grid-container {

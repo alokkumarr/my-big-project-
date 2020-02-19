@@ -12,6 +12,8 @@
   <packaging>jar</packaging>
   <name>sip-dist</name>
   <properties>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Name used for Docker Machine.  Should include the username to
          enable identifying the owner of a machine in AWS.  -->
@@ -46,6 +48,7 @@
     to be activated secure or not. Default value is set to False
     -->
     <sip.cloud.secure>False</sip.cloud.secure>
+    <jackson.core.version>2.9.8</jackson.core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -183,7 +186,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.9.1</version>
+      <version>${jackson.core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

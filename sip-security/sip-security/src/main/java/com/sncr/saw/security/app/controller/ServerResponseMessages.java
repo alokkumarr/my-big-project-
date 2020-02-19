@@ -23,6 +23,7 @@ public class ServerResponseMessages {
     public static final String GROUP_NAME_EXISTS = "Group Name already exists";
     public static final String ATTRIBUTE_NAME_EXISTS = "Attribute Name already exists";
     public static final String FIELDS_EXISTS = "Fields already exists";
+    public static final String GROUP_DOESNT_EXIST = "Group doesn't exist";
 
     public static final String GROUP_NAME_LONG = "Group Name too Long, Range(1-255)";
     public static final String ATTRIBUTE_NAME_LONG = "Attribute Name too Long, Range(1-100)";
@@ -39,4 +40,5 @@ public class ServerResponseMessages {
     public static final String CANT_GET_GROUP_ID = "Couldn't able to get Sys Id";
 
     public static final String UNASSIGN_GROUP_FROM_USER = "Failed to un-assign Group from User";
+    public static final String SEC_GRP_DOESNOT_EXIST = "The security group doesn't exist for this customer!";
 }
