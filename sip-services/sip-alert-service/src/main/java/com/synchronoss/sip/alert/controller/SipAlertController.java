@@ -3,6 +3,7 @@ package com.synchronoss.sip.alert.controller;
 import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.alert.exceptions.SipAlertRunTimeExceptions;
 import com.synchronoss.sip.alert.modal.AlertCount;
 import com.synchronoss.sip.alert.modal.AlertCountResponse;
 import com.synchronoss.sip.alert.modal.AlertResponse;
@@ -610,23 +611,27 @@ public class SipAlertController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public String deactivateSubscriber(
-      @QueryParam("token") String token,
-      HttpServletRequest request,
-      HttpServletResponse response) {
+      @QueryParam("token") String token, HttpServletRequest request, HttpServletResponse response) {
     String statusResponse = null;
 
-    AlertSubscriberToken subscriberToken = alertService.extractSubscriberToken(token);
+    try {
 
-    String alertRulesSysId = subscriberToken.getAlertRulesSysId();
-    String alertTriggerSysId = subscriberToken.getAlertTriggerSysId();
-    String emailId = subscriberToken.getEmailId();
+      AlertSubscriberToken subscriberToken = alertService.extractSubscriberToken(token);
 
-    Boolean status = alertService.deactivateSubscriber(alertRulesSysId, alertTriggerSysId, emailId);
+      String alertRulesSysId = subscriberToken.getAlertRulesSysId();
+      String alertTriggerSysId = subscriberToken.getAlertTriggerSysId();
+      String emailId = subscriberToken.getEmailId();
 
-    if (status == true) {
-      statusResponse = "Email unsubscribed successfully";
-    } else {
-      statusResponse = "Unable to unsubscribe";
+      Boolean status =
+          alertService.deactivateSubscriber(alertRulesSysId, alertTriggerSysId, emailId);
+
+      if (status == true) {
+        statusResponse = "Email unsubscribed successfully";
+      } else {
+        statusResponse = "Unable to unsubscribe";
+      }
+    } catch (SipAlertRunTimeExceptions ex) {
+      statusResponse = ex.getMessage();
     }
 
     return statusResponse;
