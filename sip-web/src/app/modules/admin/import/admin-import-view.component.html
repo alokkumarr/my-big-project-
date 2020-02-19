@@ -15,7 +15,7 @@
         type="file"
         id="input-file-id"
         style="display: none;"
-        [attr.e2e]="import-file"
+        e2e="import-file"
         (change)="readFiles($event)"
         file-upload
         multiple
@@ -54,7 +54,7 @@
           mat-raised-button
           color="primary"
           i18n
-          [attr.e2e]="import-button"
+          e2e="import-button"
           (click)="import()"
           style="margin-right: 10px;"
           [disabled]="!canImport()"
@@ -65,7 +65,7 @@
           mat-raised-button
           color="primary"
           i18n
-          [attr.e2e]="button-error-logs"
+          e2e="button-error-logs"
           (click)="exportErrors()"
           [disabled]="!userCanExportErrors"
         >
