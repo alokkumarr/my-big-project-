@@ -538,7 +538,7 @@ public class AlertServiceImpl implements AlertService {
         AlertUtils.getLastAlertResultByAlertRuleId(alertRulesSysId, basePath, alertResults);
 
     if (alertResultList == null || alertResultList.size() == 0) {
-      throw new SipAlertRunTimeExceptions("Alert trigger ID is invalid");
+      throw new SipAlertRunTimeExceptions("Link is no more valid");
     } else {
       String lastAlertTrigger = alertResultList.get(0).getAlertTriggerSysId();
 
@@ -568,6 +568,10 @@ public class AlertServiceImpl implements AlertService {
     } else {
       subscriber = subscriberObj.get();
       LOGGER.trace("Subscriber found");
+
+      if (subscriber.getActive() == false) {
+        throw new SipAlertRunTimeExceptions("Alert already unsubscribed");
+      }
       subscriber.setActive(false);
       subscriber.setModifiedTime(new Date());
     }
