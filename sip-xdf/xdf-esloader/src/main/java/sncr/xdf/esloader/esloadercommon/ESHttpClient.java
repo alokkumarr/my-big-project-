@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
@@ -24,20 +25,19 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by skbm0001 on 30/1/2018.
  */
 public class ESHttpClient {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ESHttpClient.class);
+  private static final Logger LOGGER = Logger.getLogger(ESHttpClient.class);
   private List<String> hosts = new ArrayList<>();
 
   private ESConfig esConfig;
   private static final String HTTP = "http://";
   private static final String HTTPS = "https://";
+  private static final String MAPPING = "/_mapping/";
   private ChallengeResponse authentication = null;
 
   public ESHttpClient(String host, String user, String password) {
@@ -75,7 +75,7 @@ public class ESHttpClient {
                   return tempHost;
                 })
             .collect(Collectors.toList());
-    LOGGER.debug("Hosts : {}", this.hosts);
+    LOGGER.debug("Hosts : " + this.hosts);
     ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
     if (user != null && pwd != null) authentication = new ChallengeResponse(scheme, user, pwd);
   }
@@ -83,22 +83,21 @@ public class ESHttpClient {
   private String get(String url) {
     String retval = null;
     for (String host : this.hosts) {
-      LOGGER.debug("Trying {}", host);
+      LOGGER.debug("Trying :" + host);
       String fullUrl = host + url;
       try {
         ClientResource cr = getClientResource(fullUrl);
-        if (cr != null) {
-          cr.get();
-          if (cr.getStatus().isSuccess()) {
-            retval = cr.getResponseEntity().getText();
-          } else {
-            LOGGER.error("Error occurred : {}", cr.getStatus());
-          }
+        cr.get();
+        if (cr.getStatus().isSuccess()) {
+          retval = cr.getResponseEntity().getText();
+        } else {
+          LOGGER.error("Error occurred : " + cr.getStatus());
         }
+
         return retval;
       } catch (Exception exception) {
-        LOGGER.warn("Unable to reach {}", host);
-        LOGGER.warn("Exception occured  {}", exception);
+        LOGGER.warn("Unable to reach " + host);
+        LOGGER.warn("Exception occurred  " + exception);
       }
     }
 
@@ -107,36 +106,34 @@ public class ESHttpClient {
 
   private boolean head(String url) {
     for (String host : this.hosts) {
-      LOGGER.debug("Trying : {}", host);
+      LOGGER.debug("Trying : " + host);
       String fullUrl = host + url;
-      LOGGER.debug("URL : {}", fullUrl);
+      LOGGER.debug("URL : " + fullUrl);
       ClientResource cr = getClientResource(fullUrl);
-      if (cr != null) {
-        cr.head();
-        if (cr.getStatus().isSuccess()) {
-          return cr.getStatus().isSuccess();
-        } else {
-          return false;
-        }
+      cr.head();
+      if (cr.getStatus().isSuccess()) {
+        return cr.getStatus().isSuccess();
+      } else {
+        return false;
       }
+
     }
     return false;
   }
 
   private boolean delete(String url) {
     for (String host : hosts) {
-      LOGGER.debug("Trying {}", host);
+      LOGGER.debug("Trying " + host);
       String fullUrl = host + url;
-      LOGGER.debug("URL = {}", fullUrl);
+      LOGGER.debug("URL = " + fullUrl);
       try {
         ClientResource cr = getClientResource(fullUrl);
-        if (cr != null) {
-          cr.delete();
-          return cr.getStatus().isSuccess();
-        }
+        cr.delete();
+        return cr.getStatus().isSuccess();
+
       } catch (ResourceException exception) {
-        LOGGER.warn("Unable to reach: {}", host);
-        LOGGER.warn("Warning occurred while deleting : {}", exception);
+        LOGGER.warn("Unable to reach: " + host);
+        LOGGER.warn("Warning occurred while deleting : " + exception);
       }
     }
 
@@ -146,23 +143,22 @@ public class ESHttpClient {
   private boolean put(String url, String body) {
     for (String host : hosts) {
       String fullUrl = host + url;
-      LOGGER.debug("URL = {}", fullUrl);
+      LOGGER.debug("URL = " + fullUrl);
 
       try {
         ClientResource cr = getClientResource(fullUrl);
-        if (cr != null) {
-          StringRepresentation jsonData = new StringRepresentation(body);
-          jsonData.setMediaType(MediaType.APPLICATION_JSON);
-          cr.put(jsonData);
-          if (!cr.getStatus().isSuccess()) {
-            LOGGER.error(cr.getStatus().getDescription());
-            return false;
-          } else {
-            return true;
-          }
+        StringRepresentation jsonData = new StringRepresentation(body);
+        jsonData.setMediaType(MediaType.APPLICATION_JSON);
+        cr.put(jsonData);
+        if (!cr.getStatus().isSuccess()) {
+          LOGGER.error(cr.getStatus().getDescription());
+          return false;
+        } else {
+          return true;
         }
+
       } catch (ResourceException exception) {
-        LOGGER.warn("Unable to reach: {}", host);
+        LOGGER.warn("Unable to reach: " + host);
         LOGGER.warn("Warning", exception);
       }
     }
@@ -175,15 +171,13 @@ public class ESHttpClient {
       String fullUrl = host + url;
       try {
         ClientResource cr = getClientResource(fullUrl);
-        LOGGER.debug("Full URL = {}  . Data = {}", fullUrl, body);
-        if (cr != null) {
-          StringRepresentation jsonData = new StringRepresentation(body);
-          jsonData.setMediaType(MediaType.APPLICATION_JSON);
-          cr.post(jsonData);
-          return cr.getStatus().isSuccess();
-        }
+        LOGGER.debug("Full URL =" + fullUrl + ". Data = " + body);
+        StringRepresentation jsonData = new StringRepresentation(body);
+        jsonData.setMediaType(MediaType.APPLICATION_JSON);
+        cr.post(jsonData);
+        return cr.getStatus().isSuccess();
       } catch (ResourceException exception) {
-        LOGGER.warn("Unable to reach {}", host);
+        LOGGER.warn("Unable to reach " + host);
         LOGGER.warn("Warning occurred while creating : {}", exception);
       }
     }
@@ -200,7 +194,7 @@ public class ESHttpClient {
     ClientResource cr = null;
     LOGGER.debug("Inside getClientResource starts here.");
     if (esConfig != null && esConfig.isEsSslEnabled()) {
-      LOGGER.debug("esConfig.isEsSslEnabled(): {}", esConfig.isEsSslEnabled());
+      LOGGER.debug("esConfig.isEsSslEnabled(): " + esConfig.isEsSslEnabled());
       Client client = new Client(new Context(), Protocol.HTTPS);
       Series<Parameter> parameters = client.getContext().getParameters();
       URL url = null;
@@ -247,10 +241,9 @@ public class ESHttpClient {
     }
   }
 
-  public int esIndexStructure(String idx, String type, Map<String, String> mapping)
-      throws Exception {
+  public int esIndexStructure(String idx, String type, Map<String, String> mapping) {
     LOGGER.debug("Getting ES index structure");
-    String mappingString = get("/" + idx + "/_mapping/" + type);
+    String mappingString = get("/" + idx + MAPPING + type);
     JsonObject mappingJson;
     try {
       // Try to parse and access mapping section of ES JSON
@@ -271,16 +264,14 @@ public class ESHttpClient {
         String fieldName = e.getKey();
         JsonElement descr = e.getValue();
         String fieldType = descr.getAsJsonObject().get("type").getAsString();
-        if (fieldType.equals("date")) {
-          if (descr.getAsJsonObject().has("format")) {
-            String fieldFmt = descr.getAsJsonObject().get("format").getAsString();
-            // It is possible to specify multiple formats for ES DATE/TIMESTAMP
-            // It is not recommended for XDF
-            // For loading data we will use the first one - this may lead to potential issues
-            // if data is stored with multiple formats in source data set
-            fieldFmt = fieldFmt.split("\\|\\|")[0];
-            fieldType += "^" + fieldFmt;
-          }
+        if ("date".equals(fieldType) && descr.getAsJsonObject().has("format")) {
+          String fieldFmt = descr.getAsJsonObject().get("format").getAsString();
+          // It is possible to specify multiple formats for ES DATE/TIMESTAMP
+          // It is not recommended for XDF
+          // For loading data we will use the first one - this may lead to potential issues
+          // if data is stored with multiple formats in source data set
+          fieldFmt = fieldFmt.split("\\|\\|")[0];
+          fieldType += "^" + fieldFmt;
         }
         mapping.put(fieldName, fieldType);
       }
@@ -301,7 +292,7 @@ public class ESHttpClient {
     long count = 0;
     String countURL = "/" + index + "/_count";
     String response = get(countURL);
-    LOGGER.debug("Response = {}", response);
+    LOGGER.debug("Response = " + response);
     if (response != null && response.length() != 0) {
       JsonObject responseObject = new JsonParser().parse(response).getAsJsonObject();
       count = responseObject.get("count").getAsLong();
@@ -316,7 +307,7 @@ public class ESHttpClient {
       isIndexExist = true;
     } catch (ResourceException ex) {
       isIndexExist = false;
-      LOGGER.warn("Index : {} does not exist in the ES nodes cluster.", idx);
+      LOGGER.warn("Index : " + idx + " does not exist in the ES nodes cluster.");
       LOGGER.warn(ex.getMessage());
     }
     return isIndexExist;
@@ -327,7 +318,7 @@ public class ESHttpClient {
   public boolean esTypeExists(String idx, String type) throws Exception {
     String clusterVersion = esClusterVersion();
     if (clusterVersion.startsWith("6.")) {
-      return head("/" + idx + "/_mapping/" + type);
+      return head("/" + idx + MAPPING + type);
     } else {
       throw new Exception(
           "TypeExists operation is not supported for Elastic Search cluster version "
@@ -336,7 +327,7 @@ public class ESHttpClient {
   }
 
   // Create Index
-  public boolean esIndexCreate(String idx, String mapping) throws Exception {
+  public boolean esIndexCreate(String idx, String mapping) {
     return put("/" + idx, mapping);
   }
 
@@ -345,20 +336,20 @@ public class ESHttpClient {
     not whole index definition
   */
   public boolean esMappingCreate(String idx, String mappingName, String mapping) {
-    return put("/" + idx + "/_mapping/" + mappingName, mapping);
+    return put("/" + idx + MAPPING + mappingName, mapping);
   }
 
   // Delete index
-  public boolean esIndexDelete(String idx) throws Exception {
+  public boolean esIndexDelete(String idx) {
     return delete("/" + idx);
   }
 
   // Safely delete indices
-  public void esIndexSafeDelete(String... idx) throws Exception {
+  public void esIndexSafeDelete(String... idx) {
     for (String s : idx) {
       // Check if index participates in any alias
       int aliasParticipation = esIndexAliasParticipation(s);
-      LOGGER.debug("Alias Participation = {}", aliasParticipation);
+      LOGGER.debug("Alias Participation = " + aliasParticipation);
       if (aliasParticipation == 0) {
         // This index is not attached to any alias - delete it
         LOGGER.debug("Safe deleting index " + s);
@@ -417,7 +408,7 @@ public class ESHttpClient {
 
   // Return list of indexes with the given alias
   public List<String> esAliasListIndices(String alias) {
-    LOGGER.debug("Getting list of indexes for the alias : {}", alias);
+    LOGGER.debug("Getting list of indexes for the alias : " + alias);
     List<String> retval = new ArrayList<>();
     String aliasStr = get("/_alias/" + alias);
     if (aliasStr == null) return retval;
@@ -438,8 +429,7 @@ public class ESHttpClient {
 
   public boolean esIndexRemoveAlias(String alias, String... indices) {
     String actions = generateActionObject(alias, indices);
-
-    LOGGER.debug("Actions = {}", actions);
+    LOGGER.debug("Actions = " + actions);
     return post("/_aliases", actions);
   }
 
@@ -454,7 +444,6 @@ public class ESHttpClient {
       actionItem.add("remove", aliasObject);
       actionsArray.add(actionItem);
     }
-
     actionsObject.add("actions", actionsArray);
     return actionsObject.toString();
   }
