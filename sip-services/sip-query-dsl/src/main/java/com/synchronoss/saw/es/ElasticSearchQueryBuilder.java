@@ -51,7 +51,15 @@ public class ElasticSearchQueryBuilder {
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
   private static String appenderForGTLTE = "||/M";
-  protected static String[] groupByFields;
+  private String[] groupByFields;
+
+  public String[] getGroupByFields() {
+    return groupByFields;
+  }
+
+  public void setGroupByFields(String[] groupByFields) {
+    this.groupByFields = groupByFields;
+  }
 
   public String buildDataQuery(SipQuery sipQuery, Integer size, SipDskAttribute dskAttribute) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -283,7 +291,7 @@ public class ElasticSearchQueryBuilder {
         reportAggregationBuilder.aggregationBuilder(
             dataFields, aggregationFields, searchSourceBuilder, aggregationFilter,booleanCriteria);
       } else {
-        groupByFields = new String[dataFields.size() - aggregationFields.size()];;
+        this.groupByFields = new String[dataFields.size() - aggregationFields.size()];;
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
                 dataFields,
