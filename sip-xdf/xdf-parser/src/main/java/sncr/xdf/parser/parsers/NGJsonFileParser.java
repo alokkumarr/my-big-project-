@@ -38,7 +38,6 @@ public class NGJsonFileParser implements FileParser {
     public Dataset<Row> parseInput(String inputLocation,boolean multiLine, Optional<PivotFields> pivotFields) {
         logger.debug("Is multiLine : " + multiLine + "\n");
         Dataset<Row> inputDataset = iCtx.sparkSession.read().option("multiline", multiLine).json(inputLocation);
-        Dataset<Row> pivotDS = null;
         Dataset<Row> outputDS = null;
         if(pivotFields.isPresent()){
             outputDS = new Pivot().applyPivot(inputDataset, pivotFields.get());

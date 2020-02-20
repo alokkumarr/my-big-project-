@@ -146,28 +146,26 @@ public class Pivot {
                 aggField = getDSFiled(fields, aggFieldName);
                 logger.debug("aggField name: "+ aggField.name());
                 logger.debug("aggField type: "+ aggField.dataType());
-                if(aggField.dataType() instanceof ArrayType){
-                    String newFiledName = aggFieldName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
-                    logger.debug("newFiledName: "+ newFiledName);
-                    do{
-                        explodeDS = explodeDS.withColumn(newFiledName,explode(explodeDS.col(aggFieldName)));
-                        logger.info("explodeDS count : "+ explodeDS.count());
-                        schema = explodeDS.schema();
-                        logger.debug("explodeDS Schema : "+ schema);
-                        fields = schema.fields();
-                        logger.debug("explodeDS Fields : "+ Arrays.toString(fields));
-                        aggField = getDSFiled(fields, newFiledName);
-                        aggFieldName = newFiledName;
-                        logger.debug("inside ArrType : aggField name: "+ aggField.name());
-                        logger.debug("inside ArrType : aggField type: "+ aggField.dataType());
-                    }while(aggField.dataType() instanceof ArrayType);
+                if(index != length-1){
+                    if(aggField.dataType() instanceof ArrayType){
+                        String newFiledName = aggFieldName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
+                        logger.debug("newFiledName: "+ newFiledName);
+                        do{
+                            explodeDS = explodeDS.withColumn(newFiledName,explode(explodeDS.col(aggFieldName)));
+                            logger.info("explodeDS count : "+ explodeDS.count());
+                            schema = explodeDS.schema();
+                            logger.debug("explodeDS Schema : "+ schema);
+                            fields = schema.fields();
+                            logger.debug("explodeDS Fields : "+ Arrays.toString(fields));
+                            aggField = getDSFiled(fields, newFiledName);
+                            aggFieldName = newFiledName;
+                            logger.debug("inside ArrType : aggField name: "+ aggField.name());
+                            logger.debug("inside ArrType : aggField type: "+ aggField.dataType());
+                        }while(aggField.dataType() instanceof ArrayType);
 
-                    if(index != length-1 && !(aggField.dataType() instanceof StructType)){
-                        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Aggregate Parent column - " + aggFieldName + " - should be Struct or Array Type.");
-                    }
-                }else{
-                    if(index != length-1 && !(aggField.dataType() instanceof StructType)){
-                        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Aggregate Parent column - " + aggFieldName + " - should be Struct or Array Type.");
+                        if(!(aggField.dataType() instanceof StructType)){
+                            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Aggregate Parent column - " + aggFieldName + " - should be Struct or Array Type.");
+                        }
                     }
                 }
             }
