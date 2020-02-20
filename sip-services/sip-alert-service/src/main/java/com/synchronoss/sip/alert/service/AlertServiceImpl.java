@@ -548,7 +548,7 @@ public class AlertServiceImpl implements AlertService {
       if (!lastAlertTrigger.equals(alertTriggerSysId)) {
         // in case there is a mismatch in the incoming trigger ID and last trigger ID,
         // throw error here
-        throw new SipAlertRunTimeExceptions("Alert trigger ID is invalid");
+        throw new SipAlertRunTimeExceptions("link is no more valid");
       }
     }
 
