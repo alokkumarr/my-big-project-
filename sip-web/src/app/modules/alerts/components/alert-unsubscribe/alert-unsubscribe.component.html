@@ -15,8 +15,13 @@
         <span><b>Alert Description:</b> {{ alertDetails.alertDesc }}</span>
       </div>
 
-      <button (click)="unSubscribeAlert()" class ="alert-unsubscribe-button" mat-raised-button color="primary" i18n>
-          Un-Subscribe
+      <button (click)="unSubscribeAlert()"
+        class ="alert-unsubscribe-button state-`${disableSubmit}`"
+        [ngClass]="{'state-true': disableSubmit, 'state-false':!disableSubmit }"
+        mat-raised-button color="primary"
+        [disabled]="disableSubmit" i18n
+      >
+        Un-Subscribe
       </button>
       <button mat-button i18n (click)="close()">Cancel</button>
     </div>
