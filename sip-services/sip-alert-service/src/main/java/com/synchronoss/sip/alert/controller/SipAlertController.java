@@ -12,6 +12,7 @@ import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import com.synchronoss.sip.alert.modal.SubscriberStatus;
 import com.synchronoss.sip.alert.service.AlertService;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
@@ -610,9 +611,9 @@ public class SipAlertController {
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public String deactivateSubscriber(
+  public SubscriberStatus deactivateSubscriber(
       @QueryParam("token") String token, HttpServletRequest request, HttpServletResponse response) {
-    String statusResponse = null;
+    SubscriberStatus subscriberStatus = new SubscriberStatus();
 
     try {
 
@@ -625,15 +626,18 @@ public class SipAlertController {
       Boolean status =
           alertService.deactivateSubscriber(alertRulesSysId, alertTriggerSysId, emailId);
 
+      subscriberStatus.setStatus(status);
+
       if (status == true) {
-        statusResponse = "Email unsubscribed successfully";
+        subscriberStatus.setMessage("Email unsubscribed successfully");
       } else {
-        statusResponse = "Unable to unsubscribe";
+        subscriberStatus.setMessage("Unable to unsubscribe");
       }
     } catch (SipAlertRunTimeExceptions ex) {
-      statusResponse = ex.getMessage();
+      subscriberStatus.setStatus(false);
+      subscriberStatus.setMessage(ex.getMessage());
     }
 
-    return statusResponse;
+    return subscriberStatus;
   }
 }
