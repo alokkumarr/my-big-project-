@@ -33,8 +33,13 @@ public class Pivot {
             String pivotColumn = pivotFields.getPivotColumn();
             String aggregateColumn = pivotFields.getAggregateColumn();
             validatePivotFields(groupByColumns, pivotColumn, aggregateColumn);
+
             Dataset<Row> pivotExplodeDS = parsePivotField(inputDS, pivotColumn);
+            logger.debug("pivotExplodeDS count : "+ pivotExplodeDS.count());
+
             Dataset<Row> aggExplodeDS = parseAggregateField(pivotExplodeDS, pivotColumn, aggregateColumn);
+            logger.debug("aggExplodeDS count : "+ aggExplodeDS.count());
+
             RelationalGroupedDataset groupByDS = null;
             logger.debug("Number of GroupBy Columns are : "+ groupByColumns.length);
             if(groupByColumns.length == 1){
@@ -45,8 +50,10 @@ public class Pivot {
                     .toArray(String[]::new));
             }
             logger.debug("groupByDS count : "+ groupByDS.count());
+
             Dataset<Row> pivotDS = groupByDS.pivot(pivotFieldName).agg(max(aggFieldName));
             logger.debug("pivotDS count : "+ pivotDS.count());
+
             return pivotDS;
         }
     }
@@ -122,18 +129,20 @@ public class Pivot {
         logger.debug("inputDS Schema : "+ schema);
         StructField[] fields = schema.fields();
         logger.debug("DS Fields : "+ Arrays.toString(fields));
+        String[] pivotColSplit = pivotColumn.trim().split(SPARK_COLUMN_NAME_DELIMITER);
+        int pivotColLength = pivotColSplit.length;
         String[] aggColSplit = aggregateColumn.trim().split(SPARK_COLUMN_NAME_DELIMITER);
+        int length = aggColSplit.length;
         Dataset<Row> explodeDS = inputDS;
         StructField aggField = null;
         int index = 0;
-        int length = aggColSplit.length;
         for(String column : aggColSplit){
             if(aggFieldName == null){
                 aggFieldName = column;
             }else{
                 aggFieldName = aggFieldName + SPARK_COLUMN_NAME_DELIMITER + column;
             }
-            if(!pivotColumn.toUpperCase().startsWith(aggFieldName.toUpperCase())){
+            if(!isAlreadyExploded(pivotColumn, pivotColLength, aggFieldName, index)){
                 aggField = getDSFiled(fields, aggFieldName);
                 if(aggField.dataType() instanceof StructType){
                     fields = ((StructType)aggField.dataType()).fields();
@@ -198,4 +207,15 @@ public class Pivot {
         }
         throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot column - "+fieldName+" - is not exist in Dataset schema.");
     }
+
+    private boolean isAlreadyExploded(String pivotColumn, int pivotColLength, String aggFieldName, int aggIndex){
+        if(aggIndex < pivotColLength-1){
+            return pivotColumn.toUpperCase().startsWith(aggFieldName.toUpperCase()+SPARK_COLUMN_NAME_DELIMITER);
+        }else if(aggIndex == pivotColLength-1){
+            return pivotColumn.equalsIgnoreCase(aggFieldName);
+        }else{
+            return false;
+        }
+    }
+
 }

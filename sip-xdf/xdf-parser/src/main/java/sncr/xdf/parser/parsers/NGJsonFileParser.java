@@ -96,7 +96,9 @@ public class NGJsonFileParser implements FileParser {
 
             dataset = dataset.withColumn(newColName, dataset.col(colName));
         }
-        return dataset.drop(parentColName);
+        dataset = dataset.drop(parentColName);
+        logger.debug("dataset count : "+ dataset.count());
+        return dataset;
     }
 
     private Dataset<Row> processArrayType(Dataset<Row> dataset, StructField arrayTypeField){
@@ -109,7 +111,9 @@ public class NGJsonFileParser implements FileParser {
             logger.debug("New Column Name : "+ newColName);
             dataset = dataset.withColumn(newColName, dataset.col(parentColName).getItem(index));
         }
-        return dataset.drop(parentColName);
+        dataset = dataset.drop(parentColName);
+        logger.debug("dataset count : "+ dataset.count());
+        return dataset;
     }
 
     private int getArrayFieldMaxSize(Dataset<Row> dataset, String arrayColName){
