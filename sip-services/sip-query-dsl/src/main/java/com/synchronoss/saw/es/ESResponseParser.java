@@ -28,9 +28,9 @@ public class ESResponseParser {
   private String[] groupByFields;
   private List<Field> aggregationFields;
 
-  public ESResponseParser(List<Field> aggregationFields) {
+  public ESResponseParser(List<Field> aggregationFields,String[] groupByFields) {
     this.aggregationFields = aggregationFields;
-    this.groupByFields = ElasticSearchQueryBuilder.groupByFields;
+    this.groupByFields = groupByFields;
   }
 
   /**
