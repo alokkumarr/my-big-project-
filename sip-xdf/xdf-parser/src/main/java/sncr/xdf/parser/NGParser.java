@@ -50,6 +50,8 @@ import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import sncr.xdf.parser.spark.Pivot;
+import sncr.xdf.parser.spark.Flattener;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -94,6 +96,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private boolean isRealTime;
     private long inputDSCount = 0;
+    private PivotFields pivotFields;
+    private boolean isFlatteningEnabled;
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
@@ -197,6 +201,26 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 }
             }
 		}
+
+        pivotFields = ngctx.componentConfiguration.getParser().getPivotFields();
+        isFlatteningEnabled = ngctx.componentConfiguration.getParser().isFlatteningEnabled();
+
+        try {
+            String checkpointDir = generateCheckpointLocation(new DataSetHelper(ngctx, services.md), null, null);
+            if (ctx.fs.exists(new Path(checkpointDir))) {
+                HFileOperations.deleteEnt(checkpointDir);
+            }
+            HFileOperations.createDir(checkpointDir);
+            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
+        }catch (Exception e) {
+            logger.error("Exception in parser module: ", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException) e);
+            } else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
+        }
+
 		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
 			logger.debug("format csv");
 			
@@ -361,9 +385,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
 
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
-            PivotFields pivotFields = ngctx.componentConfiguration.getParser().getPivotFields();
-
-            inputDataset = jsonFileParser.parseInput(sourcePath,multiLine, Optional.ofNullable(pivotFields));
+            inputDataset = jsonFileParser.parseInput(sourcePath, multiLine);
+            inputDataset = pivotOrFlattenDataset(inputDataset, Optional.ofNullable(pivotFields), isFlatteningEnabled);
             inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
@@ -532,7 +555,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
             logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
-
+            outputDataset = pivotOrFlattenDataset(outputDataset, Optional.ofNullable(pivotFields), isFlatteningEnabled);
             status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
 
         }
@@ -556,7 +579,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             }
 
             logger.debug("Dataset partition : "+ filterOutputDS.rdd().getNumPartitions());
-
+            filterOutputDS = pivotOrFlattenDataset(filterOutputDS, Optional.ofNullable(pivotFields), isFlatteningEnabled);
             status = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, tempDir.toString(), "append");
         }
 
@@ -637,6 +660,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
                 logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
 
+                df = pivotOrFlattenDataset(df, Optional.ofNullable(pivotFields), isFlatteningEnabled);
                 rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
                 logger.debug("************************************** Dest dir for file " + file + " = " + destDir + "\n");
 
@@ -667,7 +691,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
 
                 logger.debug("************************************** Dest dir for file " + file + " = " + destDir + "\n");
-
+                filterOutputDS = pivotOrFlattenDataset(filterOutputDS, Optional.ofNullable(pivotFields), isFlatteningEnabled);
                 filterOutputDS.printSchema();
                 filterOutputDS.show(5);
 
@@ -1049,6 +1073,17 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
         logger.debug("createDestinationFieldList ************************** " + hmap.toString());
         return hmap;
+    }
+
+
+    public Dataset<Row> pivotOrFlattenDataset(Dataset<Row> dataset, Optional<PivotFields> pivotFields, boolean isFlatteningEnabled) {
+        if(pivotFields.isPresent()){
+            dataset = new Pivot().applyPivot(dataset, pivotFields.get());
+        }
+        if(isFlatteningEnabled){
+            dataset = new Flattener().flattenDataset(dataset);
+        }
+        return dataset;
     }
 
 }

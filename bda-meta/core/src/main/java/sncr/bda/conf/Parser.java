@@ -61,6 +61,10 @@ public class Parser {
   @Expose
   private Integer numberOfFiles = 1;
 
+    @SerializedName("isFlatteningEnabled")
+    @Expose
+    private boolean isFlatteningEnabled = false;
+
     @SerializedName("pivotFields")
     @Expose
     private PivotFields pivotFields = null;
@@ -330,6 +334,22 @@ public class Parser {
         this.pivotFields = pivotFields;
     }
 
+    public boolean isMultiLine() {
+        return multiLine;
+    }
+
+    public void setMultiLine(boolean multiLine) {
+        this.multiLine = multiLine;
+    }
+
+    public boolean isFlatteningEnabled() {
+        return isFlatteningEnabled;
+    }
+
+    public void setFlatteningEnabled(boolean flatteningEnabled) {
+        isFlatteningEnabled = flatteningEnabled;
+    }
+
     @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
@@ -350,6 +370,7 @@ public class Parser {
         .append(headerSize)
         .append(numberOfFiles)
         .append(multiLine)
+        .append(isFlatteningEnabled)
         .append(pivotFields)
         .toHashCode();
   }
@@ -376,6 +397,7 @@ public class Parser {
         .append(headerSize, rhs.headerSize)
         .append(numberOfFiles, rhs.numberOfFiles)
         .append(multiLine,rhs.multiLine)
+        .append(isFlatteningEnabled,rhs.isFlatteningEnabled)
         .append(pivotFields,rhs.pivotFields)
         .isEquals();
   }
