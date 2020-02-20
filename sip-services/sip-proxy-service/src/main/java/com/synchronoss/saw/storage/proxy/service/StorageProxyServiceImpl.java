@@ -901,7 +901,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       dataFields = BuilderUtil.buildFieldBySort(dataFields, sipQuery.getSorts());
     }
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
-    ESResponseParser esResponseParser = new ESResponseParser(aggregationFields);
+    ESResponseParser esResponseParser = new ESResponseParser(aggregationFields,
+        elasticSearchQueryBuilder.getGroupByFields());
     if (response.get("aggregations") != null)
       result = esResponseParser.parseData(response.get("aggregations"));
     else result = QueryBuilderUtil.buildReportData(response, dataFields);

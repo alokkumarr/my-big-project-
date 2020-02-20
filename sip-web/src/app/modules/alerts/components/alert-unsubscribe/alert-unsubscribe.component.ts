@@ -13,6 +13,7 @@ import * as get from 'lodash/get';
 })
 export class AlertUnsubscribe implements OnInit {
   userLoggedIn: boolean;
+  disableSubmit: boolean = false;
   alertToken: string;
   alertDetails = {
     alertId: '',
@@ -41,7 +42,8 @@ export class AlertUnsubscribe implements OnInit {
 
   unSubscribeAlert() {
     this._alertUnsubscribeService.unsubscribeAnAlert(this.alertToken).subscribe(data => {
-      this._toastMessage.success(data);
+      this.disableSubmit = data.status;
+      this._toastMessage.success(data.message);
     });
   }
 
