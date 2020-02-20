@@ -6,7 +6,9 @@ import org.apache.spark.sql.Row;
 import sncr.xdf.context.InternalContext;
 import org.apache.spark.sql.types.*;
 import java.util.Arrays;
-import java.util.stream.IntStream;
+import sncr.xdf.parser.spark.Pivot;
+import java.util.Optional;
+import sncr.bda.conf.PivotFields;
 import org.apache.spark.sql.functions;
 
 public class NGJsonFileParser implements FileParser {
@@ -22,18 +24,31 @@ public class NGJsonFileParser implements FileParser {
     public Dataset<Row> parseInput(String inputLocation,boolean multiLine) {
         logger.debug("Is multiLine : " + multiLine + "\n");
         Dataset<Row> inputDataset = iCtx.sparkSession.read().option("multiline", multiLine).json(inputLocation);
-        Dataset<Row> outputDS = processNestedJsonDS(inputDataset);
+        Dataset<Row> outputDS = flattenNestedJsonDS(inputDataset);
         return outputDS;
     }
 
     @Override
     public Dataset<Row> parseInput(String inputLocation){
         Dataset<Row> inputDataset =iCtx.sparkSession.read().json(inputLocation);
-        Dataset<Row> outputDS = processNestedJsonDS(inputDataset);
+        Dataset<Row> outputDS = flattenNestedJsonDS(inputDataset);
         return outputDS;
     }
 
-    private Dataset<Row> processNestedJsonDS(Dataset<Row> dataset){
+    public Dataset<Row> parseInput(String inputLocation,boolean multiLine, Optional<PivotFields> pivotFields) {
+        logger.debug("Is multiLine : " + multiLine + "\n");
+        Dataset<Row> inputDataset = iCtx.sparkSession.read().option("multiline", multiLine).json(inputLocation);
+        Dataset<Row> pivotDS = null;
+        if(pivotFields.isPresent()){
+            pivotDS = new Pivot().applyPivot(inputDataset, pivotFields.get());
+        }else{
+            pivotDS = inputDataset;
+        }
+        Dataset<Row> outputDS = flattenNestedJsonDS(pivotDS);
+        return outputDS;
+    }
+
+    private Dataset<Row> flattenNestedJsonDS(Dataset<Row> dataset){
         StructType dsSchema = dataset.schema();
         logger.debug("DS Schema : "+ dsSchema);
         StructField[] dsFields = dsSchema.fields();
@@ -56,7 +71,7 @@ public class NGJsonFileParser implements FileParser {
             }
         }
         if(isNested){
-            dataset = processNestedJsonDS(dataset);
+            dataset = flattenNestedJsonDS(dataset);
         }
         return dataset;
     }

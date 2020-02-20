@@ -61,6 +61,10 @@ public class Parser {
   @Expose
   private Integer numberOfFiles = 1;
 
+    @SerializedName("pivotFields")
+    @Expose
+    private PivotFields pivotFields = null;
+
     /**
      * Alert configuration for the component.
      *
@@ -318,6 +322,14 @@ public class Parser {
         this.alerts = alerts;
     }
 
+    public PivotFields getPivotFields() {
+        return pivotFields;
+    }
+
+    public void setPivotFields(PivotFields pivotFields) {
+        this.pivotFields = pivotFields;
+    }
+
     @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
@@ -338,6 +350,7 @@ public class Parser {
         .append(headerSize)
         .append(numberOfFiles)
         .append(multiLine)
+        .append(pivotFields)
         .toHashCode();
   }
 
@@ -363,6 +376,7 @@ public class Parser {
         .append(headerSize, rhs.headerSize)
         .append(numberOfFiles, rhs.numberOfFiles)
         .append(multiLine,rhs.multiLine)
+        .append(pivotFields,rhs.pivotFields)
         .isEquals();
   }
 }

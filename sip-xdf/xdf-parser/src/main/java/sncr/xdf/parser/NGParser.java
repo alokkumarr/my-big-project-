@@ -17,6 +17,7 @@ import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
+import sncr.bda.conf.PivotFields;
 import sncr.bda.conf.Output;
 import sncr.bda.conf.OutputFieldsList;
 import sncr.bda.core.file.HFileOperations;
@@ -360,7 +361,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
 
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
-            inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
+            PivotFields pivotFields = ngctx.componentConfiguration.getParser().getPivotFields();
+
+            inputDataset = jsonFileParser.parseInput(sourcePath,multiLine, Optional.ofNullable(pivotFields));
             inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
