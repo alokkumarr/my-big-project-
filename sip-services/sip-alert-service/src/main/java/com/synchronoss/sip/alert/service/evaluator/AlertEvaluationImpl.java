@@ -163,6 +163,8 @@ public class AlertEvaluationImpl implements AlertEvaluation {
             } else {
               updateAlertResultAndSubscriptionStatus(alertRuleDetails);
             }
+          } else {
+            updateAlertResultAndSubscriptionStatus(alertRuleDetails);
           }
         }
       } catch (Exception ex) {
