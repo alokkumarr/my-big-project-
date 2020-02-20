@@ -26,6 +26,7 @@ public class Pivot {
 
     public Dataset<Row> applyPivot(Dataset<Row> inputDS, PivotFields pivotFields){
         logger.debug("==> applyPivot()");
+        logger.info("inputDS count : " + inputDS.count());
         if(pivotFields == null) {
             return inputDS;
         }else{
@@ -35,13 +36,13 @@ public class Pivot {
             validatePivotFields(groupByColumns, pivotColumn, aggregateColumn);
 
             Dataset<Row> pivotExplodeDS = parsePivotField(inputDS, pivotColumn);
-            logger.debug("pivotExplodeDS count : "+ pivotExplodeDS.count());
+            logger.info("pivotExplodeDS count : "+ pivotExplodeDS.count());
 
             Dataset<Row> aggExplodeDS = parseAggregateField(pivotExplodeDS, pivotColumn, aggregateColumn);
-            logger.debug("aggExplodeDS count : "+ aggExplodeDS.count());
+            logger.info("aggExplodeDS count : "+ aggExplodeDS.count());
 
             RelationalGroupedDataset groupByDS = null;
-            logger.debug("Number of GroupBy Columns are : "+ groupByColumns.length);
+            logger.info("Number of GroupBy Columns are : "+ groupByColumns.length);
             if(groupByColumns.length == 1){
                 groupByDS = aggExplodeDS.groupBy(groupByColumns[0]);
             }else{
@@ -49,10 +50,12 @@ public class Pivot {
                     .mapToObj(index -> groupByColumns[index].trim())
                     .toArray(String[]::new));
             }
-            logger.debug("groupByDS count : "+ groupByDS.count());
+            logger.info("groupByDS count : "+ groupByDS.count());
 
+            logger.info("pivotFieldName : " + pivotFieldName);
+            logger.info("aggFieldName : " + aggFieldName);
             Dataset<Row> pivotDS = groupByDS.pivot(pivotFieldName).agg(max(aggFieldName));
-            logger.debug("pivotDS count : "+ pivotDS.count());
+            logger.info("pivotDS count : "+ pivotDS.count());
 
             return pivotDS;
         }
@@ -64,57 +67,48 @@ public class Pivot {
         logger.debug("inputDS Schema : "+ schema);
         StructField[] fields = schema.fields();
         logger.debug("DS Fields : "+ Arrays.toString(fields));
-        String[] pivotColumnSplit = pivotColumn.trim().split(SPARK_COLUMN_NAME_DELIMITER);
+        String[] pivotColumnSplit = pivotColumn.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
         Dataset<Row> explodeDS = inputDS;
         StructField pivotField = null;
         int index = 0;
         int length = pivotColumnSplit.length;
+        logger.debug("pivotColumnSplit length : "+ length);
         for(String column : pivotColumnSplit){
+            logger.debug("pivot index : "+ index);
             if(pivotFieldName == null){
                 pivotFieldName = column;
             }else{
                 pivotFieldName = pivotFieldName + SPARK_COLUMN_NAME_DELIMITER + column;
             }
+            logger.debug("Partial pivotFieldName : "+ pivotFieldName);
             pivotField = getDSFiled(fields, pivotFieldName);
-            if(pivotField.dataType() instanceof StructType){
-                if(index == length-1){
-                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot column - " + pivotFieldName + " - should not be Struct Type.");
-                }else{
-                    fields = ((StructType)pivotField.dataType()).fields();
-                }
-            }else if(pivotField.dataType() instanceof ArrayType){
+            logger.debug("pivotField name: "+ pivotField.name());
+            logger.debug("pivotField type: "+ pivotField.dataType());
+            if(pivotField.dataType() instanceof ArrayType){
                 String newFiledName = pivotFieldName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
+                logger.debug("newFiledName: "+ newFiledName);
                 do{
                     explodeDS = explodeDS.withColumn(newFiledName,explode(explodeDS.col(pivotFieldName)));
-                    pivotField = getDSFiled(explodeDS.schema().fields(), newFiledName);
+                    logger.info("explodeDS count : "+ explodeDS.count());
+                    schema = explodeDS.schema();
+                    logger.debug("explodeDS Schema : "+ schema);
+                    fields = schema.fields();
+                    logger.debug("explodeDS Fields : "+ Arrays.toString(fields));
+                    pivotField = getDSFiled(fields, newFiledName);
                     pivotFieldName = newFiledName;
+                    logger.debug("inside ArrType : pivotField name: "+ pivotField.name());
+                    logger.debug("inside ArrType : pivotField type: "+ pivotField.dataType());
                 }while(pivotField.dataType() instanceof ArrayType);
 
-                if(pivotField.dataType() instanceof StructType){
-                    if(index == length-1){
-                        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot column - " + pivotFieldName + " - should not be Struct Type.");
-                    }else{
-                        fields = ((StructType)pivotField.dataType()).fields();
-                    }
-                }else if(pivotField.dataType() instanceof StringType){
-                    if(index != length-1){
-                        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot Parent column - " + pivotFieldName + " - should be Struct Type.");
-                    }
-                }else{
-                    if(index == length-1){
-                        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot column - " + pivotFieldName + " - should be String Type.");
-                    }else{
-                        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot Parent column - " + pivotFieldName + " - should be Struct Type.");
-                    }
-                }
-            }else if(pivotField.dataType() instanceof StringType){
-                if(index != length-1){
+                if(index == length-1 && !(pivotField.dataType() instanceof StringType)){
+                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot column - " + pivotFieldName + " - should be String Type.");
+                }else if(index != length-1 && !(pivotField.dataType() instanceof StructType)){
                     throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot Parent column - " + pivotFieldName + " - should be Struct or Array Type.");
                 }
             }else{
-                if(index == length-1){
+                if(index == length-1 && !(pivotField.dataType() instanceof StringType)){
                     throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot column - " + pivotFieldName + " - should be String Type.");
-                }else{
+                }else if(index != length-1 && !(pivotField.dataType() instanceof StructType)){
                     throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot Parent column - " + pivotFieldName + " - should be Struct or Array Type.");
                 }
             }
@@ -129,40 +123,50 @@ public class Pivot {
         logger.debug("inputDS Schema : "+ schema);
         StructField[] fields = schema.fields();
         logger.debug("DS Fields : "+ Arrays.toString(fields));
-        String[] pivotColSplit = pivotColumn.trim().split(SPARK_COLUMN_NAME_DELIMITER);
+        String[] pivotColSplit = pivotColumn.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
         int pivotColLength = pivotColSplit.length;
-        String[] aggColSplit = aggregateColumn.trim().split(SPARK_COLUMN_NAME_DELIMITER);
+        logger.debug("pivotColumnSplit length : "+ pivotColLength);
+        String[] aggColSplit = aggregateColumn.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
         int length = aggColSplit.length;
+        logger.debug("aggColSplit length : "+ length);
         Dataset<Row> explodeDS = inputDS;
         StructField aggField = null;
         int index = 0;
         for(String column : aggColSplit){
+            logger.debug("agg index : "+ index);
             if(aggFieldName == null){
                 aggFieldName = column;
             }else{
                 aggFieldName = aggFieldName + SPARK_COLUMN_NAME_DELIMITER + column;
             }
-            if(!isAlreadyExploded(pivotColumn, pivotColLength, aggFieldName, index)){
+            logger.debug("Partial aggFieldName : "+ aggFieldName);
+            boolean isAlreadyExploded = isAlreadyExploded(pivotColumn, pivotColLength, aggFieldName, index);
+            logger.debug("isAlreadyExploded : "+ isAlreadyExploded);
+            if(!isAlreadyExploded){
                 aggField = getDSFiled(fields, aggFieldName);
-                if(aggField.dataType() instanceof StructType){
-                    fields = ((StructType)aggField.dataType()).fields();
-                }else if(aggField.dataType() instanceof ArrayType){
+                logger.debug("aggField name: "+ aggField.name());
+                logger.debug("aggField type: "+ aggField.dataType());
+                if(aggField.dataType() instanceof ArrayType){
                     String newFiledName = aggFieldName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
+                    logger.debug("newFiledName: "+ newFiledName);
                     do{
                         explodeDS = explodeDS.withColumn(newFiledName,explode(explodeDS.col(aggFieldName)));
-                        aggField = getDSFiled(explodeDS.schema().fields(), newFiledName);
+                        logger.info("explodeDS count : "+ explodeDS.count());
+                        schema = explodeDS.schema();
+                        logger.debug("explodeDS Schema : "+ schema);
+                        fields = schema.fields();
+                        logger.debug("explodeDS Fields : "+ Arrays.toString(fields));
+                        aggField = getDSFiled(fields, newFiledName);
                         aggFieldName = newFiledName;
+                        logger.debug("inside ArrType : aggField name: "+ aggField.name());
+                        logger.debug("inside ArrType : aggField type: "+ aggField.dataType());
                     }while(aggField.dataType() instanceof ArrayType);
 
-                    if(aggField.dataType() instanceof StructType){
-                        fields = ((StructType)aggField.dataType()).fields();
-                    }else{
-                        if(index != length-1){
-                            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Aggregate Parent column - " + aggFieldName + " - should be Struct Type.");
-                        }
+                    if(index != length-1 && !(aggField.dataType() instanceof StructType)){
+                        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Aggregate Parent column - " + aggFieldName + " - should be Struct or Array Type.");
                     }
                 }else{
-                    if(index != length-1){
+                    if(index != length-1 && !(aggField.dataType() instanceof StructType)){
                         throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Aggregate Parent column - " + aggFieldName + " - should be Struct or Array Type.");
                     }
                 }
@@ -200,12 +204,35 @@ public class Pivot {
 
     private StructField getDSFiled(StructField[] fields, String fieldName){
         logger.trace("==> getDSFiled()");
-        for(StructField field : fields){
-            if(field.name().equalsIgnoreCase(fieldName)){
-                return field;
+        String[] fieldNameSplit = fieldName.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
+        int length = fieldNameSplit.length;
+        logger.debug("fieldNameSplit length : "+ length);
+        int index = 0;
+        StructField structField = null;
+        for(String fieldParentName : fieldNameSplit){
+            boolean fieldNotFound = true;
+            for(StructField field : fields){
+                if(field.name().equalsIgnoreCase(fieldParentName)){
+                    fieldNotFound = false;
+                    if(index == length-1){
+                        structField = field;
+                        break;
+                    }else{
+                        if(field.dataType() instanceof StructType){
+                            fields = ((StructType)field.dataType()).fields();
+                            break;
+                        }else{
+                            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Parent column - "+fieldParentName+" - should be StructType.");
+                        }
+                    }
+                }
             }
+            if(fieldNotFound){
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. column - "+fieldName+" - is not exist in Dataset schema.");
+            }
+            index++;
         }
-        throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. Pivot column - "+fieldName+" - is not exist in Dataset schema.");
+        return structField;
     }
 
     private boolean isAlreadyExploded(String pivotColumn, int pivotColLength, String aggFieldName, int aggIndex){

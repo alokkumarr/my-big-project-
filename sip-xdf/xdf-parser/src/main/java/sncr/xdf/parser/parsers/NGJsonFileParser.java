@@ -39,12 +39,12 @@ public class NGJsonFileParser implements FileParser {
         logger.debug("Is multiLine : " + multiLine + "\n");
         Dataset<Row> inputDataset = iCtx.sparkSession.read().option("multiline", multiLine).json(inputLocation);
         Dataset<Row> pivotDS = null;
+        Dataset<Row> outputDS = null;
         if(pivotFields.isPresent()){
-            pivotDS = new Pivot().applyPivot(inputDataset, pivotFields.get());
+            outputDS = new Pivot().applyPivot(inputDataset, pivotFields.get());
         }else{
-            pivotDS = inputDataset;
+            outputDS = flattenNestedJsonDS(inputDataset);
         }
-        Dataset<Row> outputDS = flattenNestedJsonDS(pivotDS);
         return outputDS;
     }
 
