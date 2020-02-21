@@ -55,8 +55,9 @@ public class Pivot {
             logger.info("aggFieldName : " + aggFieldName);
             Dataset<Row> pivotDS = groupByDS.pivot(pivotFieldName).agg(max(aggFieldName));
             logger.info("pivotDS count : "+ pivotDS.count());
-
-            return pivotDS;
+            Dataset<Row> finalDS = sanitizeColumnNames(pivotDS);
+            logger.info("Pivot finalDS count : "+ finalDS.count());
+            return finalDS;
         }
     }
 
@@ -242,4 +243,25 @@ public class Pivot {
         }
     }
 
+    private Dataset<Row> sanitizeColumnNames(Dataset<Row> dataset) {
+        StructType schema = dataset.schema();
+        logger.debug("DS Schema : "+ schema);
+        StructField[] fields = schema.fields();
+        logger.debug("DS fields : "+ fields);
+        for(StructField field : fields){
+            dataset = dataset.withColumnRenamed(field.name(), sanitizeFieldName(field.name()));
+        }
+        return dataset;
+    }
+
+    private String sanitizeFieldName(String fieldName) {
+        logger.debug("sanitizeFieldName - FieldName :"+ fieldName);
+        String invalidCharRegex = "[^a-zA-Z0-9_ ]";
+        if(fieldName != null && !fieldName.trim().isEmpty()){
+            fieldName = fieldName.replaceAll(invalidCharRegex, "").trim()
+                .replaceAll("\\s+", "_").toUpperCase();
+            logger.debug("Converted to :"+fieldName);
+        }
+        return fieldName;
+    }
 }
