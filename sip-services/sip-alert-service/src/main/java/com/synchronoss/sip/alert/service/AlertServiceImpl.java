@@ -185,7 +185,25 @@ public class AlertServiceImpl implements AlertService {
   public Boolean deleteAlertRule(
       @NotNull(message = "Alert Id cannot be null") @NotNull String alertRuleId, Ticket ticket) {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-    return connection.deleteById(alertRuleId);
+    boolean isDeleted = connection.deleteById(alertRuleId);
+    if (isDeleted) {
+      deleteSubscribersForAlertRule(alertRuleId);
+    }
+    return isDeleted;
+  }
+
+  private void deleteSubscribersForAlertRule(
+      @NotNull(message = "Alert Id cannot be null") @NotNull String alertRuleId) {
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+    try {
+      String[] fields = {"*"};
+      ObjectNode node =
+          AlertUtils.buildObjectNodeForMaprQuery(AlertUtils.ALERT_RULE_SYS_ID, alertRuleId);
+      boolean areSubscribersDeleted = connection.deleteByMaprDBQuery(fields, node.toString());
+      LOGGER.trace("are subscribers  deleted for alert rule:{}", areSubscribersDeleted);
+    } catch (Exception e) {
+      LOGGER.error("Exception occured while deleting the subscribers for alert rule:{}", e);
+    }
   }
 
   /**
@@ -561,6 +579,7 @@ public class AlertServiceImpl implements AlertService {
       subscriber.setSubscriberId(UUID.randomUUID().toString());
 
       subscriber.setAlertRulesSysId(alertRulesSysId);
+      subscriber.setAlertTriggerSysId(alertTriggerSysId);
       subscriber.setEmail(email);
       subscriber.setActive(false);
       subscriber.setCreatedTime(new Date());

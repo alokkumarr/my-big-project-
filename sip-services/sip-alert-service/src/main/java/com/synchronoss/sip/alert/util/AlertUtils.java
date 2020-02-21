@@ -330,14 +330,26 @@ public class AlertUtils {
     }
   }
 
-   public static List<AlertResult> getLastAlertResultByAlertRuleId(
+  public static List<AlertResult> getLastAlertResultByAlertRuleId(
       String alertRulesSysId, String basePath, String alertResultsTable) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    ObjectNode node = objectMapper.createObjectNode();
-    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
-    objectNode.put(ALERT_RULE_SYS_ID, alertRulesSysId);
+    ObjectNode node = buildObjectNodeForMaprQuery(ALERT_RULE_SYS_ID, alertRulesSysId);
     MaprConnection connection = new MaprConnection(basePath, alertResultsTable);
     return connection.runMaprDbQueryWithFilter(
         node.toString(), 1, 1, AlertUtils.START_TIME, AlertResult.class);
+  }
+
+  /**
+   * Build a query node which need to be executed on mapr db.
+   *
+   * @param columnName column name for the query
+   * @param columnValue column value for the query
+   * @return ObjectNode
+   */
+  public static ObjectNode buildObjectNodeForMaprQuery(String columnName, String columnValue) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put(columnName, columnValue);
+    return node;
   }
 }
