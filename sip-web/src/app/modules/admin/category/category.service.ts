@@ -32,9 +32,7 @@ export class CategoryService implements IAdminDataService {
 
   getCustomerId() {
     const token = this._jwtService.getTokenObj();
-    const customerId = token.ticket.custID;
-    this.customerId = parseInt(customerId, 10);
-    return this.customerId;
+    return parseInt(token.ticket.custID, 10);
   }
 
   getList$(): Observable<any[]> {
