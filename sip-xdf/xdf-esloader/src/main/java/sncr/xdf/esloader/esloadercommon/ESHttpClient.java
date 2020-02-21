@@ -65,10 +65,12 @@ public class ESHttpClient {
             .map(
                 host -> {
                   String tempHost;
-                  if (!host.toLowerCase().startsWith(HTTPS) && config.isEsSslEnabled()) {
-                    tempHost = HTTPS + host + ":" + port;
-                  } else if (!host.toLowerCase().startsWith(HTTP)) {
-                    tempHost = HTTP + host + ":" + port;
+                  if (!host.toLowerCase().startsWith(HTTPS) && !host.toLowerCase().startsWith(HTTP)) {
+                    if (config.isEsSslEnabled()) {
+                      tempHost = HTTPS + host + ":" + port;
+                    } else {
+                      tempHost = HTTP + host + ":" + port;
+                    }
                   } else {
                     tempHost = host + ":" + port;
                   }
@@ -111,12 +113,7 @@ public class ESHttpClient {
       LOGGER.debug("URL : " + fullUrl);
       ClientResource cr = getClientResource(fullUrl);
       cr.head();
-      if (cr.getStatus().isSuccess()) {
-        return cr.getStatus().isSuccess();
-      } else {
-        return false;
-      }
-
+      return cr.getStatus().isSuccess();
     }
     return false;
   }
@@ -301,12 +298,11 @@ public class ESHttpClient {
   }
 
   public boolean esIndexExists(String idx) {
-    boolean isIndexExist;
+    boolean isIndexExist = false;
     try {
       head("/" + idx);
       isIndexExist = true;
     } catch (ResourceException ex) {
-      isIndexExist = false;
       LOGGER.warn("Index : " + idx + " does not exist in the ES nodes cluster.");
       LOGGER.warn(ex.getMessage());
     }
