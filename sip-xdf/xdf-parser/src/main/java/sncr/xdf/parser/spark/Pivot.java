@@ -20,6 +20,7 @@ public class Pivot {
     private static final Logger logger = Logger.getLogger(Pivot.class);
     private String pivotFieldName = null;
     private String aggFieldName = null;
+    private String[] groupByFields = null;
     private static final String SPARK_COLUMN_NAME_DELIMITER = ".";
     private static final String NEW_COLUMN_NAME_DELIMITER = "_";
 
@@ -40,16 +41,19 @@ public class Pivot {
             Dataset<Row> aggExplodeDS = parseAggregateField(pivotExplodeDS, pivotColumn, aggregateColumn);
             logger.info("aggExplodeDS count : "+ aggExplodeDS.count());
 
+            Dataset<Row> grpByExplodeDS = parseGroupByFields(aggExplodeDS, pivotColumn, aggregateColumn, groupByColumns);
+            logger.info("grpByExplodeDS count : "+ grpByExplodeDS.count());
+
             RelationalGroupedDataset groupByDS = null;
-            logger.info("Number of GroupBy Columns are : "+ groupByColumns.length);
-            if(groupByColumns.length == 1){
-                groupByDS = aggExplodeDS.groupBy(groupByColumns[0]);
+            logger.info("Number of GroupBy Columns are : "+ groupByFields.length);
+            if(groupByFields.length == 1){
+                groupByDS = grpByExplodeDS.groupBy(groupByFields[0]);
             }else{
-                groupByDS = aggExplodeDS.groupBy(groupByColumns[0].trim(), IntStream.range(1, groupByColumns.length)
-                    .mapToObj(index -> groupByColumns[index].trim())
+                groupByDS = grpByExplodeDS.groupBy(groupByFields[0].trim(), IntStream.range(1, groupByFields.length)
+                    .mapToObj(index -> groupByFields[index].trim())
                     .toArray(String[]::new));
             }
-            logger.info("groupByDS count : "+ groupByDS.count());
+            logger.info("groupByDS count : "+ groupByDS.count().count());
 
             logger.info("pivotFieldName : " + pivotFieldName);
             logger.info("aggFieldName : " + aggFieldName);
@@ -69,7 +73,6 @@ public class Pivot {
         logger.debug("DS Fields : "+ Arrays.toString(fields));
         String[] pivotColumnSplit = pivotColumn.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
         Dataset<Row> explodeDS = inputDS;
-        StructField pivotField = null;
         int index = 0;
         int length = pivotColumnSplit.length;
         logger.debug("pivotColumnSplit length : "+ length);
@@ -81,7 +84,7 @@ public class Pivot {
                 pivotFieldName = pivotFieldName + SPARK_COLUMN_NAME_DELIMITER + column;
             }
             logger.debug("Partial pivotFieldName : "+ pivotFieldName);
-            pivotField = getDSFiled(fields, pivotFieldName);
+            StructField pivotField = getDSFiled(fields, pivotFieldName);
             logger.debug("pivotField name: "+ pivotField.name());
             logger.debug("pivotField type: "+ pivotField.dataType());
             if(pivotField.dataType() instanceof ArrayType){
@@ -130,7 +133,6 @@ public class Pivot {
         int length = aggColSplit.length;
         logger.debug("aggColSplit length : "+ length);
         Dataset<Row> explodeDS = inputDS;
-        StructField aggField = null;
         int index = 0;
         for(String column : aggColSplit){
             logger.debug("agg index : "+ index);
@@ -143,7 +145,7 @@ public class Pivot {
             boolean isAlreadyExploded = isAlreadyExploded(pivotColumn, pivotColLength, aggFieldName, index);
             logger.debug("isAlreadyExploded : "+ isAlreadyExploded);
             if(!isAlreadyExploded){
-                aggField = getDSFiled(fields, aggFieldName);
+                StructField aggField = getDSFiled(fields, aggFieldName);
                 logger.debug("aggField name: "+ aggField.name());
                 logger.debug("aggField type: "+ aggField.dataType());
                 if(index != length-1){
@@ -170,6 +172,77 @@ public class Pivot {
                 }
             }
             index++;
+        }
+        return explodeDS;
+    }
+
+    private Dataset<Row> parseGroupByFields(Dataset<Row> inputDS, String pivotColumn, String aggregateColumn, String[] groupByColumns){
+        logger.debug("==> parseGroupByFields()");
+        StructType schema = inputDS.schema();
+        logger.debug("inputDS Schema : "+ schema);
+        StructField[] fields = schema.fields();
+        logger.debug("DS Fields : "+ Arrays.toString(fields));
+        String[] pivotColSplit = pivotColumn.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
+        int pivotColLength = pivotColSplit.length;
+        logger.debug("pivotColumnSplit length : "+ pivotColLength);
+        String[] aggColSplit = aggregateColumn.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
+        int aggColLength = aggColSplit.length;
+        logger.debug("aggColSplit length : "+ aggColLength);
+        Dataset<Row> explodeDS = inputDS;
+        groupByFields = new String[groupByColumns.length];
+        String grpByFieldName = null;
+        int groupByIndex = 0;
+        for(String groupByColumn : groupByColumns){
+            String[] grpByColSplit = groupByColumn.trim().split("\\"+SPARK_COLUMN_NAME_DELIMITER);
+            int length = grpByColSplit.length;
+            logger.debug("grpByColSplit length : "+ length);
+            grpByFieldName = null;
+            int index = 0;
+            for(String column : aggColSplit){
+                logger.debug("grpBy index : "+ index);
+                if(grpByFieldName == null){
+                    grpByFieldName = column;
+                }else{
+                    grpByFieldName = grpByFieldName + SPARK_COLUMN_NAME_DELIMITER + column;
+                }
+                logger.debug("Partial grpByFieldName : "+ grpByFieldName);
+                boolean isAlreadyExplodedInPivot = isAlreadyExploded(pivotColumn, pivotColLength, grpByFieldName, index);
+                logger.debug("isAlreadyExplodedInPivot : "+ isAlreadyExplodedInPivot);
+                if(!isAlreadyExplodedInPivot){
+                    boolean isAlreadyExplodedInAgg = isAlreadyExploded(aggregateColumn, aggColLength, grpByFieldName, index);
+                    logger.debug("isAlreadyExplodedInAgg : "+ isAlreadyExplodedInAgg);
+                    if(!isAlreadyExplodedInAgg){
+                        StructField grpByField = getDSFiled(fields, grpByFieldName);
+                        logger.debug("grpByField name: "+ grpByField.name());
+                        logger.debug("grpByField type: "+ grpByField.dataType());
+                        if(index != length-1){
+                            if(grpByField.dataType() instanceof ArrayType){
+                                String newFiledName = grpByFieldName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
+                                logger.debug("newFiledName: "+ newFiledName);
+                                do{
+                                    explodeDS = explodeDS.withColumn(newFiledName,explode(explodeDS.col(grpByFieldName)));
+                                    logger.info("explodeDS count : "+ explodeDS.count());
+                                    schema = explodeDS.schema();
+                                    logger.debug("explodeDS Schema : "+ schema);
+                                    fields = schema.fields();
+                                    logger.debug("explodeDS Fields : "+ Arrays.toString(fields));
+                                    grpByField = getDSFiled(fields, newFiledName);
+                                    grpByFieldName = newFiledName;
+                                    logger.debug("inside ArrType : grpByField name: "+ grpByField.name());
+                                    logger.debug("inside ArrType : grpByField type: "+ grpByField.dataType());
+                                }while(grpByField.dataType() instanceof ArrayType);
+
+                                if(!(grpByField.dataType() instanceof StructType)){
+                                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Pivot Config is not correct. FroupBy Parent column - " + grpByFieldName + " - should be Struct or Array Type.");
+                                }
+                            }
+                        }
+                    }
+                }
+                index++;
+            }
+            groupByFields[groupByIndex] = grpByFieldName;
+            groupByIndex++;
         }
         return explodeDS;
     }

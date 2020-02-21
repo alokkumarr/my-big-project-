@@ -35,6 +35,7 @@ import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.parser.spark.HeaderFilter;
+import java.util.stream.IntStream;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -204,22 +205,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         pivotFields = ngctx.componentConfiguration.getParser().getPivotFields();
         isFlatteningEnabled = ngctx.componentConfiguration.getParser().isFlatteningEnabled();
-
-        try {
-            String checkpointDir = generateCheckpointLocation(new DataSetHelper(ngctx, services.md), null, null);
-            if (ctx.fs.exists(new Path(checkpointDir))) {
-                HFileOperations.deleteEnt(checkpointDir);
-            }
-            HFileOperations.createDir(checkpointDir);
-            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
-        }catch (Exception e) {
-            logger.error("Exception in parser module: ", e);
-            if (e instanceof XDFException) {
-                throw ((XDFException) e);
-            } else {
-                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
-            }
-        }
 
 		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
 			logger.debug("format csv");
@@ -1083,6 +1068,18 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if(isFlatteningEnabled){
             dataset = new Flattener().flattenDataset(dataset);
         }
+        dataset = sortColumnNames(dataset);
+        return dataset;
+    }
+
+    public Dataset<Row> sortColumnNames(Dataset<Row> dataset){
+        String[] dsCols = dataset.columns();
+        logger.debug("Before Sort - Columns : " + Arrays.toString(dsCols));
+        Arrays.sort(dsCols);
+        logger.debug("After Sort - Columns : " + Arrays.toString(dsCols));
+        dataset = dataset.select(dsCols[0].trim(), IntStream.range(1, dsCols.length)
+            .mapToObj(index -> dsCols[index].trim())
+            .toArray(String[]::new));
         return dataset;
     }
 
