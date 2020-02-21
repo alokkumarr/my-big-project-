@@ -100,6 +100,26 @@ export class JwtService {
   }
 
   /**
+   * Returns the id first subcategory id in the auth token.
+   *
+   * @readonly
+   * @type {number}
+   * @memberof JwtService
+   */
+  get findDefaultCategoryId() {
+    const token = this.getTokenObj();
+    const product = get(token, 'ticket.products.[0]');
+    const checkPermissionForSubCat = fpPipe(
+      fpFlatMap(module => module.prodModFeature),
+      fpFlatMap(subModule => subModule.productModuleSubFeatures),
+      fpFilter(({ prodModFeatureID }) => {
+        return parseInt(prodModFeatureID)
+      })
+    )(product.productModules);
+    return checkPermissionForSubCat[0].prodModFeatureID;
+  }
+
+  /**
    * Returns the id of user's private sub category.
    *
    * @readonly

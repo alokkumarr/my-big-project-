@@ -11,7 +11,7 @@ export const routes: Routes = [
   {
     // name: 'analyze',
     path: '',
-    canActivate: [IsUserLoggedInGuard, DefaultAnalyzeCategoryGuard],
+    canActivate: [IsUserLoggedInGuard],
     canActivateChild: [IsUserLoggedInGuard],
     component: AnalyzePageComponent,
     children: [
@@ -37,6 +37,10 @@ export const routes: Routes = [
           analyses: AnalysesResolver
         },
         component: AnalyzeViewComponent
+      },
+      {
+        path: '**',
+        canActivate: [DefaultAnalyzeCategoryGuard]
       }
     ]
   }
