@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import * as isNumber from 'lodash/isNumber';
 import * as reject from 'lodash/reject';
 import { AdminService } from '../main-view/admin.service';
 import { JwtService } from '../../../common/services';
@@ -32,11 +31,9 @@ export class CategoryService implements IAdminDataService {
   ) {}
 
   getCustomerId() {
-    if (!isNumber(this.customerId)) {
-      const token = this._jwtService.getTokenObj();
-      const customerId = token.ticket.custID;
-      this.customerId = parseInt(customerId, 10);
-    }
+    const token = this._jwtService.getTokenObj();
+    const customerId = token.ticket.custID;
+    this.customerId = parseInt(customerId, 10);
     return this.customerId;
   }
 
