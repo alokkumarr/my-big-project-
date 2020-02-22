@@ -198,7 +198,7 @@ public class Pivot {
             logger.debug("grpByColSplit length : "+ length);
             grpByFieldName = null;
             int index = 0;
-            for(String column : aggColSplit){
+            for(String column : grpByColSplit){
                 logger.debug("grpBy index : "+ index);
                 if(grpByFieldName == null){
                     grpByFieldName = column;
@@ -241,7 +241,9 @@ public class Pivot {
                 }
                 index++;
             }
-            groupByFields[groupByIndex] = grpByFieldName;
+            String newFiledName = grpByFieldName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
+            explodeDS = explodeDS.withColumn(newFiledName,explodeDS.col(grpByFieldName));
+            groupByFields[groupByIndex] = newFiledName;
             groupByIndex++;
         }
         return explodeDS;
