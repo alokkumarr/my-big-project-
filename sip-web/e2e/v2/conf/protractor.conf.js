@@ -182,13 +182,13 @@ exports.config = {
       if (!appUrl) {
         logger.error(
           'appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' +
-            appUrl +
-            ', hence exiting test suite and failing it...'
+          appUrl +
+          ', hence exiting test suite and failing it...'
         );
         process.exit(1);
       }
 
-       try {
+      try {
         logger.info('Generating test for this run...');
 
         let APICommonHelpers = require('../helpers/api/APICommonHelpers');
@@ -206,8 +206,8 @@ exports.config = {
       } catch (e) {
         logger.error(
           'There is some error during cleanup and setting up test data for e2e tests, ' +
-            'hence exiting test suite and failing it....' +
-            e
+          'hence exiting test suite and failing it....' +
+          e
         );
         process.exit(1);
       }
