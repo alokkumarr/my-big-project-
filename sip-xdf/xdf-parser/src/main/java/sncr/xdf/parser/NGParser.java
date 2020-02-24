@@ -414,12 +414,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
-            inputDataset = pivotOrFlattenDataset(inputDataset);
-            commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
+            Dataset<Row> outputDS = pivotOrFlattenDataset(inputDataset);
+            commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, "append");
 
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+            ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
 		}
 		else if(this.inputDataFrame != null)
 		{
@@ -429,12 +429,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
             }
-            inputDataFrame = pivotOrFlattenDataset(inputDataFrame);
-            commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+            Dataset<Row> outputDS = pivotOrFlattenDataset(inputDataFrame);
+            commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, Output.Mode.APPEND.name());
 
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
+            ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
         }
 
         //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
@@ -555,8 +555,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
             logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
-            outputDataset = pivotOrFlattenDataset(outputDataset);
-            status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
+            Dataset<Row> outputDS = pivotOrFlattenDataset(outputDataset);
+            status = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir.toString(), "append");
 
         }
         else {
@@ -579,8 +579,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             }
 
             logger.debug("Dataset partition : "+ filterOutputDS.rdd().getNumPartitions());
-            filterOutputDS = pivotOrFlattenDataset(filterOutputDS);
-            status = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, tempDir.toString(), "append");
+            Dataset<Row> outputDS = pivotOrFlattenDataset(filterOutputDS);
+            status = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir.toString(), "append");
         }
 
         collectAcceptedData(parsedRdd,outputRdd);
@@ -668,8 +668,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
             logger.debug("************************************** Dest dir for rdd = " + destDir + "\n");
 
-            df = pivotOrFlattenDataset(df);
-            rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
+            Dataset<Row> outputDS =  pivotOrFlattenDataset(df);
+            rc = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
             logger.debug("Write dataset status = " + rc);
         } else {
 
@@ -692,10 +692,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
             logger.debug("************************************** Dest dir for rdd = " + destDir + "\n");
 
-            filterOutputDS = pivotOrFlattenDataset(filterOutputDS);
-            filterOutputDS.printSchema();
-            filterOutputDS.show(5);
-            rc = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, destDir.toString(), "append");
+            Dataset<Row> outputDS = pivotOrFlattenDataset(filterOutputDS);
+            outputDS.printSchema();
+            outputDS.show(5);
+            rc = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, destDir.toString(), "append");
             logger.debug("Write dataset status = " + rc);
         }
 
@@ -742,8 +742,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Output rdd length in data frame = " + recCounter.value() +"\n");
         logger.debug("Rejected rdd length in data frame = " + errCounter.value() +"\n");
         logger.debug("Dest dir for file in data frame = " + destDir +"\n");
-        localDataFrame = pivotOrFlattenDataset(localDataFrame);
-        int rc = commitDataSetFromDSMap(ngctx, localDataFrame, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
+        Dataset<Row> outputDS =  pivotOrFlattenDataset(localDataFrame);
+        int rc = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
         logger.debug("Write dataset status = " + rc);
         //Filter out Rejected Data
         collectRejectedData(parseRdd, outputRdd);
