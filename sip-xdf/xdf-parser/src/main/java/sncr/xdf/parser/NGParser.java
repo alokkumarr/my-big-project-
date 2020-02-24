@@ -388,15 +388,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
             inputDataset = jsonFileParser.parseInput(sourcePath, multiLine);
             inputDSCount = inputDataset.count();
-            Dataset<Row> outputDataset =  = pivotOrFlattenDataset(inputDataset, Optional.ofNullable(pivotFields), isFlatteningEnabled);
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
-
+            Dataset<Row> outputDataset = pivotOrFlattenDataset(inputDataset, Optional.ofNullable(pivotFields), isFlatteningEnabled);
             commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
-
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,outputDataset.cache());
