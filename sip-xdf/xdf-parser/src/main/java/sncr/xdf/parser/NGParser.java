@@ -206,7 +206,23 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         pivotFields = ngctx.componentConfiguration.getParser().getPivotFields();
         isFlatteningEnabled = ngctx.componentConfiguration.getParser().isFlatteningEnabled();
 
-		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
+        try {
+            String checkpointDir = generateCheckpointLocation(new DataSetHelper(ngctx, services.md), null, null);
+            if (ctx.fs.exists(new Path(checkpointDir))) {
+                HFileOperations.deleteEnt(checkpointDir);
+            }
+            HFileOperations.createDir(checkpointDir);
+            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
+        }catch (Exception e) {
+            logger.error("Exception in parser module: ", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException) e);
+            } else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
+        }
+
+        if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
 			logger.debug("format csv");
 			
 			logger.debug("#####Component config:: " + ngctx.componentConfiguration);

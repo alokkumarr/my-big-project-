@@ -20,6 +20,7 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import java.util.UUID;
 
 import java.time.Instant;
 import java.util.*;
@@ -506,7 +507,25 @@ public interface WithDataSet {
 
     }
 
+    default String  generateCheckpointLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
+        StringBuilder tempLocationBuilder = new StringBuilder(aux.ctx.xdfDataRootSys);
 
+        tempLocationBuilder.append(Path.SEPARATOR + aux.ctx.applicationID)
+            .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
+            .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
+            .append(Path.SEPARATOR + aux.ctx.batchID)
+            .append(Path.SEPARATOR + aux.ctx.componentName)
+            .append(Path.SEPARATOR + "checkpoint")
+
+            /* Creating a dynamic directory, so that components running is parallel will not
+             * run into conflicts
+             */
+            .append(Path.SEPARATOR + UUID.randomUUID().toString());
+
+        DataSetHelper.logger.debug(String.format("Generated temp location: %s",
+            tempLocationBuilder.toString()));
+        return tempLocationBuilder.toString();
+    }
 
 }
 

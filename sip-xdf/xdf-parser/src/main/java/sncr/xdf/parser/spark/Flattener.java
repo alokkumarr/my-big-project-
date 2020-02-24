@@ -8,6 +8,8 @@ import org.apache.spark.sql.types.ArrayType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.DataType;
 import static org.apache.spark.sql.functions.explode;
+import static org.apache.spark.sql.functions.max;
+import static org.apache.spark.sql.functions.size;
 import java.util.Arrays;
 
 public class Flattener {
@@ -64,14 +66,38 @@ public class Flattener {
             dataset = dataset.withColumn(newColName, dataset.col(colName));
         }
         dataset = dataset.drop(parentColName);
+        dataset = dataset.checkpoint(false);
         return dataset;
     }
 
-    private Dataset<Row> processArrayType(Dataset<Row> dataset, StructField arrayTypeField){
+/*    private Dataset<Row> processArrayType(Dataset<Row> dataset, StructField arrayTypeField){
         logger.debug("Processing ArrayType Field");
         String colName = arrayTypeField.name();
         logger.debug("Array Column Name : "+ colName);
         dataset = dataset.withColumn(colName,explode(dataset.col(colName)));
         return dataset;
+    }*/
+
+    private Dataset<Row> processArrayType(Dataset<Row> dataset, StructField arrayTypeField){
+        logger.debug("Processing ArrayType Field");
+        String parentColName = arrayTypeField.name();
+        logger.debug("Parent Column Name : "+ parentColName);
+        int arrSize = getArrayFieldMaxSize(dataset, parentColName);
+        for(int index = 0; index < arrSize; index++) {
+            String newColName = parentColName +  NEW_COLUMN_NAME_DELIMITER + index;
+            logger.debug("New Column Name : "+ newColName);
+            dataset = dataset.withColumn(newColName, dataset.col(parentColName).getItem(index));
+        }
+        dataset = dataset.drop(parentColName);
+        dataset = dataset.checkpoint(false);
+        return dataset;
+    }
+
+    private int getArrayFieldMaxSize(Dataset<Row> dataset, String arrayColName){
+        String newSizeColumn = arrayColName + NEW_COLUMN_NAME_DELIMITER + "arrSize";
+        Dataset<Row> arraySizeDS = dataset.withColumn(newSizeColumn,size(dataset.col(arrayColName)));
+        int arrSize = arraySizeDS.agg(max(arraySizeDS.col(newSizeColumn))).head().getInt(0);
+        logger.debug(arrayColName+" Array Column Max Length : "+ arrSize);
+        return arrSize;
     }
 }
