@@ -26,7 +26,7 @@ public class Pivot {
 
     public Dataset<Row> applyPivot(Dataset<Row> inputDS, PivotFields pivotFields){
         logger.debug("==> applyPivot()");
-        logger.info("inputDS count : " + inputDS.count());
+        logger.debug("inputDS count : " + inputDS.count());
         if(pivotFields == null) {
             return inputDS;
         }else{
@@ -36,16 +36,17 @@ public class Pivot {
             validatePivotFields(groupByColumns, pivotColumn, aggregateColumn);
 
             Dataset<Row> pivotExplodeDS = parsePivotField(inputDS, pivotColumn);
-            logger.info("pivotExplodeDS count : "+ pivotExplodeDS.count());
+            logger.debug("pivotExplodeDS count : "+ pivotExplodeDS.count());
 
             Dataset<Row> aggExplodeDS = parseAggregateField(pivotExplodeDS, pivotColumn, aggregateColumn);
-            logger.info("aggExplodeDS count : "+ aggExplodeDS.count());
+            logger.debug("aggExplodeDS count : "+ aggExplodeDS.count());
 
             Dataset<Row> grpByExplodeDS = parseGroupByFields(aggExplodeDS, pivotColumn, aggregateColumn, groupByColumns);
-            logger.info("grpByExplodeDS count : "+ grpByExplodeDS.count());
+            logger.debug("grpByExplodeDS count : "+ grpByExplodeDS.count());
 
             RelationalGroupedDataset groupByDS = null;
-            logger.info("Number of GroupBy Columns are : "+ groupByFields.length);
+            logger.debug("Number of GroupBy Columns are : "+ groupByFields.length);
+            logger.info("groupByFields are : "+ Arrays.toString(groupByFields));
             if(groupByFields.length == 1){
                 groupByDS = grpByExplodeDS.groupBy(groupByFields[0]);
             }else{
@@ -53,12 +54,12 @@ public class Pivot {
                     .mapToObj(index -> groupByFields[index].trim())
                     .toArray(String[]::new));
             }
-            logger.info("groupByDS count : "+ groupByDS.count().count());
+            logger.debug("groupByDS count : "+ groupByDS.count().count());
 
             logger.info("pivotFieldName : " + pivotFieldName);
             logger.info("aggFieldName : " + aggFieldName);
             Dataset<Row> pivotDS = groupByDS.pivot(pivotFieldName).agg(max(aggFieldName));
-            logger.info("pivotDS count : "+ pivotDS.count());
+            logger.debug("pivotDS count : "+ pivotDS.count());
             Dataset<Row> finalDS = sanitizeColumnNames(pivotDS);
             logger.info("Pivot finalDS count : "+ finalDS.count());
             return finalDS;
