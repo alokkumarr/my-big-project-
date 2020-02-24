@@ -242,7 +242,6 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
                   logger.info("error occured while parsing element to json node");
                 }
               });
-      logger.debug("Data from the stream  " + data);
       return data;
     }
   }

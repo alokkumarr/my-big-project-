@@ -8,6 +8,8 @@ import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as reverse from 'lodash/reverse';
 import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as set from 'lodash/set';
 import * as moment from 'moment';
 import { HeaderProgressService } from './../../../common/services';
 import {
@@ -89,7 +91,8 @@ export class ChartGridComponent {
       this._headerProgress.hide();
     });
   }
-  @ViewChild(DxDataGridComponent, { static: false }) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid: DxDataGridComponent;
 
   public analysis: AnalysisDSL;
   public chartOptions: ChartOptions;
@@ -317,8 +320,7 @@ export class ChartGridComponent {
     const chartData = orderedData || data;
 
     this.chartToggleData = this.trimKeyword(chartData);
-
-    return [
+    const updates = [
       ...this._chartService.dataToChangeConfig(
         analysis.type === 'chart'
           ? (<AnalysisChartDSL>analysis).chartOptions.chartType
@@ -341,6 +343,18 @@ export class ChartGridComponent {
         data: this.getChartHeight()
       }
     ];
+    // Setting the series color if any present in updater obj.
+    const seriesData = find(updates, ({ path }) => {
+      return path === 'series';
+    });
+    const { fields } = analysis.sipQuery.artifacts[0];
+    forEach(fields, serie => {
+      const matchedObj = find(seriesData.data, ({ dataType, aggregate }) => {
+        return dataType === serie.type && aggregate === serie.aggregate;
+      });
+      set(matchedObj, 'color', serie.seriesColor);
+    });
+    return updates;
   }
 
   getChartHeight() {

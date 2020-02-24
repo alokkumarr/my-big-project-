@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 /**
  * Created by srya0001 on 12/19/2017.
@@ -62,7 +63,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         logger.trace(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
-
     @Override
     protected int execute(){
         logger.debug("Processing NGTransformerComponent ......" );
@@ -89,15 +89,34 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
 
 //2. Read input datasets
-
             Map<String, Dataset> dsMap = new HashMap();
-            if (!(ngctx.runningPipeLine)) {
+            long inputDSCount = 0;
+            if (ngctx.runningPipeLine) {
+                String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
+                Dataset ds = ngctx.datafileDFmap.get(transInKey);
+                if(ds == null) {
+                    throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+                }
+                inputDSCount = ds.count();
+                if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0) {
+                    throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
+                }
+            }else{
                 for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputs.entrySet()) {
                     Map<String, Object> desc = entry.getValue();
                     String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
                     String format = (String) desc.get(DataSetProperties.Format.name());
+                    String transInKey =  (String) desc.get(DataSetProperties.Name.name());
+                    if(!HFileOperations.getFileSystem().exists(new Path(loc))){
+                        throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+                    }
+                    if(ngctx.componentConfiguration.isErrorHandlingEnabled() && HFileOperations.getFileSystem().getContentSummary(new Path(loc)).getLength() == 0){
+                        inputDSCount = 0;
+                        throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
+                    }
                     Dataset ds = reader.readDataset(entry.getKey(), format, loc);
                     logger.trace("Added to DS map: " + entry.getKey());
+                    inputDSCount = ds.count();
                     dsMap.put(entry.getKey(), ds);
                 }
             }
@@ -171,7 +190,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     return -1;
                 }
             }
-
+            validateOutputDSCounts(inputDSCount);
         } catch (Exception e) {
             logger.error("Exception in main transformer module: ",e);
             if (e instanceof XDFException) {
@@ -316,6 +335,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(handleErrorIfAny(component, rc, exception));
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        System.exit(rc);
     }
 }

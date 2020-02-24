@@ -509,10 +509,16 @@ public class UserRepositoryImpl implements UserRepository {
 
 		// Generic User Details
 		try {
-			String sql = "SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,C.IS_JV_CUSTOMER,R.ROLE_CODE,R.ROLE_TYPE "
+            StringBuffer sql = new StringBuffer();
+            sql.append("SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,C.IS_JV_CUSTOMER,R.ROLE_CODE,R.ROLE_TYPE "
 					+ "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
-					+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
-      TicketDetails ticketDetails = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, masterLoginId), new UserRepositoryImpl.PrepareTicketExtractor());
+					+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ");
+			// Check is Id3 enabled request.
+            if (user.isId3Enabled())
+            {
+                sql.append("AND ID3_ENABLED = TRUE");
+            }
+      TicketDetails ticketDetails = jdbcTemplate.query(sql.toString(), preparedStatement -> preparedStatement.setString(1, masterLoginId), new UserRepositoryImpl.PrepareTicketExtractor());
 			String configValSql = "SELECT CV.FILTER_BY_CUSTOMER_CODE FROM CONFIG_VAL CV, CUSTOMERS C WHERE CV.CONFIG_VAL_OBJ_GROUP=C.CUSTOMER_CODE AND CV.CONFIG_VAL_OBJ_GROUP=? ";
       Integer filterByCustCode =
           jdbcTemplate.query(
@@ -3121,8 +3127,8 @@ public class UserRepositoryImpl implements UserRepository {
     Valid valid = new Valid();
     String sql =
         "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID,SEC_GROUP_SYS_ID, ENCRYPTED_PASSWORD, "
-            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
-            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?, SYSDATE(), ? ); ";
+            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, ID3_ENABLED, CREATED_DATE, CREATED_BY ) "
+            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, SYSDATE(), ? ); ";
     try {
       jdbcTemplate.update(
           sql,
@@ -3141,7 +3147,8 @@ public class UserRepositoryImpl implements UserRepository {
             preparedStatement.setString(8, userDetails.getMiddleName());
             preparedStatement.setString(9, userDetails.getLastName());
             preparedStatement.setString(10, getActiveStatusInd(userDetails.getActiveStatusInd()));
-            preparedStatement.setString(11, createdBy);
+            preparedStatement.setBoolean(11,(userDetails.getId3Enabled()));
+            preparedStatement.setString(12, createdBy);
           });
     } catch (DuplicateKeyException e) {
       logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
@@ -3163,6 +3170,49 @@ public class UserRepositoryImpl implements UserRepository {
     return valid;
   }
 
+    @Override
+    public Valid updateUserDetails(UserDetails userDetails, String modifiedBy) {
+        Valid valid = new Valid();
+        String sql =
+            " UPDATE USERS SET EMAIL=? , ROLE_SYS_ID=?,SEC_GROUP_SYS_ID= ? , ENCRYPTED_PASSWORD =? , "
+                + "FIRST_NAME =? , MIDDLE_NAME =? , LAST_NAME=? , ACTIVE_STATUS_IND=? , ID3_ENABLED=? , MODIFIED_DATE= SYSDATE() , MODIFIED_BY=? "
+                + " where USER_SYS_ID=? and CUSTOMER_SYS_ID=? ; ";
+        try {
+            jdbcTemplate.update(
+                sql,
+                preparedStatement -> {
+                    preparedStatement.setString(1, userDetails.getEmail());
+                    preparedStatement.setLong(2, userDetails.getRoleId());
+                    if (userDetails.getSecGroupSysId() != null) {
+                        preparedStatement.setLong(3, userDetails.getSecGroupSysId());
+                    } else {
+                        preparedStatement.setNull(3, Types.BIGINT);
+                    }
+                    preparedStatement.setString(4, Ccode.cencode(userDetails.getPassword()).trim());
+                    preparedStatement.setString(5, userDetails.getFirstName());
+                    preparedStatement.setString(6, userDetails.getMiddleName());
+                    preparedStatement.setString(7, userDetails.getLastName());
+                    preparedStatement.setString(8, getActiveStatusInd(userDetails.getActiveStatusInd()));
+                    preparedStatement.setBoolean(9,(userDetails.getId3Enabled()));
+                    preparedStatement.setString(10, modifiedBy);
+                    preparedStatement.setLong(11, userDetails.getUserId());
+                    preparedStatement.setLong(12,userDetails.getCustomerId());
+                });
+        } catch (DataIntegrityViolationException de) {
+            logger.error("Exception encountered while updating user " + de.getMessage(), null, de);
+            valid.setValid(false);
+            valid.setError("Please enter valid input in the field(s)");
+            return valid;
+        } catch (Exception e) {
+            logger.error("Exception encountered while updating user " + e.getMessage(), null, e);
+            valid.setValid(false);
+            valid.setError(e.getMessage());
+            return valid;
+        }
+        valid.setValid(true);
+        return valid;
+    }
+
   private String getActiveStatusInd(Boolean activeStatusInd) {
     return activeStatusInd ? "1" : "0";
   }
@@ -3172,7 +3222,7 @@ public class UserRepositoryImpl implements UserRepository {
     UserDetails userDetails = null;
     String sql =
         "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, "
-            + "U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,U.ACTIVE_STATUS_IND,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME "
+            + "U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,U.ACTIVE_STATUS_IND,U.ID3_ENABLED, U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME "
             + "FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID "
             + " inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_ID=? AND U.CUSTOMER_SYS_ID=?";
     try {
@@ -3193,6 +3243,35 @@ public class UserRepositoryImpl implements UserRepository {
           null,
           e);
     }
+    return userDetails;
+    }
+
+      @Override
+      public UserDetails getUserbyId(long userSysId, Long customerSysId) {
+          UserDetails userDetails = null;
+          String sql =
+              "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, "
+                  + "U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,U.ACTIVE_STATUS_IND,U.ID3_ENABLED, U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME "
+                  + "FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID "
+                  + " inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_SYS_ID=? AND U.CUSTOMER_SYS_ID=?";
+          try {
+              userDetails =
+                  jdbcTemplate.query(
+                      sql,
+                      preparedStatement -> {
+                          preparedStatement.setLong(1, userSysId);
+                          preparedStatement.setLong(2, customerSysId);
+                      },
+                      new UserDetailsExtractor());
+          } catch (DataAccessException de) {
+              logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+              throw de;
+          } catch (Exception e) {
+              logger.error(
+                  "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+                  null,
+                  e);
+          }
 
     return userDetails;
   }

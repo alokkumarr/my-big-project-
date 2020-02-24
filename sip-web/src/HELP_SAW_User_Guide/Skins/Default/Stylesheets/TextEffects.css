@@ -200,6 +200,7 @@ a.MCToggler_Open.MCTogglerHotSpot
 	left: 20px;
 	white-space: normal;
 	filter: alpha( opacity = 0 );
+	display: none;
 	opacity: 0.0;
 	z-index: 10001;
 }
@@ -238,6 +239,190 @@ a.MCToggler_Open.MCTogglerHotSpot
 	border-bottom: none;
 	top: auto;
 	bottom: -13px;
+}
+
+/**/
+/* Topic Popup */
+
+.MCTopicPopup
+{
+	text-decoration: none;
+}
+
+.MCTopicPopupHotSpot
+{
+	cursor: pointer;
+	background-position: left center;
+	background-repeat: no-repeat;
+}
+
+.MCTopicPopup_Open.MCTopicPopupHotSpot
+{
+	
+}
+
+.MCTopicPopup_Closed.MCTopicPopupHotSpot
+{
+	
+}
+
+.MCTopicPopupContainer
+{
+	background-color: #FFFFFF;
+	padding: 10px;
+	position: fixed;
+	top: 100px;
+	left: 100px;
+	right: 100px;
+	bottom: 100px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: 0 4px 10px #333333;
+	-moz-box-shadow: 0 4px 10px #333333;
+	box-shadow: 0 4px 10px #333333;
+	filter: alpha( opacity = 0 );
+	opacity: 0.0;
+	z-index: 10001;
+}
+
+#contentBodyInner .MCTopicPopupContainer
+{
+	position: absolute;
+}
+
+.MCTopicPopupBody
+{
+	width: 100%;
+	border: none;
+}
+
+/**/
+/* Thumbnail Popup */
+
+.MCPopupThumbnailLink
+{
+	
+}
+
+.MCPopupThumbnail
+{
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.MCPopupContainer
+{
+	background-color: #FFFFFF;
+	border: solid 1px #000000;
+	padding: 10px;
+	position: absolute;
+	cursor: pointer;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	z-index: 1001;
+}
+
+.MCPopupContainer2
+{
+	background-color: #FFFFFF;
+	border: solid 1px #000000;
+	padding: 10px;
+	position: absolute;
+	cursor: pointer;
+	-moz-box-shadow: 2px 2px 8px #FFFFFF;
+	-webkit-box-shadow: 2px 2px 8px #FFFFFF;
+	box-shadow: 2px 2px 8px #FFFFFF;
+}
+
+.MCPopupFullImage
+{
+	width: 0px;
+	height: 0px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+/**/
+/* HelpControl */
+
+.MCHelpControl_Image_Icon
+{
+	border: none;
+}
+
+.MCHelpControl span
+{
+	background: url("Images/help-control.png") no-repeat left center;
+	padding-left: 18px;
+}
+
+a.MCHelpControl
+{
+	cursor: pointer;
+	text-decoration: none;
+}
+
+/**/
+/* Dialog */
+
+.MCDialog
+{
+	display: none;
+	width: 400px;
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	padding: 6px;
+	background-color: #000000;
+	border: 1px solid #000000;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-moz-box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+	box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+	filter: alpha( opacity = 0 );
+	opacity: 0.0;
+	z-index: 10001;
+}
+
+.MCDialogHeader
+{
+	margin: 0 0 4px;
+	padding: 5px 0 5px 5px;
+	color: #FFFFFF;
+	font-size: 15px;
+	font-family: Helvetica;
+}
+
+.MCDialogClose
+{
+	color: #FFFFFF;
+	font-family: tahoma, sans-serif;
+	font-weight: bold;
+	font-size: 16px;
+	line-height: 12px;
+	text-align: center;
+	text-decoration: none;
+	float: right;
+	width: 20px;
+	height: 18px;
+	padding-top: 2px;
+	margin-top: -2px;
+	background-color: #999999;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.MCDialogBody
+{
+	color: #555555;
+	padding: 10px;
+	background-color: #FFFFFF;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
 }
 
 /**/
@@ -575,6 +760,12 @@ a.MCToggler_Open.MCTogglerHotSpot
 	/* W3C */
 	-pie-background: url("Skins/Default/Stylesheets/Images/select-language.png") no-repeat center center, linear-gradient(#FFF, #ECECEC);
 	/*PIE*/
+}
+
+.invisible-label
+{
+	height: 1px;
+	font-size: 0px;
 }
 
 /* select-language-button image is dynamically set by javascript */
@@ -917,6 +1108,95 @@ span.SearchHighlight10
 .highlightIndex
 {
 	font-weight: bold;
+}
+
+.tooltip
+{
+	display: none;
+	position: absolute;
+	border: 1px solid #707070;
+	color: #707070;
+	background-color: white;
+	padding: .2rem .4rem .2rem .4rem;
+	font-size: .75rem;
+	z-index: 100001;
+	box-shadow: 0px 3px 9px rgba(0,0,0,0.16);
+	line-height: 1rem;
+	pointer-events: none;
+}
+
+button.CloseTopicPopupButton
+{
+	background: none;
+	color: #FFF;
+	border: none;
+	cursor: pointer;
+}
+
+button.CloseTopicPopupButton.CloseTopicOuter
+{
+	position: relative;
+	padding: 0;
+	top: -37px;
+	right: 4px;
+	display: block;
+	margin-left: auto;
+}
+
+button.CloseTopicPopupButton.CloseTopicInner
+{
+	font-size: 22px;
+}
+
+button.CloseTopicPopupButton:hover,
+button.CloseTopicPopupButton:focus
+{
+	color: #D3D3D3;
+}
+
+.CloseTopicPopupButtonContainer
+{
+	position: absolute;
+	width: 100%;
+}
+
+button.mc-dropdown-item
+{
+	border: none;
+	background: transparent;
+	text-align: left;
+	font: inherit;
+}
+
+.mc-dropdown-item
+{
+	display: block;
+	width: 100%;
+	padding: 5px;
+	white-space: nowrap;
+	text-decoration: none;
+	color: inherit !important;
+}
+
+.skip-to-content.fluid-skip
+{
+	position: relative;
+	width: 100%;
+	text-align: center;
+	display: block;
+	padding: 4px;
+}
+
+.skip-to-content.tripane-skip
+{
+	position: absolute;
+	left: 0;
+	overflow-wrap: break-word;
+	z-index: 20000;
+	text-align: center;
+	padding: .5rem;
+	top: 6rem;
+	width: 10rem;
 }
 
 @media print

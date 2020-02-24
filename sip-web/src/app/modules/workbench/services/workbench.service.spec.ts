@@ -80,4 +80,10 @@ describe('Workbench Service', () => {
       workbenchService.updateSemanticDetails({}) instanceof Observable
     ).toBeTruthy();
   });
+
+  it('getdataset with filters should exist and return an Observable', () => {
+    expect(
+      workbenchService.getFilteredDatasets({}) instanceof Observable
+    ).toBeTruthy();
+  });
 });

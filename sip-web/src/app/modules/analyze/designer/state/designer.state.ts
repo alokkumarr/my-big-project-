@@ -277,7 +277,7 @@ export class DesignerState {
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
-    const sortedArtifacts = filter(
+    let sortedArtifacts = filter(
       artifacts,
       artifact => !isEmpty(artifact.fields)
     );
@@ -287,6 +287,7 @@ export class DesignerState {
       sipQuery.sorts,
       sort => sort.columnName !== artifactColumn.columnName
     );
+    sortedArtifacts = DesignerService.setSeriesColorForColumns(sortedArtifacts);
     patchState({
       analysis: {
         ...analysis,
@@ -364,7 +365,6 @@ export class DesignerState {
         adapter.marker ===
         artifacts[artifactIndex].fields[artifactColumnIndex].area
     );
-
     // In case of reports, there's no concept of group adapters. Check for that here.
     if (targetAdapterIndex >= 0) {
       const targetAdapter = groupAdapters[targetAdapterIndex];
@@ -839,6 +839,7 @@ export class DesignerState {
     remove(sipQuery.artifacts, artifact => {
       return isEmpty(artifact.fields);
     });
+    artifacts = DesignerService.setSeriesColorForColumns(artifacts);
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
@@ -848,7 +849,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {}: DesignerClearGroupAdapters
+    {  }: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 

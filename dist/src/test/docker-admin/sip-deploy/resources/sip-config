@@ -142,8 +142,8 @@ saw_s3_export_size=1000000
 ## Chunk size for processing exports
 saw_export_chunk_size=10000
 
-## Alert dashboard URL required to send to mail.
-alert_dashboard_link=http://<hostname>/sip/web/#/alerts/view
+## Hostname required to form Alert dashboard URL.
+hostname=<hostname>
 
 saw_email_host=sip-admin
 
@@ -158,6 +158,7 @@ saw_security_email_host=sip-admin
 #
 sip_maxUnsuccessfulLoginAttemptAllowed=2
 sip_user_lockingTime_mins=2
+sip_id3_url=https://flying-kraken.id3.uat.cloud.synchronoss.net
 
 [saw-security-arbitrator]
 sip-app3

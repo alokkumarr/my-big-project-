@@ -10,7 +10,7 @@
       [ngClass]="{ 'sidenav-closed': !sidenav.opened }"
     >
     <div fxLayout="row" fxLayoutAlign="center center" class="menu-logo">
-      <div fxFlex class="company-logo-white"></div>
+      <app-branding-logo [page]="'sidenav'"></app-branding-logo>
     </div>
     <accordion-menu [source]="menu"></accordion-menu>
   </mat-sidenav>

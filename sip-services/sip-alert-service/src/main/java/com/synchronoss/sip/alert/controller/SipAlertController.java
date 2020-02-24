@@ -1,6 +1,9 @@
 package com.synchronoss.sip.alert.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
+
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.alert.exceptions.SipAlertRunTimeExceptions;
 import com.synchronoss.sip.alert.modal.AlertCount;
 import com.synchronoss.sip.alert.modal.AlertCountResponse;
 import com.synchronoss.sip.alert.modal.AlertResponse;
@@ -8,22 +11,33 @@ import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
+import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import com.synchronoss.sip.alert.modal.SubscriberStatus;
 import com.synchronoss.sip.alert.service.AlertService;
+import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import javax.ws.rs.QueryParam;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,10 +61,17 @@ import org.springframework.web.bind.annotation.RestController;
     })
 public class SipAlertController {
 
-  private static final Logger logger = LoggerFactory.getLogger(SipAlertController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SipAlertController.class);
 
-  @Autowired
-  AlertService alertService;
+  @Autowired private AlertUtils utils;
+  @Autowired private AlertService alertService;
+
+  private static final String ACCESS = "Access";
+  private static final String VIEW_ALERT = "View Alerts";
+  private static final String INVALID_TOKEN = "Invalid Token";
+  private static final String CONFIGURE_ALERT = "Configure Alerts";
+  private static String UNAUTHORIZED =
+      "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
 
   /**
    * create Alert API.
@@ -75,20 +96,25 @@ public class SipAlertController {
       HttpServletResponse response,
       @RequestBody AlertRuleDetails alertRuleDetails) {
     AlertResponse alertResponse = new AlertResponse();
+
     Ticket ticket = SipCommonUtils.getTicket(request);
-    if (ticket != null) {
-      if (alertRuleDetails == null) {
-        alertResponse.setMessage("Alert rule definition can't be null for create request");
-        response.setStatus(HttpStatus.SC_BAD_REQUEST);
-        return alertResponse;
-      }
-      alertResponse.setAlert(alertService.createAlertRule(alertRuleDetails, ticket));
-      alertResponse.setMessage("Alert rule created successfully");
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      alertResponse.setMessage("Invalid Token");
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertResponse);
     }
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), CONFIGURE_ALERT)) {
+      return utils.validatePermissionResponse(response, alertResponse, "Create");
+    }
+
+    if (alertRuleDetails == null) {
+      alertResponse.setMessage("Alert rule definition can't be null for create request");
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return alertResponse;
+    }
+
+    alertResponse.setAlert(alertService.createAlertRule(alertRuleDetails, ticket));
+    alertResponse.setMessage("Alert rule created successfully");
     return alertResponse;
   }
 
@@ -116,20 +142,24 @@ public class SipAlertController {
       @PathVariable(name = "id") String id,
       @RequestBody AlertRuleDetails alertRuleDetails) {
     AlertResponse alertResponse = new AlertResponse();
+
     Ticket ticket = SipCommonUtils.getTicket(request);
-    if (ticket != null) {
-      alertResponse.setAlert(alertService.updateAlertRule(alertRuleDetails, id, ticket));
-      if (alertRuleDetails == null) {
-        alertResponse.setMessage("Alert rule definition can't be null for create request");
-        response.setStatus(HttpStatus.SC_BAD_REQUEST);
-        return alertResponse;
-      }
-      alertResponse.setMessage("Alert rule updated successfully");
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      alertResponse.setMessage("Invalid Token");
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertResponse);
     }
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), CONFIGURE_ALERT)) {
+      return utils.validatePermissionResponse(response, alertResponse, "Edit");
+    }
+
+    alertResponse.setAlert(alertService.updateAlertRule(alertRuleDetails, id, ticket));
+    if (alertRuleDetails == null) {
+      alertResponse.setMessage("Alert rule definition can't be null for create request");
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return alertResponse;
+    }
+    alertResponse.setMessage("Alert rule updated successfully");
     return alertResponse;
   }
 
@@ -158,15 +188,18 @@ public class SipAlertController {
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
           @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize) {
+    AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     Ticket ticket = SipCommonUtils.getTicket(request);
-    AlertRuleResponse alertRuleResponse = null;
-    if (ticket != null) {
-      alertRuleResponse = alertService.retrieveAllAlerts(pageNumber, pageSize, ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertRuleResponse);
     }
-    return alertRuleResponse;
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertRuleResponse, ACCESS);
+    }
+
+    return alertService.retrieveAllAlerts(pageNumber, pageSize, ticket);
   }
 
   /**
@@ -187,14 +220,15 @@ public class SipAlertController {
   @ResponseBody
   public String listAlertOperators(HttpServletRequest request, HttpServletResponse response) {
     Ticket ticket = SipCommonUtils.getTicket(request);
-    String operators = null;
-    if (ticket != null) {
-      operators = alertService.retrieveOperatorsDetails(ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response);
     }
-    return operators;
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, ACCESS);
+    }
+    return alertService.retrieveOperatorsDetails(ticket);
   }
 
   /**
@@ -215,14 +249,15 @@ public class SipAlertController {
   @ResponseBody
   public String listAlertAggregation(HttpServletRequest request, HttpServletResponse response) {
     Ticket ticket = SipCommonUtils.getTicket(request);
-    String aggegation = null;
-    if (ticket != null) {
-      aggegation = alertService.retrieveAggregations(ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response);
     }
-    return aggegation;
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, ACCESS);
+    }
+    return alertService.retrieveAggregations(ticket);
   }
 
   /**
@@ -252,17 +287,20 @@ public class SipAlertController {
           @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize,
       @PathVariable(name = "categoryId") String categoryId) {
+    AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
 
     Ticket ticket = SipCommonUtils.getTicket(request);
-    AlertRuleResponse alertRuleResponse = null;
-    if (ticket != null) {
-      alertRuleResponse =
-          alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertRuleResponse);
     }
-    return alertRuleResponse;
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertRuleResponse, ACCESS);
+    }
+
+    return alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket);
   }
 
   /**
@@ -286,16 +324,19 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id) {
-
     AlertResponse alertResponse = new AlertResponse();
     Ticket ticket = SipCommonUtils.getTicket(request);
-    if (ticket != null) {
-      alertResponse.setAlert(alertService.getAlertRule(id, ticket));
-      alertResponse.setMessage("Alert rule retrieved successfully");
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertResponse);
     }
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertResponse, ACCESS);
+    }
+
+    alertResponse.setAlert(alertService.getAlertRule(id, ticket));
+    alertResponse.setMessage("Alert rule retrieved successfully");
     return alertResponse;
   }
 
@@ -323,19 +364,24 @@ public class SipAlertController {
 
     AlertResponse alertResponse = new AlertResponse();
     Ticket ticket = SipCommonUtils.getTicket(request);
-    if (ticket != null) {
-      Boolean flag = alertService.deleteAlertRule(id, ticket);
-      if (flag) {
-        alertResponse.setMessage("Alert rule deleted successfully");
-      } else {
-        response.setStatus(401);
-        alertResponse.setMessage("You are not authorized to delete alertId : " + id);
-      }
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertResponse);
     }
-    return alertResponse;
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), CONFIGURE_ALERT)) {
+      return utils.validatePermissionResponse(response, alertResponse, "Delete");
+    }
+
+    Boolean isAlertDeleted = alertService.deleteAlertRule(id, ticket);
+    if (isAlertDeleted) {
+      alertResponse.setMessage("Alert rule deleted successfully");
+      return alertResponse;
+    } else {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      alertResponse.setMessage("You are not authorized to delete alertId : " + id);
+      return alertResponse;
+    }
   }
 
   /**
@@ -365,22 +411,26 @@ public class SipAlertController {
       @ApiParam(value = "page size", required = false, defaultValue = "25")
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           Integer pageSize) {
+
+    AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
     Ticket ticket = SipCommonUtils.getTicket(request);
-    AlertStatesResponse alertStatesResponse = null;
-    if (ticket != null) {
-      alertStatesResponse = alertService.getAlertStates(id, pageNumber, pageSize, ticket);
-      if (alertStatesResponse != null) {
-        alertStatesResponse.setMessage("Success");
-        return alertStatesResponse;
-      } else {
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      }
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      alertStatesResponse.setMessage("Invalid Token");
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertStatesResponse);
     }
-    return alertStatesResponse;
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertStatesResponse, ACCESS);
+    }
+
+    alertStatesResponse = alertService.getAlertStates(id, pageNumber, pageSize, ticket);
+    if (alertStatesResponse != null) {
+      alertStatesResponse.setMessage("Success");
+      return alertStatesResponse;
+    } else {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return alertStatesResponse;
+    }
   }
 
   /**
@@ -410,16 +460,19 @@ public class SipAlertController {
       @ApiParam(value = "page size", required = false, defaultValue = "25")
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           Integer pageSize) {
+
+    AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
     Ticket ticket = SipCommonUtils.getTicket(request);
-    AlertStatesResponse alertStatesResponse = null;
-    if (ticket != null) {
-      alertStatesResponse =
-          alertService.listAlertStates(pageNumber, pageSize, ticket, alertStatesFilter);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response, alertStatesResponse);
     }
-    return alertStatesResponse;
+
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, alertStatesResponse, ACCESS);
+    }
+
+    return alertService.listAlertStates(pageNumber, pageSize, ticket, alertStatesFilter);
   }
 
   /**
@@ -452,14 +505,28 @@ public class SipAlertController {
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
           @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize) {
-    Ticket ticket = SipCommonUtils.getTicket(request);
-    List<AlertCountResponse> alertCountResponse = null;
-    if (ticket != null) {
+
+    List<AlertCountResponse> alertCountResponse = new ArrayList<>();
+    try {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (ticket == null) {
+        LOGGER.error(INVALID_TOKEN);
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        return alertCountResponse;
+      }
+
+      // validate the alerts access privileges
+      if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+        LOGGER.error(String.format(UNAUTHORIZED, ACCESS));
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        response.sendError(HttpStatus.SC_UNAUTHORIZED, String.format(UNAUTHORIZED, ACCESS));
+        return alertCountResponse;
+      }
+
       alertCountResponse =
           alertService.alertCount(alertCount, pageNumber, pageSize, alertRuleId, ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    } catch (IOException ex) {
+      LOGGER.error("Error while counting the alerts : {}", ex);
     }
     return alertCountResponse;
   }
@@ -482,13 +549,25 @@ public class SipAlertController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public Set<String> listAttributeValues(HttpServletRequest request, HttpServletResponse response) {
-    Ticket ticket = SipCommonUtils.getTicket(request);
-    Set<String> attributeValues = null;
-    if (ticket != null) {
+    Set<String> attributeValues = new HashSet<>();
+    try {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (ticket == null) {
+        LOGGER.error(INVALID_TOKEN);
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        return attributeValues;
+      }
+
+      // validate the alerts access privileges
+      if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+        LOGGER.error(String.format(UNAUTHORIZED, ACCESS));
+        setUnAuthResponse(response);
+        return attributeValues;
+      }
+
       attributeValues = alertService.listAttribueValues(ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    } catch (IOException ex) {
+      LOGGER.error("Error occurred while  fetching attribute values : {}", ex.getMessage());
     }
     return attributeValues;
   }
@@ -511,13 +590,54 @@ public class SipAlertController {
   @ResponseBody
   public String listMonitoringType(HttpServletRequest request, HttpServletResponse response) {
     Ticket ticket = SipCommonUtils.getTicket(request);
-    String monitoringTypes = null;
-    if (ticket != null) {
-      monitoringTypes = alertService.retrieveMonitoringType(ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    if (ticket == null) {
+      return utils.emptyTicketResponse(response);
     }
-    return monitoringTypes;
+    // validate the alerts access privileges
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
+      return utils.validatePermissionResponse(response, ACCESS);
+    }
+    return alertService.retrieveMonitoringType(ticket);
+  }
+
+  /**
+   * Unsubscribe an email id.
+   *
+   * @return Status of unsubscribe
+   */
+  @ApiOperation(value = "/subscriber/deactivate", response = String.class)
+  @RequestMapping(
+      value = "/subscriber/deactivate",
+      method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public SubscriberStatus deactivateSubscriber(
+      @QueryParam("token") String token, HttpServletRequest request, HttpServletResponse response) {
+    SubscriberStatus subscriberStatus = new SubscriberStatus();
+
+    try {
+
+      AlertSubscriberToken subscriberToken = alertService.extractSubscriberToken(token);
+
+      String alertRulesSysId = subscriberToken.getAlertRulesSysId();
+      String alertTriggerSysId = subscriberToken.getAlertTriggerSysId();
+      String emailId = subscriberToken.getEmailId();
+
+      Boolean status =
+          alertService.deactivateSubscriber(alertRulesSysId, alertTriggerSysId, emailId);
+
+      subscriberStatus.setStatus(status);
+
+      if (status == true) {
+        subscriberStatus.setMessage("Email unsubscribed successfully");
+      } else {
+        subscriberStatus.setMessage("Unable to unsubscribe");
+      }
+    } catch (SipAlertRunTimeExceptions ex) {
+      subscriberStatus.setStatus(false);
+      subscriberStatus.setMessage(ex.getMessage());
+    }
+
+    return subscriberStatus;
   }
 }

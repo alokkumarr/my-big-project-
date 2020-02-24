@@ -77,7 +77,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * @return
     */
   def loadObject(name: String, location: String, format: String, limit:Int = DLConfiguration.rowLimit) : Unit  = {
-    if (!sparkSession.catalog.tableExists("name")) {
+    if (!sparkSession.catalog.tableExists(name)) {
     //Recycling
       m_log trace s"Load object 1: $name at location: $location, sample size: $limit"
     if (loadedData.get(name).isDefined) loadedData -= name

@@ -1,8 +1,14 @@
 package com.synchronoss.saw.observe.service;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.service.AnalysisService;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
@@ -26,8 +32,10 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import sncr.bda.cli.Request;
 import sncr.bda.metastore.PortalDataSetStore;
 
@@ -38,6 +46,9 @@ public class ObserveServiceImpl implements ObserveService {
 
   @Value("${metastore.base}")
   private String basePath;
+
+  @Autowired
+  AnalysisService analysisService;
 
   /*
    * 24-hr date time format. E.g.: 2018-05-25 13:08:25
@@ -65,7 +76,7 @@ public class ObserveServiceImpl implements ObserveService {
       logger.error("Problem on the storage while creating an entity", ex);
       throw new SipCreateEntityException("Problem on the storage while creating an entity.");
     }
-    logger.debug("Response : " + response.toString());
+    logger.debug(Response, response.toString());
     return response;
   }
 
@@ -81,17 +92,17 @@ public class ObserveServiceImpl implements ObserveService {
       String id = node.getEntityId();
 
       String jsonStringFromStore = store.read(id).toString();
-      response.setMessage("Entity has been retrieved successfully");
+      response.setMessage(SUCCESS);
       ObjectMapper mapper = new ObjectMapper();
       Observe observeData = mapper.readValue(jsonStringFromStore, Observe.class);
       response =
-          ObserveUtils.prepareResponse(observeData, "Entity has been retrieved successfully");
+          ObserveUtils.prepareResponse(observeData, SUCCESS);
     } catch (Exception ex) {
-      logger.error("While retrieving it has been found that Entity does not exist.", ex);
+      logger.error("While retrieving it has been found that Entity does not exist. {}", ex);
       throw new SipReadEntityException(
           "While retrieving it has been found that Entity does not exist.");
     }
-    logger.debug("Response : " + response.toString());
+    logger.debug(Response, response.toString());
     return response;
   }
 
@@ -112,7 +123,7 @@ public class ObserveServiceImpl implements ObserveService {
       logger.error("Entity does not exist to update.", ex);
       throw new SipUpdateEntityException("Entity does not exist to update.");
     }
-    logger.debug("Response : " + response.toString());
+    logger.debug(Response, response.toString());
     return response;
   }
 
@@ -133,7 +144,7 @@ public class ObserveServiceImpl implements ObserveService {
       logger.error("Entity does not exist to delete.", ex.getCause());
       throw new SipDeleteEntityException("Entity does not exist to delete");
     }
-    logger.debug("Response : " + response.toString());
+    logger.debug(Response, response.toString());
     return response;
   }
 
@@ -161,30 +172,30 @@ public class ObserveServiceImpl implements ObserveService {
       String searchQuery =
           ObserveUtils.node2JsonString(
               node, basePath, node.getEntityId(), Action.SEARCH, Category.USER_INTERFACE, query);
-      logger.debug("Search Query getDashboardbyCategoryId :" + searchQuery);
+      logger.debug("Search Query getDashboardbyCategoryId : {}", searchQuery);
       Request request = new Request(searchQuery);
       JsonObject searchResult = request.search();
 
-      logger.debug("Search Result " + searchResult);
+      logger.debug("Search Result  {}", searchResult);
 
       if (searchResult != null && searchResult.has("result")) {
         JsonElement resultArray = searchResult.get("result");
-        logger.debug("Entity has been retrieved successfully :" + resultArray.toString());
+        logger.debug("Entity has been retrieved successfully : {}", resultArray);
         Content content = new Content();
         List<Observe> observeList = new ArrayList<Observe>();
         ObjectMapper mapper = new ObjectMapper();
         if (resultArray.isJsonArray()) {
           for (int i = 0, j = 1; i < resultArray.getAsJsonArray().size(); i++, j++) {
             logger.debug("Inside resultArray.isJsonArray() ");
-            logger.debug(
-                " element.isJsonArray() :" + resultArray.getAsJsonArray().get(i).isJsonArray());
+            logger.trace(
+                " element.isJsonArray() : {}", resultArray.getAsJsonArray().get(i).isJsonArray());
             logger.debug(
                 " element.isJsonObject() :"
                     + resultArray
-                        .getAsJsonArray()
-                        .get(i)
-                        .getAsJsonObject()
-                        .getAsJsonObject(String.valueOf(j)));
+                    .getAsJsonArray()
+                    .get(i)
+                    .getAsJsonObject()
+                    .getAsJsonObject(String.valueOf(j)));
             String jsonString =
                 resultArray
                     .getAsJsonArray()
@@ -198,7 +209,7 @@ public class ObserveServiceImpl implements ObserveService {
         }
         content.setObserve(observeList);
         response.setContents(content);
-        response.setMessage("Entity has been retrieved successfully");
+        response.setMessage(SUCCESS);
       } else {
         response.setMessage(
             "There is no data avaiable for the category Id & user Id"
@@ -207,12 +218,52 @@ public class ObserveServiceImpl implements ObserveService {
                 + node.getCreatedBy());
       }
     } catch (Exception ex) {
-      logger.error("While retrieving it has been found that Entity does not exist.", ex);
+      logger.error("While retrieving it has been found that Entity does not exist. {}", ex);
       throw new SipReadEntityException(
           "While retrieving it has been found that Entity does not exist.");
     }
-    logger.debug("Response : " + response.toString());
+    logger.debug(Response, response.toString());
     return response;
+  }
+
+  @Override
+  public boolean haveValidAnalysis(List<Object> observeTiles, Ticket ticket) {
+    ObjectMapper mapper = new ObjectMapper();
+    List<String> analysisId = new ArrayList<>();
+    if (observeTiles != null && !observeTiles.isEmpty()) {
+      observeTiles.stream().forEach(tile -> {
+        JsonNode node = mapper.convertValue(tile, JsonNode.class);
+        if (node.has("id")) {
+          analysisId.add(node.get("id").asText());
+        }
+      });
+
+      // validate the given analysis has valid user
+      if (!analysisId.isEmpty() && analysisId.size() > 0) {
+        try {
+          for (String id : analysisId) {
+            if (!StringUtils.isEmpty(id)) {
+              Analysis analysis = analysisService.getAnalysis(id, ticket);
+              Long privateCatForTicket = checkForPrivateCategory(ticket);
+              privateCatForTicket = privateCatForTicket == null ? 0L : privateCatForTicket;
+              logger.trace("Print the analysis {}", analysis);
+              if (!(ticket.getCustCode() != null && analysis != null
+                  && ticket.getCustCode().equalsIgnoreCase(analysis.getCustomerCode()))) {
+                return false;
+              }
+              Long userId = analysis != null ? analysis.getUserId() : 0L;
+              if (privateCatForTicket == Long.valueOf(analysis.getCategory())
+                  && !(ticket.getUserId().equals(userId))) {
+                return false;
+              }
+            }
+          }
+        } catch (Exception ex) {
+          logger.error("Error while checking the analysis for dashboard:  {}", ex.getMessage());
+        }
+      }
+    }
+    return true;
   }
 
   @Override

@@ -110,3 +110,16 @@ tr.dx-row.dx-header-row[role='row'] td[role='columnheader'] {
   height: 6px !important;
   width: 6px !important;
 }
+
+.dx-calendar-navigator .dx-calendar-caption-button.dx-button .dx-button-content {
+  color: $primary-blue-b1 !important;
+}
+
+.dx-calendar-cell.dx-calendar-contoured-date {
+  box-shadow: inset 0px 0px 0px 1px $primary-blue-b2 !important;
+  background-color: $primary-blue-b2 !important;
+}
+
+.dx-icon {
+  color: $primary-blue-b1 !important;
+}

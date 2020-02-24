@@ -15,6 +15,8 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
+import java.io.IOException;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.junit.Before;
@@ -24,6 +26,8 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
@@ -148,5 +152,22 @@ public class BaseIT {
    */
   protected String testId() {
     return UUID.randomUUID().toString();
+  }
+
+  /**
+   * Read Json data from classpath.
+   *
+   * @param classpath Classpath file.
+   * @return String
+   * @throws IOException when classpath file does not exists
+   */
+  public ObjectNode getJsonObject(String classpath) {
+    try {
+      Resource resource = new ClassPathResource(classpath);
+      return (ObjectNode) mapper.readTree(resource.getFile());
+    } catch (IOException e) {
+      log.error("Exception occurred while reading the file from class path {}", e);
+    }
+    return null;
   }
 }

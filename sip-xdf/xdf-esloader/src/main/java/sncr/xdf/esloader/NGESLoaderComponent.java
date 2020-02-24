@@ -34,6 +34,8 @@ import sncr.xdf.ngcomponent.AbstractComponent;
     import java.util.List;
     import java.util.Map;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import java.util.Optional;
 
     import static java.util.stream.Collectors.toList;
 
@@ -45,7 +47,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
     private static final Logger logger = Logger.getLogger(NGESLoaderComponent.class);
 
     //TODO: Remove thisx
-    public static String ESLOADER_DATASET;
+    private static String ESLOADER_DATASET;
 
     private Map<String, Object> esDataset;
     private String dataSetName;
@@ -78,6 +80,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             Map<String, Object> parameters = cli.parse(args);
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
+            
             if (configAsStr == null || configAsStr.isEmpty()) {
                 throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
@@ -109,6 +112,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
             logger.debug("Output datasets:");
+            
             ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.warn(id)
             );
@@ -124,7 +128,8 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(handleErrorIfAny(component, rc, exception));
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        System.exit(rc);
     }
 
     @Override
@@ -132,6 +137,11 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         int retVal = 0;
         try {
             esLoaderConfig = ngctx.componentConfiguration.getEsLoader();
+            if(esLoaderConfig.getAdditonalESConfigParams() != null){
+                logger.debug("#####After loading ES configuration additional params ######");
+                esLoaderConfig.getAdditonalESConfigParams().forEach((paramKey,paramVal) ->  logger.debug(paramKey+ "-->"+ paramVal));
+            }
+
 
             if (ngctx.inputDataSets != null && !ngctx.inputDataSets.isEmpty()) {
                 ESLOADER_DATASET = ngctx.inputDataSets.keySet().iterator().next();
@@ -149,7 +159,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
             Dataset<Row> inputDataset = dataSetMap.get(this.dataSetName);
 
-            inputDataset.show(4);
 
             ElasticSearchLoader loader = new ElasticSearchLoader(this.ctx.sparkSession, esLoaderConfig);
 

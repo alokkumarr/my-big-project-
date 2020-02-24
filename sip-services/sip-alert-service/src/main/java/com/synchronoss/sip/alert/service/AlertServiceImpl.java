@@ -10,6 +10,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.alert.exceptions.SipAlertRunTimeExceptions;
 import com.synchronoss.sip.alert.modal.AlertCount;
 import com.synchronoss.sip.alert.modal.AlertCount.GroupBy;
 import com.synchronoss.sip.alert.modal.AlertCountResponse;
@@ -20,7 +21,9 @@ import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertSeverity;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
+import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import com.synchronoss.sip.alert.modal.MonitoringType;
+import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.service.evaluator.EvaluatorListener;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Field.Type;
@@ -28,6 +31,8 @@ import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.Model.Preset;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
+
+import com.synchronoss.sip.alert.util.AlertUtils;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -45,6 +50,8 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import org.ojai.exceptions.OjaiException;
 import org.ojai.store.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,13 +63,13 @@ import sncr.bda.store.generic.schema.Sort;
 
 @Service
 public class AlertServiceImpl implements AlertService {
-  private static final Logger logger = LoggerFactory.getLogger(AlertServiceImpl.class);
-  private static final String DATE_FORMAT = "dd-MM-yyyy";
-  private static final String CUSTOMER_CODE = "customerCode";
-  private static final String ALERT_RULE_SYS_ID = "alertRulesSysId";
-  private static final String CREATED_TIME = "createdTime";
+  private static final Logger LOGGER = LoggerFactory.getLogger(AlertServiceImpl.class);
+
   private static final String ID = "id";
   private static final String NAME = "name";
+  private static final String CREATED_TIME = "createdTime";
+  private static final String DATE_FORMAT = "dd-MM-yyyy";
+  private static final String CUSTOMER_CODE = "customerCode";
 
   @Value("${sip.service.metastore.base}")
   @NotNull
@@ -74,14 +81,26 @@ public class AlertServiceImpl implements AlertService {
 
   @Value("${sip.service.metastore.alertResults}")
   @NotNull
-  private String alertTriggerLog;
+  private String alertResults;
+
+  @Value("${sip.service.metastore.subscribersTable}")
+  @NotNull
+  private String subscribersTable;
+
+  @Value("${subscriber.secret.key}")
+  @NotNull
+  private String subscriberSecretKey;
 
   @Autowired EvaluatorListener evaluatorListener;
 
   @PostConstruct
-  public void init() throws Exception {
-    MaprConnection alertRuleTableConnection = new MaprConnection(basePath, alertRulesMetadata);
-    MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertTriggerLog);
+  public void init() {
+    try {
+      MaprConnection alertRuleTableConnection = new MaprConnection(basePath, alertRulesMetadata);
+      MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertResults);
+    } catch (OjaiException e) {
+      LOGGER.error("Error occurred while setup tables {}", e);
+    }
   }
 
   /**
@@ -95,7 +114,7 @@ public class AlertServiceImpl implements AlertService {
   public AlertRuleDetails createAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
       Ticket ticket) {
-    logger.info("Inside create alert rule");
+    LOGGER.info("Inside create alert rule");
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     String id = UUID.randomUUID().toString();
     alert.setAlertRulesSysId(id);
@@ -166,7 +185,25 @@ public class AlertServiceImpl implements AlertService {
   public Boolean deleteAlertRule(
       @NotNull(message = "Alert Id cannot be null") @NotNull String alertRuleId, Ticket ticket) {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-    return connection.deleteById(alertRuleId);
+    boolean isDeleted = connection.deleteById(alertRuleId);
+    if (isDeleted) {
+      deleteSubscribersForAlertRule(alertRuleId);
+    }
+    return isDeleted;
+  }
+
+  private void deleteSubscribersForAlertRule(
+      @NotNull(message = "Alert Id cannot be null") @NotNull String alertRuleId) {
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+    try {
+      String[] fields = {"*"};
+      ObjectNode node =
+          AlertUtils.buildObjectNodeForMaprQuery(AlertUtils.ALERT_RULE_SYS_ID, alertRuleId);
+      boolean areSubscribersDeleted = connection.deleteByMaprDBQuery(fields, node.toString());
+      LOGGER.trace("are subscribers  deleted for alert rule:{}", areSubscribersDeleted);
+    } catch (Exception e) {
+      LOGGER.error("Exception occured while deleting the subscribers for alert rule:{}", e);
+    }
   }
 
   /**
@@ -187,8 +224,8 @@ public class AlertServiceImpl implements AlertService {
     try {
       alertRule = objectMapper.treeToValue(document, AlertRuleDetails.class);
     } catch (JsonProcessingException e) {
-      logger.error("error occured while converting json to alertRuledetails  ");
-      throw new RuntimeException("Error occured while retrieving alertdetails :" + e);
+      LOGGER.error("Error occurred while converting json to alertRuledetails");
+      throw new SipAlertRunTimeExceptions("Error occurred while retrieving alertdetails :" + e);
     }
     return alertRule;
   }
@@ -208,7 +245,7 @@ public class AlertServiceImpl implements AlertService {
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket) {
-    logger.info("Inside get alert rule by category");
+    LOGGER.info("Inside get alert rule by category");
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
@@ -221,7 +258,7 @@ public class AlertServiceImpl implements AlertService {
     objectNode1.put(CUSTOMER_CODE, ticket.getCustCode());
     arrayNode.add(node1);
     arrayNode.add(node2);
-    logger.debug("Mapr Filter query for alert rule by category:{}", node.toString());
+    LOGGER.debug("Mapr Filter query for alert rule by category:{}", node.toString());
     List<AlertRuleDetails> alertList =
         connection.runMaprDbQueryWithFilter(
             node.toString(), pageNumber, pageSize, CREATED_TIME, AlertRuleDetails.class);
@@ -292,20 +329,20 @@ public class AlertServiceImpl implements AlertService {
       Integer pageSize,
       Ticket ticket) {
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
-    logger.info("Inside states:");
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
+    LOGGER.info("Inside states:");
 
     List<AlertFilter> alertFilters = new ArrayList<>();
     AlertFilter customerFilter =
         new AlertFilter(CUSTOMER_CODE, ticket.getCustCode(), Type.STRING, Operator.EQ);
     AlertFilter filerByRuleId =
-        new AlertFilter(ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
+        new AlertFilter(AlertUtils.ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
     alertFilters.add(customerFilter);
     alertFilters.add(filerByRuleId);
     String query = getMaprQueryForFilter(alertFilters);
     List<AlertResult> alertResultLists =
         connection.runMaprDbQueryWithFilter(
-            query, pageNumber, pageSize, "startTime", AlertResult.class);
+            query, pageNumber, pageSize, AlertUtils.START_TIME, AlertResult.class);
     Long noOfRecords = connection.runMapDbQueryForCount(query);
     alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
@@ -325,7 +362,7 @@ public class AlertServiceImpl implements AlertService {
   @Override
   public AlertStatesResponse listAlertStates(
       Integer pageNumber, Integer pageSize, Ticket ticket, Optional<AlertStatesFilter> alertState) {
-    logger.trace("Request body to list all alert states:{}", alertState);
+    LOGGER.trace("Request body to list all alert states:{}", alertState);
     String query;
     List<AlertFilter> alertFilters;
     List<Sort> sorts = null;
@@ -336,17 +373,17 @@ public class AlertServiceImpl implements AlertService {
     } else {
       alertFilters = new ArrayList<>();
     }
-    if (sorts == null || sorts.size() == 0) {
+    if (sorts == null || sorts.isEmpty()) {
       sorts = new ArrayList<>();
-      Sort s = new Sort("startTime", SortOrder.DESC);
+      Sort s = new Sort(AlertUtils.START_TIME, SortOrder.DESC);
       sorts.add(s);
     }
     AlertFilter customerFilter =
         new AlertFilter(CUSTOMER_CODE, ticket.getCustCode(), Type.STRING, Operator.EQ);
     alertFilters.add(customerFilter);
     query = getMaprQueryForFilter(alertFilters);
-    logger.trace("Mapr Query for the filter:{}", query);
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
+    LOGGER.trace("Mapr Query for the filter:{}", query);
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
     List<AlertResult> alertResultLists =
         connection.runMaprDbQuery(query, pageNumber, pageSize, sorts, AlertResult.class);
     Long noOfRecords = connection.runMapDbQueryForCount(query);
@@ -450,7 +487,7 @@ public class AlertServiceImpl implements AlertService {
       Integer pageSize,
       String alertRuleSysId,
       Ticket ticket) {
-    logger.info("Inside Alert Count for group by :" + alertCount.getGroupBy());
+    LOGGER.info("Inside Alert Count for group by :" + alertCount.getGroupBy());
     GroupBy groupBy = alertCount.getGroupBy();
     List<AlertFilter> alertFilters = alertCount.getFilters();
     Preconditions.checkArgument(groupBy != null, "Group By field cannot be null");
@@ -460,16 +497,16 @@ public class AlertServiceImpl implements AlertService {
     alertFilters.add(customerFilter);
     if (alertRuleSysId != null) {
       AlertFilter filerByRuleId =
-          new AlertFilter(ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
+          new AlertFilter(AlertUtils.ALERT_RULE_SYS_ID, alertRuleSysId, Type.STRING, Operator.EQ);
       alertFilters.add(filerByRuleId);
     }
 
     String query = getMaprQueryForFilter(alertFilters);
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
-    logger.trace("Mapr Filter query for alert count:{}", query);
+    MaprConnection connection = new MaprConnection(basePath, alertResults);
+    LOGGER.trace("Mapr Filter query for alert count:{}", query);
     List<AlertResult> result =
         connection.runMaprDbQueryWithFilter(
-            query, pageNumber, pageSize, "startTime", AlertResult.class);
+            query, pageNumber, pageSize, AlertUtils.START_TIME, AlertResult.class);
     switch (alertCount.getGroupBy()) {
       case SEVERITY:
         return groupByseverity(result);
@@ -478,7 +515,7 @@ public class AlertServiceImpl implements AlertService {
       case DATE:
         return groupByDate(result);
       default:
-        throw new RuntimeException("unsupported group by field");
+        throw new SipAlertRunTimeExceptions("Unsupported group by field");
     }
   }
 
@@ -508,6 +545,137 @@ public class AlertServiceImpl implements AlertService {
       }
     }
     return elements.toString();
+  }
+
+  @Override
+  public Boolean deactivateSubscriber(
+      String alertRulesSysId, String alertTriggerSysId, String email) {
+    Boolean status;
+
+    List<AlertResult> alertResultList =
+        AlertUtils.getLastAlertResultByAlertRuleId(alertRulesSysId, basePath, alertResults);
+
+    if (alertResultList == null || alertResultList.size() == 0) {
+      throw new SipAlertRunTimeExceptions("Link is no more valid");
+    } else {
+      String lastAlertTrigger = alertResultList.get(0).getAlertTriggerSysId();
+
+      LOGGER.trace("Alert Trigger sys id = " + alertTriggerSysId);
+      LOGGER.trace("Last alert trigger = {}", lastAlertTrigger);
+
+      if (!lastAlertTrigger.equals(alertTriggerSysId)) {
+        // in case there is a mismatch in the incoming trigger ID and last trigger ID,
+        // throw error here
+        throw new SipAlertRunTimeExceptions("link is no more valid");
+      }
+    }
+
+    Optional<Subscriber> subscriberObj = fetchSubscriberByAlertIdAndEmail(alertRulesSysId, email);
+
+    Subscriber subscriber = null;
+    if (!subscriberObj.isPresent()) {
+      LOGGER.trace("Subscriber not found");
+      subscriber = new Subscriber();
+      subscriber.setSubscriberId(UUID.randomUUID().toString());
+
+      subscriber.setAlertRulesSysId(alertRulesSysId);
+      subscriber.setAlertTriggerSysId(alertTriggerSysId);
+      subscriber.setEmail(email);
+      subscriber.setActive(false);
+      subscriber.setCreatedTime(new Date());
+      subscriber.setModifiedTime(new Date());
+    } else {
+      subscriber = subscriberObj.get();
+      LOGGER.trace("Subscriber found");
+
+      if (subscriber.getActive() == false) {
+        throw new SipAlertRunTimeExceptions("Alert already unsubscribed");
+      }
+      subscriber.setActive(false);
+      subscriber.setModifiedTime(new Date());
+    }
+    LOGGER.trace("Subscriber = " + subscriber);
+
+    LOGGER.trace("Subscriber ID = " + subscriber.getSubscriberId());
+
+    status = createOrUpdateSubscriber(subscriber);
+
+    return status;
+  }
+
+  public AlertSubscriberToken extractSubscriberToken(String tokenStr) {
+    AlertSubscriberToken token = AlertUtils.parseSubscriberToken(tokenStr, subscriberSecretKey);
+
+    return token;
+  }
+
+  private Optional<Subscriber> fetchSubscriberByAlertIdAndEmail(
+      String alertRuleSysId, String email) {
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+
+    String query = prepareSubscriberQuery(alertRuleSysId, email);
+    LOGGER.trace("Mapr query for alert subscriber:{}", query);
+    List<Subscriber> result =
+        connection.runMaprDbQueryWithFilter(query, null, null, null, Subscriber.class);
+
+    if (result != null && result.size() != 0) return Optional.of(result.get(0));
+    else return Optional.empty();
+  }
+
+  @Override
+  public List<Subscriber> fetchInactiveSubscriberByAlertId(String alertRuleSysId) {
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+
+    ObjectNode alertRuleNode = objectMapper.createObjectNode();
+    ObjectNode alertRuleEqNode = alertRuleNode.putObject(MaprConnection.EQ);
+    alertRuleEqNode.put("alertRulesSysId", alertRuleSysId);
+
+    arrayNode.add(alertRuleNode);
+
+    ObjectNode emailNode = objectMapper.createObjectNode();
+    ObjectNode emailEqNode = emailNode.putObject(MaprConnection.EQ);
+    emailEqNode.put("active", Boolean.FALSE);
+
+    arrayNode.add(emailNode);
+
+    String query = node.toString();
+    LOGGER.trace("Mapr query for alert subscriber:{}", query);
+    return connection.runMaprDbQueryWithFilter(query, null, null, null, Subscriber.class);
+  }
+
+  public Boolean createOrUpdateSubscriber(Subscriber subscriber) {
+    Boolean status = true;
+
+    MaprConnection connection = new MaprConnection(basePath, subscribersTable);
+    connection.insertOrUpdate(subscriber.getSubscriberId(), subscriber);
+
+    return status;
+  }
+
+  private String prepareSubscriberQuery(String alertRuleSysId, String email) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+
+    ObjectNode alertRuleNode = objectMapper.createObjectNode();
+    ObjectNode alertRuleEqNode = alertRuleNode.putObject(MaprConnection.EQ);
+    alertRuleEqNode.put("alertRulesSysId", alertRuleSysId);
+
+    arrayNode.add(alertRuleNode);
+
+    ObjectNode emailNode = objectMapper.createObjectNode();
+    ObjectNode emailEqNode = emailNode.putObject(MaprConnection.EQ);
+    emailEqNode.put("email", email);
+
+    arrayNode.add(emailNode);
+
+    return node.toString();
   }
 
   private List<AlertCountResponse> groupByseverity(List<AlertResult> list) {
@@ -544,8 +712,8 @@ public class AlertServiceImpl implements AlertService {
         list.stream()
             .collect(
                 Collectors.groupingBy(
-                    alertTriggerLog -> {
-                      Long startTime = alertTriggerLog.getStartTime();
+                    result -> {
+                      Long startTime = result.getStartTime();
                       Date date = new Date(startTime);
                       DateFormat df = new SimpleDateFormat(DATE_FORMAT);
                       return df.format(date);
@@ -587,12 +755,12 @@ public class AlertServiceImpl implements AlertService {
           epochLte = getEpochFromDateTime(convertor.getLte());
         }
         ObjectNode innerNode = objectMapper.createObjectNode();
-        ArrayNode BetweenValues = innerNode.putArray("startTime");
-        BetweenValues.add(epochGte);
-        BetweenValues.add(epochLte);
-        ObjectNode OuterNode = objectMapper.createObjectNode();
-        OuterNode.set(MaprConnection.BTW, innerNode);
-        arrayNode.add(OuterNode);
+        ArrayNode betweenValues = innerNode.putArray(AlertUtils.START_TIME);
+        betweenValues.add(epochGte);
+        betweenValues.add(epochLte);
+        ObjectNode outerNode = objectMapper.createObjectNode();
+        outerNode.set(MaprConnection.BTW, innerNode);
+        arrayNode.add(outerNode);
       }
     }
 
@@ -604,6 +772,7 @@ public class AlertServiceImpl implements AlertService {
     Preconditions.checkArgument(preset != null, "Preset is missing for the date filter");
     return BuilderUtil.dynamicDecipher(filter.getPreset().value());
   }
+
   /**
    * Return timestamp from the given date.
    *
@@ -614,7 +783,6 @@ public class AlertServiceImpl implements AlertService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     LocalDateTime ldt = LocalDateTime.parse(date, formatter);
     ZoneId zoneId = ZoneId.systemDefault();
-    Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
-    return epochValue;
+    return ldt.atZone(zoneId).toInstant().toEpochMilli();
   }
 }

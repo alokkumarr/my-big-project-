@@ -32,6 +32,7 @@ import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.rtps.driver.EventProcessingApplicationDriver;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 
 public class NGRTPSComponent extends AbstractComponent
@@ -58,7 +59,11 @@ public class NGRTPSComponent extends AbstractComponent
             logger.debug("######## reading config path " + this.configPath);
             String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
             ComponentConfiguration config = null;
-            config = NGRTPSComponent.analyzeAndValidate(configAsStr);
+            try {
+                config = NGRTPSComponent.analyzeAndValidate(configAsStr);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage());
+            }
             Rtps rtpsProps = config.getRtps();
 
             if (ngctx == null) {
@@ -167,7 +172,8 @@ public class NGRTPSComponent extends AbstractComponent
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(handleErrorIfAny(component, rc, exception));
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        System.exit(rc);
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {

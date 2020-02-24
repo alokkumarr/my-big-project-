@@ -5,6 +5,10 @@ import {
   OnInit,
   AfterContentInit
 } from '@angular/core';
+import {
+  HeaderProgressService
+} from './../../../../common/services';
+
 import { Location } from '@angular/common';
 import { MatDialog, MatSidenav } from '@angular/material';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -38,6 +42,8 @@ export class CreateDashboardComponent
   public mode = 'create';
   public sidebarWidget: string;
   public editItem: any;
+  public executionInProgress: boolean;
+  progressSub;
 
   editSubscription: Subscription;
 
@@ -51,8 +57,13 @@ export class CreateDashboardComponent
     public dashboardService: DashboardService,
     public observe: ObserveService,
     private locationService: Location,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    public _headerProgress: HeaderProgressService
+  ) {
+    this.progressSub = _headerProgress.subscribe(showProgress => {
+      this.executionInProgress = showProgress;
+    });
+  }
 
   ngOnInit() {
     const { dashboardId, mode, categoryId } = this.route.snapshot.queryParams;
@@ -73,6 +84,7 @@ export class CreateDashboardComponent
         .getDashboard(dashboardId)
         .subscribe((dashboard: Dashboard) => {
           this.dashboard = dashboard;
+          this.globalFilterService.lastAnalysisFilters = dashboard.filters;
           this.checkEmpty(this.dashboard);
         });
     }

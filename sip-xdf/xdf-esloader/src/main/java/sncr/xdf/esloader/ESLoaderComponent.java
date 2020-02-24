@@ -7,9 +7,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.base.MetadataStore;
@@ -37,10 +38,10 @@ import sncr.xdf.context.XDFReturnCode;
  * Created by skbm0001 on 29/1/2018.
  */
 public class ESLoaderComponent extends Component implements WithSparkContext, WithDataSetService {
-    private static final Logger logger = Logger.getLogger(ESLoaderComponent.class);
+    private static final Logger logger = LoggerFactory.getLogger(ESLoaderComponent.class);
 
     //TODO: Remove this
-    public static String ESLOADER_DATASET;
+    private static String ESLOADER_DATASET;
 
     private Map<String, Object> esDataset;
     private String dataSetName;
@@ -61,7 +62,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
                 System.exit(r);
             }
         } catch (Exception e){
-            e.printStackTrace();
+            logger.error("Error occurred while loading {}", e.getMessage());
             System.exit(-1);
         }
     }
@@ -123,7 +124,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             }
             return retVal;
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.error("Error occurred : {}", ex.getMessage());
             retVal = -1;
         }
 
@@ -290,7 +291,6 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         if (alias != null) {
             system.addProperty(DataSetProperties.PhysicalLocation.toString(), alias);
             system.addProperty(DataSetProperties.Name.toString(), alias);
-//            system.addProperty("alias", alias);
         } else {
             system.addProperty(DataSetProperties.PhysicalLocation.toString(), index);
             system.addProperty(DataSetProperties.Name.toString(), index);
