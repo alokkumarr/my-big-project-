@@ -393,11 +393,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
-            Dataset<Row> outputDataset = pivotOrFlattenDataset(inputDataset, Optional.ofNullable(pivotFields), isFlatteningEnabled);
-            commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+            Dataset<Row> outputDS = pivotOrFlattenDataset(inputDataset, Optional.ofNullable(pivotFields), isFlatteningEnabled);
+            commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, Output.Mode.APPEND.name());
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,outputDataset.cache());
+            ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
          }
 		else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
 		{
