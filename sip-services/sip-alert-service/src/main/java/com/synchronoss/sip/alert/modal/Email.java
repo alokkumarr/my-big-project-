@@ -2,7 +2,7 @@ package com.synchronoss.sip.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.List;
+import java.util.Set;
 
 public class Email {
 
@@ -11,7 +11,7 @@ public class Email {
       "recipients",
   })
   @JsonProperty("recipients")
-  List<String> recipients;
+  Set<String> recipients;
 
   String template;
 
@@ -20,12 +20,12 @@ public class Email {
    *
    * @return value of recipients
    */
-  public List<String> getRecipients() {
+  public Set<String> getRecipients() {
     return recipients;
   }
 
   /** Sets recipients. */
-  public void setRecipients(List<String> recipients) {
+  public void setRecipients(Set<String> recipients) {
     this.recipients = recipients;
   }
 
