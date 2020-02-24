@@ -8,125 +8,107 @@ let Header = require('../components/Header');
 class UserManagementPage {
   constructor() {
     // Initialize all elements
-    this._loginErrorMessage = element(by.css('[e2e="error-msg"]'));
-    this._addUser = element(by.xpath('//span[text()=\'USER\']'));
-    this._roledropdown = element(by.css('[formcontrolname="roleId"]'));
+    this._addUser = element(by.css('[e2e="admin-selector-user"]'));
+    this._roledropdown = element(by.css('[e2e="role-types"]'));
     this._selectDropDownElement = Option => element(by.cssContainingText('span',`${Option}`));
-    this._firstName = element(by.css('[formcontrolname="firstName"]'));
-    this._middleName = element(by.css('[formcontrolname="middleName"]'));
-    this._lastName = element(by.css('[formcontrolname="lastName"]'));
-    this._loginId = element(by.css('[formcontrolname="masterLoginId"]'));
-    this._password = element(by.css('[type="password"]'));
-    this._emailId = element(by.css('[formcontrolname="email"]'));
-    this._statusdropdown = element(by.css('[formcontrolname="activeStatusInd"]'));
-    this._activeStatusOption = Option => element(by.xpath(`//span[text()=' ${Option} ']`));
-    this._inactiveStatusOption = Option => element(by.cssContainingText('span',`${Option}`));
+    this._firstName = element(by.css('[e2e="first-name"]'));
+    this._middleName = element(by.css('[e2e="middle-name"]'));
+    this._lastName = element(by.css('[e2e="last-name"]'));
+    this._loginId = element(by.css('[e2e="master-login-id"]'));
+    this._password = element(by.css('[e2e="password-input"]'));
+    this._emailId = element(by.css('[e2e="user-email"]'));
+    this._statusdropdown = element(by.css('[e2e="user-status"]'));
+    this._selectStatus = status => element(by.xpath(`//span[text()=' ${status} ']`));
     this._createUser = element(by.css('[e2e="create-analysis-btn"]'));
     this._cancelButton = element(by.cssContainingText('span','Cancel'));
-    this._toastMessage = message => element(by.cssContainingText('div',`${message}`));
-    this._deleteUserName = value => element(by.xpath(`//div[text()='${value}']/following::mat-icon[@fonticon='icon-trash']`));
-    this._confirmDeleteButton = element(by.css(`[e2e='confirm-dialog-ok-btn']`));
+    this._deleteUser = value => element(by.xpath(`//span[text()='${value}']/following::mat-icon[@fonticon='icon-trash']`));
+    this._confirmDelete = element(by.css(`[e2e='confirm-dialog-ok-btn']`));
     this._passwordErrorAlert = element(by.cssContainingText('pre',`Password should have`));
+    this._search = element(by.css(`[e2e="search-admin"]`));
+    this._clickSearch =this._search.element(by.css(`[fonticon="icon-search"]`));
+    this._searchUser = element(by.css(`[e2e="search-box-admin"]`));
+    this._toastMessage = element(by.xpath(`//div[@class='toast-message']`));
   }
 
-  clickNewUser() {
-    logger.debug('Click on New User button');
+  addUser() {
     commonFunctions.waitFor.elementToBeVisible(this._addUser);
-    this._addUser.click();
+    commonFunctions.clickOnElement(this._addUser);
   }
 
   clickRole() {
-    logger.debug('Click on role drop down button');
-    this._roledropdown.click();
+    commonFunctions.clickOnElement(this._roledropdown);
   }
 
-  selectRole(selectiveOption) {
-    logger.debug('selecting the roleType :' + selectiveOption);
-    commonFunctions.clickOnElement(this._selectDropDownElement(selectiveOption));
-  }
-
-
-  validateStatusOfCreatedRole(createdRole) {
-    commonFunctions.waitFor.elementToBeNotVisible(this._selectDropDownElement(createdRole));
-    browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+  chooseRole(Option) {
+    commonFunctions.clickOnElement(this._selectDropDownElement(Option));
   }
 
   fillFirstName(firstName) {
-    logger.debug('Filling firstName with :' + firstName);
     commonFunctions.fillInput(this._firstName, firstName);
-
   }
 
   fillMiddleName(middleName) {
-    logger.debug('Filling password with :' + middleName);
     commonFunctions.fillInput(this._middleName, middleName);
   }
 
   fillLastName(lastName) {
-    logger.debug('Filling password with :' + lastName);
     commonFunctions.fillInput(this._lastName, lastName);
   }
 
   fillLoginId(loginId) {
-    logger.debug('Filling password with :' + loginId);
     commonFunctions.fillInput(this._loginId, loginId);
   }
 
   fillPassword(password) {
-    logger.debug('Filling password with :' + password);
     commonFunctions.fillInput(this._password, password);
   }
 
-  fillEmailId(emailid) {
-    logger.debug('Filling password with :' + emailid);
+  fillEmail(emailid) {
     commonFunctions.fillInput(this._emailId, emailid);
   }
 
   clickStatus() {
-    logger.debug('Click on role drop down button');
     commonFunctions.waitFor.elementToBeVisible(this._statusdropdown);
-    this._statusdropdown.click();
+    commonFunctions.clickOnElement(this._statusdropdown);
   }
 
   selectStatus(status) {
-    logger.debug('selecting the StatusType as active');
-    commonFunctions.clickOnElement(this._activeStatusOption(status));
+    commonFunctions.clickOnElement(this._selectStatus(status));
   }
 
   clickCancel() {
-    logger.debug('Click on Cancel button');
     commonFunctions.clickOnElement(this._cancelButton);
   }
 
-  clickCreate() {
-    logger.debug('Click on Create button');
+  createUser() {
     commonFunctions.waitFor.elementToBeVisible(this._createUser);
     commonFunctions.clickOnElement(this._createUser);
   }
 
-  /*Method to verify Toast message*/
-  verifyToastMessage(message) {
-    element(
-      this._toastMessage(message).getText().then(value => {
-        if (value) {
-          expect(value.trim()).toEqual(message.trim());
-          commonFunctions.clickOnElement(this._toastMessage(message));
-        } else {
-          expect(false).toBe(
-            true,
-            'Toast Message should be equal but mismatched'
-          );
-        }
-      })
-    );
+  searchUser(userName) {
+    commonFunctions.clickOnElement(this._clickSearch);
+    commonFunctions.fillInput(this._searchUser,userName);
   }
+
+  deleteUser(userName) {
+    commonFunctions.clickOnElement(this._deleteUser(userName));
+    commonFunctions.clickOnElement(this._confirmDelete);
+  }
+
+  generateRandomString(dataType,length) {
+      var result = '';
+      var characters = dataType;
+      var charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
 
   validateEmail(emailStatus) {
     browser.actions().sendKeys(protractor.Key.TAB).perform();
     this._emailId.getAttribute("aria-invalid").then(status =>{
       if(status){
-        console.log("disabled status is "+status);
-        console.log("email status is "+emailStatus);
         expect(status).toEqual(emailStatus);
         logger.debug('Email status is matched and validation successful');
       }else {
@@ -150,49 +132,22 @@ class UserManagementPage {
           'PassWord Status validation is not successful'
         );
       }
-      });
-    }
-
-    validatePasswordErrorText(ErrorMessage) {
-      this._passwordErrorAlert.getText().then( passwordError=> {
-        if(passwordError){
-          expect(passwordError).toContain(ErrorMessage);
-          logger.debug('PassWord Error Message validation successful');
-        }else {
-          expect(false).toBe(
-            true,
-            'PassWord Error Message validation is not successful'
-          );
-        }
-      })
-    }
-
-  DeleteCreatedUser(userName) {
-    /*commonFunctions.waitFor.elementToBeVisible(this._deleteUserName(userName));
-    commonFunctions.clickOnElement(this._deleteUserName(userName));*/
-    this._deleteUserName(userName).isDisplayed().then(()=>{
-      commonFunctions.clickOnElement(this._deleteUserName(userName));
-      this.clickConfirmDelete();
-    },()=>{
-      console.log("User is not present to Delete" + userName);
     });
   }
 
-  clickConfirmDelete() {
-    commonFunctions.clickOnElement(this._confirmDeleteButton);
-    }
-
-  validateLoginErrorMessage(message) {
-    this._loginErrorMessage.getText().then(errorMessage=>{
-      if(errorMessage){
-        expect(errorMessage).toBe(message);
-        logger.debug('Login error message validation successful');
+  validatePasswordErrorText(ErrorMessage) {
+    this._passwordErrorAlert.getText().then( passwordError=> {
+      if(passwordError){
+        expect(passwordError).toContain(ErrorMessage);
+        logger.debug('PassWord Error Message validation successful');
       }else {
-        expect(false).toBe(true,'Login error message validation is not successful');
+        expect(false).toBe(
+          true,
+          'PassWord Error Message validation is not successful'
+        );
       }
     })
   }
-  }
-
+}
 
 module.exports = UserManagementPage;

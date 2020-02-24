@@ -42,6 +42,9 @@ class Header extends SideNav {
     this._alertsLink = element(
       by.xpath('//a[contains(@class,"module-alerts")]')
     );
+    this._adminLink = element(
+      by.xpath('//a[contains(@class,"module-admin")]')
+    );
   }
 
   clickOnModuleLauncher() {
@@ -108,6 +111,26 @@ class Header extends SideNav {
 
   clickOnConfigureAlert() {
     commonFunctions.clickOnElement(this._configureAlert);
+  }
+
+  clickOnAdminLink() {
+    commonFunctions.clickOnElement(this._adminLink);
+  }
+
+  statusOfAdminLink(role) {
+    if(role === "ADMIN") {
+      this.visibilityOfAdminLink();
+    }else {
+      this.invisibilityOfAdminLink();
+    }
+  }
+
+  invisibilityOfAdminLink() {
+    commonFunctions.waitFor.elementToBeNotVisible(this._adminLink);
+  }
+
+  visibilityOfAdminLink() {
+    commonFunctions.waitFor.elementToBeVisible(this._adminLink);
   }
 }
 module.exports = Header;

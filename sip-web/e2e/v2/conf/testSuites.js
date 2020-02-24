@@ -61,14 +61,10 @@ const CRITICAL = [
   'reports/DLReportQuery.test.js',
   'pivots/UpdateAndDeletePivot.test.js',
   'alert/addAlert.test.js',
-  'alert/editDeleteAlerts.test.js'
+  'alert/editDeleteAlerts.test.js',
+  'admin/create-user.test.js'
 ];
 // All tests which were executed in critical with larger data set
-const REGRESSION = [
-  ...CRITICAL,
-  TEST_BASE_DIR + 'change-password/changepassword.test.js',
-  TEST_BASE_DIR + 'admin/userManagement-create-role_user.test.js'
-];
 const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
