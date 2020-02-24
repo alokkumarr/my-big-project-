@@ -168,7 +168,7 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
       testBaseDir +
-      'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
       testBaseDir + 'observe/dashboardGlobalFilter.test.js',
       testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
@@ -199,7 +199,7 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
       testBaseDir +
-      'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+        'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
       testBaseDir + 'observe/dashboardGlobalFilter.test.js',
       testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
@@ -215,8 +215,8 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'dummyDevelopmentTests1.js',
-      testBaseDir + 'dummyDevelopmentTests2.js'
+      /* testBaseDir + 'dummyDevelopmentTests1.js',
+      testBaseDir + 'dummyDevelopmentTests2.js', */
     ]
   },
   onCleanUp: function(results) {
@@ -314,13 +314,13 @@ exports.config = {
       if (!appUrl) {
         logger.error(
           'appUrl can not be null or undefined hence exiting the e2e suite...appUrl:' +
-          appUrl +
-          ', hence exiting test suite and failing it...'
+            appUrl +
+            ', hence exiting test suite and failing it...'
         );
         process.exit(1);
       }
 
-      try {
+       try {
         logger.info('Generating test for this run...');
 
         let APICommonHelpers = require('./v2/helpers/api/APICommonHelpers');
@@ -343,8 +343,8 @@ exports.config = {
       } catch (e) {
         logger.error(
           'There is some error during cleanup and setting up test data for e2e tests, ' +
-          'hence exiting test suite and failing it....' +
-          e
+            'hence exiting test suite and failing it....' +
+            e
         );
         process.exit(1);
       }
@@ -377,7 +377,7 @@ exports.config = {
         }
         logger.error(
           'There are some failures hence marking test suite failed. Failed tests are: ' +
-          JSON.stringify(failedTests)
+            JSON.stringify(failedTests)
         );
         process.exit(1);
       } else if (retryStatus === 0) {
@@ -388,7 +388,7 @@ exports.config = {
           );
           logger.error(
             'There are some failures hence marking test suite failed. Failed tests are: ' +
-            JSON.stringify(failedTests)
+              JSON.stringify(failedTests)
           );
           process.exit(1);
         }
