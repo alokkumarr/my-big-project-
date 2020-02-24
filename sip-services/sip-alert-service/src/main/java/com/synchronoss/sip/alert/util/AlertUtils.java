@@ -1,16 +1,28 @@
 package com.synchronoss.sip.alert.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.saw.model.Model.Operator;
 
+import com.synchronoss.sip.alert.modal.AlertResult;
+import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,6 +33,7 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import sncr.bda.base.MaprConnection;
 
 
 @Component
@@ -29,6 +42,12 @@ public class AlertUtils {
 
   private static final String INVALID_TOKEN = "Invalid Token";
   private static final String ERROR_MESSAGE = "Error occurred while checking permission {}";
+  public static final String ALERT_RULE_SYS_ID = "alertRulesSysId";
+  public static final String START_TIME = "startTime";
+  public static final String ALERT_STATE = "alertState";
+  public static final String ALERT_UNSUBSCRIBE = "AlertUnsubscription";
+  public static final String ALERT_SUBSCRIBER = "AlertSubscriber";
+
   private static String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
 
@@ -261,5 +280,76 @@ public class AlertUtils {
       LOGGER.error(ERROR_MESSAGE, ex);
       return errorMessage;
     }
+  }
+
+  public static String getSubscriberToken(AlertSubscriberToken alertSubscriberToken, String secretKey) {
+    return Jwts.builder()
+        .setSubject(ALERT_UNSUBSCRIBE)
+        .claim(ALERT_SUBSCRIBER, alertSubscriberToken)
+        .setIssuedAt(new Date())
+        .signWith(SignatureAlgorithm.HS256, secretKey)
+        .compact();
+  }
+
+  public static AlertSubscriberToken parseSubscriberToken(String token, String secretKey) {
+    // Check if the Token is valid
+    try {
+      Claims ssoToken = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+      Set<Entry<String, Object>> entrySet =
+          ((Map<String, Object>) ssoToken.get(ALERT_SUBSCRIBER)).entrySet();
+      String alertRulesSysId = null,
+          alertTriggerSysId = null,
+          emailId = null,
+          alertRuleName = null,
+          alertRuleDescription = null;
+      for (Map.Entry<String, Object> pair : entrySet) {
+        if (pair.getKey().equals("alertRulesSysId")) {
+          alertRulesSysId = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("alertTriggerSysId")) {
+          alertTriggerSysId = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("emailId")) {
+          emailId = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("alertRuleName")) {
+          alertRuleName = pair.getValue().toString();
+        }
+        if (pair.getKey().equals("alertRuleDescription")) {
+          alertRuleDescription = pair.getValue().toString();
+        }
+      }
+      AlertSubscriberToken alertSubscriberToken =
+          new AlertSubscriberToken(
+              alertRulesSysId, alertRuleName, alertRuleDescription, alertTriggerSysId, emailId);
+      return alertSubscriberToken;
+    } catch (SignatureException signatureException) {
+      throw signatureException;
+    } catch (Exception exception) {
+      throw exception;
+    }
+  }
+
+  public static List<AlertResult> getLastAlertResultByAlertRuleId(
+      String alertRulesSysId, String basePath, String alertResultsTable) {
+    ObjectNode node = buildObjectNodeForMaprQuery(ALERT_RULE_SYS_ID, alertRulesSysId);
+    MaprConnection connection = new MaprConnection(basePath, alertResultsTable);
+    return connection.runMaprDbQueryWithFilter(
+        node.toString(), 1, 1, AlertUtils.START_TIME, AlertResult.class);
+  }
+
+  /**
+   * Build a query node which need to be executed on mapr db.
+   *
+   * @param columnName column name for the query
+   * @param columnValue column value for the query
+   * @return ObjectNode
+   */
+  public static ObjectNode buildObjectNodeForMaprQuery(String columnName, String columnValue) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put(columnName, columnValue);
+    return node;
   }
 }

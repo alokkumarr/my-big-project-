@@ -5,6 +5,12 @@
   yum: name=/tmp/sip-alert.rpm state=present
   notify:
     - restart sip-alert
+# Generate the random secret key to make key unique per SIP enviroment.
+- name: Generate sip-alert-subscriber jwt secret key
+  set_fact:
+    alert_subscriber_jwt_secret: >-
+      {{ lookup('password', inventory_dir
+        + '/alert_subscriber_jwt_secret chars=ascii_letters,digits') }}
 - name: Install SIP alert Service configuration file
   template: src=application.yml dest=/opt/bda/sip-alert-service/conf
   notify:
