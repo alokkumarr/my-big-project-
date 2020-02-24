@@ -1,0 +1,30 @@
+
+<div  [ngClass]="{'alert-subscribe-login': userLoggedIn, 'alert-subscribe-notlogin':!userLoggedIn }">
+  <div class="alert-unsubscribe-content">
+    <div class="company-logo align-center"></div>
+    <div class="content">
+      <div class="header">
+        <h1>Alert Unsubscription</h1>
+        <h3>
+          By Clicking on Un-Subscribe, notifications generated from the following Alert will be disabled.
+        </h3>
+      </div>
+      <div fxLayout="column" class="alert-details">
+        <!-- <span><b>E-Mail ID:</b> {{ parsedToken.AlertSubscriber.emailId }}</span> -->
+        <span><b>Alert Name:</b> {{ alertDetails.alertId }}</span>
+        <span><b>Alert Description:</b> {{ alertDetails.alertDesc }}</span>
+      </div>
+
+      <button (click)="unSubscribeAlert()"
+        class ="alert-unsubscribe-button state-`${disableSubmit}`"
+        [ngClass]="{'state-true': disableSubmit, 'state-false':!disableSubmit }"
+        mat-raised-button color="primary"
+        [disabled]="disableSubmit" i18n
+      >
+        Un-Subscribe
+      </button>
+      <button mat-button i18n (click)="close()">Cancel</button>
+    </div>
+  </div>
+</div>
+
