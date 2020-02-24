@@ -37,3 +37,13 @@ export class CommonDesignerJoinsArray {
   static readonly type = '[Common] Update joins on jsplumb ngoninit';
   constructor(public joins: any) {}
 }
+
+/**
+ * When any datapod is created/updated, make it available in Analyze module without any page refresh.
+ * Added as a part of SIP-9482
+ */
+export class CommonLoadUpdatedMetrics {
+  static readonly type =
+    '[Common State] Load all metrics when any datapod is created/updated';
+  constructor() {}
+}
