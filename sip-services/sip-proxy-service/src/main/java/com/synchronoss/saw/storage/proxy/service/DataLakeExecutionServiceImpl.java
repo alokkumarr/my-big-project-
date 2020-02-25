@@ -2,14 +2,11 @@ package com.synchronoss.saw.storage.proxy.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
-import com.synchronoss.saw.storage.proxy.model.SemanticNode;
 import com.synchronoss.sip.utils.RestUtil;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,8 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 import sncr.bda.core.file.HFileOperations;
 
 @Service
@@ -87,6 +87,14 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
 
     if (designerEdit) {
       query = sipQuery.getQuery().concat(" ");
+      List<Object> runTimeFilters = getRunTimeFilters(sipQuery);
+      if (StringUtils.countOccurrencesOf(query,"?") != runTimeFilters.size()) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Number of wild card filters in query and "
+                + "number of run time filter values doesn't match!!");
+      }
+      query = applyRunTimeFilterForQuery(query,runTimeFilters,0);
       queryShownTOUser = query;
       query = dlQueryBuilder.dskForManualQuery(sipQueryFromSemantic, query, dskAttribute);
     } else {
@@ -291,5 +299,36 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
         }
       });
     }
+  }
+
+  /**
+   *
+   * @param query
+   * @param filters
+   * @param count
+   * @return
+   */
+  public String applyRunTimeFilterForQuery(String query, List<Object> filters, int count) {
+    if (!query.contains("?")) {
+      return query;
+    }
+    query = query.replaceFirst("\\?",String.format(" \"%s\" ",filters.get(count)));
+    return applyRunTimeFilterForQuery(query, filters, ++count);
+  }
+
+  /**
+   *
+   * @param sipQuery
+   * @return
+   */
+  public List<Object> getRunTimeFilters(SipQuery sipQuery) {
+    List<Object> runTimeFilters = new ArrayList<>();
+    if (!CollectionUtils.isEmpty(sipQuery.getFilters()))
+    sipQuery.getFilters().forEach(filter -> {
+      if (Boolean.valueOf(filter.getIsRuntimeFilter())) {
+        runTimeFilters.add(filter.getModel().getModelValues().get(0));
+      }
+    });
+    return runTimeFilters;
   }
 }
