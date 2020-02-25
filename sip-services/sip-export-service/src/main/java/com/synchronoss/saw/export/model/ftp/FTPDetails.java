@@ -14,6 +14,8 @@ public class FTPDetails {
     private int port;
     private String username;
     private String password;
+    private String privateKeyPath;
+    private String passPhrase;
 
     // location is for the destination ftp / sftp "folder"
     // scheduled exports will be dumped at this location.
@@ -84,5 +86,21 @@ public class FTPDetails {
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
+    }
+
+    public String getPrivateKeyPath() {
+        return privateKeyPath;
+    }
+
+    public void setPrivateKeyPath(String privateKeyPath) {
+        this.privateKeyPath = privateKeyPath;
+    }
+
+    public String getPassPhrase() {
+        return passPhrase;
+    }
+
+    public void setPassPhrase(String passPhrase) {
+        this.passPhrase = passPhrase;
     }
 }

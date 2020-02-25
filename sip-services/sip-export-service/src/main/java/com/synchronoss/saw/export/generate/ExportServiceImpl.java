@@ -1031,7 +1031,9 @@ public class ExportServiceImpl implements ExportService {
                 fileName,
                 alias.getLocation(),
                 destinationFileName,
-                alias.getType());
+                alias.getType(),
+                alias.getPrivateKeyPath(),
+                alias.getPassPhrase());
             logger.debug(
                 "Uploaded to ftp alias: {} : {}",alias.getCustomerName(),alias.getHost());
           }
