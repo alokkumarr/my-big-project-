@@ -303,9 +303,9 @@ public class WorkbenchIT extends BaseIT {
   }
   
   /**
-   * Ignoring the test case and this will 
+   * Ignoring the test case. This will 
    * be fixed as part of SIP-10369
-   * @throws IOException
+   * @throws IOException exception
    */
   @Ignore
   public void testSqlDataset() throws IOException {
@@ -413,18 +413,9 @@ public class WorkbenchIT extends BaseIT {
     root.put("name", name);
     Response response = given(authSpec)
         
-        .when().get(WORKBENCH_PATH + "/previews/"+name)
+        .when().get(WORKBENCH_PATH + "/previews/" + name)
         .then().assertThat().statusCode(200)
         .extract().response();
-    //String previewId = response.path("id");
-    /* Wait for preview to become available */
-   // waitForPreview(previewId, WAIT_RETRIES);
-    /* Assert preview rows exist 
-    given(authSpec)
-        .when().get(WORKBENCH_PATH + "/previews/" + previewId)
-        .then().assertThat().statusCode(200)
-        .body("rows", hasSize(3))
-        .body("rows[0].field1", equalTo("foo"));*/
   }
 
   /**
