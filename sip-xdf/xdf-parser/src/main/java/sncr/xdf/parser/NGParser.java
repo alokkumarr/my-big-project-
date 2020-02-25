@@ -330,18 +330,20 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 Dataset<Row> outputDS =  pivotOrFlattenDataset(parsedDS);
                 outputDS.printSchema();
                 outputDS.show(5);
-                commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, Output.Mode.APPEND.toString());
+                retval = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, Output.Mode.APPEND.toString());
                 logger.debug("Write dataset status = " + retval);
-                ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-                ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-                //Filter out Rejected Datasss
-                collectRejectedData(parseRdd);
-                //Write rejected data
-                if (this.rejectedDataCollector != null) {
-					boolean status = writeRejectedData();
+                if(retval == 0){
+                    ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
+                    ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+                    //Filter out Rejected Datasss
+                    collectRejectedData(parseRdd);
+                    //Write rejected data
+                    if (this.rejectedDataCollector != null) {
+                        boolean status = writeRejectedData();
 
-                    if (!status) {
-                        logger.warn("Unable to write rejected data");
+                        if (!status) {
+                            logger.warn("Unable to write rejected data");
+                        }
                     }
                 }
             }catch (Exception e) {
