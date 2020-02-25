@@ -135,7 +135,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
 		
 		logger.debug(":::: parser execute   :::"+ ngctx.componentConfiguration.getParser());
-        int retval = 0;
 
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
         sourcePath = ngctx.componentConfiguration.getParser().getFile();
@@ -220,7 +219,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
             }
         }
-
+        Dataset<Row> outputDS = null;
         if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
 			logger.debug("format csv");
 			
@@ -314,40 +313,25 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 					}
 				}
                 inputDSCount = inputRdd.count();
-                this.recCounter.setValue(inputDSCount);
-                if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
-                    throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
-                }
                 JavaRDD<Row> parseRdd = inputRdd.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
                     quoteEscapeChar, '\'', recCounter, errCounter));
-                JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
-                logger.debug("####### Rejected RDD COUNT:: " + rejectedRdd.count());
                 // Create output dataset
                 JavaRDD<Row> outputRdd = getOutputData(parseRdd);
+                outputDS = convertRddToDS(outputRdd);
 
-                Dataset<Row> parsedDS = convertRddToDS(outputRdd);
-                logger.debug("************************************** Dest dir for rdd = " + tempDir + "\n");
-                Dataset<Row> outputDS =  pivotOrFlattenDataset(parsedDS);
-                outputDS.printSchema();
-                outputDS.show(5);
-                retval = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, Output.Mode.APPEND.toString());
-                logger.debug("Write dataset status = " + retval);
-                if(retval == 0){
-                    ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-                    if(inputDataFrame ==null){
-                        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-                    }
-                    //Filter out Rejected Datasss
-                    collectRejectedData(parseRdd);
-                    //Write rejected data
-                    if (this.rejectedDataCollector != null) {
-                        boolean status = writeRejectedData();
+                JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
+                logger.debug("####### Rejected RDD COUNT:: " + rejectedRdd.count());
+                //Filter out Rejected Datasss
+                collectRejectedData(parseRdd);
+                //Write rejected data
+                if (this.rejectedDataCollector != null) {
+                    boolean status = writeRejectedData();
 
-                        if (!status) {
-                            logger.warn("Unable to write rejected data");
-                        }
+                    if (!status) {
+                        logger.warn("Unable to write rejected data");
                     }
                 }
+
             }catch (Exception e) {
                 logger.error("Exception in parser module: ",e);
                 if (e instanceof XDFException) {
@@ -360,71 +344,50 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 		else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
-
-            Dataset<Row> inputDataset = null;
             multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
 
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
-            inputDataset = jsonFileParser.parseInput(sourcePath, multiLine);
-            inputDSCount = inputDataset.count();
-            this.recCounter.setValue(inputDSCount);
-            //This will throw an error if Dataset is Empty
-            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
-                throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
-            }
-            Dataset<Row> outputDS = pivotOrFlattenDataset(inputDataset);
-            commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, Output.Mode.APPEND.name());
-            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
-                outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
+            outputDS = jsonFileParser.parseInput(sourcePath, multiLine);
+            inputDSCount = outputDS.count();
          }
 		else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
 		{
             NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
-            Dataset<Row> inputDataset = null;
-
             if (inputDataFrame != null) {
-                inputDataset = inputDataFrame;
+                outputDS = inputDataFrame;
             } else {
-                inputDataset = parquetFileParser.parseInput(sourcePath);
+                outputDS = parquetFileParser.parseInput(sourcePath);
             }
-            inputDSCount = inputDataset.count();
-            this.recCounter.setValue(inputDSCount);
-            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
-                throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
-            }
-            Dataset<Row> outputDS = pivotOrFlattenDataset(inputDataset);
-            commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, "append");
-
-            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
-                outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
+            inputDSCount = outputDS.count();
 		}
 		else if(this.inputDataFrame != null)
 		{
-            inputDataFrame.show();
-            inputDSCount = inputDataFrame.count();
-            this.recCounter.setValue(inputDSCount);
-            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
-                throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
-            }
-            Dataset<Row> outputDS = pivotOrFlattenDataset(inputDataFrame);
-            commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir, Output.Mode.APPEND.name());
-
+            outputDS = inputDataFrame;
+            outputDS.show();
+            inputDSCount = outputDS.count();
+        }
+        this.recCounter.setValue(inputDSCount);
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
+            throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
+        }
+        Dataset<Row> pivotDS = pivotOrFlattenDataset(outputDS);
+        logger.debug("************************************** Dest dir for rdd = " + tempDir + "\n");
+        int retval = commitDataSetFromDSMap(ngctx, pivotDS, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+        if(retval == 0){
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-        }
+            ngctx.datafileDFmap.put(ngctx.dataSetName,pivotDS.cache());
 
-        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
-        //TODO: This is a crude way of checking. This need to be revisited.
-        if(
-            //logger.isDebugEnabled() &&
+            //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+            //TODO: This is a crude way of checking. This need to be revisited.
+            if(
+                //logger.isDebugEnabled() &&
                 ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
-            logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+            }
+            logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
+            validateOutputDSCounts(inputDSCount, pivotFields != null);
         }
-        logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
-        validateOutputDSCounts(inputDSCount, pivotFields != null);
         return retval;
     }
 	
