@@ -334,7 +334,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.debug("Write dataset status = " + retval);
                 if(retval == 0){
                     ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-                    ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+                    if(inputDataFrame ==null){
+                        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+                    }
                     //Filter out Rejected Datasss
                     collectRejectedData(parseRdd);
                     //Write rejected data
