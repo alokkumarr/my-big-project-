@@ -536,6 +536,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
 
         scala.collection.Seq<Column> outputColumns = null;
+        Dataset<Row> outputDS = null;
         if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
         {
             outputColumns =
@@ -545,8 +546,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
             logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
-            outputDataset = pivotOrFlattenDataset(outputDataset);
-            status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
+            outputDS = pivotOrFlattenDataset(outputDataset);
+            status = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir.toString(), "append");
 
         }
         else {
@@ -569,11 +570,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             }
 
             logger.debug("Dataset partition : "+ filterOutputDS.rdd().getNumPartitions());
-            filterOutputDS = pivotOrFlattenDataset(filterOutputDS);
-            status = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, tempDir.toString(), "append");
+            outputDS = pivotOrFlattenDataset(filterOutputDS);
+            status = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir.toString(), "append");
         }
 
-        if(!isPivotApplied && !isFlatteningEnabled) {
+        if(isPivotApplied || isFlatteningEnabled) {
+            ngctx.datafileDFmap.put(ngctx.dataSetName, outputDS.cache());
+        }else{
             collectAcceptedData(parsedRdd, outputRdd);
         }
 
@@ -738,7 +741,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         int rc = 0;
         rc = commitDataSetFromDSMap(ngctx, localDataFrame, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
         logger.debug("Write dataset status = " + rc);
-        if(!isPivotApplied && !isFlatteningEnabled) {
+        if(isPivotApplied || isFlatteningEnabled) {
+            ngctx.datafileDFmap.put(ngctx.dataSetName, localDataFrame.cache());
+        }else{
             collectAcceptedData(parseRdd,outputRdd);
         }
         //Filter out Rejected Data
@@ -771,6 +776,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         int retval = commitDataSetFromDSMap(ngctx, pivotDS, outputDataSetName, tempDir, Output.Mode.APPEND.name());
         if (retval == 0) {
+            ngctx.datafileDFmap.put(ngctx.dataSetName, pivotDS.cache());
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, mode, outputFormat, pkeys));
         }
@@ -1157,7 +1163,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         if(isPivotApplied || isFlatteningEnabled) {
             dataset = sortColumnNames(dataset);
-            ngctx.datafileDFmap.put(ngctx.dataSetName, dataset.cache());
         }
         return dataset;
     }
