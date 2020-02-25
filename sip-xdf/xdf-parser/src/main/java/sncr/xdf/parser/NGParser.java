@@ -535,7 +535,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         int status = 0 ;
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
 
-        Dataset<Row> outputDS = null;
         scala.collection.Seq<Column> outputColumns = null;
         if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
         {
@@ -571,7 +570,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             logger.debug("Dataset partition : "+ filterOutputDS.rdd().getNumPartitions());
             filterOutputDS = pivotOrFlattenDataset(filterOutputDS);
-            status = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir.toString(), "append");
+            status = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, tempDir.toString(), "append");
         }
 
         if(!isPivotApplied && !isFlatteningEnabled) {
