@@ -29,6 +29,7 @@ import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchServiceImpl;
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
+import com.synchronoss.saw.workbench.service.WorkbenchExecutorQueue;
 
 
 @RunWith(SpringRunner.class)
@@ -54,11 +55,15 @@ public class SAWWorkBenchInternalAddRAWDataControllerTest {
   @MockBean
   private WorkbenchExecutionService workbenchExecutionService;
   
+  @MockBean
+  private WorkbenchExecutorQueue executorQueue;
+  
   @Test
   public void previewRAWData() throws Exception {
       Mockito.when(
           workBenchService.previewFromProjectDirectoybyId(Mockito.any(Project.class))).
           thenReturn(project);
+      Mockito.doNothing().when(executorQueue).init();
       RequestBuilder requestBuilder = MockMvcRequestBuilders
               .post("/internal/workbench/projects/project2/raw/directory/preview")
               .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
