@@ -344,24 +344,6 @@ public class SecurityController {
 	}
 
 	/**
-	 * This method will be Deprecated since its uses user input as ticket Id.
-     * Logout ticketid should be extracted from token see method }
-	 * @param ticketID
-	 * @return
-	 */
-	@Deprecated
-	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.POST)
-	public String doLogout(@RequestBody String ticketID) {
-		Gson gson = new Gson();
-		try {
-			return gson.toJson(tHelper.logout(ticketID));
-		} catch (DataAccessException de) {
-			logger.error("Error while logout {}", de);
-			return de.getMessage();
-		}
-	}
-
-	/**
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)

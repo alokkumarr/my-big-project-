@@ -1262,6 +1262,9 @@ Run the "onboard-customer" command with all required parameters stated
 above and it will start the process of creating customer and related
 products/components in the system.
 
+If the product code already exists in the system, then the customer is tied to the existing product,
+else new Product will be created and linked to the customer.
+
 The below is one such example to call onboard-customer with its
 required parameters.
 
