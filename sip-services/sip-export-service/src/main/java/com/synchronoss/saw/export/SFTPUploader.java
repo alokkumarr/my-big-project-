@@ -20,27 +20,33 @@ public class SFTPUploader {
 
     private static final Logger logger = LoggerFactory.getLogger(SFTPUploader.class);
 
-    public SFTPUploader(String host, int port, String user, String pwd) throws Exception {
+    public SFTPUploader(String host, int port, String user, String pwd, String privateKeyPath, String passPhrase) throws Exception {
         // Username and Password may or may not have spaces so no trimming required
         // URLEncoding them is necessary because of special characters in username / password.
         String username = URLEncoder.encode(user, "UTF-8");
-        String password = URLEncoder.encode(pwd, "UTF-8");
-        sftpURL = sftpUrlBuilder(username, password, host, port, null, null);
+        String password = null;
+        if (pwd != null) {
+            password= URLEncoder.encode(pwd, "UTF-8");
+        }
+        sftpURL = sftpUrlBuilder(username, password, host, port, privateKeyPath, passPhrase);
         manager = new StandardFileSystemManager();
     }
 
     private String sftpUrlBuilder(String username, String password, String host,
-        int port, String privateKeyPath, String parsePhrase) {
+        int port, String privateKeyPath, String passPhrase) {
         StringBuilder builder =
             new StringBuilder().append("sftp://")
                 .append(username);
 
+        logger.trace("Private Key Path = " + privateKeyPath);
         if (privateKeyPath == null) {
             builder.append(":").append(password);
         }
         builder.append("@")
             .append(host.trim()).append(":").append(Integer.toString(port))
             .append("/");
+
+        logger.trace("SFTP URL : " + builder.toString());
 
         return builder.toString();
     }
@@ -97,9 +103,9 @@ public class SFTPUploader {
             remoteFile.copyFrom(localFile, Selectors.SELECT_SELF);
 
         } catch (IOException e) {
-            logger.error("SFTP Error: "+ e.getMessage());
+            logger.error("IO SFTP Error: ", e);
         } catch (Exception e) {
-            logger.error("SFTP Error: "+ e.getMessage());
+            logger.error("SFTP Error: ", e);
         }
     }
 

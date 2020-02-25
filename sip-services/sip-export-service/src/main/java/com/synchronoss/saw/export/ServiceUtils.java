@@ -110,7 +110,6 @@ public class ServiceUtils {
 
     if (ftpServer == null
         || ftpUsername == null
-        || ftpPassword == null
         || localFilePath == null
         || destinationDir == null
         || destinationFileName == null
@@ -140,13 +139,14 @@ public class ServiceUtils {
           ftp.disconnect();
         } else if (type.equalsIgnoreCase("sftp")) {
           logger.debug("uploading to sftp --> ");
-          SFTPUploader ftp = new SFTPUploader(ftpServer, ftpPort, ftpUsername, ftpPassword);
+          SFTPUploader ftp = new SFTPUploader(ftpServer, ftpPort,
+              ftpUsername, ftpPassword, privateKeyPath, passPhrase);
           ftp.uploadFile(localFilePath, destinationFileName, destinationDir, privateKeyPath, passPhrase);
           ftp.disconnect();
         }
         logger.info("Successfully uploaded to FTP");
       } catch (Exception e) {
-        logger.error(e.getMessage());
+        logger.error("Error occurred: ", e);
         return false;
       }
     }
