@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -301,7 +302,12 @@ public class WorkbenchIT extends BaseIT {
     waitForDataset(id, WAIT_RETRIES);
   }
   
-  @Test
+  /**
+   * Ignoring the test case and this will 
+   * be fixed as part of SIP-10369
+   * @throws IOException
+   */
+  @Ignore
   public void testSqlDataset() throws IOException {
     String name = "test-sql-" + testId();
     /* Use only characters suitable for a SQL table name */
