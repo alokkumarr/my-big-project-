@@ -128,18 +128,26 @@ public class SparkConfig {
 	  }
 
 	@Bean
-	public JavaSparkContext sc() {
+	public JavaSparkContext sparkContext() {
 
 		logger.debug("#### Setting librarires as class path for spark context ######");
 		
 		JavaSparkContext jsc = new  JavaSparkContext(SparkContext.getOrCreate(conf()));
-		File folder = new File(libPath);
-		File[] files = folder.listFiles();
-		for(File file: files) {
-			logger.debug("adding file "+ libPath + file.getName() + "to classpath");
-			jsc.addJar(libPath + file.getName());
+		
+		if(libPath != null && !libPath.isEmpty()) {
+			File folder = new File(libPath);
+			File[] files = folder.listFiles();
+			if(files != null) {
+				for(File file: files) {
+					logger.debug("adding file "+ libPath + file.getName() + "to classpath");
+					jsc.addJar(libPath + file.getName());
+				}
+			}
+			
 		}
-    logger.debug("#### Manual class path settings completed!! ######");
+		
+        
+	   logger.debug("#### Manual class path settings completed!! ######");
     
     return jsc;
 	}

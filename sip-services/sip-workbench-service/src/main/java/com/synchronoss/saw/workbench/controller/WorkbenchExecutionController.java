@@ -133,27 +133,7 @@ public class WorkbenchExecutionController {
       project, name, component, xdfConfig.toString());
   }
 
-  /**
-   * Preview dataset function.
-   *
-   * @param project Project ID
-   * @param body Body Parameters
-   * @return Returns a preview
-   * @throws JsonProcessingException When not able to get the preview
-   * @throws Exception General Exception
-   */
-
-  @RequestMapping(value = "{project}/previews", method = RequestMethod.POST,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
-  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-                          @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
-   logger .debug("Create dataset preview: project = {}", project);
-    /* Extract dataset name which is to be previewed */
-    String name = body.path("name").asText();
-    /* Start asynchronous preview creation */
-    return workbenchExecutionService.preview(project, name);
-  }
+  
 
 	/**
 	 * This method is to preview the data.
