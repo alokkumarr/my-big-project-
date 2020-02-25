@@ -130,31 +130,10 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   public ObjectNode execute(
     String project, String name, String component, String cfg) throws Exception {
 	  
-	  
-	System.out.print("Checking logger level...");
-	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
-	logger4j.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
-	System.out.print("Logger level set to debug");
-	
-	//org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
-	//logger.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
-	
-	
     log.debug("Executing dataset transformation starts here ");
     log.debug("XDF Configuration = " + cfg);
-    
-    
-    //createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
-    
-    
-    log.info("execute name = " + name);
-    log.info("execute root = " + root);
-    log.info("execute component = " + component);
-
     ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
-
     log.info("Component Config = " + config);
-
     String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 
     NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
@@ -167,8 +146,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
     executor.executeJob(project, name, component, cfg);
     
-    //String project, String name, String component, String cfg
-    //client.submit(new WorkbenchExecuteJob(workBenchcontext));
     ObjectNode root = mapper.createObjectNode();
     ArrayNode ids = root.putArray("outputDatasetIds");
     for (String id: workBenchcontext.registeredOutputDSIds) {
@@ -196,54 +173,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     return path;
   }
 
-  @Value("${metastore.base}")
-  @NotNull
-  private String metastoreBase;
 
-  /**
-   * Preview the output of a executing a transformation component on a dataset.
-   * Also used for simply viewing the contents of an existing dataset.
-   */
-  @Override
-  public ObjectNode preview(String project, String name) throws Exception {
-    log.info("Creating dataset transformation preview");
-    /* Get physical location of dataset */
-    DataSetStore dss = new DataSetStore(metastoreBase);
-    String json = dss.readDataSet(project, name);
-    log.debug("Dataset metadata: {}", json);
-    if (json == null) {
-      throw new RuntimeException("Dataset not found: " + name);
-    }
-    JsonNode dataset = mapper.readTree(json);
-    String status = dataset.path("asOfNow").path("status").asText();
-    if (status == null || !status.equals("SUCCESS")) {
-      throw new RuntimeException("Unhandled dataset status: " + status);
-    }
-    String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
-    /* Submit job to Livy for reading out preview data */
-//    WorkbenchClient client = getWorkbenchClient();
-    String id = UUID.randomUUID().toString();
-    WorkbenchExecutor service = new WorkbenchExecutorImpl();
-    
-    service.createPreview(id, location, previewLimit, id, project, name);
-    //service.preview(id, location, previewLimit, id, project, name);
-    //client.submit(new WorkbenchPreviewJob(id, location, previewLimit, previewsTablePath),
-     //   () -> handlePreviewFailure(id));
-    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "queued");
-    preview.insert();
-    /*
-     * Return generated preview ID to client to be used for retrieving preview data
-     */
-    ObjectNode root = mapper.createObjectNode();
-    root.put("id", id);
-    return root;
-  }
-
-  private void handlePreviewFailure(String previewId) {
-    log.error("Creating preview failed");
-    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, previewId, "failed");
-    preview.insert();
-  }
 
   @Override
   public ObjectNode getPreview(String project, String name) throws Exception {
@@ -302,7 +232,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 						result.add(map);
 					}
 					contents = mapper.writeValueAsString(result);
-					log.debug("JSON ::" + contents.toString());
 					
 				} catch (Exception exception) {
 					log.error("#######ERROR reading file " 

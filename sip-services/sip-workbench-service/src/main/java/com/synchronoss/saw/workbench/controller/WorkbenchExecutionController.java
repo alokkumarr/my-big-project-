@@ -81,9 +81,9 @@ public class WorkbenchExecutionController {
     final String description = body.path("description").asText();
     String input = body.path("input").asText();
 
-//     Ticket ticket = TokenParser.retrieveTicket(authToken);
+    Ticket ticket = TokenParser.retrieveTicket(authToken);
 
-  //  .info(ticket.getUserFullName());
+    logger.info(ticket.getUserFullName());
 
     String component = body.path("component").asText();
     JsonNode configNode = body.path("configuration");
@@ -124,7 +124,7 @@ public class WorkbenchExecutionController {
     xdfOutput.put("desc", description);
 
     ObjectNode userData = mapper.createObjectNode();
-   // userData.put(DataSetProperties.createdBy.toString(), ticket.getUserFullName());
+    userData.put(DataSetProperties.createdBy.toString(), ticket.getUserFullName());
 
 
     xdfOutput.set(DataSetProperties.UserData.toString(), userData);
@@ -155,71 +155,33 @@ public class WorkbenchExecutionController {
     return workbenchExecutionService.preview(project, name);
   }
 
-  /**
-   * This method is to preview the data.
-   * @param project is of type String.
-   * @param previewId is of type String.
-   * @return ObjectNode is of type Object.
-   * @throws JsonProcessingException when this exceptional condition happens.
-   * @throws Exception when this exceptional condition happens.
-   */
-  @RequestMapping(value = "{project}/previews/{datasetName}", method = RequestMethod.GET,
+	/**
+	 * This method is to preview the data.
+	 * 
+	 * @param project   is of type String.
+	 * @param previewId is of type String.
+	 * @return ObjectNode is of type Object.
+	 * @throws JsonProcessingException when this exceptional condition happens.
+	 * @throws Exception               when this exceptional condition happens.
+	 */
+	@RequestMapping(value = "{project}/previews/{datasetName}", method = RequestMethod.GET, 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public ObjectNode getPreview(@PathVariable(name = "project", required = true) String project,
+			@PathVariable(name = "datasetName", required = true) String datasetName)
+			throws JsonProcessingException, Exception {
 
-	      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+		logger.debug("Get dataset preview: project = {}", project);
+		logger.debug("Get dataset preview: dataset = {}", datasetName);
 
-	  @ResponseStatus(HttpStatus.OK)
+		/* Get previously created preview */
+		ObjectNode content = workbenchExecutionService.getPreview(project, datasetName);
 
-	  public ObjectNode getPreview(@PathVariable(name = "project", required = true) String project,
+		/* Otherwise return the preview contents */
+		return content;
 
-	  @PathVariable(name = "datasetName", required = true) String datasetName)
+	}
 
-	      throws JsonProcessingException, Exception {
-
-	    logger.debug("Get dataset preview: project = {}", project);
-
-	    logger.debug("Get dataset preview: dataset = {}", datasetName);
-
-	   // String name = body.path("name").asText();
-
-	    /* Get previously created preview */
-
-	    ObjectNode content = workbenchExecutionService.getPreview(project, datasetName);
-
-	    
-
-	    /* Otherwise return the preview contents */
-
-	    return content;
-
-	  }
-  
-  /**
-   * This method is to preview the data.
-   * @param project is of type String.
-   * @param previewId is of type String.
-   * @return ObjectNode is of type Object.
-   * @throws JsonProcessingException when this exceptional condition happens.
-   * @throws Exception when this exceptional condition happens.
-   */
-  @RequestMapping(value = "{project}/previews/getPreview", method = RequestMethod.GET,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
-  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-		  @PathVariable(name = "previewId", required = true) String previewId)
-      throws JsonProcessingException, Exception {
-    logger.debug("Get dataset preview: project = {}", project);
-    /* Get previously created preview */
-    //ObjectNode body = workbenchExecutionService.getPreview(previewId);
-    /*
-     * If preview was not found, response to indicate that preview has not been created yet
-     */
-    //if (body == null) {
-    //  throw new NotFoundException();
-   // }
-    /* Otherwise return the preview contents */
-    return null;
-  }
-  
   
   /**
    * This method is to preview the data.

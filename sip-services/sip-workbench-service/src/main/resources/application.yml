@@ -55,7 +55,7 @@ sip:
       store: /Users/spau0004/Desktop/keystore/keystore.jks
       password: sip@123
 spark:
-  master: yarn
+  master: local[2]
   executor.memory: "2G"
   cores.max: "2"
   executor.cores: "2"

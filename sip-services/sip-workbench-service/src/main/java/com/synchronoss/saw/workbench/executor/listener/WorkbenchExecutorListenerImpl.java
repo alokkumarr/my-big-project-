@@ -31,11 +31,8 @@ import com.synchronoss.saw.workbench.service.WorkbenchJobServiceImpl;
 public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener{
 	
 	 private static final Logger logger = LoggerFactory.getLogger(WorkbenchExecutorListenerImpl.class);
-	 //@Value("${sip.service.metastore.base}")
-	 // @NotNull
-	 // private String basePath="";
 	 
-	 @Value("${workbench.project-root}")
+	  @Value("${workbench.project-root}")
 	  @NotNull
 	  private String root;
 
@@ -61,12 +58,9 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	     
 	      this.streamPath = sipBasePath + File.separator + "services/workbench/executor";
 	      this.evaluatorstream = this.streamPath
-      + File.separator
-      + "sip-workbench-executor";
+	    		  + File.separator
+	    		  + "sip-workbench-executor";
 	      this.workbenchTopics = evaluatorstream + ":executions";
-	      
-	      
-	   
 	  }
 	  
 	  
@@ -151,45 +145,25 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 					        		  }
 					        		  break;
 					        		  
-				        		  /*case SHOW_PREVIEW:
-
-					        		  if(content.length == 6) {
-					        			      String id= content[0];
-					        			      String location= content[1];
-					        			  	  String previewLimit= content[2];
-							        		  String previewsTablePath= content[3];
-							    			  String project = content[4];
-							    			  String name = content[5];
-							    			  WorkbenchJobService service = new WorkbenchJobServiceImpl();
-							    			  service.createPreview(id, location, previewLimit, previewsTablePath, project, name);
-							    			  break;
-							    			  
-					        		  }
-					        		  break;*/
+					        		  /**
+					        		   * Any additional future usecases goes here
+					        		   */
+					        		  
 								default:
 									break;
 				        		  }
 				        		  
-				    			  
-				    			  
 				        	  } catch (JsonSyntaxException exception) {
 								logger.error(exception.getMessage());
 							} catch (Exception exception) {
 								logger.error(exception.getMessage());
 							}
 							return pollTimeout;
-				        	  
-				        	  
 				          }
 	        	  });
-						
-							
-						
 
 					});
 
-	        	  
-	        	  
 	      consumer.commitAsync();
 	      logger.debug("####End of while loop one iteration");
 	    }

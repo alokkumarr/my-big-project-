@@ -109,7 +109,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   
   @PostConstruct
   private void init() throws Exception {
-	  logger.info("#######post construct ::");
     if (defaultProjectRoot.startsWith(prefix)) {
       if (!HFileOperations.exists(defaultProjectRoot)) {
         logger.trace("Path {}", defaultProjectRoot + defaultProjectPath);
