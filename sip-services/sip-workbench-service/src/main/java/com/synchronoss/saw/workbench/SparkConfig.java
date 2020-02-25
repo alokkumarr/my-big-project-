@@ -1,18 +1,13 @@
 package com.synchronoss.saw.workbench;
 
+import java.io.File;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.info.ConditionalOnEnabledInfoContributor;
-import org.springframework.boot.actuate.info.BuildInfoContributor;
-import org.springframework.boot.actuate.info.InfoContributor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
-import org.springframework.boot.info.BuildProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -85,11 +80,11 @@ public class SparkConfig {
 	
 
 	//BuildProperties buildProperties = this.context.getBean(BuildProperties.class);
-	@Autowired
-	private BuildProperties buildProp;
+	//@Autowired
+	//private BuildProperties buildProp;
 	
-	 @Autowired
-	  private ApplicationContext appContext;
+	 //@Autowired
+	  //private ApplicationContext appContext;
 
 
 	@Bean
@@ -134,32 +129,23 @@ public class SparkConfig {
 
 	@Bean
 	public JavaSparkContext sc() {
-		BuildProperties buildProperties = this.appContext.getBean(BuildProperties.class);
-		 String JAR_SUFFIX = "-"+buildProperties.getVersion() + ".jar";
-	JavaSparkContext jsc = new  JavaSparkContext(SparkContext.getOrCreate(conf()));
-	logger.debug("#### Setting librarires as class path for spark context ######");
-    jsc.addJar(libPath + "com.synchronoss.bda.core"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.bda.xdf-core"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.bda.xdf-parser"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.bda.meta-api"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.bda.xdf-data-profiler"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.bda.xdf-preview"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.bda.xdf-component"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.bda.xdf-ext"+ JAR_SUFFIX);
-    jsc.addJar(libPath + "com.synchronoss.saw.sip-workbench-service"+ JAR_SUFFIX);
+
+		logger.debug("#### Setting librarires as class path for spark context ######");
+		
+		JavaSparkContext jsc = new  JavaSparkContext(SparkContext.getOrCreate(conf()));
+		File folder = new File(libPath);
+		File[] files = folder.listFiles();
+		for(File file: files) {
+			logger.debug("adding file "+ libPath + file.getName() + "to classpath");
+			jsc.addJar(libPath + file.getName());
+		}
     logger.debug("#### Manual class path settings completed!! ######");
     
     return jsc;
 	}
 	
 	
-	@Bean
-	@ConditionalOnEnabledInfoContributor("build")
-	@ConditionalOnSingleCandidate(BuildProperties.class)
-	//@Order(DEFAULT_ORDER)
-	public InfoContributor buildInfoContributor(BuildProperties buildProperties) {
-		return new BuildInfoContributor(buildProperties);
-	}
+	
 	
 	
 }

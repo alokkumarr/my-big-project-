@@ -17,7 +17,6 @@ import org.springframework.context.event.EventListener;
 import info.faljse.SDNotify.SDNotify;
 
 @SpringBootApplication
-@EnableAutoConfiguration
 @ComponentScan(basePackages = {"com.synchronoss.saw.workbench", "com.synchronoss.saw.workbench.executor.service", "com.synchronoss.sip.utils"})
 public class SAWWorkBenchServiceApplication {
 	

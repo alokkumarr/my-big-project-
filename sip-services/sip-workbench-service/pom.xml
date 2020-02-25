@@ -339,14 +339,6 @@
 						scope so exclude JUnit explicitly from packaging -->
 					<excludeGroupIds>junit</excludeGroupIds>
 				</configuration>
-				<executions>
-					<execution>
-						<id>build-info</id>
-						<goals>
-							<goal>build-info</goal>
-						</goals>
-					</execution>
-			    </executions>
 			</plugin>
 			<!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-assembly-plugin</artifactId> 
 				<executions> <execution> <id>create-bundle</id> <phase>package</phase> <goals> 
