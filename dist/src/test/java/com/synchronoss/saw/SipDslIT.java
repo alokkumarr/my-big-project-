@@ -1827,4 +1827,38 @@ public class SipDslIT extends BaseIT {
     Integer noOfRows = response12.getBody().as(ObjectNode.class).get("totalRows").asInt();
     assertTrue(noOfRows == count);
   }
+
+  @Test
+  public void testRunTimeFilterQueryMode() {
+    ObjectNode analysis = getJsonObject("json/dsl/DataLake/sample-query-mode.json");
+    Response response = execute(token, analysis);
+    String testStringFilter = "string 1";
+    Assert.assertNotNull(response);
+    ObjectNode a = response.getBody().as(ObjectNode.class);
+    ArrayNode data = a.withArray("data");
+    Long countOfRows = a.get("totalRows").asLong();
+    Assert.assertTrue(countOfRows == 1);
+    Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
+    List<Map<String, String>> dataNode = response.getBody().path("data");
+    Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
+    Assert.assertEquals(dataNode.get(0).get("integer"), 100);
+
+    ObjectNode sipQuery = (ObjectNode) analysis.get("sipQuery");
+    sipQuery.put("query", "select * from sales"
+        + " where integer = ? and string = ? and date = ?");
+    analysis.put("sipQuery", sipQuery);
+
+    /** Negative Test Case :
+     * If number of wild card filters in query doesn't match with
+     * the number of run time filters passed for execution. **/
+
+    given(spec)
+        .header(AUTHORIZATION, "Bearer " + token)
+        .body(analysis)
+        .when()
+        .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.BAD_REQUEST.value());
+  }
 }
