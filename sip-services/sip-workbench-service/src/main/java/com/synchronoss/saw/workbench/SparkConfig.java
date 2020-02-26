@@ -2,9 +2,12 @@ package com.synchronoss.saw.workbench;
 
 import java.io.File;
 
+import javax.annotation.PreDestroy;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,12 +82,6 @@ public class SparkConfig {
 	private String libPath;
 	
 
-	//BuildProperties buildProperties = this.context.getBean(BuildProperties.class);
-	//@Autowired
-	//private BuildProperties buildProp;
-	
-	 //@Autowired
-	  //private ApplicationContext appContext;
 
 
 	@Bean
@@ -153,7 +150,15 @@ public class SparkConfig {
 	}
 	
 	
-	
+	@PreDestroy
+	  public void onDestroy() {
+		
+		logger.debug("Cleaning up spark cache.....");
+		SparkSession sparkSession = SparkSession.builder().
+				config(this.conf()).getOrCreate(); 
+		sparkSession.catalog().clearCache();
+		
+	  }
 	
 	
 }
