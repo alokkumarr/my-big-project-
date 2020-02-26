@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -96,6 +97,8 @@ public class SipRtisController {
       configResponse.setMessage("Invalid authentication token");
     }
     config.setCustomerCode(authTicket.getCustCode());
+    final String configId = UUID.randomUUID().toString();
+    config.setAppKey(configId);
     rtisService.createConfig(config);
 
     configResponse.setAppKey(config.getAppKey());
