@@ -38,7 +38,6 @@ public class SFTPUploader {
             new StringBuilder().append("sftp://")
                 .append(username);
 
-        logger.trace("Private Key Path = " + privateKeyPath);
         if (privateKeyPath == null) {
             builder.append(":").append(password);
         }
