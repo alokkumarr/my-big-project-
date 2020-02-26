@@ -26,7 +26,7 @@ import java.util.List;
  * @since 3.6.0
  */
 @RunWith(JUnit4.class)
-public class InconsistentColumnParserTest extends BaseTest{
+public class InconsistentColumnParserTest extends BaseTest {
 
   private ConvertToRow ctr;
   private String configFile;
@@ -62,7 +62,7 @@ public class InconsistentColumnParserTest extends BaseTest{
   }
 
   @After
-  public void cleanUp(){
+  public void cleanUp() {
     session.close();
     ctr = null;
   }
@@ -81,6 +81,8 @@ public class InconsistentColumnParserTest extends BaseTest{
     Assert.assertEquals(5l, record);
 
     List<Row> rowList = dataFrame.select("Field").collectAsList();
-    Assert.assertNotNull(rowList.get(2));
+    Assert.assertEquals("null", rowList.get(3).mkString());
+    Assert.assertEquals("Test string5", rowList.get(4).mkString());
+    Assert.assertNotNull(dataFrame.select("ID").collectAsList().get(2).get(0));
   }
 }
