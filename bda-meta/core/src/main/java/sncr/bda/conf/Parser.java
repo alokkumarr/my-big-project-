@@ -61,13 +61,17 @@ public class Parser {
   @Expose
   private Integer numberOfFiles = 1;
 
-    /**
-     * Alert configuration for the component.
-     *
-     */
-    @SerializedName("alert")
-    @Expose
-    private Alert alerts;
+  /**
+   * Alert configuration for the component.
+   *
+   */
+  @SerializedName("alert")
+  @Expose
+  private Alert alerts;
+
+  @SerializedName("inconsistentCol")
+  @Expose
+  private boolean inconsistentCol;
 
   /** No args constructor for use in serialization */
   public Parser() {}
@@ -318,7 +322,23 @@ public class Parser {
         this.alerts = alerts;
     }
 
-    @Override
+  /**
+   * Gets inconsistentCol
+   *
+   * @return value of inconsistentCol
+   */
+  public boolean getInconsistentCol() {
+    return inconsistentCol;
+  }
+
+  /**
+   * Sets inconsistentCol
+   */
+  public void setInconsistentCol(boolean inconsistentCol) {
+    this.inconsistentCol = inconsistentCol;
+  }
+
+  @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
   }
@@ -338,6 +358,7 @@ public class Parser {
         .append(headerSize)
         .append(numberOfFiles)
         .append(multiLine)
+        .append(inconsistentCol)
         .toHashCode();
   }
 
@@ -363,6 +384,7 @@ public class Parser {
         .append(headerSize, rhs.headerSize)
         .append(numberOfFiles, rhs.numberOfFiles)
         .append(multiLine,rhs.multiLine)
+        .append(inconsistentCol, this.inconsistentCol)
         .isEquals();
   }
 }

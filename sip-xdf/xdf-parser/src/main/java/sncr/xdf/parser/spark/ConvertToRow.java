@@ -41,6 +41,7 @@ public class ConvertToRow implements Function<String, Row> {
     private SimpleDateFormat df;
 
     private CsvParser parser = null;
+    private boolean inconsistentCol;
 
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
@@ -50,7 +51,8 @@ public class ConvertToRow implements Function<String, Row> {
                         char quoteEscapeChar,
                         char charToEscapeQuoteEscaping,
                         LongAccumulator recordCounter,
-                        LongAccumulator errorCounter) {
+                        LongAccumulator errorCounter,
+                        boolean inconsistentCol) {
         this.schema = schema;
         this.tsFormats = tsFormats;
         this.lineSeparator = lineSeparator ;
@@ -60,6 +62,7 @@ public class ConvertToRow implements Function<String, Row> {
         this.charToEscapeQuoteEscaping = charToEscapeQuoteEscaping;
         this.errCounter = errorCounter;
         this.recCounter = recordCounter;
+        this.inconsistentCol = inconsistentCol;
 
         df = new SimpleDateFormat();
         /*
@@ -115,7 +118,7 @@ public class ConvertToRow implements Function<String, Row> {
                 int validSchemaLength = schema.fields().length;
                 // Don't reject the record if column are inconsistent (less than the schema length)
                 // increase the length of input row array and copy the input row column
-                if(parsedLength < validSchemaLength){
+                if(inconsistentCol && parsedLength < validSchemaLength){
                     String[] tempColumn = new String[validSchemaLength];
                     for (int i = 0; i < parsedLength; i++){
                         tempColumn[i] = parsed[i];

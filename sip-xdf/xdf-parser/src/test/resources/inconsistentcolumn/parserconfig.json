@@ -12,7 +12,8 @@
     "delimiter": "|",
     "quoteChar": "\"",
     "quoteEscape": "\\",
-    "headerSize": 0
+    "headerSize": 0,
+    "inconsistentCol" : true
   },
   "outputs" : [
     {"name":"OutputDataset1",

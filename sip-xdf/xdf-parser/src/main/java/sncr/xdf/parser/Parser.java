@@ -364,7 +364,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter));
+                '\'', recCounter, errCounter, false));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
@@ -428,7 +428,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             // Get rid of file numbers
             .keys()
             .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter));
+                quoteEscapeChar, '\'', recCounter, errCounter, false));
 
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =

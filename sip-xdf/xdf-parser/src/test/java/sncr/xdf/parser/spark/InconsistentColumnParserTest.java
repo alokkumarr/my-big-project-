@@ -58,7 +58,7 @@ public class InconsistentColumnParserTest extends BaseTest {
     LongAccumulator recCounter = context.getSparkContext().longAccumulator("ParserRecCounter");
 
     ctr = new ConvertToRow(originalSchema, tsFormats, lineSeparator, delimiter,
-        quoteChar, quoteEscapeChar, '\'', recCounter, errCounter);
+        quoteChar, quoteEscapeChar, '\'', recCounter, errCounter, parser.getInconsistentCol());
   }
 
   @After
