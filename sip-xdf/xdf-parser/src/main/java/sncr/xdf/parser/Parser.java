@@ -81,6 +81,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
     public static final String REJECTED_FLAG = "__REJ_FLAG";
     public static final String REJ_REASON = "__REJ_REASON";
+    private boolean inconsistentCol;
 
     private JavaRDD<Row> rejectedDataCollector;
 
@@ -125,6 +126,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         outputDsPartitionKeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
+        inconsistentCol = ctx.componentConfiguration.getParser().getInconsistentCol();
 
         logger.debug("Input file format = " + this.parserInputFileFormat);
         logger.debug("outputDsPartitionKeys size is = " + outputDsPartitionKeys.size());
@@ -364,7 +366,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter, false));
+                '\'', recCounter, errCounter, inconsistentCol));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
@@ -428,7 +430,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             // Get rid of file numbers
             .keys()
             .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter, false));
+                quoteEscapeChar, '\'', recCounter, errCounter, inconsistentCol));
 
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
