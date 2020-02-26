@@ -28,17 +28,20 @@ public class SFTPUploader {
         if (pwd != null) {
             password= URLEncoder.encode(pwd, "UTF-8");
         }
-        sftpURL = sftpUrlBuilder(username, password, host, port, privateKeyPath, passPhrase);
+
+        boolean privateKeyPresent = privateKeyPath == null ? false: true;
+
+        sftpURL = sftpUrlBuilder(username, password, host, port, privateKeyPresent);
         manager = new StandardFileSystemManager();
     }
 
     private String sftpUrlBuilder(String username, String password, String host,
-        int port, String privateKeyPath, String passPhrase) {
+        int port, boolean privateKeyPresent) {
         StringBuilder builder =
             new StringBuilder().append("sftp://")
                 .append(username);
 
-        if (privateKeyPath == null) {
+        if (!privateKeyPresent) {
             builder.append(":").append(password);
         }
         builder.append("@")
