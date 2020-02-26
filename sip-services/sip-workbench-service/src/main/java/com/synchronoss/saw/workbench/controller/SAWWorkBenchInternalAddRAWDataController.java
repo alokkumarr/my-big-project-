@@ -30,6 +30,7 @@ import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.DSSearchParams;
+import com.synchronoss.saw.workbench.model.ProjectMetadata;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
@@ -353,6 +354,29 @@ public class SAWWorkBenchInternalAddRAWDataController {
     logger.trace("createRGeneratedDataSet ends here : ", returnData.toString());
     return returnData;
   }
+
+    /**
+     *
+     * Retrieve the properties of a given Project id
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "projects/{projectId}",
+        method = RequestMethod.GET,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectMetadata getProjectMetadata(
+        @PathVariable(name="projectId", required = true) String projectId) {
+        logger.debug("Get the properties of a  project {}", projectId);
+
+        ProjectMetadata project = null;
+        try {
+            project = sawWorkbenchService.getProjectMetadata(projectId);
+        } catch(Exception ex) {
+            logger.error("Error occurred while retriving the dataset properties " + ex);
+        }
+        return project;
+    }
   
 }
   

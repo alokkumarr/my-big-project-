@@ -99,6 +99,15 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
         return toJsonElement(prj);
     }
 
+    public String readProjectDataAsString(String name) throws Exception {
+        JsonElement je = this.readProjectData(name);
+        if(je != null){
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            return gson.toJson(je);
+        }else{
+            return null;
+        }
+    }
 
     public void updateProjectRecord(String name, String src) throws Exception {
         if (name == null || name.isEmpty())
