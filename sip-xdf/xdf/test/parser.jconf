@@ -18,7 +18,8 @@
     "quoteChar": "\"",
     "quoteEscape": "\\",
     "headerSize": 0,
-    "fieldNameLine": 0
+    "fieldNameLine": 0,
+    "inconsistentCol": false
   },
   "outputs" : [
     { "dataSet" : "parsedDataSet"}

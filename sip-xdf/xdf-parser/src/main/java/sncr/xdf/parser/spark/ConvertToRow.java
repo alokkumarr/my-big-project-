@@ -111,7 +111,7 @@ public class ConvertToRow implements Function<String, Row> {
                 + Arrays.toString(parsed));
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");
-        } else if (parsed.length != schema.fields().length){
+        } else if (!inconsistentCol && parsed.length != schema.fields().length){
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");
         } else {

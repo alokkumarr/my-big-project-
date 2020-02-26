@@ -5,7 +5,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructType;
-import org.apache.spark.util.LongAccumulator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,19 +18,22 @@ import sncr.xdf.parser.TestSparkContext;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * This unit class test the inconsistent column use case
+ * This unit class to test inconsistent column use cases
  *
  * @author alok.kumarr
  * @since 3.6.0
  */
 @RunWith(JUnit4.class)
-public class InconsistentColumnParserTest extends BaseTest {
+public class NGParserWithInvalidColTest extends BaseTest {
 
-  private ConvertToRow ctr;
+  private Parser parser;
   private String configFile;
   private SparkSession session;
   private TestSparkContext context;
+  private StructType parsedSchema;
   private StructType originalSchema;
   private ComponentConfiguration configuration;
 
@@ -45,33 +47,30 @@ public class InconsistentColumnParserTest extends BaseTest {
     String configFilePath = getFileFromResource(configFile);
     configuration = ConfigLoader.parseConfiguration(ConfigLoader.loadConfiguration("file:///" + configFilePath));
 
-    Parser parser = configuration.getParser();
+    parser = configuration.getParser();
+
+    parsedSchema = createSchema(parser.getFields(), true, true);
     originalSchema = createSchema(parser.getFields(), false, false);
-
-    List<String> tsFormats = createTsFormatList(parser.getFields());
-    String lineSeparator = parser.getLineSeparator();
-    char delimiter = parser.getDelimiter().charAt(0);
-    char quoteChar = parser.getQuoteChar().charAt(0);
-    char quoteEscapeChar = parser.getQuoteEscape().charAt(0);
-
-    LongAccumulator errCounter = context.getSparkContext().longAccumulator("ParserErrorCounter");
-    LongAccumulator recCounter = context.getSparkContext().longAccumulator("ParserRecCounter");
-
-    ctr = new ConvertToRow(originalSchema, tsFormats, lineSeparator, delimiter,
-        quoteChar, quoteEscapeChar, '\'', recCounter, errCounter, parser.getInconsistentCol());
   }
 
   @After
   public void cleanUp() {
     session.close();
-    ctr = null;
+    context.getJavaSparkContext().close();
+    context = null;
   }
 
   @Test
   public void testInconsistentColumn() {
-    String dataFilePath = getFileFromResource("inconsistentcolumn/testdata.dat");
+    String dataFilePath = getFileFromResource("inconsistentcolumn/inconsistentcol.dat");
     JavaRDD<String> rawData = context.getJavaSparkContext().textFile("file:///" + dataFilePath);
+
+    ConvertToRow ctr = new ConvertToRow(originalSchema, createTsFormatList(parser.getFields()), parser.getLineSeparator(),
+        parser.getDelimiter().charAt(0), parser.getQuoteChar().charAt(0), parser.getQuoteChar().charAt(0),
+        '\'', context.getSparkContext().longAccumulator("ParserRecCounter"),
+        context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.getInconsistentCol());
     JavaRDD<Row> data = rawData.map(ctr);
+    data.count();
 
     Dataset<Row> dataFrame = session.createDataFrame(data.rdd(), originalSchema);
     dataFrame.show();
@@ -84,5 +83,24 @@ public class InconsistentColumnParserTest extends BaseTest {
     Assert.assertEquals("null", rowList.get(3).mkString());
     Assert.assertEquals("Test string5", rowList.get(4).mkString());
     Assert.assertNotNull(dataFrame.select("ID").collectAsList().get(2).get(0));
+  }
+
+  @Test
+  public void testParserWithDefaultConfig() {
+    String dataFilePath = getFileFromResource("inconsistentcolumn/inconsistentcol.dat");
+    JavaRDD<String> rawData = context.getJavaSparkContext().textFile("file:///" + dataFilePath);
+
+    ConvertToRow ctr = new ConvertToRow(originalSchema, createTsFormatList(parser.getFields()), parser.getLineSeparator(),
+        parser.getDelimiter().charAt(0), parser.getQuoteChar().charAt(0), parser.getQuoteChar().charAt(0),
+        '\'', context.getSparkContext().longAccumulator("ParserRecCounter"),
+        context.getSparkContext().longAccumulator("ParserErrorCounter"), false);
+    JavaRDD<Row> data = rawData.map(ctr);
+
+    int rejectedColumn = parsedSchema.length() - 2;
+    JavaRDD<Row> filterData = data.filter(row -> (int) (row.get(rejectedColumn)) == 0);
+
+    long finalCount = filterData.count();
+    long expectedResult = 2;
+    assertEquals(expectedResult, finalCount);
   }
 }
