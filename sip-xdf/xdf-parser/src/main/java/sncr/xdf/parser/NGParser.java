@@ -151,7 +151,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         pkeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
-        inconsistentCol = ngctx.componentConfiguration.getParser().getInconsistentCol();
+        inconsistentCol = ngctx.componentConfiguration.getParser().getInconsistentColumn();
 
         logger.info("Input file format = " + this.parserInputFileFormat);
 

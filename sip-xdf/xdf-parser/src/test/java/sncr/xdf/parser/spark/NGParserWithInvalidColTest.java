@@ -68,7 +68,7 @@ public class NGParserWithInvalidColTest extends BaseTest {
     ConvertToRow ctr = new ConvertToRow(originalSchema, createTsFormatList(parser.getFields()), parser.getLineSeparator(),
         parser.getDelimiter().charAt(0), parser.getQuoteChar().charAt(0), parser.getQuoteChar().charAt(0),
         '\'', context.getSparkContext().longAccumulator("ParserRecCounter"),
-        context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.getInconsistentCol());
+        context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.getInconsistentColumn());
     JavaRDD<Row> data = rawData.map(ctr);
     data.count();
 

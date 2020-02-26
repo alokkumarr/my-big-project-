@@ -210,7 +210,7 @@
         "numberOfFiles": {
           "$ref": "#/numberOfFiles"
         },
-        "inconsistentCol": {
+        "inconsistentColumn": {
           "type" : "boolean"
         }
       }

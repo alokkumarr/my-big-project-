@@ -69,9 +69,9 @@ public class Parser {
   @Expose
   private Alert alerts;
 
-  @SerializedName("inconsistentCol")
+  @SerializedName("inconsistentColumn")
   @Expose
-  private boolean inconsistentCol;
+  private boolean inconsistentColumn;
 
   /** No args constructor for use in serialization */
   public Parser() {}
@@ -327,15 +327,15 @@ public class Parser {
    *
    * @return value of inconsistentCol
    */
-  public boolean getInconsistentCol() {
-    return inconsistentCol;
+  public boolean getInconsistentColumn() {
+    return inconsistentColumn;
   }
 
   /**
    * Sets inconsistentCol
    */
-  public void setInconsistentCol(boolean inconsistentCol) {
-    this.inconsistentCol = inconsistentCol;
+  public void setInconsistentColumn(boolean inconsistentColumn) {
+    this.inconsistentColumn = inconsistentColumn;
   }
 
   @Override
@@ -358,7 +358,7 @@ public class Parser {
         .append(headerSize)
         .append(numberOfFiles)
         .append(multiLine)
-        .append(inconsistentCol)
+        .append(inconsistentColumn)
         .toHashCode();
   }
 
@@ -384,7 +384,7 @@ public class Parser {
         .append(headerSize, rhs.headerSize)
         .append(numberOfFiles, rhs.numberOfFiles)
         .append(multiLine,rhs.multiLine)
-        .append(inconsistentCol, this.inconsistentCol)
+        .append(inconsistentColumn, this.inconsistentColumn)
         .isEquals();
   }
 }
