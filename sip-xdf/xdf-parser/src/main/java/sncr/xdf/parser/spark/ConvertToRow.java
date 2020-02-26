@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * This class build and validate the every column of the row.
+ * Mark the accepted/rejected record with the addition column schema.
  */
 public class ConvertToRow implements Function<String, Row> {
 
@@ -101,13 +102,27 @@ public class ConvertToRow implements Function<String, Row> {
             logger.info("Unable to parse the record");
             errCounter.add(1);
             record = createRejectedRecord(line, "Unable to parse the record");
-        } else if(parsed.length != schema.fields().length){
-            // Create record with rejected flag
+        } else if(parsed.length > schema.fields().length){
+            // Create record with rejected flag, if column are more than schema
+            logger.debug("Rejected : No of column are more than the defined schema : "
+                + Arrays.toString(parsed));
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");
 
         } else {
             try {
+                int parsedLength = parsed.length;
+                int validSchemaLength = schema.fields().length;
+                // Don't reject the record if column are inconsistent (less than the schema length)
+                // increase the length of input row array and copy the input row column
+                if(parsedLength < validSchemaLength){
+                    String[] tempColumn = new String[validSchemaLength];
+                    for (int i = 0; i < parsedLength; i++){
+                        tempColumn[i] = parsed[i];
+                    }
+                    parsed = tempColumn;
+                    logger.debug("Column with default values : " + Arrays.toString(parsed));
+                }
                 if (Arrays.stream(parsed).filter(val -> val != null).count() == 0) {
                     record = createRejectedRecord(line, "All fields are null");
                 }

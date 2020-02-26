@@ -6,17 +6,15 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.*;
 import org.apache.spark.util.LongAccumulator;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import sncr.bda.ConfigLoader;
 import sncr.bda.conf.ComponentConfiguration;
-import sncr.bda.conf.Field;
 import sncr.bda.conf.Parser;
 import sncr.xdf.parser.TestSparkContext;
-import sncr.xdf.preview.CsvInspectorRowProcessor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -24,8 +22,8 @@ import static org.junit.Assert.*;
 /**
  * Created by skbm0001 on 21/2/2018.
  */
-
-public class ConvertToRowTest {
+@Ignore
+public class ConvertToRowTest extends BaseTest{
 
   private String dataFile;
   private ConvertToRow ctr;
@@ -38,6 +36,7 @@ public class ConvertToRowTest {
 
   @Before
   public void setUp() {
+    //System.setProperty("hadoop.home.dir", "c://hadoop");
     configFile = "parserconfig.json";
     dataFile = "parserdata.dat";
     context = new TestSparkContext();
@@ -72,10 +71,11 @@ public class ConvertToRowTest {
 
     JavaRDD<String> rawData = context.getJavaSparkContext().textFile("file:///" + dataFilePath);
     JavaRDD<Row> data = rawData.map(ctr);
+
     JavaRDD<Row> filterData = data.filter(row -> (int) (row.get(rejectedColumn)) == 0);
 
     long finalCount = filterData.count();
-    long expectedResult = 6;
+    long expectedResult = 1;
     assertEquals(expectedResult, finalCount);
   }
 
@@ -114,61 +114,5 @@ public class ConvertToRowTest {
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     }
-  }
-
-
-  private Method testableMethod(Class className, String methodName, Class... args) throws NoSuchMethodException,
-      IllegalArgumentException {
-    Method method = className.getDeclaredMethod(methodName, args);
-    method.setAccessible(true);
-    return method;
-  }
-
-  private static StructType createSchema(List<Field> fields, boolean addRejectedFlag, boolean addReasonFlag) {
-    StructField[] structFields = new StructField[fields.size() + (addRejectedFlag ? 1 : 0) + (addReasonFlag ? 1 : 0)];
-    int i = 0;
-    for (Field field : fields) {
-      StructField structField = new StructField(field.getName(), convertXdfToSparkType(field.getType()), true, Metadata.empty());
-      structFields[i] = structField;
-      i++;
-    }
-
-    if (addRejectedFlag) {
-      structFields[i] = new StructField("__REJ_FLAG", DataTypes.IntegerType, true, Metadata.empty());
-    }
-    if (addReasonFlag) {
-      structFields[i + 1] = new StructField("__REJ_REASON", DataTypes.StringType, true, Metadata.empty());
-    }
-    return new StructType(structFields);
-  }
-
-  private static DataType convertXdfToSparkType(String xdfType) {
-    switch (xdfType) {
-      case CsvInspectorRowProcessor.T_STRING:
-        return DataTypes.StringType;
-      case CsvInspectorRowProcessor.T_LONG:
-        return DataTypes.LongType;
-      case CsvInspectorRowProcessor.T_DOUBLE:
-        return DataTypes.DoubleType;
-      case CsvInspectorRowProcessor.T_INTEGER:
-        return DataTypes.IntegerType;
-      case CsvInspectorRowProcessor.T_DATETIME:
-        return DataTypes.TimestampType;
-      default:
-        return DataTypes.StringType;
-    }
-  }
-
-  private static List<String> createTsFormatList(List<Field> fields) {
-    List<String> retval = new ArrayList<>();
-    for (Field field : fields) {
-      if (field.getType().equals(CsvInspectorRowProcessor.T_DATETIME) &&
-          field.getFormat() != null && !field.getFormat().isEmpty()) {
-        retval.add(field.getFormat());
-      } else {
-        retval.add("");
-      }
-    }
-    return retval;
   }
 }
