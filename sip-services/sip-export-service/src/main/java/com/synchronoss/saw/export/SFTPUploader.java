@@ -62,7 +62,7 @@ public class SFTPUploader {
         SftpFileSystemConfigBuilder sftpBuilder = SftpFileSystemConfigBuilder.getInstance();
         sftpBuilder.setStrictHostKeyChecking(options, "no");
         //set root directory to user home
-        sftpBuilder.setUserDirIsRoot(options, true);
+        sftpBuilder.setUserDirIsRoot(options, false);
         //timeout
         sftpBuilder.setTimeout(options, 600000);
 
