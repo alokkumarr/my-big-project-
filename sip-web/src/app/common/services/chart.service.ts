@@ -116,10 +116,16 @@ const donutConfig = config => {
   return pieConfig(config);
 };
 
+const comparisonConfig = config => {
+  set(config, 'chart.type', 'column');
+  return config;
+};
+
 const configCustomizer = {
   stack: stackConfig,
   pie: pieConfig,
-  donut: donutConfig
+  donut: donutConfig,
+  comparison: comparisonConfig
 };
 
 const addCommas = nStr => {
