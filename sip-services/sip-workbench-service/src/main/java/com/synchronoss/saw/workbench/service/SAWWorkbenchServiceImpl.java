@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+
+import com.synchronoss.saw.workbench.model.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -40,14 +42,9 @@ import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.SAWWorkBenchUtils;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.workbench.model.DataSet;
-import com.synchronoss.saw.workbench.model.Inspect;
-import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.model.Project.ResultFormat;
-import com.synchronoss.saw.workbench.model.StorageProxy;
 import com.synchronoss.saw.workbench.model.StorageProxy.Storage;
 import com.synchronoss.sip.utils.RestUtil;
-import com.synchronoss.saw.workbench.model.StorageType;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
@@ -58,7 +55,6 @@ import sncr.bda.services.DLMetadata;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
-import com.synchronoss.saw.workbench.model.DSSearchParams;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -605,5 +601,21 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     System.out.println("Dataset : " +dataset.getSystem());
     System.out.println(DataSetProperties.UserData.toString());
   }
+
+    @Override
+    public ProjectMetadata getProjectMetadata(String proj) throws Exception {
+        logger.trace("Getting details of a project {} " + proj);
+        ProjectStore ps = new ProjectStore(defaultProjectRoot);
+        String json = ps.readProjectDataAsString(proj);
+        logger.debug("project Metadata Json " + json);
+        ProjectMetadata projectMetadata = null;
+        if(json != null){
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+            projectMetadata = objectMapper.readValue(json, ProjectMetadata.class);
+        }
+        return projectMetadata;
+    }
 
 }
