@@ -13,7 +13,7 @@
     "quoteChar": "\"",
     "quoteEscape": "\\",
     "headerSize": 0,
-    "inconsistentColumn" : true
+    "allowInconsistentCol" : true
   },
   "outputs" : [
     {"name":"OutputDataset1",

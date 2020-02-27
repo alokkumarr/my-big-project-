@@ -41,7 +41,7 @@ public class ConvertToRow implements Function<String, Row> {
     private SimpleDateFormat df;
 
     private CsvParser parser = null;
-    private boolean inconsistentCol;
+    private boolean allowInconsistentCol;
 
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
@@ -52,7 +52,7 @@ public class ConvertToRow implements Function<String, Row> {
                         char charToEscapeQuoteEscaping,
                         LongAccumulator recordCounter,
                         LongAccumulator errorCounter,
-                        boolean inconsistentCol) {
+                        boolean allowInconsistentCol) {
         this.schema = schema;
         this.tsFormats = tsFormats;
         this.lineSeparator = lineSeparator ;
@@ -62,7 +62,7 @@ public class ConvertToRow implements Function<String, Row> {
         this.charToEscapeQuoteEscaping = charToEscapeQuoteEscaping;
         this.errCounter = errorCounter;
         this.recCounter = recordCounter;
-        this.inconsistentCol = inconsistentCol;
+        this.allowInconsistentCol = allowInconsistentCol;
 
         df = new SimpleDateFormat();
         /*
@@ -105,13 +105,9 @@ public class ConvertToRow implements Function<String, Row> {
             logger.info("Unable to parse the record");
             errCounter.add(1);
             record = createRejectedRecord(line, "Unable to parse the record");
-        } else if(inconsistentCol && parsed.length > schema.fields().length){
-            // Create record with rejected flag, if column are more than schema
-            logger.debug("Rejected : No of column are more than the defined schema : "
-                + Arrays.toString(parsed));
-            errCounter.add(1);
-            record = createRejectedRecord(line, "Invalid number of columns");
-        } else if (!inconsistentCol && parsed.length != schema.fields().length){
+        } else if((allowInconsistentCol && parsed.length > schema.fields().length)
+                    || !allowInconsistentCol && parsed.length != schema.fields().length) {
+            // Create record with rejected flag
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");
         } else {
@@ -121,7 +117,7 @@ public class ConvertToRow implements Function<String, Row> {
 
                 // Don't reject the record if columns are inconsistent (less than the schema length)
                 // Copy the input row array and create a valid schema length array with default values
-                if(inconsistentCol && parsedLength < validSchemaLength){
+                if(allowInconsistentCol && parsedLength < validSchemaLength){
                     parsed = Arrays.copyOf(parsed, validSchemaLength);
                     logger.debug("Column with default values : " + Arrays.toString(parsed));
                 }

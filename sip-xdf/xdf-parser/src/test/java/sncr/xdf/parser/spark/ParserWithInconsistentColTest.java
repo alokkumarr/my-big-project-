@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  * @since 3.6.0
  */
 @RunWith(JUnit4.class)
-public class NGParserWithInconsistColTest extends BaseTest {
+public class ParserWithInconsistentColTest extends BaseTest {
 
   private Parser parser;
   private String configFile;
@@ -68,7 +68,7 @@ public class NGParserWithInconsistColTest extends BaseTest {
     ConvertToRow ctr = new ConvertToRow(originalSchema, createTsFormatList(parser.getFields()), parser.getLineSeparator(),
         parser.getDelimiter().charAt(0), parser.getQuoteChar().charAt(0), parser.getQuoteChar().charAt(0),
         '\'', context.getSparkContext().longAccumulator("ParserRecCounter"),
-        context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.getInconsistentColumn());
+        context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.getAllowInconsistentColumn());
     JavaRDD<Row> data = rawData.map(ctr);
     data.count();
 
