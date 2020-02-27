@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
@@ -35,7 +36,7 @@ public class ConvertToRow implements Function<String, Row> {
     private LongAccumulator recCounter;
     private LongAccumulator errCounter;
 
-    private static String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
+    private static final String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
     private SimpleDateFormat df;
 
@@ -117,17 +118,14 @@ public class ConvertToRow implements Function<String, Row> {
             try {
                 int parsedLength = parsed.length;
                 int validSchemaLength = schema.fields().length;
-                // Don't reject the record if column are inconsistent (less than the schema length)
-                // increase the length of input row array and copy the input row column
+
+                // Don't reject the record if columns are inconsistent (less than the schema length)
+                // Copy the input row array and create a valid schema length array with default values
                 if(inconsistentCol && parsedLength < validSchemaLength){
-                    String[] tempColumn = new String[validSchemaLength];
-                    for (int i = 0; i < parsedLength; i++){
-                        tempColumn[i] = parsed[i];
-                    }
-                    parsed = tempColumn;
+                    parsed = Arrays.copyOf(parsed, validSchemaLength);
                     logger.debug("Column with default values : " + Arrays.toString(parsed));
                 }
-                if (Arrays.stream(parsed).filter(val -> val != null).count() == 0) {
+                if (Arrays.stream(parsed).filter(Objects::nonNull).count() == 0) {
                     record = createRejectedRecord(line, "All fields are null");
                 }
                 int i = 0;
@@ -161,13 +159,12 @@ public class ConvertToRow implements Function<String, Row> {
                     }
                     i++;
                 }
+            } catch (NumberFormatException ex){
+              errCounter.add(1);
+              record = createRejectedRecord(line, "Invalid number format " + ex.getMessage());
             } catch(Exception e){
-                errCounter.add(1);
-                if (e instanceof NumberFormatException){
-                    record = createRejectedRecord(line, "Invalid number format " + e.getMessage());
-                } else {
-                    record = createRejectedRecord(line, e.getMessage());
-                }
+               errCounter.add(1);
+               record = createRejectedRecord(line, e.getMessage());
             }
         }
         recCounter.add(1);
