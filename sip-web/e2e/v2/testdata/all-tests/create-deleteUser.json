@@ -715,9 +715,7 @@
         "description": "masterAdmin Should be able to create Active user by validating email and password fields"
       },
       "USR33": {
-        "suites": [
-          "critical"
-        ],
+        "suites": ["critical"],
         "roleType": "REPORT USER",
         "user": "masterAdmin",
         "firstName": "report",
