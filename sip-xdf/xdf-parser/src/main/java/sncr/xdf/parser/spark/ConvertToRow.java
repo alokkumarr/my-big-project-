@@ -105,8 +105,7 @@ public class ConvertToRow implements Function<String, Row> {
             logger.info("Unable to parse the record");
             errCounter.add(1);
             record = createRejectedRecord(line, "Unable to parse the record");
-        } else if((allowInconsistentCol && parsed.length > schema.fields().length)
-                    || !allowInconsistentCol && parsed.length != schema.fields().length) {
+        } else if(parsed.length > schema.fields().length || (!allowInconsistentCol && parsed.length != schema.fields().length)) {
             // Create record with rejected flag
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");

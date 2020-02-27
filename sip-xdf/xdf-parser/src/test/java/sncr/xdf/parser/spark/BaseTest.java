@@ -1,5 +1,6 @@
 package sncr.xdf.parser.spark;
 
+import org.apache.log4j.Logger;
 import org.apache.spark.sql.types.*;
 import sncr.bda.conf.Field;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
@@ -9,12 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base test class have all the utiliy method to support NG parser Test cases.
+ * Base test class have all the utility method to support NG parser Test cases.
  *
  * @author alok.kumarr
  * @since 3.6.0
  */
 public class BaseTest {
+
+  protected static final Logger LOGGER = Logger.getLogger(BaseTest.class);
+
 
   protected String getFileFromResource(String resource) {
     ClassLoader loader = this.getClass().getClassLoader();

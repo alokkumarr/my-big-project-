@@ -91,11 +91,11 @@ public class ConvertToRowTest extends BaseTest{
 
       assertEquals(2, count);
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      LOGGER.error(e.getMessage());
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      LOGGER.error(e.getMessage());
     } catch (InvocationTargetException e) {
-      e.printStackTrace();
+      LOGGER.error(e.getMessage());
     }
   }
 
@@ -112,11 +112,11 @@ public class ConvertToRowTest extends BaseTest{
       assertEquals(true, validateQuoteBalance.invoke(ctr, "0\u0011\u0016Binary", '"'));
       assertEquals(true, validateQuoteBalance.invoke(ctr, "\"0\u0011\u0016Binary\"", '"'));
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      LOGGER.error(e.getMessage());
     } catch (InvocationTargetException e) {
-      e.printStackTrace();
+      LOGGER.error(e.getMessage());
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      LOGGER.error(e.getMessage());
     }
   }
 }
