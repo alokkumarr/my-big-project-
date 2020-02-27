@@ -1414,10 +1414,13 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
 	@Override
-	public boolean deleteUser(Long userId, String masterLoginId) {
-		String sql = "DELETE FROM USERS WHERE USER_SYS_ID = ?";
+	public boolean deleteUser(Long userId, String masterLoginId , Long customerSysId) {
+		String sql = "DELETE FROM USERS WHERE USER_SYS_ID = ? AND CUSTOMER_SYS_ID = ? ";
 		try {
-			int valid = jdbcTemplate.update(sql, preparedStatement -> preparedStatement.setLong(1, userId));
+			int valid = jdbcTemplate.update(sql, preparedStatement -> {
+                preparedStatement.setLong(1, userId);
+                preparedStatement.setLong(2,customerSysId);
+            });
 			// if user deleted successfully then invalidate ticket
 			if (valid > 0) {
 				String updateSql = "UPDATE TICKET SET VALID_INDICATOR=0,INACTIVATED_DATE=sysdate(),DESCRIPTION=? where MASTER_LOGIN_ID = ?";
