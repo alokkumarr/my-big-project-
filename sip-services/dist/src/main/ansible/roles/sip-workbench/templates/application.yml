@@ -91,6 +91,7 @@ workbench:
         storage-uri: ${connector}://localhost:9800
         app-name: workbench-executor
         lib.path: "{{ saw_workbench_lib_path | default('/opt/bda/saw-workbench-service/lib/') }}"
+        stream.base-path:  {{ sip_var_path | default('/var/sip') }}/services/workbench/executor
 metastore:
     base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"
 

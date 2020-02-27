@@ -11,9 +11,11 @@ import java.util.concurrent.Future;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -22,10 +24,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.gson.JsonSyntaxException;
+import com.mapr.streams.Admin;
+import com.mapr.streams.StreamDescriptor;
+import com.mapr.streams.Streams;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutionType;
 import com.synchronoss.saw.workbench.service.WorkbenchJobService;
 import com.synchronoss.saw.workbench.service.WorkbenchJobServiceImpl;
+
+import sncr.bda.core.file.HFileOperations;
 
 @Service
 public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener{
@@ -36,13 +44,18 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	  @NotNull
 	  private String root;
 
-	  private String streamPath = null;
+
+	  @Value("${workbench.stream.base-path}")
+	  @NotNull
+	  private String streamBasePath;
+	  
 	  private String workbenchTopics= null;
 	  
 	  @Autowired
 	  WorkbenchJobService service;
+	  
+	  private String workbenchStream;
 
-	private String evaluatorstream;
 
 	  /**
 	   * Init method for listener.
@@ -51,29 +64,67 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	   */
 	  @PostConstruct
 	  public void init() {
-		String basePath = "";
 		logger.debug("#####Inside post construct of listener #####");
 		
-		String sipBasePath = "";
 	     
-	      this.streamPath = sipBasePath + File.separator + "services/workbench/executor";
-	      this.evaluatorstream = this.streamPath
+	      this.workbenchStream = this.streamBasePath
 	    		  + File.separator
 	    		  + "sip-workbench-executor";
-	      this.workbenchTopics = evaluatorstream + ":executions";
+	      this.workbenchTopics = workbenchStream + ":executions";
 	  }
 	  
 	  
 
 	@Override
 	public void createIfNotExists(int retries) throws Exception {
-		// TODO Auto-generated method stub
+
 		
+		 
+	    try {
+	      HFileOperations.createDir(streamBasePath);
+	    } catch (Exception e) {
+	      if (retries == 0) {
+	        logger.error("unable to create path for workbench executor stream for path : " + streamBasePath);
+	        throw e;
+	      }
+	      Thread.sleep(5 * 1000);
+	      createIfNotExists(retries - 1);
+	    }
+	    Configuration conf = new Configuration();
+	    Admin streamAdmin = Streams.newAdmin(conf);
+	    if (!streamAdmin.streamExists(workbenchStream)) {
+	      StreamDescriptor streamDescriptor = Streams.newStreamDescriptor();
+	      try {
+	    	logger.debug("####Stream not exists. Creating stream ####" + workbenchStream);
+	        streamAdmin.createStream(workbenchStream, streamDescriptor);
+	        logger.debug("####Stream created Successfully!! ####"+  workbenchStream);
+	      } catch (Exception e) {
+	    	  logger.error("unable to create stream ..."+ workbenchStream);
+	        if (retries == 0) {
+	          logger.error("Error unable to create the workbench stream no reties left: " + e);
+	          throw e;
+	        }
+	        logger.warn("unable to create the workbench stream leftover reties : " + retries);
+	        Thread.sleep(5 * 1000);
+	        createIfNotExists(retries - 1);
+	      } finally {
+	        streamAdmin.close();
+	      }
+	    }
+	    
+	    
+	    
+	  		
 	}
 
 	@Override
 	public void runWorkbenchConsumer() throws Exception {
-
+		
+		   try {
+		     createIfNotExists(10);
+		   } catch (Exception e) {
+		    logger.error("Error occurred while initializing the workbench executor stream ", e);
+		   }
 
 	      logger.debug("Starting receive:");
 	      Properties properties = new Properties();
@@ -93,12 +144,7 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	      receiveMessages(consumer);
 	    }
 
-	@Override
-	public boolean sendMessageToStream() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
 	/**
 	   * Method to receive consumer messages.
 	   *

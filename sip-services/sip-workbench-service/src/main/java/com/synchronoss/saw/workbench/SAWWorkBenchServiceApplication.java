@@ -1,5 +1,7 @@
 package com.synchronoss.saw.workbench;
 
+import javax.annotation.PreDestroy;
+
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,4 +50,6 @@ public class SAWWorkBenchServiceApplication {
     LOG.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
   }
+  
+  
 }

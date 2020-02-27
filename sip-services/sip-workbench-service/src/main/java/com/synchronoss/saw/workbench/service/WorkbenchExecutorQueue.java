@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -11,6 +12,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.mapr.streams.Admin;
@@ -24,13 +26,14 @@ import sncr.bda.core.file.HFileOperations;
 public class WorkbenchExecutorQueue {
 
 	  private static final Logger logger = LoggerFactory.getLogger(WorkbenchExecutorQueue.class);
-	  private String streamBasePath = "";
-	  private String project="";
-	  private String name="";
-	  private String component="";
-	  private String cfg="";
+	  
+	  @Value("${workbench.stream.base-path}")
+	  @NotNull
+	  private String streamBasePath;
+	  
+	  private String workbenchStream;
+	  
 	  private String topic="";
-	  private String workbenchExecutorStream="";
 	  KafkaProducer<String, String> producer=null;
 	  @Autowired
 	  WorkbenchExecutorListener listener;
@@ -38,20 +41,19 @@ public class WorkbenchExecutorQueue {
 	  @PostConstruct
 	  public void init() {
 		  logger.info("#### Post construct of WorkbenchQueue Manager");
-	      String sipBasePath = "";
 	     
-	      this.streamBasePath = sipBasePath + File.separator + "services/workbench/executor";
-	      this.workbenchExecutorStream = this.streamBasePath
-        + File.separator
-        + "sip-workbench-executor";
-	      this.topic = workbenchExecutorStream + ":executions";
+	      //this.streamPath = workbenchExecutorStream + File.separator + "services/workbench/executor";
+		  this.workbenchStream = this.streamBasePath
+	    		  + File.separator
+	    		  + "sip-workbench-executor";
+	      this.topic = workbenchStream + ":executions";
 
 	      
 	      
 	    try {
 	      createIfNotExists(10);
 	    } catch (Exception e) {
-	      logger.error("unable to create path for alert stream : " + this.streamBasePath);
+	      logger.error("unable to create path for workbench executor stream : " + this.streamBasePath);
 	    }
 	  }
 
@@ -62,11 +64,13 @@ public class WorkbenchExecutorQueue {
 	   * @throws Exception when unable to create stream path.
 	   */
 	   private void createIfNotExists(int retries) throws Exception {
+		
+		 
 	    try {
 	      HFileOperations.createDir(streamBasePath);
 	    } catch (Exception e) {
 	      if (retries == 0) {
-	        logger.error("unable to create path for alert stream for path : " + streamBasePath);
+	        logger.error("unable to create path for workbench executor stream for path : " + streamBasePath);
 	        throw e;
 	      }
 	      Thread.sleep(5 * 1000);
@@ -74,19 +78,19 @@ public class WorkbenchExecutorQueue {
 	    }
 	    Configuration conf = new Configuration();
 	    Admin streamAdmin = Streams.newAdmin(conf);
-	    if (!streamAdmin.streamExists(workbenchExecutorStream)) {
+	    if (!streamAdmin.streamExists(workbenchStream)) {
 	      StreamDescriptor streamDescriptor = Streams.newStreamDescriptor();
 	      try {
 	    	logger.debug("####Stream not exists. Creating stream ####");
-	        streamAdmin.createStream(workbenchExecutorStream, streamDescriptor);
+	        streamAdmin.createStream(workbenchStream, streamDescriptor);
 	        logger.debug("####Stream created Successfully!! ####");
 	      } catch (Exception e) {
 
 	        if (retries == 0) {
-	          logger.error("Error unable to create the alert stream no reties left: " + e);
+	          logger.error("Error unable to create the workbench stream no reties left: " + e);
 	          throw e;
 	        }
-	        logger.warn("unable to create the alert stream leftover reties : " + retries);
+	        logger.warn("unable to create the workbench stream leftover reties : " + retries);
 	        Thread.sleep(5 * 1000);
 	        createIfNotExists(retries - 1);
 	      } finally {

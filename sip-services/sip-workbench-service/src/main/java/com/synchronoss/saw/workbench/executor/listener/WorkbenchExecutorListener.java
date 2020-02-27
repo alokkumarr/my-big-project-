@@ -7,7 +7,6 @@ public interface WorkbenchExecutorListener {
 
 	  void runWorkbenchConsumer() throws Exception;
 
-	  boolean sendMessageToStream();
 
 
 }

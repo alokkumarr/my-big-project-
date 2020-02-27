@@ -41,6 +41,7 @@ workbench:
         preview-limit: 10000
         livy-uri: http://localhost:8998
         storage-url: ${connector}://localhost:9800
+        stream.base-path: "/var/sip/workbench/services/workbench/executor"
 
 metastore:
     base:  hdfs:///var/sip
