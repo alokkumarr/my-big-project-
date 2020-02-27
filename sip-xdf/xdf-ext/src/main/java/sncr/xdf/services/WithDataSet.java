@@ -21,7 +21,6 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
-import sncr.bda.conf.DSCategory;
 
 import java.time.Instant;
 import java.util.*;
@@ -431,38 +430,35 @@ public interface WithDataSet {
             }else {
                 userData = new Gson().toJsonTree((LinkedTreeMap) userDataObject).getAsJsonObject();
             }
-            addDatasetCategory(userData);
+            addDatasetTags(userData);
             return userData;
         }
 
-        private void addDatasetCategory(JsonObject userData){
+        private void addDatasetTags(JsonObject userData){
             logger.debug("addDatasetCategory(): userData : "+ userData);
-            List<String> categories = null;
-            if(userData.has(DataSetProperties.Category.toString())) {
-                JsonElement categoriesElement = userData.get(DataSetProperties.Category.toString());
-                if (categoriesElement != null) {
-                    JsonArray categoriesArray = categoriesElement.getAsJsonArray();
-                    if (categoriesArray != null && categoriesArray.size() != 0) {
-                        categories = new ArrayList<>();
-                        for (JsonElement categoryElement : categoriesArray) {
-                            String inputCategory = categoryElement.getAsString();
-                            if(inputCategory != null && !inputCategory.trim().isEmpty()) {
-                                categories.add(inputCategory.trim());
+            List<String> tags = null;
+            if(userData.has(DataSetProperties.Tags.toString())) {
+                JsonElement tagsElement = userData.get(DataSetProperties.Tags.toString());
+                if (tagsElement != null) {
+                    JsonArray tagsArray = tagsElement.getAsJsonArray();
+                    if (tagsArray != null && tagsArray.size() != 0) {
+                        tags = new ArrayList<>();
+                        for (JsonElement tagElement : tagsArray) {
+                            String tag = tagElement.getAsString();
+                            if(tag != null && !tag.trim().isEmpty()) {
+                                tags.add(tag.trim());
                             }
                         }
                     }
                 }
             }
-            JsonArray dsCategoryArray = new JsonArray();
-            if(categories == null || categories.size() == 0) {
-                dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.toString()));
-            }else {
-                for(String category : categories) {
-                    DSCategory categoryConstant = DSCategory.fromValue(category);
-                    dsCategoryArray.add(new JsonPrimitive(categoryConstant.toString()));
+            JsonArray dsTagsArray = new JsonArray();
+            if(tags != null && !tags.isEmpty()) {
+                for(String tag : tags) {
+                    dsTagsArray.add(new JsonPrimitive(tag));
                 }
             }
-            userData.add(DataSetProperties.Category.name(),dsCategoryArray);
+            userData.add(DataSetProperties.Tags.name(),dsTagsArray);
         }
 
         private Input.Dstype getOutputDatasetType() {

@@ -21,4 +21,5 @@ public interface SAWWorkbenchService {
   public DataSet getDataSet(String projectId, String datasetId) throws Exception;
   public DataSet createDataSet(DataSet dataSet, String proj) throws Exception;
   public ProjectMetadata getProjectMetadata(String proj) throws Exception;
+  public ProjectMetadata[] getAllProjectsMetadata() throws Exception;
 }

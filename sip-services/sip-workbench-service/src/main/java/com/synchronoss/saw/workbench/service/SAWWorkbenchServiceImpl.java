@@ -618,4 +618,25 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         return projectMetadata;
     }
 
+    @Override
+    public ProjectMetadata[] getAllProjectsMetadata() throws Exception {
+        logger.trace("Getting details of all projects");
+        ProjectStore ps = new ProjectStore(defaultProjectRoot);
+        String[] jsons = ps.readAllProjectsMetadata(proj);
+        logger.debug("projects Metadata Json " + json);
+        ProjectMetadata[] projectsMetadata = null;
+        if(jsons != null){
+            projectsMetadata = new ProjectMetadata[jsons.length];
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+            int index = 0;
+            for(String json : jsons){
+                projectsMetadata[index] = objectMapper.readValue(json, ProjectMetadata.class);
+                index++;
+            }
+        }
+        return projectsMetadata;
+    }
+
 }

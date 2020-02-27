@@ -361,21 +361,41 @@ public class SAWWorkBenchInternalAddRAWDataController {
      * @param projectId
      * @return
      */
-    @RequestMapping(value = "projects/{projectId}",
+    @RequestMapping(value = "{project}/metadata",
         method = RequestMethod.GET,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProjectMetadata getProjectMetadata(
-        @PathVariable(name="projectId", required = true) String projectId) {
-        logger.debug("Get the properties of a  project {}", projectId);
+        @PathVariable(name="project", required = true) String project) {
+        logger.debug("Get the properties of a  project {}", project);
 
         ProjectMetadata project = null;
         try {
-            project = sawWorkbenchService.getProjectMetadata(projectId);
+            project = sawWorkbenchService.getProjectMetadata(project);
         } catch(Exception ex) {
             logger.error("Error occurred while retriving the dataset properties " + ex);
         }
         return project;
+    }
+
+    /**
+     *
+     * Retrieve the properties of a given Project id
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "all/metadata",
+        method = RequestMethod.GET,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectMetadata[] getAllProjectsMetadata() {
+        ProjectMetadata[] projects = null;
+        try {
+            projects = sawWorkbenchService.getAllProjectsMetadata();
+        } catch(Exception ex) {
+            logger.error("Error occurred while retriving the dataset properties " + ex);
+        }
+        return projects;
     }
   
 }

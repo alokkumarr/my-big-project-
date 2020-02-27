@@ -5,6 +5,7 @@ import com.mapr.db.MapRDB;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
+import org.ojai.DocumentStream;
 import org.ojai.store.QueryCondition;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.base.WithSearchInMetastore;
@@ -14,7 +15,9 @@ import sncr.bda.services.DLMetadata;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -100,13 +103,23 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
     }
 
     public String readProjectDataAsString(String name) throws Exception {
-        JsonElement je = this.readProjectData(name);
-        if(je != null){
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            return gson.toJson(je);
-        }else{
-            return null;
+        if (name == null || name.isEmpty())
+            throw new IllegalArgumentException("Project name cannot be null or empty");
+        Document prj = table.findById(name);
+        if (prj == null)
+            throw new Exception("Project with name: " + name + " not found");
+        return prj.asJsonString();
+    }
+
+    public String[] readAllProjectsMetadata() throws Exception {
+        List<String> projects = new ArrayList<>();
+       try(DocumentStream documentStream = table.find()) {
+            for (Document document : documentStream) {
+                projects.add(document.asJsonString());
+            }
         }
+       Object[] objArr = projects.toArray();
+       return Arrays.copyOf(objArr, objArr.length, String[].class);
     }
 
     public void updateProjectRecord(String name, String src) throws Exception {
