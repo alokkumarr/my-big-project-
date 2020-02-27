@@ -369,13 +369,13 @@ public class SAWWorkBenchInternalAddRAWDataController {
         @PathVariable(name="project", required = true) String project) {
         logger.debug("Get the properties of a  project {}", project);
 
-        ProjectMetadata project = null;
+        ProjectMetadata projectMetadata = null;
         try {
-            project = sawWorkbenchService.getProjectMetadata(project);
+            projectMetadata = sawWorkbenchService.getProjectMetadata(project);
         } catch(Exception ex) {
             logger.error("Error occurred while retriving the dataset properties " + ex);
         }
-        return project;
+        return projectMetadata;
     }
 
     /**
@@ -389,13 +389,13 @@ public class SAWWorkBenchInternalAddRAWDataController {
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProjectMetadata[] getAllProjectsMetadata() {
-        ProjectMetadata[] projects = null;
+        ProjectMetadata[] projectsMetadata = null;
         try {
-            projects = sawWorkbenchService.getAllProjectsMetadata();
+            projectsMetadata = sawWorkbenchService.getAllProjectsMetadata();
         } catch(Exception ex) {
             logger.error("Error occurred while retriving the dataset properties " + ex);
         }
-        return projects;
+        return projectsMetadata;
     }
   
 }

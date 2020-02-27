@@ -622,8 +622,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     public ProjectMetadata[] getAllProjectsMetadata() throws Exception {
         logger.trace("Getting details of all projects");
         ProjectStore ps = new ProjectStore(defaultProjectRoot);
-        String[] jsons = ps.readAllProjectsMetadata(proj);
-        logger.debug("projects Metadata Json " + json);
+        String[] jsons = ps.readAllProjectsMetadata();
+        logger.debug("projects Metadata Json " + jsons);
         ProjectMetadata[] projectsMetadata = null;
         if(jsons != null){
             projectsMetadata = new ProjectMetadata[jsons.length];
