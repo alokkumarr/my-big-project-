@@ -18,8 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class build and validate the every column of the row.
- * Mark the accepted/rejected record with the addition column schema.
+ * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
  */
 public class ConvertToRow implements Function<String, Row> {
 

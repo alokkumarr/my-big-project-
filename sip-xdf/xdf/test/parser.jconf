@@ -19,7 +19,7 @@
     "quoteEscape": "\\",
     "headerSize": 0,
     "fieldNameLine": 0,
-    "inconsistentCol": false
+    "inconsistentColumn": false
   },
   "outputs" : [
     { "dataSet" : "parsedDataSet"}
