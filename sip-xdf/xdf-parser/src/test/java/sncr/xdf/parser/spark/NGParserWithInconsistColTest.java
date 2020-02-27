@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  * @since 3.6.0
  */
 @RunWith(JUnit4.class)
-public class NGParserWithInvalidColTest extends BaseTest {
+public class NGParserWithInconsistColTest extends BaseTest {
 
   private Parser parser;
   private String configFile;
