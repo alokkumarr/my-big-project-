@@ -9,6 +9,10 @@ import { GlobalFilterService } from '../../services/global-filter.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { ObserveService } from '../../services/observe.service';
 
+import {
+  HeaderProgressService
+} from './../../../../common/services';
+
 class MatDialogStub {}
 class RouterStub {}
 class LocationStub {}
@@ -17,6 +21,9 @@ class MenuServiceStub {}
 class DashboardServiceStub {}
 class ObserveServiceStub {}
 class GlobalFilterServiceStub {}
+class HeaderProgressStubService {
+  subscribe = () => true;
+}
 
 describe('Create dashboard component', () => {
   let fixture: ComponentFixture<CreateDashboardComponent>;
@@ -35,7 +42,8 @@ describe('Create dashboard component', () => {
         {
           provide: GlobalFilterService,
           useValue: new GlobalFilterServiceStub()
-        }
+        },
+        { provide: HeaderProgressService, useClass: HeaderProgressStubService }
       ]
     })
       .compileComponents()

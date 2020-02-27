@@ -351,13 +351,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                 }
             }
-
-             //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
-             //TODO: This is a crude way of checking. This need to be revisited.
-            if(logger.isDebugEnabled()) {
-                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-            }
-
         }
 		else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
@@ -371,7 +364,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
-            if(inputDSCount == 0 ){
+            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
 
@@ -393,7 +386,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             }
             inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
-            if(inputDSCount == 0 ){
+            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
 
@@ -408,7 +401,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             inputDataFrame.show();
             inputDSCount = inputDataFrame.count();
             this.recCounter.setValue(inputDSCount);
-            if(inputDSCount == 0 ){
+            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
             }
             commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
@@ -416,6 +409,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
+        }
+
+        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+        //TODO: This is a crude way of checking. This need to be revisited.
+        if(
+            //logger.isDebugEnabled() &&
+                ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
+            logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
         }
         logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
         validateOutputDSCounts(inputDSCount);
@@ -502,7 +503,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             .textFile(sourcePath, outputNOF);
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
         inputDSCount = rdd.count();
-        if(inputDSCount == 0 ){
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
 
@@ -589,7 +590,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 }
             }
         }
-        if(inputDSCount == 0 ){
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
         return 0;
@@ -613,7 +614,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         long rddCount = rddWithoutHeader.count();
         logger.info("RDD Count is : " + rddCount);
         int rc = 0;
-        if(rddCount > 0) {
+        if(!ngctx.componentConfiguration.isErrorHandlingEnabled() || rddCount > 0) {
             inputDSCount += rddCount;
             JavaRDD<Row> parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
                 quoteEscapeChar, '\'', recCounter, errCounter));
@@ -700,7 +701,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 		} else {
             rddWithoutHeader = rdd;
 		}
-        if(rddWithoutHeader.count() == 0 ){
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && rddWithoutHeader.count() == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
         JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
@@ -1022,7 +1023,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
         System.exit(rc);
     }
     

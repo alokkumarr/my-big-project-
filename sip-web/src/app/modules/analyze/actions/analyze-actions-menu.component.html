@@ -7,7 +7,7 @@
             (click)="action.fn()"
             [disabled]="actionsToDisable[action.value]"
             [style.color]="action.color"
-            [attr.e2e]="'actions-menu-selector-' + action.value"
+            [attr.e2e]="action.label === 'Schedule' ? 'actions-menu-selector-schedule' : 'actions-menu-selector-' + action.value"
             mat-menu-item
     >
       {{action.label}}

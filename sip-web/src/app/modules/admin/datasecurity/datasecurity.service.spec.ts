@@ -103,7 +103,7 @@ describe('User Assignment Service', () => {
         pipe: () => {}
       });
       datasecurityService.getFiltersFor('123');
-      expect(spy).toHaveBeenCalledWith('auth/admin/dsk-security-groups/123');
+      expect(spy).toHaveBeenCalledWith('auth/admin/v1/dsk-security-groups/123');
     });
   });
 

@@ -23,6 +23,7 @@ public class UserDetailsExtractor implements ResultSetExtractor<UserDetails> {
       userDetails.setMiddleName(rs.getString("MIDDLE_NAME"));
       userDetails.setCustomerCode(rs.getString("CUSTOMER_CODE"));
       userDetails.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));
+      userDetails.setId3Enabled(rs.getBoolean("ID3_ENABLED"));
       Long secGroupSysId = rs.getLong("SEC_GROUP_SYS_ID");
       secGroupSysId = (secGroupSysId < 1) ? null : secGroupSysId;
       userDetails.setSecGroupSysId(secGroupSysId);
