@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Arrays;
 import java.util.Optional;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
@@ -594,7 +593,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
           FileStatus file = files[0];
           String tempPath = tempDir + Path.SEPARATOR + file.getPath();
 
-          int retVal = parseSingleFile(file.getPath(), new Path(tempPath));
+          int retVal = parseMultipleFiles(new Path(tempPath));
           if (retVal == 0) {
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
           } else {
@@ -608,8 +607,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     }
 
 
-    private int parseSingleFile(Path file, Path destDir){
-        logger.trace("Parsing " + file + " to " + destDir +"\n");
+    private int parseMultipleFiles(Path destDir){
         logger.trace("Header size : " + headerSize +"\n");
 
         JavaPairRDD<String, String> javaPairRDD = new JavaSparkContext(ctx.sparkSession.sparkContext())
@@ -617,7 +615,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         JavaRDD<String> rddWithoutHeader = javaPairRDD
                 // Filter out header based on line number from all values
-                .flatMapValues(new HeaderMapFilter(headerSize))
+                .flatMapValues(new HeaderMapFilter(headerSize, lineSeparator))
                 .values()
                 // Add line numbers
                 .zipWithIndex()
@@ -644,10 +642,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 logger.debug("Output rdd length = " + recCounter.value() + "\n");
                 logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
-                logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
+                logger.debug("Dest dir for file " + " = " + destDir + "\n");
 
                 rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
-                logger.debug("************************************** Dest dir for file " + file + " = " + destDir + "\n");
+                logger.debug("************************************** Dest dir for file " + " = " + destDir + "\n");
 
 
                 logger.debug("Write dataset status = " + rc);
@@ -673,9 +671,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 logger.debug("Output rdd length = " + recCounter.value() + "\n");
                 logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
-                logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
+                logger.debug("Dest dir for file " + " = " + destDir + "\n");
 
-                logger.debug("************************************** Dest dir for file " + file + " = " + destDir + "\n");
+                logger.debug("************************************** Dest dir for file "+ " = " + destDir + "\n");
 
                 filterOutputDS.printSchema();
                 filterOutputDS.show(5);
