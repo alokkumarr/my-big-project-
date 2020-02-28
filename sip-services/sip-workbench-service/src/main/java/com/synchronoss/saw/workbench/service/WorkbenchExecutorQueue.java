@@ -23,6 +23,11 @@ import com.synchronoss.saw.workbench.executor.listener.WorkbenchExecutorListener
 import sncr.bda.core.file.HFileOperations;
 
 @Service
+/**
+ * Workbench add dataset request is submitted to the queue.
+ * Workbench executor consumer recieves and processes the messages
+ * from the queue. This is to control backpressure.
+ */
 public class WorkbenchExecutorQueue {
 
 	  private static final Logger logger = LoggerFactory.getLogger(WorkbenchExecutorQueue.class);
@@ -125,7 +130,13 @@ public class WorkbenchExecutorQueue {
 	    
 	    
 	  }
-
+	   
+	  /**
+	   * Senindg messages to the queue.
+	   * 
+	   * @param recordContent content of record
+	   * @return record sent or not.
+	   */
 	  public boolean sendWorkbenchMessageToStream(String recordContent) {
 	   
 

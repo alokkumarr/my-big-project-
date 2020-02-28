@@ -65,10 +65,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private String root;
 
-  @Value("${workbench.livy-uri}")
-  @NotNull
-  private String livyUri;
-
   @Value("${workbench.preview-limit}")
   @NotNull
   private Integer previewLimit;
@@ -106,18 +102,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
         admin.createTable(table).close();
       }
     }
-    /*
-     * Cache a Workbench Livy client to reduce startup time for first operation
-     */
-    try {
-//      cacheWorkbenchClient();
-    } catch (Exception e) {
-      /* If Apache Livy is not installed in the environment, fail
-       * gracefully by letting the Workbench Service still start up.
-       * If Apache Livy is later installed, the Workbench Service will
-       * be able to recover by reattempting to create the client.  */
-      log.error("Unable to create Workbench client upon startup", e);
-    }
+    
   }
 
   

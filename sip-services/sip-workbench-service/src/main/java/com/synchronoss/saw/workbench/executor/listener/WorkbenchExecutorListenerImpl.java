@@ -36,6 +36,13 @@ import com.synchronoss.saw.workbench.service.WorkbenchJobServiceImpl;
 import sncr.bda.core.file.HFileOperations;
 
 @Service
+/**
+ * 
+ * Listener polls for messages coming to queue
+ * and process by invoking XDF component or 
+ * pipeline.
+ *
+ */
 public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener{
 	
 	 private static final Logger logger = LoggerFactory.getLogger(WorkbenchExecutorListenerImpl.class);
