@@ -16,7 +16,7 @@ public class HeaderMapFilter implements Function<String, Iterable<String>> {
   }
 
   @Override
-  public Iterable<String> call(String s) {
-    return Arrays.asList(s.split(lineSeparator)).stream().skip(headerSize).collect(Collectors.toList());
+  public Iterable<String> call(String value) {
+    return Arrays.asList(value.split(lineSeparator)).stream().skip(headerSize).collect(Collectors.toList());
   }
 }
