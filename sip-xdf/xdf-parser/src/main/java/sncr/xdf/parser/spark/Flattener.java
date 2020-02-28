@@ -8,6 +8,7 @@ import org.apache.spark.sql.types.ArrayType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.DataType;
 import static org.apache.spark.sql.functions.explode;
+import static org.apache.spark.sql.functions.explode_outer;
 import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.size;
 import java.util.Arrays;
@@ -74,17 +75,21 @@ public class Flattener {
         int arrSize = getArrayFieldMaxSize(dataset, parentColName);
         DataType childType = arrayType.elementType();
         logger.debug("childType: "+ childType);
-        for(int index = 0; index < arrSize; index++) {
-            String newColName = parentColName +  NEW_COLUMN_NAME_DELIMITER + index;
-            logger.debug("Child New Column Name : "+ newColName);
-            dataset = dataset.withColumn(newColName, dataset.col(parentColName).getItem(index));
-            if(childType instanceof StructType){
-                dataset = processStructType(dataset, newColName, (StructType)childType);
-            }else if(childType instanceof ArrayType){
-                dataset = processArrayType(dataset, newColName, (ArrayType)childType);
+        if(arrSize != 0){
+            for(int index = 0; index < arrSize; index++) {
+                String newColName = parentColName +  NEW_COLUMN_NAME_DELIMITER + index;
+                logger.debug("Child New Column Name : "+ newColName);
+                dataset = dataset.withColumn(newColName, dataset.col(parentColName).getItem(index));
+                if(childType instanceof StructType){
+                    dataset = processStructType(dataset, newColName, (StructType)childType);
+                }else if(childType instanceof ArrayType){
+                    dataset = processArrayType(dataset, newColName, (ArrayType)childType);
+                }
             }
+            dataset = dataset.drop(parentColName);
+        }else{
+            dataset = dataset.withColumn(parentColName,explode_outer(dataset.col(parentColName)));
         }
-        dataset = dataset.drop(parentColName);
         dataset = dataset.checkpoint(false);
         return dataset;
     }
