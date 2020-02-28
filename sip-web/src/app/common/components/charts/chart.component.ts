@@ -241,6 +241,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
           config
         );
     }
+    console.log('config', config);
 
     this.addExportSize(config);
 

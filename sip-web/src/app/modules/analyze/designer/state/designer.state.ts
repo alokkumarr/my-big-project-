@@ -65,7 +65,7 @@ import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
 import {
   DATE_TYPES,
-  DEFAULT_DATE_FORMAT,
+  DEFAULT_PIVOT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
 } from '../../consts';
@@ -820,7 +820,7 @@ export class DesignerState {
       ...(isDateType
         ? {
             dateFormat:
-              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
+              <string>artifactColumn.format || DEFAULT_PIVOT_DATE_FORMAT.value
           }
         : { format: artifactColumn.format })
     };
@@ -849,7 +849,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 

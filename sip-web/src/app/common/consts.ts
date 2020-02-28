@@ -118,6 +118,85 @@ export const CHART_COLORS = [
   '#DFB2B2'
 ];
 
+const NEW_DATE_FORMATS = [
+  {
+    label: '09/15/2017',
+    value: 'MM/dd/yyyy',
+    groupInterval: 'day',
+    momentValue: 'MM/DD/YYYY'
+  },
+  {
+    label: '15/09/2017',
+    value: 'dd/MM/yyyy',
+    groupInterval: 'day',
+    momentValue: 'DD/MM/YYYY'
+  },
+  {
+    label: '09/15/17',
+    value: 'MM/dd/yy',
+    groupInterval: 'day',
+    momentValue: 'MM/DD/YY'
+  },
+  {
+    label: '15/09/17',
+    value: 'dd/MM/yy',
+    groupInterval: 'day',
+    momentValue: 'DD/MM/YY'
+  },
+  {
+    label: '09/15/17 11:20',
+    value: 'MM/dd/yyyy hh:mm',
+    // TODO change this when minute level aggregation works
+    // groupInterval: 'minute',
+    groupInterval: 'day',
+    momentValue: 'MM/DD/YYYY HH:mm'
+  },
+  {
+    label: '09/15 11:20',
+    value: 'MM/dd HH:mm',
+    // TODO change this when minute level aggregation works
+    // groupInterval: 'minute',
+    groupInterval: 'day',
+    momentValue: 'MM/DD HH:mm'
+  },
+  {
+    label: 'September-2017',
+    value: 'MMMM-yyyy',
+    groupInterval: 'month',
+    momentValue: 'MMMM-YYYY'
+  },
+  {
+    label: '09-2017',
+    value: 'MM-yyyy',
+    groupInterval: 'month',
+    momentValue: 'MM-YYYY'
+  },
+  {
+    label: 'Sept-2017',
+    value: 'MMM-yyyy',
+    groupInterval: 'month',
+    momentValue: 'MMM-YYYY'
+  },
+  {
+    label: 'Sept-17 (Month-day)',
+    value: 'MMM-yy',
+    groupInterval: 'month',
+    momentValue: 'MMM-YY'
+  },
+  {
+    label: 'September-15',
+    value: 'MMMM-dd',
+    groupInterval: 'day',
+    momentValue: 'MMMM-DD'
+  },
+  {
+    label: 'Sept-15 (Month-year)',
+    value: 'MMM-dd',
+    groupInterval: 'day',
+    momentValue: 'MMM-DD'
+  }
+];
+
 export const PIVOT_DATE_FORMATS = [
   {
     label: 'Default',
@@ -153,7 +232,8 @@ export const PIVOT_DATE_FORMATS = [
     label: '09/01/2017 11:20:36',
     value: 'MM/dd/yyyy HH:mm:ss',
     momentValue: 'MM/DD/YYYY HH:mm:ss'
-  }
+  },
+  ...NEW_DATE_FORMATS
 ];
 
 export const DEFAULT_PIVOT_DATE_FORMAT = PIVOT_DATE_FORMATS[0];
@@ -165,81 +245,42 @@ export const PIVOT_DATE_FORMATS_OBJ = fpPipe(
 
 export const ES_REPORTS_DATE_FORMATS = [...PIVOT_DATE_FORMATS];
 
-export const DATE_FORMATS = [
-  {
-    label: 'Default',
-    value: 'yyyy-MM-dd',
-    momentValue: 'YYYY-MM-DD'
-  },
-  {
-    label: 'September 1, 2017',
-    value: 'longDate',
-    momentValue: 'MMMM D, YYYY'
-  },
-  {
-    label: '09/01/2017 (MM/DD/YYYY)',
-    value: 'shortDate',
-    momentValue: 'MM/DD/YYYY'
-  },
-  {
-    label: '01/09/2017 (DD/MM/YYYY)',
-    value: 'dd/MM/yyyy',
-    momentValue: 'DD/MM/YYYY'
-  },
-  {
-    label: 'September 2017',
-    value: 'monthAndYear',
-    momentValue: 'MMMM YYYY'
-  },
-  {
-    label: 'September 1',
-    value: 'monthAndDay',
-    momentValue: 'MMMM D'
-  },
-  {
-    label: '09/01/2017 11:20:36',
-    value: 'MM/dd/yyyy HH:mm:ss',
-    momentValue: 'MM/DD/YYYY HH:mm:ss'
-  }
-];
-
 export const CUSTOM_HEADERS = {
   SKIP_TOAST: 'SIP-Skip-Error-Toast'
 };
 
-export const DEFAULT_DATE_FORMAT = DATE_FORMATS[0];
-
-export const DATE_FORMATS_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(DATE_FORMATS);
-
 export const CHART_DATE_FORMATS = [
   {
     value: 'MMMM d YYYY, h:mm:ss a',
+    momentValue: 'MMMM Do YYYY, h:mm:ss a',
     groupInterval: 'hour',
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {
     value: 'MMM d YYYY',
+    momentValue: 'MMM Do YYYY',
     groupInterval: 'day',
     label: ' Sep 1st 2017'
   },
   {
     value: 'MMM YYYY',
+    momentValue: 'MMM YYYY',
     groupInterval: 'month',
     label: 'September 2017'
   },
   {
     value: 'MM YYYY',
+    momentValue: 'MM YYYY',
     groupInterval: 'month',
     label: '09 2017'
   },
   {
     value: 'YYYY',
+    momentValue: 'YYYY',
     groupInterval: 'year',
     label: '2017'
-  }
+  },
+  ...NEW_DATE_FORMATS
 ];
 
 export const CHART_DEFAULT_DATE_FORMAT = CHART_DATE_FORMATS[1];

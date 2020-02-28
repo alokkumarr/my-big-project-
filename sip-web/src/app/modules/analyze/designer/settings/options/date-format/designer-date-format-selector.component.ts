@@ -100,9 +100,9 @@ export class DesignerDateFormatSelectorComponent {
 
   openDateFormatDialog() {
     const columnFormat = this.artifactColumn.dateFormat;
-    const dateFormats = get(dateFormatsMap, `${this.analysisType}.array`);
+    const availableFormats = get(dateFormatsMap, `${this.analysisType}.array`);
     this._analyzeDialogService
-      .openDateFormatDialog(<string>columnFormat, dateFormats)
+      .openDateFormatDialog(<string>columnFormat, availableFormats)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }

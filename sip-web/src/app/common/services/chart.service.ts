@@ -41,7 +41,12 @@ import {
   getTooltipFormats,
   displayNameWithoutAggregateFor
 } from './tooltipFormatter';
-import { DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS } from '../consts';
+import {
+  DATE_TYPES,
+  AGGREGATE_TYPES_OBJ,
+  CHART_COLORS,
+  CHART_DATE_FORMATS_OBJ
+} from '../consts';
 
 const removeKeyword = (input: string) => {
   if (!input) {
@@ -528,7 +533,7 @@ export class ChartService {
   getMomentDateFormat(dateFormat) {
     // the backend and moment.js require different date formats for days of month
     // the backend represents it with "d", and momentjs with "Do"
-    return replace(dateFormat, 'd', 'Do');
+    return CHART_DATE_FORMATS_OBJ[dateFormat].momentValue;
   }
 
   getZIndex(type) {
