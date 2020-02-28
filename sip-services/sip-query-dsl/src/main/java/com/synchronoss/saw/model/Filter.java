@@ -50,6 +50,9 @@ public class Filter {
   @JsonProperty("model")
   private Model model;
 
+  @JsonProperty("description")
+  private String description;
+
   @JsonProperty("type")
   public Type getType() {
     return type;
@@ -142,6 +145,16 @@ public class Filter {
   @JsonProperty("model")
   public void setModel(Model model) {
     this.model = model;
+  }
+
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override

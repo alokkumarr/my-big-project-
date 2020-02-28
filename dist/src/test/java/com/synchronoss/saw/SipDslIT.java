@@ -1830,7 +1830,7 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testRunTimeFilterQueryMode() {
-    ObjectNode analysis = getJsonObject("json/dsl/DataLake/sample-query-mode.json");
+    ObjectNode analysis = getJsonObject("json/dsl/dataLake/sample-query-mode.json");
     Response response = execute(token, analysis);
     String testStringFilter = "string 1";
     Assert.assertNotNull(response);
