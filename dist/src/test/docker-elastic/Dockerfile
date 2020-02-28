@@ -22,4 +22,6 @@ RUN echo "discovery.type: single-node" >> /etc/elasticsearch/elasticsearch.yml
 RUN sed -i -e 's/^-Xms2g$/-Xms256m/' -e 's/^-Xmx2g$/-Xmx256m/' \
     /etc/elasticsearch/jvm.options
 RUN systemctl enable elasticsearch
-RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://distfiles.compuscene.net/elasticsearch/elasticsearch-prometheus-exporter-$version.0.zip
+# Disable the prometheus exporter to make build passing,  seems 6.3.1 version is deprecated ,
+# ToDo : Prometheus exporter Will be enabled as part of Elasticsearch version upgrade 7.x version (SIP-10144)
+#RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://distfiles.compuscene.net/elasticsearch/elasticsearch-prometheus-exporter-$version.0.zip

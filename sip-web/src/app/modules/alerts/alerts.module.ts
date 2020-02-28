@@ -8,6 +8,7 @@ import { routes } from './routes';
 import { AlertRedirectGuard, AlertPrivilegeGuard } from './guards';
 import { AlertsPageComponent } from './components/alerts-page/alerts-page.component';
 import { ObserveService } from '../observe/services/observe.service';
+import { AlertUnsubscribeService } from './components/alert-unsubscribe/alert-unsubscribe.service';
 import {
   AlertsConfigurationComponent,
   AddAlertComponent,
@@ -24,6 +25,7 @@ import {
 } from './components/alerts-view/index';
 import { AlertsState } from './state/alerts.state';
 import { IsAdminGuard } from '../admin/guards';
+import { AlertUnsubscribe } from './components/alert-unsubscribe/alert-unsubscribe.component';
 
 const components = [
   AlertsPageComponent,
@@ -36,7 +38,8 @@ const components = [
   AlertDetailComponent,
   AlertsDateFilterComponent,
   AlertsStringFilterComponent,
-  AlertsFiltersComponent
+  AlertsFiltersComponent,
+  AlertUnsubscribe
 ];
 
 @NgModule({
@@ -52,7 +55,8 @@ const components = [
     IsAdminGuard,
     ObserveService,
     AlertRedirectGuard,
-    AlertPrivilegeGuard
+    AlertPrivilegeGuard,
+    AlertUnsubscribeService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

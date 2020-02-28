@@ -77,16 +77,9 @@ export class UserService {
 
   logout(path) {
     const route = '/auth/doLogout';
-    const token = this._jwtService.get();
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      })
-    };
 
     return this._http
-      .post(loginUrl + route, httpOptions)
+      .get(loginUrl + route)
       .toPromise()
       .then(
         () => {

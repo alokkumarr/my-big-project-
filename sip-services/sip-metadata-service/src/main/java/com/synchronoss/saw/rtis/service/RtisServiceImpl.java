@@ -79,9 +79,8 @@ public class RtisServiceImpl implements RtisService {
       configuration.setSecondaryStreams(secondaryStreams);
       JsonElement config =
           SipMetadataUtils.toJsonElement(mapper.writeValueAsString(configuration));
-      final String configId = UUID.randomUUID().toString();
       rtisMetadataStore = new RtisMetadata(TABLE_NAME, basePath);
-      rtisMetadataStore.create(configId, config);
+      rtisMetadataStore.create(configuration.getAppKey(), config);
     } catch (Exception ex) {
       LOGGER.error("Exception occurred while creating configuration", ex);
       throw new SipCreateEntityException("Exception occurred while creating configuration");

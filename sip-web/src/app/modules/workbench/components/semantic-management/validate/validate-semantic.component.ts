@@ -1,6 +1,8 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
+import { Store } from '@ngxs/store';
+
 import * as forIn from 'lodash/forIn';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
@@ -12,6 +14,7 @@ import { SemanticDetailsDialogComponent } from '../semantic-details-dialog/seman
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
+import { CommonLoadUpdatedMetrics } from '../.././../../../common/actions/common.actions';
 
 @Component({
   selector: 'validate-semantic',
@@ -26,7 +29,8 @@ export class ValidateSemanticComponent implements OnDestroy {
     public router: Router,
     public workBench: WorkbenchService,
     public dialog: MatDialog,
-    public notify: ToastService
+    public notify: ToastService,
+    public store: Store
   ) {
     this.selectedDS = this.injectFieldProperties(
       this.workBench.getDataFromLS('selectedDS')
@@ -124,6 +128,11 @@ export class ValidateSemanticComponent implements OnDestroy {
           this.notify.info('Datapod created successfully', 'Datapod', {
             hideDelay: 9000
           });
+          /**
+           * When any datapod is created, make it available in Analyze module without page refresh.
+           * Added as a part of SIP-9482
+           */
+          this.store.dispatch(new CommonLoadUpdatedMetrics());
           this.router.navigate(['workbench', 'dataobjects']);
         });
       }
