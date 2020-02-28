@@ -137,7 +137,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         ps.readProjectData(defaultProjectId);
     } catch (Exception e) {
         logger.info("Creating default project: {}", defaultProjectId);
-        ps.createProjectRecord(defaultProjectId, "{}");
+        ps.createProjectRecord(defaultProjectId, "{\"allowableTags\":[\"cloud\",\"iot\"]}");
     }
 
     if (defaultProjectRoot.startsWith(prefix)) {
