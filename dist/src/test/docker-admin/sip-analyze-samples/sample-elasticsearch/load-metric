@@ -17,7 +17,7 @@ load_data() {
     local index_url="http://sip-elastic:8200/sample"
     local alias_url="http://sip-elastic:8200/_aliases"
     echo "Loading sample Elasticsearch data"
-    curl_json PUT "$index_url" $dir/index.json
+    curl_json PUT "${index_url}?include_type_name=true" $dir/index.json
     echo "Creating alias for the index"
     curl_json POST "$alias_url" $dir/aliases.json
     data=$dir/es-data.ndjson

@@ -8,7 +8,9 @@
 FROM sip-base:${project.version}
 
 # Install Elasticsearch
-ENV version=6.3.1
+# ES version should be 7.6 but seems elasticsearch-prometheus-exporter 7.6 is not avalible
+# so 7.5 considered for now
+ENV version=7.5.0
 COPY elasticsearch.repo /etc/yum.repos.d
 RUN rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 RUN yum -y -q install elasticsearch-$version

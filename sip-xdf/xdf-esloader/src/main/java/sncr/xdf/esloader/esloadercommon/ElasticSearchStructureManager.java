@@ -108,10 +108,15 @@ public class ElasticSearchStructureManager {
                             mappings = HFileOperations.readFile(mappingsFile);
 
                         logger.info("Loading " + mappingsFile);
+                        boolean esTypeExists = false;
+                        if (typeName!=null && !typeName.isEmpty())
+                        {
+                            esTypeExists=true;
+                            }
                         if(!indexExists){
                             // Create Index AND Mapping
                             // Create Elastic Search index
-                            if (!esClient.esIndexCreate( indexName, mappings)) {
+                            if (!esClient.esIndexCreate( indexName, mappings ,esTypeExists )) {
                                 throw new Exception("Failed to create elasticSearch index.");
                             }
                             logger.info("Index created: " + indexName + "/" + typeName);
