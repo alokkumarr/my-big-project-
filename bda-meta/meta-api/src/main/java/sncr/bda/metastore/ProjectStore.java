@@ -102,15 +102,6 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
         return toJsonElement(prj);
     }
 
-    public String readProjectDataAsString(String name) throws Exception {
-        if (name == null || name.isEmpty())
-            throw new IllegalArgumentException("Project name cannot be null or empty");
-        Document prj = table.findById(name);
-        if (prj == null)
-            throw new Exception("Project with name: " + name + " not found");
-        return prj.asJsonString();
-    }
-
     public String[] readAllProjectsMetadata() throws Exception {
         List<String> projects = new ArrayList<>();
        try(DocumentStream documentStream = table.find()) {

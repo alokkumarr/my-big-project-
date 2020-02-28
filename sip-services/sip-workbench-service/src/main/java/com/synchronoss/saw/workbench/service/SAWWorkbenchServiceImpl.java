@@ -56,6 +56,8 @@ import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 import sncr.bda.conf.ProjectMetadata;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -607,14 +609,10 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     public ProjectMetadata getProjectMetadata(String proj) throws Exception {
         logger.trace("Getting details of a project {} " + proj);
         ProjectStore ps = new ProjectStore(defaultProjectRoot);
-        String json = ps.readProjectDataAsString(proj);
-        logger.debug("project Metadata Json " + json);
+        JsonElement prj = ps.readProjectData(proj);
         ProjectMetadata projectMetadata = null;
-        if(json != null){
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-            projectMetadata = objectMapper.readValue(json, ProjectMetadata.class);
+        if(prj != null){
+            projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
         }
         return projectMetadata;
     }
@@ -628,12 +626,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         ProjectMetadata[] projectsMetadata = null;
         if(jsons != null){
             projectsMetadata = new ProjectMetadata[jsons.length];
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
             int index = 0;
             for(String json : jsons){
-                projectsMetadata[index] = objectMapper.readValue(json, ProjectMetadata.class);
+                projectsMetadata[index] = new Gson().fromJson(json, ProjectMetadata.class);
                 index++;
             }
         }
