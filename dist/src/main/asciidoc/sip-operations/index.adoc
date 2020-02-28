@@ -15,7 +15,9 @@ provided in the environment:
 
 . Install and configure a MapR version 6.1.0 cluster in the environment
 
-. Install and configure Apache Spark version 2.3.2 from the MapR
+. Install and configure a MapR Ecosystem MEP version 6.3.0 in the environment
+
+. Install and configure Apache Spark version 2.4.4 from the MapR
   Ecosystem Pack on the MapR cluster
 
 . Install and configure Apache Livy from the MapR Ecosystem Pack on
@@ -40,7 +42,7 @@ provided in the environment:
   host is typically common to the entire environment.
 
 . Provision hosts for running SIP (the target host), with 32 GB of
-  memory and CentOS 7.4 as the operating system.  The hosts should be
+  memory and CentOS 7.7 as the operating system.  The hosts should be
   dedicated to SIP and not run other applications.  The hosts should
   have time synchronization enabled.
 
