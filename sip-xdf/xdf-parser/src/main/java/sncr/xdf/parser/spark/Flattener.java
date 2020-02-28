@@ -22,48 +22,38 @@ public class Flattener {
         logger.debug("DS Schema : "+ dsSchema);
         StructField[] dsFields = dsSchema.fields();
         logger.debug("DS Fields : "+ Arrays.toString(dsFields));
-        boolean isNested = false;
         for(StructField field : dsFields){
             String name = field.name();
             logger.debug("Field Name : "+ name);
             DataType datatype = field.dataType();
             logger.debug("Field Type : "+ datatype);
-            logger.debug("Field Nullable : "+ field.nullable());
             if(datatype instanceof StructType){
-                //StructType
-                isNested=true;
-                dataset = processStructType(dataset, field);
+                dataset = processStructType(dataset, field.name(), (StructType)datatype);
             }else if(datatype instanceof ArrayType){
-                //ArrayType
-                isNested=true;
-                dataset = processArrayType(dataset, field);
+                dataset = processArrayType(dataset, field.name(), (ArrayType)datatype);
             }
-        }
-        if(isNested){
-            dataset = flattenDataset(dataset);
         }
         return dataset;
     }
 
-    private Dataset<Row> processStructType(Dataset<Row> dataset, StructField structTypeField){
+    private Dataset<Row> processStructType(Dataset<Row> dataset, String parentColName, StructType structType){
         logger.debug("Processing StructType Field");
-        String parentColName = structTypeField.name();
         logger.debug("Parent Column Name : "+ parentColName);
-        StructField[] subFields = ((StructType)structTypeField.dataType()).fields();
+        StructField[] subFields = structType.fields();
         logger.debug("Sub Fields : "+ Arrays.toString(subFields));
         for(StructField field : subFields){
-            String name = field.name();
-            logger.debug("Sub Field Name : "+ name);
-            DataType datatype = field.dataType();
-            logger.debug("Sub Field Type : "+ datatype);
-            logger.debug("Sub Field Nullable : "+ field.nullable());
-
-            String colName = parentColName + SPARK_COLUMN_NAME_DELIMITER + name;
-            logger.debug("Full Column Name : "+ colName);
+            DataType childType = field.dataType();
+            logger.debug("childType: "+ childType);
+            String colName = parentColName + SPARK_COLUMN_NAME_DELIMITER + field.name();
+            logger.debug("Child Column Name : "+ colName);
             String newColName = colName.replace(SPARK_COLUMN_NAME_DELIMITER, NEW_COLUMN_NAME_DELIMITER);
-            logger.debug("New Column Name : "+ newColName);
-
+            logger.debug("Child New Column Name : "+ newColName);
             dataset = dataset.withColumn(newColName, dataset.col(colName));
+            if(childType instanceof StructType){
+                dataset = processStructType(dataset, newColName, (StructType)childType);
+            }else if(childType instanceof ArrayType){
+                dataset = processArrayType(dataset, newColName, (ArrayType)childType);
+            }
         }
         dataset = dataset.drop(parentColName);
         dataset = dataset.checkpoint(false);
@@ -78,15 +68,21 @@ public class Flattener {
         return dataset;
     }*/
 
-    private Dataset<Row> processArrayType(Dataset<Row> dataset, StructField arrayTypeField){
+    private Dataset<Row> processArrayType(Dataset<Row> dataset, String parentColName, ArrayType arrayType){
         logger.debug("Processing ArrayType Field");
-        String parentColName = arrayTypeField.name();
         logger.debug("Parent Column Name : "+ parentColName);
         int arrSize = getArrayFieldMaxSize(dataset, parentColName);
+        DataType childType = arrayType.elementType();
+        logger.debug("childType: "+ childType);
         for(int index = 0; index < arrSize; index++) {
             String newColName = parentColName +  NEW_COLUMN_NAME_DELIMITER + index;
-            logger.debug("New Column Name : "+ newColName);
+            logger.debug("Child New Column Name : "+ newColName);
             dataset = dataset.withColumn(newColName, dataset.col(parentColName).getItem(index));
+            if(childType instanceof StructType){
+                dataset = processStructType(dataset, newColName, (StructType)childType);
+            }else if(childType instanceof ArrayType){
+                dataset = processArrayType(dataset, newColName, (ArrayType)childType);
+            }
         }
         dataset = dataset.drop(parentColName);
         dataset = dataset.checkpoint(false);
