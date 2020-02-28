@@ -20,7 +20,7 @@ public class SFTPUploader {
 
     private static final Logger logger = LoggerFactory.getLogger(SFTPUploader.class);
 
-    public SFTPUploader(String host, int port, String user, String pwd, String privateKeyPath, String passPhrase) throws Exception {
+    public SFTPUploader(String host, int port, String user, String pwd, String privatekeyPath) throws Exception {
         // Username and Password may or may not have spaces so no trimming required
         // URLEncoding them is necessary because of special characters in username / password.
         String username = URLEncoder.encode(user, "UTF-8");
@@ -29,7 +29,7 @@ public class SFTPUploader {
             password= URLEncoder.encode(pwd, "UTF-8");
         }
 
-        boolean privateKeyPresent = privateKeyPath == null ? false: true;
+        boolean privateKeyPresent = privatekeyPath == null ? false: true;
 
         sftpURL = sftpUrlBuilder(username, password, host, port, privateKeyPresent);
         manager = new StandardFileSystemManager();

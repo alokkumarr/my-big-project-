@@ -1,11 +1,5 @@
 package com.synchronoss.saw.export.model.ftp;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public class FTPDetails {
 
     private String customerName;
@@ -14,7 +8,7 @@ public class FTPDetails {
     private int port;
     private String username;
     private String password;
-    private String privateKeyPath;
+    private String privatekeyFile;
     private String passPhrase;
 
     // location is for the destination ftp / sftp "folder"
@@ -88,12 +82,12 @@ public class FTPDetails {
         this.customerName = customerName;
     }
 
-    public String getPrivateKeyPath() {
-        return privateKeyPath;
+    public String getPrivatekeyFile() {
+        return privatekeyFile;
     }
 
-    public void setPrivateKeyPath(String privateKeyPath) {
-        this.privateKeyPath = privateKeyPath;
+    public void setPrivatekeyFile(String privatekeyFile) {
+        this.privatekeyFile = privatekeyFile;
     }
 
     public String getPassPhrase() {

@@ -106,7 +106,9 @@ public class ServiceUtils {
       String localFilePath,
       String destinationDir,
       String destinationFileName,
-      String type, String privateKeyPath, String passPhrase) {
+      String type,
+      String privatekeyPath,
+      String passPhrase) {
 
     if (ftpServer == null
         || ftpUsername == null
@@ -140,8 +142,9 @@ public class ServiceUtils {
         } else if (type.equalsIgnoreCase("sftp")) {
           logger.debug("uploading to sftp --> ");
           SFTPUploader ftp = new SFTPUploader(ftpServer, ftpPort,
-              ftpUsername, ftpPassword, privateKeyPath, passPhrase);
-          ftp.uploadFile(localFilePath, destinationFileName, destinationDir, privateKeyPath, passPhrase);
+              ftpUsername, ftpPassword, privatekeyPath);
+          ftp.uploadFile(
+              localFilePath, destinationFileName, destinationDir, privatekeyPath, passPhrase);
           ftp.disconnect();
         }
         logger.info("Successfully uploaded to FTP");
