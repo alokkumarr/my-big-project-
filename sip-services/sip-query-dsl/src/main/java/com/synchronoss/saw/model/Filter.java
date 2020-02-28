@@ -35,6 +35,9 @@ public class Filter {
   @JsonProperty("columnName")
   private String columnName;
 
+  @JsonProperty("displayName")
+  private String displayName;
+
   @JsonProperty("isRuntimeFilter")
   private Boolean isRuntimeFilter;
 
@@ -91,6 +94,16 @@ public class Filter {
   @JsonProperty("columnName")
   public void setColumnName(String columnName) {
     this.columnName = columnName;
+  }
+
+  @JsonProperty("displayName")
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  @JsonProperty("displayName")
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
   }
 
   @JsonProperty("isRuntimeFilter")
@@ -164,6 +177,7 @@ public class Filter {
         .append("artifactsName", artifactsName)
         .append("isOptional", isOptional)
         .append("columnName", columnName)
+        .append("displayName",displayName)
         .append("isRuntimeFilter", isRuntimeFilter)
         .append("isGlobalFilter", isGlobalFilter)
         .append("isAggregationFilter",isAggregationFilter)
@@ -179,6 +193,7 @@ public class Filter {
         .append(isRuntimeFilter)
         .append(artifactsName)
         .append(columnName)
+        .append(displayName)
         .append(isGlobalFilter)
         .append(isAggregationFilter)
         .append(aggregate)
@@ -201,6 +216,7 @@ public class Filter {
         .append(isRuntimeFilter, rhs.isRuntimeFilter)
         .append(artifactsName, rhs.artifactsName)
         .append(columnName, rhs.columnName)
+        .append(displayName, rhs.displayName)
         .append(isGlobalFilter, rhs.isGlobalFilter)
         .append(isAggregationFilter,rhs.isAggregationFilter)
         .append(aggregate,rhs.aggregate)
