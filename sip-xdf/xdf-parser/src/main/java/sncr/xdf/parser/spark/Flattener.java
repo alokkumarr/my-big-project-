@@ -75,7 +75,7 @@ public class Flattener {
         int arrSize = getArrayFieldMaxSize(dataset, parentColName);
         DataType childType = arrayType.elementType();
         logger.debug("childType: "+ childType);
-        if(arrSize != 0){
+        if(arrSize > 0){
             for(int index = 0; index < arrSize; index++) {
                 String newColName = parentColName +  NEW_COLUMN_NAME_DELIMITER + index;
                 logger.debug("Child New Column Name : "+ newColName);
