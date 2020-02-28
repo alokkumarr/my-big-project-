@@ -52,8 +52,7 @@ public class SAWExportServiceApplication {
         SpringApplication.run(SAWExportServiceApplication.class, args);
     LOG.info(ctx.getApplicationName() + " has started.");
   }
-
-  @Bean ("Health check ")
+  
   public boolean validatePrivateKeys()
       throws IOException {
     boolean status = false;
