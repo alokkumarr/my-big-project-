@@ -55,6 +55,7 @@ import sncr.bda.services.DLMetadata;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+import sncr.bda.conf.ProjectMetadata;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {

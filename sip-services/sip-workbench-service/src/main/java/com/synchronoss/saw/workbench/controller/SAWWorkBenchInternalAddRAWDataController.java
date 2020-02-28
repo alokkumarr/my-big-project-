@@ -30,7 +30,7 @@ import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.DSSearchParams;
-import com.synchronoss.saw.workbench.model.ProjectMetadata;
+import sncr.bda.conf.ProjectMetadata;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
