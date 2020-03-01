@@ -51,9 +51,6 @@ export class NewRegistrationComponent implements OnInit {
   createRegistration(data) {
     const requestBody = {
       id: this.model,
-      app_key: Math.random()
-        .toString(36)
-        .substring(7),
       streams_1: [
         {
           topic: data.streamTopic,
