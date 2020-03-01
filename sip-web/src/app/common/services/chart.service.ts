@@ -1036,7 +1036,30 @@ export class ChartService {
     return concat(changes, this.addTooltipsAndLegend(fields, type));
   }
 
-  getComparisonChangeConfig(type, fields, gridData, opts) {
+  getCategoriesForComparisonChart(interval = 'month') {
+    switch (interval) {
+      case 'month':
+        return [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec'
+        ];
+      case 'quarter':
+      default:
+        return ['Q1', 'Q2', 'Q3', 'Q4'];
+    }
+  }
+
+  getComparisonChangeConfig(chartType, fields, gridData, opts) {
     const labels = {
       x:
         get(fields, 'x.alias') ||
@@ -1044,7 +1067,7 @@ export class ChartService {
         get(fields, 'x.displayName', '')
     };
 
-    const yAxesChanges = this.getYAxesChanges(type, fields.y, opts);
+    const yAxesChanges = this.getYAxesChanges(chartType, fields.y, opts);
     const changes = [
       {
         path: 'xAxis.title.text',
@@ -1056,23 +1079,52 @@ export class ChartService {
       }
     ];
 
-    const { series, categories } = this.splitToSeriesAndCategories(
-      gridData,
-      fields,
-      opts,
-      type
+    const dataField = isArray(fields.y) ? fields.y[0] : fields.y;
+    const dateField = fields.x;
+    if (!DATE_TYPES.includes(dateField.type)) {
+      return changes;
+    }
+    const categories = this.getCategoriesForComparisonChart(
+      dateField.groupInterval
     );
+    changes.push({
+      path: 'xAxis.categories',
+      data: categories
+    });
+
+    const series = [];
+
+    const dataCategoryFormat =
+      dateField.groupInterval === 'month' ? 'MMM' : '[Q]Q';
+    forEach(gridData, row => {
+      const momentDate = moment(
+        row[dateField.alias || dateField.columnName],
+        'YYYY-MM'
+      );
+      const year = `${momentDate.year()}`;
+      let yearSeries = series.find(s => s.name === year);
+      if (!yearSeries) {
+        yearSeries = {
+          name: year,
+          type: dataField.displayType || 'column',
+          dataType: dataField.type,
+          yAxis: 0,
+          zIndex: 1,
+          data: []
+        };
+        series.push(yearSeries);
+      }
+      yearSeries.data.push({
+        x: categories.indexOf(momentDate.format(dataCategoryFormat)),
+        y: row[`${dataField.aggregate}@@${dataField.columnName}`]
+      });
+    });
+
     changes.push({
       path: 'series',
       data: series
     });
-    // add the categories
-    forEach(categories, (category, k) => {
-      changes.push({
-        path: `${k}Axis.categories`,
-        data: category
-      });
-    });
+
     return changes;
   }
 
@@ -1144,6 +1196,8 @@ export class ChartService {
   addTooltipsAndLegend(fields, chartType) {
     const changes = [];
     const yIsSingle = fields.y.length === 1;
+    const enableLegend =
+      chartType === 'comparison' || !yIsSingle || Boolean(fields.g);
     if (!this.getViewOptionsFor(chartType).customTooltip) {
       return changes;
     }
@@ -1182,7 +1236,7 @@ export class ChartService {
     // because there is only one data series
     changes.push({
       path: 'legend.enabled',
-      data: Boolean(!yIsSingle || fields.g)
+      data: enableLegend
     });
 
     return changes;
