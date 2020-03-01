@@ -41,7 +41,12 @@ import {
   getTooltipFormats,
   displayNameWithoutAggregateFor
 } from './tooltipFormatter';
-import { DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS } from '../consts';
+import {
+  DATE_TYPES,
+  AGGREGATE_TYPES_OBJ,
+  CHART_COLORS,
+  DATE_INTERVALS
+} from '../consts';
 
 const removeKeyword = (input: string) => {
   if (!input) {
@@ -434,7 +439,7 @@ export class ChartService {
     if (DATE_TYPES.includes(field.type)) {
       const momentDateFormat = this.getMomentDateFormat(
         field.dateFormat || field.format
-      );
+      ).dateFormat;
       return moment(value, momentDateFormat);
     }
 
@@ -456,7 +461,8 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat }) => {
-          const momentDateFormat = this.getMomentDateFormat(dateFormat);
+          const momentDateFormat = this.getMomentDateFormat(dateFormat)
+            .dateFormat;
           dataPoint[removeKeyword(columnName)] =
             moment(dataPoint[removeKeyword(columnName)], momentDateFormat)
               .utc()
@@ -469,11 +475,14 @@ export class ChartService {
   formatDatesIfNeeded(parsedData, dateFields) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
-        forEach(dateFields, ({ columnName, dateFormat }) => {
-          const momentDateFormat = this.getMomentDateFormat(dateFormat);
+        forEach(dateFields, ({ columnName, dateFormat, groupInterval }) => {
+          const dateFormats = this.getMomentDateFormat(
+            dateFormat,
+            groupInterval
+          );
           dataPoint[removeKeyword(columnName)] = moment
-            .utc(dataPoint[removeKeyword(columnName)], momentDateFormat)
-            .format(momentDateFormat);
+            .utc(dataPoint[removeKeyword(columnName)], dateFormats.dateFormat)
+            .format(dateFormats.momentFormat || dateFormats.dateFormat);
         });
       });
     }
@@ -531,10 +540,22 @@ export class ChartService {
     };
   }
 
-  getMomentDateFormat(dateFormat) {
+  getMomentDateFormat(dateFormat, groupInterval = null) {
+    const momentFormatId = DATE_INTERVALS.findIndex(
+      interval =>
+        interval.formatForBackEnd === dateFormat &&
+        (groupInterval ? interval.value === groupInterval : true)
+    );
     // the backend and moment.js require different date formats for days of month
     // the backend represents it with "d", and momentjs with "Do"
-    return replace(dateFormat, 'd', 'Do');
+    return {
+      /* Date format saved with column will cater to backend. Make adjustments for FE */
+      dateFormat: replace(replace(dateFormat, 'd', 'Do'), /y/g, 'Y'),
+
+      /* If an explicit moment format is defined for this date format, return that too */
+      momentFormat:
+        momentFormatId >= 0 ? DATE_INTERVALS[momentFormatId].momentFormat : null
+    };
   }
 
   getZIndex(type) {
@@ -995,6 +1016,9 @@ export class ChartService {
       case 'pie':
         changes = this.getPieChangeConfig(type, fields, gridData, opts);
         break;
+      case 'comparison':
+        changes = this.getComparisonChangeConfig(type, fields, gridData, opts);
+        break;
       case 'column':
       case 'bar':
       case 'line':
@@ -1010,6 +1034,46 @@ export class ChartService {
     }
 
     return concat(changes, this.addTooltipsAndLegend(fields, type));
+  }
+
+  getComparisonChangeConfig(type, fields, gridData, opts) {
+    const labels = {
+      x:
+        get(fields, 'x.alias') ||
+        get(opts, 'labels.x') ||
+        get(fields, 'x.displayName', '')
+    };
+
+    const yAxesChanges = this.getYAxesChanges(type, fields.y, opts);
+    const changes = [
+      {
+        path: 'xAxis.title.text',
+        data: labels.x || (opts.labels && opts.labels.x)
+      },
+      {
+        path: 'yAxis',
+        data: yAxesChanges
+      }
+    ];
+
+    const { series, categories } = this.splitToSeriesAndCategories(
+      gridData,
+      fields,
+      opts,
+      type
+    );
+    changes.push({
+      path: 'series',
+      data: series
+    });
+    // add the categories
+    forEach(categories, (category, k) => {
+      changes.push({
+        path: `${k}Axis.categories`,
+        data: category
+      });
+    });
+    return changes;
   }
 
   getPackedBubbleChartConfig(fields, gridData) {

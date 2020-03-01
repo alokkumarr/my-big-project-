@@ -1,5 +1,6 @@
 <mat-expansion-panel
   class="data-option"
+  [expanded]="true"
   [attr.e2e]="'designer-data-option-' + artifactColumn.displayName"
 >
   <mat-expansion-panel-header class="data-option__header">
@@ -79,7 +80,7 @@
     </div>
 
     <div
-      *ngIf="analysisType === 'pivot' && hasDateInterval"
+      *ngIf="supportsDateInterval"
       fxLayout="row"
       fxLayoutAlign="space-around center"
     >
@@ -93,9 +94,8 @@
     </div>
     <div
       *ngIf="
-        (analysisType !== 'pivot' && hasDateInterval) ||
-        (analysisType === 'pivot' &&
-          hasDateInterval &&
+        !this.supportsDateInterval ||
+        (this.supportsDateInterval &&
           asPivotColumn(artifactColumn).groupInterval === 'day')
       "
       fxLayout="row"

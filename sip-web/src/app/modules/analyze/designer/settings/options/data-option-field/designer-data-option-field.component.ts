@@ -61,7 +61,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
-  public hasDateInterval = false;
+  public supportsDateInterval = false;
   public isDataField = false;
   public colorPickerConfig = {};
 
@@ -71,7 +71,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-    this.hasDateInterval = DATE_TYPES.includes(type);
+
+    this.supportsDateInterval =
+      DATE_TYPES.includes(type) &&
+      (this.analysisType === 'pivot' || this.analysisSubtype === 'comparison');
     this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
     );

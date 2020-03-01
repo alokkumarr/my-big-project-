@@ -220,6 +220,7 @@ export class ChartGridComponent {
                 .utc(
                   value,
                   this._chartService.getMomentDateFormat(columnFormat)
+                    .dateFormat
                 )
                 .format(
                   columnFormat === 'MMM d YYYY'
@@ -287,7 +288,7 @@ export class ChartGridComponent {
       }
       res[field.columnName] = this._chartService.getMomentDateFormat(
         field.dateFormat
-      );
+      ).dateFormat;
       return res;
     }, {});
   }
