@@ -259,10 +259,10 @@ public class DLDataSetService {
                 dl.add(DataSetProperties.modifiedBy.toString(), new JsonPrimitive(modifiedBy));
             }
 
-            if (userData.has(DataSetProperties.Category.name())) {
-                JsonArray categoriesArray = userData.get(DataSetProperties.Category.name()).getAsJsonArray();
-                logger.debug("category " + DataSetProperties.Category.name() + " " + categoriesArray);
-                dl.add(DataSetProperties.Category.toString(), categoriesArray);
+            if (userData.has(DataSetProperties.Tags.name())) {
+                JsonArray tagsArray = userData.get(DataSetProperties.Tags.name()).getAsJsonArray();
+                logger.debug("tags " + DataSetProperties.Tags.name() + " " + tagsArray);
+                dl.add(DataSetProperties.Tags.toString(), tagsArray);
             }
         }
 

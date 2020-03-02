@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.synchronoss.saw.workbench.model.*;
 import org.springframework.web.multipart.MultipartFile;
+import sncr.bda.conf.ProjectMetadata;
 
 public interface SAWWorkbenchService {
   
@@ -21,4 +22,5 @@ public interface SAWWorkbenchService {
   public DataSet getDataSet(String projectId, String datasetId) throws Exception;
   public DataSet createDataSet(DataSet dataSet, String proj) throws Exception;
   public ProjectMetadata getProjectMetadata(String proj) throws Exception;
+  public ProjectMetadata[] getAllProjectsMetadata() throws Exception;
 }

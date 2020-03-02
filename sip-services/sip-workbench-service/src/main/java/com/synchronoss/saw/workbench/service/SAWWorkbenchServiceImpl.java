@@ -55,6 +55,9 @@ import sncr.bda.services.DLMetadata;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+import sncr.bda.conf.ProjectMetadata;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -136,7 +139,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         ps.readProjectData(defaultProjectId);
     } catch (Exception e) {
         logger.info("Creating default project: {}", defaultProjectId);
-        ps.createProjectRecord(defaultProjectId, "{}");
+        ps.createProjectRecord(defaultProjectId, "{\"allowableTags\":[\"cloud\",\"iot\"]}");
     }
 
     if (defaultProjectRoot.startsWith(prefix)) {
@@ -606,16 +609,30 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     public ProjectMetadata getProjectMetadata(String proj) throws Exception {
         logger.trace("Getting details of a project {} " + proj);
         ProjectStore ps = new ProjectStore(defaultProjectRoot);
-        String json = ps.readProjectDataAsString(proj);
-        logger.debug("project Metadata Json " + json);
+        JsonElement prj = ps.readProjectData(proj);
         ProjectMetadata projectMetadata = null;
-        if(json != null){
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-            projectMetadata = objectMapper.readValue(json, ProjectMetadata.class);
+        if(prj != null){
+            projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
         }
         return projectMetadata;
+    }
+
+    @Override
+    public ProjectMetadata[] getAllProjectsMetadata() throws Exception {
+        logger.trace("Getting details of all projects");
+        ProjectStore ps = new ProjectStore(defaultProjectRoot);
+        String[] jsons = ps.readAllProjectsMetadata();
+        logger.debug("projects Metadata Json " + jsons);
+        ProjectMetadata[] projectsMetadata = null;
+        if(jsons != null){
+            projectsMetadata = new ProjectMetadata[jsons.length];
+            int index = 0;
+            for(String json : jsons){
+                projectsMetadata[index] = new Gson().fromJson(json, ProjectMetadata.class);
+                index++;
+            }
+        }
+        return projectsMetadata;
     }
 
 }

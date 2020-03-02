@@ -21,10 +21,12 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
-import sncr.bda.conf.DSCategory;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import sncr.bda.metastore.ProjectStore;
+import sncr.bda.conf.ProjectMetadata;
 
 
 /**
@@ -33,7 +35,7 @@ import java.util.*;
  *
  */
 public interface WithDataSet {
-	
+
 	static final String SQL_COMPONENT  = "sql";
 
     /**
@@ -431,38 +433,57 @@ public interface WithDataSet {
             }else {
                 userData = new Gson().toJsonTree((LinkedTreeMap) userDataObject).getAsJsonObject();
             }
-            addDatasetCategory(userData);
+            addDatasetTags(userData);
             return userData;
         }
 
-        private void addDatasetCategory(JsonObject userData){
+        private void addDatasetTags(JsonObject userData){
             logger.debug("addDatasetCategory(): userData : "+ userData);
-            List<String> categories = null;
-            if(userData.has(DataSetProperties.Category.toString())) {
-                JsonElement categoriesElement = userData.get(DataSetProperties.Category.toString());
-                if (categoriesElement != null) {
-                    JsonArray categoriesArray = categoriesElement.getAsJsonArray();
-                    if (categoriesArray != null && categoriesArray.size() != 0) {
-                        categories = new ArrayList<>();
-                        for (JsonElement categoryElement : categoriesArray) {
-                            String inputCategory = categoryElement.getAsString();
-                            if(inputCategory != null && !inputCategory.trim().isEmpty()) {
-                                categories.add(inputCategory.trim());
+            if(userData.has(DataSetProperties.Tags.toString())) {
+                JsonElement tagsElement = userData.get(DataSetProperties.Tags.toString());
+                if (tagsElement != null) {
+                    JsonArray tagsArray = tagsElement.getAsJsonArray();
+                    if (tagsArray != null && tagsArray.size() != 0) {
+                        List<String> tags = new ArrayList<>();
+                        for (JsonElement tagElement : tagsArray) {
+                            String tag = tagElement.getAsString();
+                            if(tag != null && !tag.trim().isEmpty()) {
+                                tags.add(tag.trim());
+                            }
+                        }
+                        if(tags != null && !tags.isEmpty()) {
+                            if(isProjectContainsTags(tags)) {
+                                JsonArray dsTagsArray = new JsonArray();
+                                for(String tag : tags) {
+                                    dsTagsArray.add(new JsonPrimitive(tag));
+                                }
+                                userData.add(DataSetProperties.Tags.name(),dsTagsArray);
+                            }else{
+                                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Dataset Tags - "+ tags + " - configured are not exist in Project Metadata.");
                             }
                         }
                     }
                 }
             }
-            JsonArray dsCategoryArray = new JsonArray();
-            if(categories == null || categories.size() == 0) {
-                dsCategoryArray.add(new JsonPrimitive(DSCategory.DEFAULT.toString()));
-            }else {
-                for(String category : categories) {
-                    DSCategory categoryConstant = DSCategory.fromValue(category);
-                    dsCategoryArray.add(new JsonPrimitive(categoryConstant.toString()));
-                }
+        }
+        private boolean isProjectContainsTags(List<String> tags){
+            try {
+                ProjectStore prjStore = new ProjectStore(this.ctx.xdfDataRootSys);
+                JsonElement prj = prjStore.readProjectData(this.ctx.applicationID);
+                ProjectMetadata projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
+                String[] allowableTags = projectMetadata.getAllowableTags();
+                logger.debug("Project Allowable Tags are : " + Arrays.toString(allowableTags));
+                logger.debug("Dataset Tags are : " + tags);
+                return Arrays.stream(allowableTags)
+                    .filter(aTag -> (aTag != null && !aTag.trim().isEmpty()))
+                    .map(aTag -> aTag.trim().toLowerCase())
+                    .collect(Collectors.toList())
+                    .containsAll(tags.stream()
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toList()));
+            }catch (Exception ex) {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, ex);
             }
-            userData.add(DataSetProperties.Category.name(),dsCategoryArray);
         }
 
         private Input.Dstype getOutputDatasetType() {
@@ -532,12 +553,7 @@ public interface WithDataSet {
 
                 return res;
             }
-
         }
-
     }
-
-
-
 }
 

@@ -129,7 +129,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
                 if ( values != null && values.length != 0){
                     switch (searchParam) {
                         case Category:
-                            addQueryCondition(cond, "system.category[]", values);
+                            addQueryCondition(cond, "userData.category", values);
                             break;
                         case SubCategory:
                             if (searchParams.get(DataSetProperties.Category) != null
@@ -145,6 +145,9 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
                             break;
                         case Type:
                             addQueryCondition(cond, "system.dstype", values);
+                            break;
+                        case Tags:
+                            addQueryCondition(cond, "system.tags[]", values);
                             break;
                     }
                 }

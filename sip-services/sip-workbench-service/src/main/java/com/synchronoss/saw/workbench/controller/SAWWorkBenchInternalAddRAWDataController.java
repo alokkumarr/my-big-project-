@@ -30,7 +30,7 @@ import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.DSSearchParams;
-import com.synchronoss.saw.workbench.model.ProjectMetadata;
+import sncr.bda.conf.ProjectMetadata;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
@@ -361,21 +361,41 @@ public class SAWWorkBenchInternalAddRAWDataController {
      * @param projectId
      * @return
      */
-    @RequestMapping(value = "projects/{projectId}",
+    @RequestMapping(value = "{project}/metadata",
         method = RequestMethod.GET,
         produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProjectMetadata getProjectMetadata(
-        @PathVariable(name="projectId", required = true) String projectId) {
-        logger.debug("Get the properties of a  project {}", projectId);
+        @PathVariable(name="project", required = true) String project) {
+        logger.debug("Get the properties of a  project {}", project);
 
-        ProjectMetadata project = null;
+        ProjectMetadata projectMetadata = null;
         try {
-            project = sawWorkbenchService.getProjectMetadata(projectId);
+            projectMetadata = sawWorkbenchService.getProjectMetadata(project);
         } catch(Exception ex) {
             logger.error("Error occurred while retriving the dataset properties " + ex);
         }
-        return project;
+        return projectMetadata;
+    }
+
+    /**
+     *
+     * Retrieve the properties of a given Project id
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "all/metadata",
+        method = RequestMethod.GET,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectMetadata[] getAllProjectsMetadata() {
+        ProjectMetadata[] projectsMetadata = null;
+        try {
+            projectsMetadata = sawWorkbenchService.getAllProjectsMetadata();
+        } catch(Exception ex) {
+            logger.error("Error occurred while retriving the dataset properties " + ex);
+        }
+        return projectsMetadata;
     }
   
 }
