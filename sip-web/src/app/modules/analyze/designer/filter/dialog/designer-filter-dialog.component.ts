@@ -56,20 +56,19 @@ export class DesignerFilterDialogComponent implements OnInit {
 
   ngOnInit() {
    const keywords = ['SELECT',
-    'FROM',
-    'WHERE',
-    'LIKE',
-    'BETWEEN',
-    'NOT LIKE',
-    'FALSE',
-    'NULL',
-    'FROM',
-    'TRUE',
-    'NOT IN'
-  ];;
+      'FROM',
+      'WHERE',
+      'LIKE',
+      'BETWEEN',
+      'NOT LIKE',
+      'FALSE',
+      'NULL',
+      'FROM',
+      'TRUE',
+      'NOT IN'
+    ];
     let addClass = '';
     this.data.query.replace(/[\s]+/g, " ").trim().split(" ").forEach(function(val) {
-      console.log(val.trim().toUpperCase());
       if (keywords.indexOf(val.trim().toUpperCase()) > -1) {
         addClass += "<span class='sql-keyword'>" + val + "&nbsp;</span>";
       }
@@ -79,7 +78,6 @@ export class DesignerFilterDialogComponent implements OnInit {
         addClass += "<span class='other'>" + val + "&nbsp;</span>";
       }
     });
-    console.log(addClass);
     this.queryWithClass = addClass;
     this.filters = cloneDeep(this.data.filters);
     forEach(this.filters, filtr => {
