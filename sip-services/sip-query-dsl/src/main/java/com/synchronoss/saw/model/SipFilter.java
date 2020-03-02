@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
-import com.synchronoss.bda.sip.dsk.Model;
-import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.HashMap;
@@ -60,7 +58,7 @@ public class SipFilter {
 
   @JsonProperty("model")
   @ApiModelProperty(notes = "Attribute Model", name = "model")
-  private com.synchronoss.bda.sip.dsk.Model model;
+  private Model model;
 
   @JsonProperty("booleanCriteria")
   @ApiModelProperty(notes = "Conjunction used", name = "booleanCriteria")
@@ -70,7 +68,7 @@ public class SipFilter {
   @ApiModelProperty(
       notes = "List of attributes on which boolean criteria has to be applied",
       name = "booleanQuery")
-  private List<SipDskAttribute> booleanQuery;
+  private List<SipFilter> booleanQuery;
 
   public String getColumnName() {
     return columnName;
@@ -156,7 +154,7 @@ public class SipFilter {
     this.aggregate = aggregate;
   }
 
-  public com.synchronoss.bda.sip.dsk.Model getModel() {
+  public Model getModel() {
     return model;
   }
 
@@ -172,11 +170,11 @@ public class SipFilter {
     this.booleanCriteria = booleanCriteria;
   }
 
-  public List<SipDskAttribute> getBooleanQuery() {
+  public List<SipFilter> getBooleanQuery() {
     return booleanQuery;
   }
 
-  public void setBooleanQuery(List<SipDskAttribute> booleanQuery) {
+  public void setBooleanQuery(List<SipFilter> booleanQuery) {
     this.booleanQuery = booleanQuery;
   }
 
