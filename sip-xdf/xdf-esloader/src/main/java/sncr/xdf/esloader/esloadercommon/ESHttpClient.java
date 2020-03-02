@@ -106,14 +106,20 @@ public class ESHttpClient {
     return null;
   }
 
-  private boolean head(String url) {
+  private boolean head(String url, boolean isIndexExist) {
     for (String host : this.hosts) {
       LOGGER.debug("Trying : " + host);
-      String fullUrl = host + url;
-      LOGGER.debug("URL : " + fullUrl);
-      ClientResource cr = getClientResource(fullUrl);
-      cr.head();
-      return cr.getStatus().isSuccess();
+      try {
+        String fullUrl = host + url;
+        LOGGER.debug("URL : " + fullUrl);
+        ClientResource cr = getClientResource(fullUrl);
+        cr.head();
+        return cr.getStatus().isSuccess();
+      } catch (ResourceException ex) {
+        String message = isIndexExist ? "Index does not exist in the ES nodes cluster." : "Unable to reach " + host;
+        LOGGER.warn(ex.getMessage());
+        LOGGER.warn(message);
+      }
     }
     return false;
   }
@@ -298,15 +304,7 @@ public class ESHttpClient {
   }
 
   public boolean esIndexExists(String idx) {
-    boolean isIndexExist = false;
-    try {
-      head("/" + idx);
-      isIndexExist = true;
-    } catch (ResourceException ex) {
-      LOGGER.warn("Index : " + idx + " does not exist in the ES nodes cluster.");
-      LOGGER.warn(ex.getMessage());
-    }
-    return isIndexExist;
+    return head("/" + idx, true);
   }
 
   // Check if index type exists
@@ -314,7 +312,7 @@ public class ESHttpClient {
   public boolean esTypeExists(String idx, String type) throws Exception {
     String clusterVersion = esClusterVersion();
     if (clusterVersion.startsWith("6.")) {
-      return head("/" + idx + MAPPING + type);
+      return head("/" + idx + MAPPING + type, false);
     } else {
       throw new Exception(
           "TypeExists operation is not supported for Elastic Search cluster version "
@@ -399,7 +397,7 @@ public class ESHttpClient {
   }
 
   public boolean esAliasExists(String alias) {
-    return head("/_alias/" + alias);
+    return head("/_alias/" + alias, false);
   }
 
   // Return list of indexes with the given alias
