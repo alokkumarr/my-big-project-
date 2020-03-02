@@ -1116,7 +1116,7 @@ export class ChartService {
       }
       yearSeries.data.push({
         x: categories.indexOf(momentDate.format(dataCategoryFormat)),
-        y: row[`${dataField.aggregate}@@${dataField.columnName}`]
+        y: row[this.getDataFieldIdentifier(dataField)]
       });
     });
 
@@ -1126,6 +1126,24 @@ export class ChartService {
     });
 
     return changes;
+  }
+
+  /**
+   * For a data field (generall used in y axis), returns the key name
+   * backend will use in execute response.
+   *
+   * @param {ArtifactColumnDSL} field
+   * @returns {string}
+   * @memberof ChartService
+   */
+  getDataFieldIdentifier(field: ArtifactColumnDSL): string {
+    if (field.expression) {
+      return field.columnName;
+    } else if (field.aggregate) {
+      return `${field.aggregate}@@${field.columnName}`;
+    } else {
+      return field.columnName;
+    }
   }
 
   getPackedBubbleChartConfig(fields, gridData) {

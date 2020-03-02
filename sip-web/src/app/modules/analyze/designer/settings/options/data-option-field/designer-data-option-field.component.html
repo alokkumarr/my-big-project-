@@ -166,7 +166,13 @@
       <pre>{{ artifactColumn.formula }}</pre>
     </div>
 
-    <div *ngIf="isDataField && analysisType === 'chart'">
+    <div
+      *ngIf="
+        isDataField &&
+        analysisType === 'chart' &&
+        analysisSubtype !== 'comparison'
+      "
+    >
       <custom-color-picker
         [config]="colorPickerConfig"
         [bgColor]="artifactColumn.seriesColor || '#ffffff'"

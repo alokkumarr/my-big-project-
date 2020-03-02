@@ -247,7 +247,7 @@ export class DashboardGridComponent
     }
 
     item.updater.next([
-      { path: 'chart.height', data: dimensions.height },
+      { path: 'chart.height', data: dimensions.height - 24 },
       { path: 'chart.width', data: dimensions.width }
     ]);
   }

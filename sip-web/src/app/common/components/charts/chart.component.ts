@@ -16,6 +16,9 @@ import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
+import * as isNil from 'lodash/isNil';
+import * as map from 'lodash/map';
+import * as isEqual from 'lodash/isEqual';
 import * as some from 'lodash/some';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
@@ -27,6 +30,7 @@ import {
   stockChartOptions,
   bulletChartOptions
 } from './default-chart-options';
+import { MatCheckboxChange } from '@angular/material';
 
 export const UPDATE_PATHS = {
   SERIES: 'series.0',
@@ -36,9 +40,7 @@ export const UPDATE_PATHS = {
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'chart',
-  template: `
-    <div style="width: 100%;" #container></div>
-  `
+  templateUrl: './chart.component.html'
 })
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
@@ -49,6 +51,13 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('container', { static: true })
   container: ElementRef;
 
+  comparisonConfig: {
+    categories: Array<{ name: string; checked: boolean }>;
+    series: Array<any>;
+  } = {
+    categories: null,
+    series: null
+  };
   /**
    * Cloning all the options to create a new copy per object.
    * Otherwise, any changes to these options will be shared between
@@ -184,6 +193,42 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
+  /**
+   * Save categories and series for comparison chart. They are used as
+   * caches to support turning on/off data points from inline filters.
+   *
+   * @param {{ path: string; data: any }} updateObj
+   * @memberof ChartComponent
+   */
+  saveComparisonConfig(updateObj: { path: string; data: any }) {
+    if (
+      this.chartType === 'comparison' &&
+      updateObj.path === 'xAxis.categories'
+    ) {
+      /* If categories already exist, and they're same as the new update, no
+      need to change them. This preserves any categories that have been turned off */
+      this.comparisonConfig.categories = isEqual(
+        map(this.comparisonConfig.categories, cat => cat.name),
+        updateObj.data
+      )
+        ? this.comparisonConfig.categories
+        : updateObj.data.map(category => ({
+            name: category,
+            checked: true
+          }));
+
+      set(
+        this.config,
+        updateObj.path,
+        this.comparisonConfig.categories
+          .filter(cat => cat.checked)
+          .map(cat => cat.name)
+      );
+    } else if (this.chartType === 'comparison' && updateObj.path === 'series') {
+      this.comparisonConfig.series = updateObj.data;
+    }
+  }
+
   reflow() {
     if (this.chart) {
       this.chart.reflow();
@@ -203,6 +248,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     forEach(updates, updateObj => {
       set(this.config, updateObj.path, updateObj.data);
+      this.saveComparisonConfig(updateObj);
     });
 
     // Not using chart.update due to a bug with navigation
@@ -242,6 +288,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         );
     }
 
+    this.onCategoryToggle(null, null);
     this.addExportSize(config);
 
     // This is causing more problems than it solves. Updating the defaultsDeep
@@ -300,6 +347,52 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chart.exportChartLocal({
       type: 'application/pdf',
       filename: this.config.title.exportFilename || 'chart'
+    });
+  }
+
+  /**
+   * Handles data on chart when user chooses to turn off/on categories
+   *
+   * @param {MatCheckboxChange} event
+   * @param {number} index
+   * @memberof ChartComponent
+   */
+  onCategoryToggle(event: MatCheckboxChange, index: number) {
+    /* Save the toggle status in category cache first */
+    if (!isNil(index) && isArray(this.comparisonConfig.categories)) {
+      this.comparisonConfig.categories[index].checked = event.checked;
+    }
+
+    /* Map of all categories' status. Looks like [true, false, true]
+     if there are three categories. */
+    const allCategoryStatus = this.comparisonConfig.categories.map(
+      category => category.checked
+    );
+
+    /* Map of all active categories' names. Doesn't include those that
+    user has turned off */
+    const activeCategories = this.comparisonConfig.categories
+      .filter(category => category.checked)
+      .map(category => category.name);
+
+    this.chart.xAxis[0].setCategories(activeCategories);
+
+    this.comparisonConfig.series.forEach((series, i) => {
+      let data = cloneDeep(series.data);
+      data = data
+        .sort((d1, d2) => d1.x - d2.x)
+        .filter(d => allCategoryStatus[d.x])
+
+        /* In each data row, replace category index with actual names */
+        .map(d => ({ x: this.comparisonConfig.categories[d.x].name, y: d.y }))
+
+        /* Then search for new index from active categories and use that index */
+        .map(d => ({
+          x: activeCategories.indexOf(d.x),
+          y: d.y
+        }));
+
+      this.chart.series[i].setData(data);
     });
   }
 }

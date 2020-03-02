@@ -635,7 +635,7 @@ export class DesignerService {
         artifactColumn.comboType = chartType;
       } else if (['tsspline', 'tsPane'].includes(chartType)) {
         artifactColumn.comboType = 'line';
-      } else if (['combo', 'bar'].includes(chartType)) {
+      } else if (['combo', 'bar', 'comparison'].includes(chartType)) {
         artifactColumn.comboType = 'column';
       }
     };
