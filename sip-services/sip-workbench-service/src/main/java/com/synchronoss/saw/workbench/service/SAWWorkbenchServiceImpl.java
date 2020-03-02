@@ -380,6 +380,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
               addSearchParamToMap(searchParams, DataSetProperties.Catalog, dsSearchParams.getCatalog());
               addSearchParamToMap(searchParams, DataSetProperties.DataSource, dsSearchParams.getDataSource());
               addSearchParamToMap(searchParams, DataSetProperties.Type, dsSearchParams.getDstype());
+              addSearchParamToMap(searchParams, DataSetProperties.Tags, dsSearchParams.getTags());
           }
           return searchParams;
       }else{
