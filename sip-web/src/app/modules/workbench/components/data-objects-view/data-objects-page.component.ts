@@ -7,13 +7,14 @@ import * as get from 'lodash/get';
 import * as orderBy from 'lodash/orderBy';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isEmpty from 'lodash/isEmpty';
+import * as set from 'lodash/set';
 
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { SearchBoxComponent } from '../../../../common/components/search-box';
 
-import { DATASET_CATEGORIES_TYPE, DATASET_CATEGORY_LIST } from '../../consts';
+import { DATASET_CATEGORIES_TYPE } from '../../consts';
 import { DatasetFilters } from '../../models/workbench.interface';
 
 @Component({
@@ -45,15 +46,14 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
     isMultiSelect: false,
     data: cloneDeep(DATASET_CATEGORIES_TYPE)
   };
-  public dsCategoryFilter: DatasetFilters = {
+  public dsTagFilter: DatasetFilters = {
     type: 'string',
-    name: 'category',
-    label: 'Filter By Category Type',
+    name: 'tag',
+    label: 'Filter By Dataset Tags',
     isMultiSelect: true,
-    data: cloneDeep(DATASET_CATEGORY_LIST)
+    data: []
   };
   public searchFilters = [];
-
   public filterList = {};
 
   @ViewChild(SearchBoxComponent, { static: true })
@@ -70,8 +70,8 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.searchFilters = [this.dsTypeFilters, this.dsCategoryFilter];
     this.getDatasets();
+    this.getListOfAllowableTags();
   }
 
   ngOnDestroy() {
@@ -247,5 +247,14 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
     this.filterList = event.data;
     this.dsFilterSideNav.close();
     this.getDatasets();
+  }
+
+  // Get the list of allowable tags. Added as part of SIP-8963
+  getListOfAllowableTags() {
+    this.workBench.getAllowableTagsList().subscribe(({ allowableTags }) => {
+      // allowableTags.unshift('No tags');
+      set(this.dsTagFilter, 'data', allowableTags);
+      this.searchFilters = [this.dsTypeFilters, this.dsTagFilter];
+    });
   }
 }

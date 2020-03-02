@@ -213,6 +213,47 @@
                   </mat-form-field>
 
                   <mat-form-field class="margin20">
+                    <mat-chip-list #tagsList aria-label="Tags selection">
+                      <mat-chip
+                        *ngFor="
+                          let tag of selectedTags;
+                          trackBy: trackByValue;
+                          let i = index
+                        "
+                        [selectable]="true"
+                        [removable]="true"
+                        (removed)="removeTag(i)"
+                      >
+                        {{ tag }}
+                        <mat-icon
+                          matChipRemove
+                          fontIcon="icon-remove"
+                        ></mat-icon>
+                      </mat-chip>
+                      <input
+                        placeholder="DS Tags..."
+                        #tagsInput
+                        formControlName="dsTagCtrl"
+                        [matAutocomplete]="auto"
+                        [matChipInputFor]="tagsList"
+                        [matChipInputSeparatorKeyCodes]="tagSeparatorKeysCodes"
+                        (matChipInputTokenEnd)="addTag($event)"
+                      />
+                    </mat-chip-list>
+                    <mat-autocomplete
+                      #auto="matAutocomplete"
+                      (optionSelected)="tagSelected($event)"
+                    >
+                      <mat-option
+                        *ngFor="let tag of (autoCompleteTagList$ | async)"
+                        [value]="tag"
+                      >
+                        {{ tag }}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+
+                  <!-- <mat-form-field class="margin20">
                     <mat-label>Category </mat-label>
                     <mat-select
                       multiple
@@ -241,7 +282,7 @@
                     >
                       Dataset Category is <strong>required</strong>
                     </mat-error>
-                  </mat-form-field>
+                  </mat-form-field> -->
                   <!-- <div class="margin20">
                     <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">
                       <mat-radio-button value="replace">

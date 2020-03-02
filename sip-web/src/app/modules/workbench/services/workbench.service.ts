@@ -294,6 +294,17 @@ export class WorkbenchService {
       .get(endpoint)
       .pipe(catchError(this.handleError('data', [])));
   }
+
+  /** GET list of allowable tags for DS from the server */
+  getAllowableTagsList(): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/workbench/projects/${userProject}/metadata`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.
