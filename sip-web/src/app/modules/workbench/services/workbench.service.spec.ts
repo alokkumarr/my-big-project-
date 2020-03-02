@@ -86,4 +86,10 @@ describe('Workbench Service', () => {
       workbenchService.getFilteredDatasets({}) instanceof Observable
     ).toBeTruthy();
   });
+
+  it('should fetch allowable tags ', () => {
+    expect(
+      workbenchService.getAllowableTagsList() instanceof Observable
+    ).toBeTruthy();
+  });
 });
