@@ -1045,9 +1045,10 @@ export class DesignerState {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     const sqlQuery = analysis.sipQuery.query;
+    const runTimeFiltersInQueryCount = sqlQuery.replace(/[^?]/g, "");
     //check if query has runtime filters
     const runTimeFilters = [];
-    for (var i = 0; i < sqlQuery.replace(/[^?]/g, "").length; i++) {
+    for (var i = 0; i < runTimeFiltersInQueryCount.length; i++) {
       runTimeFilters.push({
         'isRuntimeFilter': true,
         'displayName': isEmpty(filters[i]) ? '' : filters[i].displayName,
