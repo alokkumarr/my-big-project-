@@ -30,7 +30,6 @@ import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
 import * as values from 'lodash/values';
 import * as toString from 'lodash/toString';
-import * as replace from 'lodash/replace';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isArray from 'lodash/isArray';
 

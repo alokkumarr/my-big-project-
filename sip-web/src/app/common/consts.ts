@@ -146,17 +146,19 @@ const NEW_DATE_FORMATS = [
   {
     label: '09/15/17 11:20',
     value: 'MM/dd/yyyy hh:mm',
-    // TODO change this when minute level aggregation works
-    // groupInterval: 'minute',
-    groupInterval: 'day',
+    groupInterval: 'minute',
     momentValue: 'MM/DD/YYYY HH:mm'
+  },
+  {
+    label: '09/15/17 11:20:36',
+    value: 'MM/dd/yyyy hh:mm:ss',
+    groupInterval: 'second',
+    momentValue: 'MM/DD/YYYY HH:mm:ss'
   },
   {
     label: '09/15 11:20',
     value: 'MM/dd HH:mm',
-    // TODO change this when minute level aggregation works
-    // groupInterval: 'minute',
-    groupInterval: 'day',
+    groupInterval: 'minute',
     momentValue: 'MM/DD HH:mm'
   },
   {
