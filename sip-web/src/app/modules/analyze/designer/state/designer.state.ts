@@ -59,7 +59,8 @@ import {
   DesignerJoinsArray,
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
-  DesignerCheckAggregateFilterSupport
+  DesignerCheckAggregateFilterSupport,
+  DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -1034,5 +1035,33 @@ export class DesignerState {
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
+  }
+
+  @Action(DesignerUpdateQueryFilters)
+  updateQueryFilters(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { filters } : DesignerUpdateQueryFilters
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const sqlQuery = analysis.sipQuery.query;
+    //check if query has runtime filters
+    const runTimeFilters = [];
+    for (var i = 0; i < sqlQuery.replace(/[^?]/g, "").length; i++) {
+      runTimeFilters.push({
+        'isRuntimeFilter': true,
+        'displayName': isEmpty(filters[i]) ? '' : filters[i].displayName,
+        'description': isEmpty(filters[i]) ? '' : filters[i].description,
+        'operator': 'EQ',
+        'model': {
+          'modelValues': isEmpty(filters[i]) ? [] : [filters[i].model.modelValues[0]]
+        }
+
+      });
+    }
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, filters: runTimeFilters} }
+    });
+
   }
 }
