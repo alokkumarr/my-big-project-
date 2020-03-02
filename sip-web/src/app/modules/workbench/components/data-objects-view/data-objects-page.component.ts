@@ -48,7 +48,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   };
   public dsTagFilter: DatasetFilters = {
     type: 'string',
-    name: 'tag',
+    name: 'tags',
     label: 'Filter By Dataset Tags',
     isMultiSelect: true,
     data: []
