@@ -78,6 +78,17 @@
   font-size: 15px;
 }
 
+::ng-deep .sql-keyword {
+  color: rgb(127, 0, 85);
+  font-weight: bold;
+}
+
+::ng-deep .runtime-indicator {
+  color: #ff9000;
+  font-size: 18px;
+  font-weight: 900;
+}
+
 mat-icon.info {
   font-size: 20px;
   padding: 13px;

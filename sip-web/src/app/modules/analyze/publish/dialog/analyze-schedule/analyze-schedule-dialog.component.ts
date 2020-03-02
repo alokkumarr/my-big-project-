@@ -68,6 +68,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   errorFlagMsg = false;
   loadCron = false;
   emailValidateFlag = false;
+  disableSchedule: boolean = false;
   isEligibleToZip: boolean;
   fileType: string;
   startDateCorrectFlag = true;
@@ -83,6 +84,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.disableSchedule = !get(this.data.analysis, 'designerEdit') ? false : true;
     this.scheduleState = 'new';
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {

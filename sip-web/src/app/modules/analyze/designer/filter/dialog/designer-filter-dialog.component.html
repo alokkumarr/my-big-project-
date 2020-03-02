@@ -6,15 +6,12 @@
       <div class="dialog__content">
           <mat-card class="query-card">
               <mat-card-subtitle>Query</mat-card-subtitle>
-              <mat-card-content>{{data.query}}</mat-card-content>
+              <mat-card-content>
+                <span [innerHtml]="queryWithClass"></span>
+              </mat-card-content>
             </mat-card>
             <div class="input-field-filters">
               <div fxLayout="row" *ngFor="let filter of data.filters;let i = index;">
-
-                  <div *ngIf="!data.designerPage">
-                  <span>{{ i + 1 }}</span>
-                  </div>
-
                 <mat-form-field>
                   <input
                     matInput
