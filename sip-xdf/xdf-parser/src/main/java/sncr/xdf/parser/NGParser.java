@@ -589,13 +589,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     return retVal;
                 }
             }
-        }*/
-          FileStatus file = files[0];
-          String tempPath = tempDir + Path.SEPARATOR + file.getPath();
+        }
+        */
 
-          int retVal = parseMultipleFiles(new Path(tempPath));
+          int retVal = parseMultipleFiles(new Path(tempDir));
           if (retVal == 0) {
-            ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
+            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
           } else {
             return retVal;
           }
