@@ -85,7 +85,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   ngOnInit() {
     this.disableSchedule = this.checkStatusOfAnalysis();
-    console.log(this.data);
     this.scheduleState = 'new';
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {
