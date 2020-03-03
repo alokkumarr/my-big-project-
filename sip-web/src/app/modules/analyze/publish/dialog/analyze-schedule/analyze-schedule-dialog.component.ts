@@ -84,7 +84,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.disableSchedule = !get(this.data.analysis, 'designerEdit') ? false : true;
+    this.disableSchedule = this.checkStatusOfAnalysis();
+    console.log(this.data);
     this.scheduleState = 'new';
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {
@@ -99,6 +100,16 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
     this.fileType =
       get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
+  }
+
+  checkStatusOfAnalysis() {
+    if (get(this.data.analysis, 'designerEdit')) {
+      const runTimeFiltersInQueryCount = get(this.data.analysis, 'sipQuery.query').replace(/[^?]/g, "");
+      if (runTimeFiltersInQueryCount.length === 0) {
+        return false;
+      }
+    }
+    return !get(this.data.analysis, 'designerEdit') ? false : true;
   }
 
   onCategorySelected(value) {
