@@ -6,6 +6,7 @@ import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 import org.ojai.store.QueryCondition;
 import sncr.bda.base.MetadataStore;
+import org.ojai.Value;
 import sncr.bda.base.WithSearchInMetastore;
 import sncr.bda.core.file.HFileOperations;
 
@@ -176,8 +177,12 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         logger.debug("Tags : Length - " + length  + ", Length After removal - "+ lengthAfterRemoval);
         if(lengthAfterRemoval < length) {
             logger.debug(NO_TAGS + " - exist in tags search values.");
+            cond.or();
+            cond.notExists(key);
+            cond.typeOf(key, Value.Type.NULL);
+            cond.sizeOf(key, QueryCondition.Op.EQUAL, 0);
             addQueryCondition(cond, key, values);
-
+            cond.close();
         }else{
             logger.debug(NO_TAGS + " - not exist in tags search values.");
             addQueryCondition(cond, key, values);
