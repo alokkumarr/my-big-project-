@@ -14,7 +14,8 @@ import * as isUndefined from 'lodash/isUndefined';
 import {
   CUSTOM_DATE_PRESET_VALUE,
   DATE_TYPES,
-  NUMBER_TYPES
+  NUMBER_TYPES,
+  SQL_QUERY_KEYWORDS
 } from '../../../consts';
 import { Artifact, FilterModel, Filter } from '../../types';
 import { ArtifactDSL } from '../../../../../models';
@@ -55,30 +56,7 @@ export class DesignerFilterDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-   const keywords = ['SELECT',
-      'FROM',
-      'WHERE',
-      'LIKE',
-      'BETWEEN',
-      'NOT LIKE',
-      'FALSE',
-      'NULL',
-      'FROM',
-      'TRUE',
-      'NOT IN'
-    ];
-    let addClass = '';
-    this.data.query.replace(/[\s]+/g, " ").trim().split(" ").forEach(function(val) {
-      if (keywords.indexOf(val.trim().toUpperCase()) > -1) {
-        addClass += "<span class='sql-keyword'>" + val + "&nbsp;</span>";
-      }
-      else if (val.trim().toUpperCase() === '?') {
-        addClass += "<span class='runtime-indicator'>" + val + "&nbsp;</span>";
-      } else {
-        addClass += "<span class='other'>" + val + "&nbsp;</span>";
-      }
-    });
-    this.queryWithClass = addClass;
+    this.queryWithClass = this.loadQueryWithClasses();
     this.filters = cloneDeep(this.data.filters);
     forEach(this.filters, filtr => {
       if (filtr.artifactsName) {
@@ -95,6 +73,24 @@ export class DesignerFilterDialogComponent implements OnInit {
       }
     });
     this.onFiltersChange();
+  }
+
+  // As we show the query in filter pop up, we need to add colors
+  // to the keywords present in the sql query for better understanding
+  // if the query is too long
+  loadQueryWithClasses() {
+    let addClass = '';
+    this.data.query.replace(/[\s]+/g, " ").trim().split(" ").forEach(function(val) {
+      if (SQL_QUERY_KEYWORDS.indexOf(val.trim().toUpperCase()) > -1) {
+        addClass += "<span class='sql-keyword'>" + val + "&nbsp;</span>";
+      }
+      else if (val.trim().toUpperCase() === '?') {
+        addClass += "<span class='runtime-indicator'>" + val + "&nbsp;</span>";
+      } else {
+        addClass += "<span class='other'>" + val + "&nbsp;</span>";
+      }
+    });
+    return addClass;
   }
 
   aggregatedFiltersFor(artifactName: string): Filter[] {
