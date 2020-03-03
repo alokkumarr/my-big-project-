@@ -1,0 +1,59 @@
+<div fxLayout="column">
+  <mat-toolbar fxLayout="row">
+    <button (click)="goBack()" mat-icon-button style="margin-right: 10px;">
+      <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
+    </button>
+    <div fxLayout="row" fxFlex="45">
+      <div class="stream-inspector-title" e2e="stream-reader-title">
+        Stream Reader and Topics
+      </div>
+    </div>
+
+    <div fxLayout="row" fxFlex="50"></div>
+
+    <div fxLayout="row" fxFlex="5">
+      <button
+        matTooltip="Refresh Stream/Topic"
+        mat-mini-fab
+        e2e="refresh-stream-topic-btn"
+        color="secondary"
+        (click)="getAllStreamAndTopic()"
+      >
+        <mat-icon color="primary" fontIcon="icon-Refresh"></mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+</div>
+<mat-divider></mat-divider>
+
+<div fxLayout="column">
+  <section class="input-section">
+    <mat-form-field class="margin20" appearance="outline">
+      <mat-label i18n>Stream</mat-label>
+      <mat-select (selectionChange)="streamChanged($event)">
+        <mat-option
+          *ngFor="let stream of (streamData$ | async); trackBy: trackByFn"
+          [value]="stream.streamId"
+        >
+          {{ stream.streamTitle }}</mat-option
+        >
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="margin20" appearance="outline">
+      <mat-label i18n>Topic</mat-label>
+      <mat-select (selectionChange)="topicChanged($event)">
+        <mat-option
+          *ngFor="let topic of (topicData$ | async)"
+          [value]="topic.title"
+        >
+          {{ topic.title }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </section>
+</div>
+
+<div fxLayout="column">
+  <stream-reader-grid [gridData]="streamTopicData"> </stream-reader-grid>
+</div>

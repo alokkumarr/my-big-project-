@@ -283,6 +283,14 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', [])));
   }
 
+  /** GET list of Streams and Topic from server */
+  getStreamAndTopic(): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/datasets123123`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.

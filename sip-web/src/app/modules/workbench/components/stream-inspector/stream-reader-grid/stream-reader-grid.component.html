@@ -1,0 +1,23 @@
+<div>
+  <dx-data-grid
+    #dsGrid
+    fxFlex
+    [dataSource]="gridData"
+    [rowAlternationEnabled]="true"
+    [height]="'100%'"
+    [width]="'100%'"
+    [showBorders]="false"
+    [showColumnLines]="false"
+    [hoverStateEnabled]="true"
+  >
+    <dxo-selection mode="single"></dxo-selection>
+    <dxi-column caption="Color" dataField="eyeColor"></dxi-column>
+    <dxi-column caption="Balance" dataField="balance"></dxi-column>
+    <dxi-column caption="Age" dataField="age" dataType="integer"></dxi-column>
+    <dxo-scrolling
+      mode="virtual"
+      showScrollbar="always"
+      [useNative]="false"
+    ></dxo-scrolling>
+  </dx-data-grid>
+</div>

@@ -11,6 +11,7 @@ import { DatasourceComponent } from './components/datasource-management/datasour
 import { JobsPageComponent, JobLogsPageComponent } from './components/jobs';
 import { NewRegistrationComponent } from './components/rtis/new-form-registration/new-form-registration.component';
 import { AppkeysViewComponent } from './components/rtis/appkeys-view/appkeys-view.component';
+import { StreamInspectorComponent } from './components/stream-inspector';
 
 import { IsUserLoggedInGuard } from '../../common/guards';
 import { IsAdminGuard } from '../admin/guards';
@@ -68,6 +69,10 @@ export const routes: Routes = [
       {
         path: 'rtis/appkeys',
         component: AppkeysViewComponent
+      },
+      {
+        path: 'stream/topic',
+        component: StreamInspectorComponent
       },
       {
         path: 'datasource/joblogs/:jobId',
