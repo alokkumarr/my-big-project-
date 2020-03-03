@@ -12,12 +12,14 @@ import * as Highcharts from 'highcharts/highcharts';
 import * as Highstock from 'highcharts/highstock';
 // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
 import * as defaultsDeep from 'lodash/defaultsDeep';
-import * as forEach from 'lodash/forEach';
-import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as isNil from 'lodash/isNil';
-import * as map from 'lodash/map';
+import * as forEach from 'lodash/forEach';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as isEqual from 'lodash/isEqual';
 import * as some from 'lodash/some';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -139,7 +141,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.subscription && this.subscription.unsubscribe();
   }
 
   /**
@@ -208,21 +210,25 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       /* If categories already exist, and they're same as the new update, no
       need to change them. This preserves any categories that have been turned off */
       this.comparisonConfig.categories = isEqual(
-        map(this.comparisonConfig.categories, cat => cat.name),
+        fpMap(cat => cat.name, this.comparisonConfig.categories),
         updateObj.data
       )
         ? this.comparisonConfig.categories
-        : updateObj.data.map(category => ({
-            name: category,
-            checked: true
-          }));
+        : fpMap(
+            category => ({
+              name: category,
+              checked: true
+            }),
+            updateObj.data
+          );
 
       set(
         this.config,
         updateObj.path,
-        this.comparisonConfig.categories
-          .filter(cat => cat.checked)
-          .map(cat => cat.name)
+        fpPipe(
+          fpFilter(cat => cat.checked),
+          fpMap(cat => cat.name)
+        )(this.comparisonConfig.categories)
       );
     } else if (this.chartType === 'comparison' && updateObj.path === 'series') {
       this.comparisonConfig.series = updateObj.data;
@@ -326,7 +332,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      const positives = filter(pie.data, slice => slice.y > 0);
+      const positives = fpFilter(slice => slice.y > 0, pie.data);
 
       if (positives.length === pie.data.length) {
         result.all = false;
@@ -365,32 +371,36 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     /* Map of all categories' status. Looks like [true, false, true]
      if there are three categories. */
-    const allCategoryStatus = this.comparisonConfig.categories.map(
-      category => category.checked
+    const allCategoryStatus = fpMap(
+      category => category.checked,
+      this.comparisonConfig.categories
     );
 
     /* Map of all active categories' names. Doesn't include those that
     user has turned off */
-    const activeCategories = this.comparisonConfig.categories
-      .filter(category => category.checked)
-      .map(category => category.name);
+    const activeCategories = fpPipe(
+      fpFilter(category => category.checked),
+      fpMap(category => category.name)
+    )(this.comparisonConfig.categories);
 
     this.chart.xAxis[0].setCategories(activeCategories);
 
-    this.comparisonConfig.series.forEach((series, i) => {
+    forEach(this.comparisonConfig.series, (series, i) => {
       let data = cloneDeep(series.data);
-      data = data
-        .sort((d1, d2) => d1.x - d2.x)
-        .filter(d => allCategoryStatus[d.x])
-
+      data = fpPipe(
+        fpOrderBy(dataPoint => dataPoint.x),
+        fpFilter(dataPoint => allCategoryStatus[dataPoint.x]),
         /* In each data row, replace category index with actual names */
-        .map(d => ({ x: this.comparisonConfig.categories[d.x].name, y: d.y }))
-
+        fpMap(dataPoint => ({
+          x: this.comparisonConfig.categories[dataPoint.x].name,
+          y: dataPoint.y
+        })),
         /* Then search for new index from active categories and use that index */
-        .map(d => ({
-          x: activeCategories.indexOf(d.x),
-          y: d.y
-        }));
+        fpMap(dataPoint => ({
+          x: activeCategories.indexOf(dataPoint.x),
+          y: dataPoint.y
+        }))
+      )(data);
 
       this.chart.series[i].setData(data);
     });
