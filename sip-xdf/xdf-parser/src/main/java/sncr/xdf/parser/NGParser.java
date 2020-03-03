@@ -593,6 +593,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
 
     private int parseMultipleFiles(Path destDir){
+        logger.trace("Parsing " + sourcePath + " files to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
 
         JavaPairRDD<String, String> javaPairRDD = new JavaSparkContext(ctx.sparkSession.sparkContext())
@@ -627,10 +628,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 logger.debug("Output rdd length = " + recCounter.value() + "\n");
                 logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
-                logger.debug("Dest dir for file " + " = " + destDir + "\n");
+                logger.debug("Dest dir for file " + sourcePath + " files = " + destDir + "\n");
 
                 rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
-                logger.debug("************************************** Dest dir for file " + " = " + destDir + "\n");
+                logger.debug("************************************** Dest dir for file " + sourcePath + " files = " + destDir + "\n");
 
 
                 logger.debug("Write dataset status = " + rc);
