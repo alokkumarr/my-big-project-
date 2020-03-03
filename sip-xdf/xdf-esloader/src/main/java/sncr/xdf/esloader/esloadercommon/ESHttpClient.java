@@ -111,7 +111,7 @@ public class ESHttpClient {
       LOGGER.debug("Trying : " + host);
       try {
         String fullUrl = host + url;
-        LOGGER.debug("URL : " + fullUrl);
+        LOGGER.debug("URL :" + fullUrl);
         ClientResource cr = getClientResource(fullUrl);
         cr.head();
         return cr.getStatus().isSuccess();
