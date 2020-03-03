@@ -176,7 +176,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         logger.debug("Tags : Length - " + length  + ", Length After removal - "+ lengthAfterRemoval);
         if(lengthAfterRemoval < length) {
             logger.debug(NO_TAGS + " - exist in tags search values.");
-
+            addQueryCondition(cond, key, values);
 
         }else{
             logger.debug(NO_TAGS + " - not exist in tags search values.");
