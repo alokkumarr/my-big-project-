@@ -15,7 +15,8 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   DATE_TYPES,
   NUMBER_TYPES,
-  SQL_QUERY_KEYWORDS
+  SQL_QUERY_KEYWORDS,
+  QUERY_RUNTIME_IDENTIFIER
 } from '../../../consts';
 import { Artifact, FilterModel, Filter } from '../../types';
 import { ArtifactDSL } from '../../../../../models';
@@ -87,7 +88,7 @@ export class DesignerFilterDialogComponent implements OnInit {
       if (SQL_QUERY_KEYWORDS.indexOf(val.trim().toUpperCase()) > -1) {
         addClass += "<span class='sql-keyword'>" + val + "&nbsp;</span>";
       }
-      else if (val.trim().toUpperCase() === '?') {
+      else if (val.trim().toUpperCase() === QUERY_RUNTIME_IDENTIFIER) {
         addClass += "<span class='runtime-indicator'>" + val + "&nbsp;</span>";
       } else {
         addClass += "<span class='other'>" + val + "&nbsp;</span>";
@@ -280,7 +281,8 @@ export class DesignerFilterDialogComponent implements OnInit {
           this.filters[i].model = {
             "modelValues":[
               event.srcElement.value
-            ]
+            ],
+            'operator': 'EQ'
           }
         }
         break;

@@ -393,7 +393,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.isInQueryMode = this._store.selectSnapshot(
       DesignerState
     ).analysis.designerEdit;
-    this.queryRunTimeFilters = this.filters;
+    this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
     this.initAuxSettings();
 
     this.addDefaultSorts();
@@ -1156,6 +1156,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   changeToQueryModePermanently() {
     this._store.dispatch(new DesignerUpdateEditMode(true));
     this.filters = [];
+
     this.sorts = [];
   }
 
