@@ -1,6 +1,7 @@
 <header class="dialog__header">
   <strong i18n e2e="filter-dialog-header-text">Filter</strong>
 </header>
+
 <div [ngSwitch]="data.analysisType === 'report' && data.analysisReportType === 'query'">
     <div class="query-runtime-filters" *ngSwitchCase="true">
       <div class="dialog__content">
@@ -16,7 +17,7 @@
                   <input
                     matInput
                     matInput
-                    (change)="createFilterRequest($event, i, 'value')"
+                    (keyup)="createFilterRequest($event, i, 'value')"
                     [placeholder]="data.designerPage ? 'Run-Time Filter Value' : filter.displayName"
                   />
                 </mat-form-field>
@@ -35,7 +36,7 @@
                   <mat-form-field>
                     <input
                       matInput
-                      (change)="createFilterRequest($event, i, 'column')"
+                      (keyup)="createFilterRequest($event, i, 'column')"
                       [value]="filter.displayName"
                       placeholder="Run-Time Filter"
                     />
@@ -44,7 +45,7 @@
                   <mat-form-field>
                     <input
                       matInput
-                      (change)="createFilterRequest($event, i, 'description')"
+                      (keyup)="createFilterRequest($event, i, 'description')"
                       [value]="filter.description"
                       placeholder="Run-Time Filter Description"
                     />

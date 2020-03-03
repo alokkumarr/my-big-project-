@@ -56,7 +56,10 @@ export class DesignerFilterDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.queryWithClass = this.loadQueryWithClasses();
+    this.queryWithClass = this.data.analysisType === 'report'
+      && this.data.analysisReportType === 'query'
+        ? this.loadQueryWithClasses()
+        : '';
     this.filters = cloneDeep(this.data.filters);
     forEach(this.filters, filtr => {
       if (filtr.artifactsName) {
