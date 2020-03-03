@@ -554,3 +554,6 @@ export const SQL_QUERY_KEYWORDS = ['SELECT',
 'TRUE',
 'NOT IN'
 ];
+
+export const QUERY_RUNTIME_IDENTIFIER = '?';
+
