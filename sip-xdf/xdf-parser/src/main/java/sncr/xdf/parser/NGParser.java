@@ -577,27 +577,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
-        // Files
-        /*for (FileStatus file : files) {
-            if (file.isFile()) {
-                String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
-
-                int retVal = parseSingleFile(file.getPath(), new Path(tempPath));
-                if (retVal == 0) {
-                    ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
-                } else {
-                    return retVal;
-                }
+            // Files
+            int retVal = parseMultipleFiles(new Path(tempDir));
+            if (retVal == 0) {
+               ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
+            } else {
+               return retVal;
             }
-        }
-        */
-
-          int retVal = parseMultipleFiles(new Path(tempDir));
-          if (retVal == 0) {
-            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
-          } else {
-            return retVal;
-          }
 
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
