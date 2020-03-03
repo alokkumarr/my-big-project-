@@ -97,6 +97,9 @@ public class ExportServiceImpl implements ExportService {
   @Value("${ftp.details.file}")
   private String ftpDetailsFile;
 
+  @Value("${ftp.details.privatekeyDir}")
+  private String privatekeyDir;
+
   @Value("${s3.details.file}")
   private String s3DetailsFile;
 
@@ -1023,6 +1026,13 @@ public class ExportServiceImpl implements ExportService {
         FtpCustomer obj = jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
         for (FTPDetails alias : obj.getFtpList()) {
           if (alias.getCustomerName().equals(finalJobGroup) && aliasTemp.equals(alias.getAlias())) {
+            String privatekeyFile = alias.getPrivatekeyFile();
+
+            String privatekeyPath = null;
+            if (privatekeyFile != null) {
+              privatekeyPath = privatekeyDir + File.separator + privatekeyFile;
+            }
+
             serviceUtils.uploadToFtp(
                 alias.getHost(),
                 alias.getPort(),
@@ -1031,7 +1041,9 @@ public class ExportServiceImpl implements ExportService {
                 fileName,
                 alias.getLocation(),
                 destinationFileName,
-                alias.getType());
+                alias.getType(),
+                privatekeyPath,
+                alias.getPassPhrase());
             logger.debug(
                 "Uploaded to ftp alias: {} : {}",alias.getCustomerName(),alias.getHost());
           }
