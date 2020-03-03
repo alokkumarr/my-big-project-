@@ -8,6 +8,8 @@ import * as orderBy from 'lodash/orderBy';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isEmpty from 'lodash/isEmpty';
 import * as set from 'lodash/set';
+import * as forEach from 'lodash/forEach';
+import * as concat from 'lodash/concat';
 
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
@@ -252,7 +254,10 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   // Get the list of allowable tags for all projects. Added as part of SIP-8963
   getListOfAllowableTags() {
     this.workBench.getAllProjectsAllowableTagList().subscribe(result => {
-      const allowableTags = result[0].allowableTags;
+      let allowableTags = [];
+      forEach(result, res => {
+        allowableTags = concat(allowableTags, res.allowableTags);
+      });
       allowableTags.unshift('No Tags');
       set(this.dsTagFilter, 'data', allowableTags);
       this.searchFilters = [this.dsTypeFilters, this.dsTagFilter];
