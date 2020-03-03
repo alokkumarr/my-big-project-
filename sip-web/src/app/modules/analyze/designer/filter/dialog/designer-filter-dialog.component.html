@@ -24,7 +24,7 @@
 
                 <mat-icon
                   class="info"
-                  *ngIf="!data.designerPage"
+                  *ngIf="!data.designerPage && filter.description.length > 0"
                   fontIcon="icon-info-solid"
                   [matTooltip]="filter.description"
                   matTooltipClass="filter-tooltips"
