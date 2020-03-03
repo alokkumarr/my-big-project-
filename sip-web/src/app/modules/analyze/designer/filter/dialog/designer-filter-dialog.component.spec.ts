@@ -71,7 +71,12 @@ describe('DesignerFilterRowComponent', () => {
   });
 
   it('should add classes to query string so keywords and run time markers can be identified.', () => {
-    const sqlQueryWithClasses = "<span class='sql-keyword'>select&nbsp;</span><span class='other'>integer,&nbsp;</span><span class='other'>string&nbsp;</span><span class='sql-keyword'>from&nbsp;</span><span class='other'>sales&nbsp;</span><span class='sql-keyword'>where&nbsp;</span><span class='other'>integer&nbsp;</span><span class='other'>=&nbsp;</span><span class='runtime-indicator'>?&nbsp;</span><span class='other'>and&nbsp;</span><span class='other'>string&nbsp;</span><span class='other'>=&nbsp;</span><span class='other'>?;&nbsp;</span>"
+    const sqlQueryWithClasses = "<span class='sql-keyword'>select&nbsp;</span><span class='other'>"
+      + "integer,&nbsp;</span><span class='other'>string&nbsp;</span><span class='sql-keyword'>from"
+      + "&nbsp;</span><span class='other'>sales&nbsp;</span><span class='sql-keyword'>where&nbsp;"
+      + "</span><span class='other'>integer&nbsp;</span><span class='other'>=&nbsp;</span><span "
+      + "class='runtime-indicator'>?&nbsp;</span><span class='other'>and&nbsp;</span><span class="
+      + "'other'>string&nbsp;</span><span class='other'>=&nbsp;</span><span class='other'>?;&nbsp;</span>"
     expect(component.loadQueryWithClasses()).toEqual(sqlQueryWithClasses);
   });
 });
