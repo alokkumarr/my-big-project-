@@ -15,6 +15,7 @@ import java.util.Optional;
 import sncr.bda.datasets.conf.DataSetProperties;
 import org.apache.log4j.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Created by srya0001 on 10/30/2017.
@@ -147,7 +148,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
                             addQueryCondition(cond, "system.dstype", values);
                             break;
                         case Tags:
-                            addQueryCondition(cond, "system.tags[]", values);
+                            searchDSWithTags(cond, "system.tags[]", values);
                             break;
                     }
                 }
@@ -165,6 +166,24 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         Document res = table.findById(project + delimiter + datasetName);
         return res.asJsonString();
     }
+
+    public void searchDSWithTags(QueryCondition cond, String key, String[] values) {
+        logger.debug("==> searchDSWithTags()");
+        final String NO_TAGS = "No Tags";
+        int length = values.length;
+        values = ArrayUtils.removeElement(values, NO_TAGS);
+        int lengthAfterRemoval = values.length;
+        logger.debug("Tags : Length - " + length  + ", Length After removal - "+ lengthAfterRemoval);
+        if(lengthAfterRemoval < length) {
+            logger.debug(NO_TAGS + " - exist in tags search values.");
+
+
+        }else{
+            logger.debug(NO_TAGS + " - not exist in tags search values.");
+            addQueryCondition(cond, key, values);
+        }
+    }
+
     private void addQueryCondition(QueryCondition cond, String key, String[] values){
         logger.debug("addQueryCondition() - Key: "+key+" - values: "+ Arrays.toString(values));
         List<String> valuesList = Arrays.stream(values)
