@@ -69,7 +69,7 @@ public class SIPDSLTest {
     groupByFields[1] = "date";
     groupByFields[0] = "string";
 
-    ESResponseParser esResponseParser = new ESResponseParser(aggregationFields);
+    ESResponseParser esResponseParser = new ESResponseParser(aggregationFields, groupByFields);
     List<Object> result = esResponseParser.parseData(jsonNode);
     Assert.assertTrue(result.size() > 0);
   }

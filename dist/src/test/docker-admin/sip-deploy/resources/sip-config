@@ -125,7 +125,7 @@ saw_executor_restart_threshold=50
 # FTP JSON config
 # (Do not split this into multiple lines)
 ## FTP host should be setup in docker instance itself but for timing being we are setting the external FTP enviroment for testing.
-ftp_json_config='{"ftpList":[{"customerName":"SYNCHRONOSS","alias":"ftp_Test","host":"ftp.razorsight.com","port":22,"username":"ftp_saasadmin","password":"RhW4ndePN23","location":"/abc","type":"sftp"}]}'
+ftp_json_config='{"ftpList":[{"customerName":"SYNCHRONOSS","alias":"ftp_Test","host":"ftp.razorsight.com","port":22,"username":"ftp_saasadmin","password":"RhW4ndePN23","location":"/abc","type":"sftp"}, {"customerName":"SYNCHRONOSS","alias":"ftp_sipadmin","host":"sip-admin","port":22,"username":"root", "privatekeyFile": "sipadmin", "passPhrase": "passphrase@123", ""location":"/abc","type":"sftp"}]}'
 
 ## S3 host should be setup in docker instance itself but for timing being we are setting it manually.
 s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "Analysis", "accessKey": "AKIAJ******4AECBVQ", "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz", "type": "s3"}]}'
@@ -142,8 +142,8 @@ saw_s3_export_size=1000000
 ## Chunk size for processing exports
 saw_export_chunk_size=10000
 
-## Alert dashboard URL required to send to mail.
-alert_dashboard_link=http://<hostname>/sip/web/#/alerts/view
+## Hostname required to form Alert dashboard URL.
+hostname=<hostname>
 
 saw_email_host=sip-admin
 
