@@ -96,10 +96,10 @@ class UserManagementPage {
   }
 
   generateRandomString(dataType,length) {
-      var result = '';
-      var characters = dataType;
-      var charactersLength = characters.length;
-      for (var i = 0; i < length; i++) {
+      let result = '';
+      let characters = dataType;
+      let charactersLength = characters.length;
+      for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
       }
       return result;

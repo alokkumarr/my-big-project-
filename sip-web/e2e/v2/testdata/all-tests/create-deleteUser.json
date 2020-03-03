@@ -47,7 +47,7 @@
       },
       "USR03": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -69,7 +69,7 @@
       },
       "USR04": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": " REVIEWER ",
         "user": "masterAdmin",
@@ -91,7 +91,7 @@
       },
       "USR05": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ADMIN",
         "user": "masterAdmin",
@@ -113,7 +113,7 @@
       },
       "USR06": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REVIEWER",
         "user": "masterAdmin",
@@ -135,7 +135,7 @@
       },
       "USR07": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ADMIN",
         "user": "masterAdmin",
@@ -157,7 +157,7 @@
       },
       "USR08": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -179,7 +179,7 @@
       },
       "USR09": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -201,7 +201,7 @@
       },
       "USR10": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -223,7 +223,7 @@
       },
       "USR11": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -245,7 +245,7 @@
       },
       "USR12": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -267,7 +267,7 @@
       },
       "USR13": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -289,7 +289,7 @@
       },
       "USR14": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ADMIN",
         "user": "masterAdmin",
@@ -311,7 +311,7 @@
       },
       "USR15": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REPORT USER",
         "user": "masterAdmin",
@@ -333,7 +333,7 @@
       },
       "USR16": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -355,7 +355,7 @@
       },
       "USR17": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REVIEWER",
         "user": "masterAdmin",
@@ -377,7 +377,7 @@
       },
       "USR18": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -399,7 +399,7 @@
       },
       "USR19": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REVIEWER",
         "user": "masterAdmin",
@@ -421,7 +421,7 @@
       },
       "USR20": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REVIEWER",
         "user": "masterAdmin",
@@ -443,7 +443,7 @@
       },
       "USR21": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ADMIN",
         "user": "masterAdmin",
@@ -489,7 +489,7 @@
       },
       "USR23": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -512,7 +512,7 @@
       },
       "USR24": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": " REVIEWER ",
         "user": "masterAdmin",
@@ -535,7 +535,7 @@
       },
       "USR25": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -557,7 +557,7 @@
       },
       "USR26": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ADMIN",
         "user": "masterAdmin",
@@ -579,7 +579,7 @@
       },
       "USR27": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REPORT USER",
         "user": "masterAdmin",
@@ -601,7 +601,7 @@
       },
       "USR28": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ANALYST",
         "user": "masterAdmin",
@@ -623,7 +623,7 @@
       },
       "USR29": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REVIEWER",
         "user": "masterAdmin",
@@ -645,7 +645,7 @@
       },
       "USR30": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REVIEWER",
         "user": "masterAdmin",
@@ -667,7 +667,7 @@
       },
       "USR31": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "REVIEWER",
         "user": "masterAdmin",
@@ -691,7 +691,7 @@
     "negativeTest": {
       "USR32": {
         "suites": [
-          "critical"
+          "regression"
         ],
         "roleType": "ADMIN",
         "user": "masterAdmin",
@@ -715,7 +715,9 @@
         "description": "masterAdmin Should be able to create Active user by validating email and password fields"
       },
       "USR33": {
-        "suites": ["critical"],
+        "suites": [
+          "regression"
+        ],
         "roleType": "REPORT USER",
         "user": "masterAdmin",
         "firstName": "report",
