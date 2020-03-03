@@ -284,7 +284,6 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', [])));
   }
 
-
   /** GET datasets from the server */
   getCategoryList(): Observable<any> {
     const endpoint = `${
@@ -295,11 +294,19 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', [])));
   }
 
-  /** GET list of allowable tags for DS from the server */
-  getAllowableTagsList(): Observable<any> {
+  /** GET list of allowable tags for workbech DS from the server */
+  getWorkbenchAllowableTagsList(): Observable<any> {
     const endpoint = `${
       this.api
     }/internal/workbench/projects/${userProject}/metadata`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
+  /** GET list of allowable tags for all projects from the server */
+  getAllProjectsAllowableTagList(): Observable<any> {
+    const endpoint = `${this.api}/internal/workbench/projects/all/metadata`;
     return this.http
       .get(endpoint)
       .pipe(catchError(this.handleError('data', [])));

@@ -249,10 +249,11 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
     this.getDatasets();
   }
 
-  // Get the list of allowable tags. Added as part of SIP-8963
+  // Get the list of allowable tags for all projects. Added as part of SIP-8963
   getListOfAllowableTags() {
-    this.workBench.getAllowableTagsList().subscribe(({ allowableTags }) => {
-      // allowableTags.unshift('No tags');
+    this.workBench.getAllProjectsAllowableTagList().subscribe(result => {
+      const allowableTags = result[0].allowableTags;
+      allowableTags.unshift('No Tags');
       set(this.dsTagFilter, 'data', allowableTags);
       this.searchFilters = [this.dsTypeFilters, this.dsTagFilter];
     });

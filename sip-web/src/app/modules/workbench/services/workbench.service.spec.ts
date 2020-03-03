@@ -87,9 +87,15 @@ describe('Workbench Service', () => {
     ).toBeTruthy();
   });
 
-  it('should fetch allowable tags ', () => {
+  it('should fetch allowable tags for workbench module', () => {
     expect(
-      workbenchService.getAllowableTagsList() instanceof Observable
+      workbenchService.getWorkbenchAllowableTagsList() instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('should fetch allowable tags for all projects metadata', () => {
+    expect(
+      workbenchService.getAllProjectsAllowableTagList() instanceof Observable
     ).toBeTruthy();
   });
 });

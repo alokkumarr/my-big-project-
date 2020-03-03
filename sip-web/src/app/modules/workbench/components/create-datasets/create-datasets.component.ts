@@ -220,19 +220,21 @@ export class CreateDatasetsComponent implements OnInit {
    * all the allowable tags are present.
    */
   getListOfAllowableTags() {
-    this.workBench.getAllowableTagsList().subscribe(({ allowableTags }) => {
-      this.allowableTags = allowableTags;
-      this.autoCompleteTagList$ = this.nameFormGroup
-        .get('dsTagCtrl')
-        .valueChanges.pipe(
-          startWith(''),
-          map((tag: string | null) =>
-            tag
-              ? this.filterTag(tag)
-              : difference(this.allowableTags, this.selectedTags)
-          )
-        );
-    });
+    this.workBench
+      .getWorkbenchAllowableTagsList()
+      .subscribe(({ allowableTags }) => {
+        this.allowableTags = allowableTags;
+        this.autoCompleteTagList$ = this.nameFormGroup
+          .get('dsTagCtrl')
+          .valueChanges.pipe(
+            startWith(''),
+            map((tag: string | null) =>
+              tag
+                ? this.filterTag(tag)
+                : difference(this.allowableTags, this.selectedTags)
+            )
+          );
+      });
   }
 
   /**
