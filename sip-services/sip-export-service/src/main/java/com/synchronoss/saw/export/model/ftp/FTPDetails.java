@@ -1,11 +1,5 @@
 package com.synchronoss.saw.export.model.ftp;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public class FTPDetails {
 
     private String customerName;
@@ -14,6 +8,8 @@ public class FTPDetails {
     private int port;
     private String username;
     private String password;
+    private String privatekeyFile;
+    private String passPhrase;
 
     // location is for the destination ftp / sftp "folder"
     // scheduled exports will be dumped at this location.
@@ -84,5 +80,21 @@ public class FTPDetails {
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
+    }
+
+    public String getPrivatekeyFile() {
+        return privatekeyFile;
+    }
+
+    public void setPrivatekeyFile(String privatekeyFile) {
+        this.privatekeyFile = privatekeyFile;
+    }
+
+    public String getPassPhrase() {
+        return passPhrase;
+    }
+
+    public void setPassPhrase(String passPhrase) {
+        this.passPhrase = passPhrase;
     }
 }
