@@ -1140,9 +1140,11 @@ export class ChartService {
     if (field.expression) {
       return field.columnName;
     } else if (field.aggregate) {
-      return `${field.aggregate}@@${field.columnName}`.toLowerCase();
+      return `${field.aggregate}@@${removeKeyword(
+        field.columnName
+      )}`.toLowerCase();
     } else {
-      return field.columnName;
+      return removeKeyword(field.columnName);
     }
   }
 
