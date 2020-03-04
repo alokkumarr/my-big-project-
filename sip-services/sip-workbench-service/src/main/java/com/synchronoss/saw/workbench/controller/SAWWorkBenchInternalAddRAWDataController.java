@@ -31,6 +31,7 @@ import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.DSSearchParams;
+import sncr.bda.conf.ProjectMetadata;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
@@ -354,6 +355,49 @@ public class SAWWorkBenchInternalAddRAWDataController {
     logger.trace("createRGeneratedDataSet ends here : ", returnData.toString());
     return returnData;
   }
+
+    /**
+     *
+     * Retrieve the properties of a given Project id
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "{project}/metadata",
+        method = RequestMethod.GET,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectMetadata getProjectMetadata(
+        @PathVariable(name="project", required = true) String project) {
+        logger.debug("Get the properties of a  project {}", project);
+
+        ProjectMetadata projectMetadata = null;
+        try {
+            projectMetadata = sawWorkbenchService.getProjectMetadata(project);
+        } catch(Exception ex) {
+            logger.error("Error occurred while retriving the dataset properties " + ex);
+        }
+        return projectMetadata;
+    }
+
+    /**
+     *
+     * Retrieve the properties of a given Project id
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "all/metadata",
+        method = RequestMethod.GET,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectMetadata[] getAllProjectsMetadata() {
+        ProjectMetadata[] projectsMetadata = null;
+        try {
+            projectsMetadata = sawWorkbenchService.getAllProjectsMetadata();
+        } catch(Exception ex) {
+            logger.error("Error occurred while retriving the dataset properties " + ex);
+        }
+        return projectsMetadata;
+    }
   
 }
   

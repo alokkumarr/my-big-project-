@@ -7,6 +7,9 @@ import * as get from 'lodash/get';
 import * as orderBy from 'lodash/orderBy';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isEmpty from 'lodash/isEmpty';
+import * as set from 'lodash/set';
+import * as forEach from 'lodash/forEach';
+import * as concat from 'lodash/concat';
 
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
@@ -14,6 +17,7 @@ import { ToastService } from '../../../../common/services/toastMessage.service';
 import { SearchBoxComponent } from '../../../../common/components/search-box';
 
 import { DATASET_CATEGORIES_TYPE } from '../../consts';
+import { DatasetFilters } from '../../models/workbench.interface';
 
 @Component({
   selector: 'data-objects-page',
@@ -37,7 +41,21 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   public timerSubscription;
   public poll = false;
   public interval = 20000;
-  public categoryTypeFilters = cloneDeep(DATASET_CATEGORIES_TYPE);
+  public dsTypeFilters: DatasetFilters = {
+    type: 'string',
+    name: 'dstype',
+    label: 'Filter By Dataset Type',
+    isMultiSelect: false,
+    data: cloneDeep(DATASET_CATEGORIES_TYPE)
+  };
+  public dsTagFilter: DatasetFilters = {
+    type: 'string',
+    name: 'tags',
+    label: 'Filter By Dataset Tags',
+    isMultiSelect: true,
+    data: []
+  };
+  public searchFilters = [];
   public filterList = {};
 
   @ViewChild(SearchBoxComponent, { static: true })
@@ -55,6 +73,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getDatasets();
+    this.getListOfAllowableTags();
   }
 
   ngOnDestroy() {
@@ -230,5 +249,20 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
     this.filterList = event.data;
     this.dsFilterSideNav.close();
     this.getDatasets();
+  }
+
+  // Get the list of allowable tags for all projects. Added as part of SIP-8963
+  getListOfAllowableTags() {
+    this.workBench.getAllProjectsAllowableTagList().subscribe(result => {
+      let allowableTags = [];
+      forEach(result, res => {
+        if( res.allowableTags ){
+          allowableTags = concat(allowableTags, res.allowableTags);
+        }
+      });
+      allowableTags.unshift('No Tags');
+      set(this.dsTagFilter, 'data', allowableTags);
+      this.searchFilters = [this.dsTypeFilters, this.dsTagFilter];
+    });
   }
 }

@@ -1425,6 +1425,27 @@ Example contents (in pretty format):
         "password": "pwd3",
         "location": "/home/ubuntu",
         "type": "ftp"
+    },
+    {
+        "customerName":"UNIQUE_IDENTIFIER3",
+        "alias" : "server1",
+        "host": "server1.customer3.com",
+        "port": 21,
+        "username": "imuser1",
+        "privatekeyFile": "key1.pem",
+        "location": "/home/ubuntu",
+        "type": "sftp"
+    },
+    {
+        "customerName":"UNIQUE_IDENTIFIER4",
+        "alias" : "server1",
+        "host": "server1.customer4.com",
+        "port": 21,
+        "username": "imuser1",
+        "privatekeyFile": "key1.pem",
+        "passPhrase": "Key@123",
+        "location": "/home/ubuntu",
+        "type": "sftp"
     }
   ]
 }
@@ -1437,6 +1458,15 @@ server is required to have unique entry which gets presented to front
 end, this is maintained by means of `alias` entry. *Note* that each
 server entry per customer is required to have a unique alias entry
 which gets presented in front end.
+
+Connection to sftp can be established either using username and password
+combination or username and a private key. All the private keys should be placed
+along side the sip deployment directory under `sftpkeys`. During deployment, all these
+private keys will be placed under `/etc/bda/sftpkeys/` on all the saw nodes with
+permission `664`. In the ftp_details configuration, only private key
+file name needs to be specified using `privatekeyFile`. If the private
+key has an optional pass phrase, that can be specified
+using `passPhrase` parameter.
 
 NOTE: Please make sure to put minified JSON in configuration file.
 
