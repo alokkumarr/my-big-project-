@@ -388,7 +388,6 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     forEach(this.comparisonConfig.series, (series, i) => {
       let data = cloneDeep(series.data);
       data = fpPipe(
-        fpOrderBy(dataPoint => dataPoint.x),
         fpFilter(dataPoint => allCategoryStatus[dataPoint.x]),
         /* In each data row, replace category index with actual names */
         fpMap(dataPoint => ({
