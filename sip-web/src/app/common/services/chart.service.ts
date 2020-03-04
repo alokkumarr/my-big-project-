@@ -1084,9 +1084,27 @@ export class ChartService {
     if (!DATE_TYPES.includes(dateField.type)) {
       return changes;
     }
-    const categories = this.getCategoriesForComparisonChart(
+    let categories = this.getCategoriesForComparisonChart(
       dateField.groupInterval
     );
+
+    const dataCategoryFormat =
+      dateField.groupInterval === 'month' ? 'MMM' : '[Q]Q';
+    const sort = find(opts.sorts, s => s.columnName === dateField.columnName);
+
+    if (sort) {
+      categories = fpOrderBy(
+        [
+          category =>
+            dateField.groupInterval === 'month'
+              ? +moment(category, dataCategoryFormat)
+              : category
+        ],
+        [sort.order],
+        categories
+      );
+    }
+
     changes.push({
       path: 'xAxis.categories',
       data: categories
@@ -1094,8 +1112,6 @@ export class ChartService {
 
     const series = [];
 
-    const dataCategoryFormat =
-      dateField.groupInterval === 'month' ? 'MMM' : '[Q]Q';
     forEach(gridData, row => {
       const momentDate = moment(row[dateField.columnName], 'YYYY-MM');
       const year = `${momentDate.year()}`;
@@ -1115,6 +1131,12 @@ export class ChartService {
         x: categories.indexOf(momentDate.format(dataCategoryFormat)),
         y: row[this.getDataFieldIdentifier(dataField)]
       });
+
+      yearSeries.data = fpOrderBy(
+        [dataRow => dataRow.x],
+        ['asc'],
+        yearSeries.data
+      );
     });
 
     changes.push({

@@ -363,6 +363,9 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
    * @memberof ChartComponent
    */
   onCategoryToggle(event: MatCheckboxChange, index: number) {
+    if (this.chartType !== 'comparison') {
+      return;
+    }
     /* Save the toggle status in category cache first */
     if (!isNil(index) && isArray(this.comparisonConfig.categories)) {
       this.comparisonConfig.categories[index].checked = event.checked;
