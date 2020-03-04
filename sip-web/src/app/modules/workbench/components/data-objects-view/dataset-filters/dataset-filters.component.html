@@ -5,16 +5,25 @@
   fxLayoutAlign="space-around center"
 >
   <mat-card class="mat-elevation-z3" style="width: 80%;">
-    <mat-card-content fxLayout="column" fxLayoutAlign="space-around center">
-      <div>
+    <mat-card-content
+      fxLayout="column"
+      fxLayoutAlign="space-around center"
+      *ngFor="let filter of filterList; trackBy: trackByIndex; let i = index"
+    >
+      <div *ngIf="filter.type === 'string' && filter.data.length > 0">
         <dataset-string-filter
-          (typeFilterChange)="filterChange($event)"
-          [typeFilterList]="categoryType"
+          (filterChange)="filterChange($event)"
+          (filterRemoved)="filterRemoved($event)"
+          [filterList]="filter.data"
+          [label]="filter.name"
+          [filterLabel]="filter.label || 'Filter ' + trackByIndex(i + 1)"
+          [isMultiSelect]="filter.isMultiSelect"
           [resetFilters]="isFilterSelected()"
         >
         </dataset-string-filter>
       </div>
     </mat-card-content>
+
     <mat-card-actions fxLayout="row" fxLayoutGap="12px">
       <button
         fxFlex

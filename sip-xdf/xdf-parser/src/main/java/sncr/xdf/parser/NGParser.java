@@ -967,6 +967,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         NGParser component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
         try {
             long start_time = System.currentTimeMillis();
 
@@ -1000,7 +1001,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark,
             };
-            ComponentConfiguration cfg = NGParser.analyzeAndValidate(configAsStr);
+            cfg = NGParser.analyzeAndValidate(configAsStr);
             ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
@@ -1019,7 +1020,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg), rc, exception);
         System.exit(rc);
     }
     

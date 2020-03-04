@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
@@ -23,6 +24,9 @@ import sncr.xdf.exceptions.XDFException;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import sncr.bda.metastore.ProjectStore;
+import sncr.bda.conf.ProjectMetadata;
 
 
 /**
@@ -31,7 +35,7 @@ import java.util.*;
  *
  */
 public interface WithDataSet {
-	
+
 	static final String SQL_COMPONENT  = "sql";
 
     /**
@@ -395,21 +399,8 @@ public interface WithDataSet {
                 resOutput.put(DataSetProperties.Description.name(), description);
 
                 //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
-                //resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
-                //SIP-9791 Disable Sampling for XDF Pipeline runs as it required for only Workbench
-                resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.NONE);
-
-                //Extract User Information
-                Object userDataObject = output.getUserdata();
-                logger.debug("UserDataobject = " + userDataObject);
-
-                JsonObject userData = null;
-                if (userDataObject != null) {
-                    userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
-                    if (userData != null) {
-                        resOutput.put(DataSetProperties.UserData.name(), userData);
-                    }
-                }
+                resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
+                resOutput.put(DataSetProperties.UserData.name(), getUserDataJsonObject(output.getUserdata()));
 
                 //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>(output.getPartitionKeys());
@@ -434,7 +425,68 @@ public interface WithDataSet {
             return resMap;
         }
 
-        public Input.Dstype getOutputDatasetType() {
+        private JsonObject getUserDataJsonObject(Object userDataObject){
+            logger.debug("UserDataobject = " + userDataObject);
+            JsonObject userData = null;
+            if (userDataObject == null) {
+                userData = new JsonObject();
+            }else {
+                userData = new Gson().toJsonTree((LinkedTreeMap) userDataObject).getAsJsonObject();
+            }
+            addDatasetTags(userData);
+            return userData;
+        }
+
+        private void addDatasetTags(JsonObject userData){
+            logger.debug("addDatasetCategory(): userData : "+ userData);
+            if(userData.has(DataSetProperties.Tags.toString())) {
+                JsonElement tagsElement = userData.get(DataSetProperties.Tags.toString());
+                if (tagsElement != null) {
+                    JsonArray tagsArray = tagsElement.getAsJsonArray();
+                    if (tagsArray != null && tagsArray.size() != 0) {
+                        List<String> tags = new ArrayList<>();
+                        for (JsonElement tagElement : tagsArray) {
+                            String tag = tagElement.getAsString();
+                            if(tag != null && !tag.trim().isEmpty()) {
+                                tags.add(tag.trim());
+                            }
+                        }
+                        if(tags != null && !tags.isEmpty()) {
+                            if(isProjectContainsTags(tags)) {
+                                JsonArray dsTagsArray = new JsonArray();
+                                for(String tag : tags) {
+                                    dsTagsArray.add(new JsonPrimitive(tag));
+                                }
+                                userData.add(DataSetProperties.Tags.name(),dsTagsArray);
+                            }else{
+                                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Dataset Tags - "+ tags + " - configured are not exist in Project Metadata.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private boolean isProjectContainsTags(List<String> tags){
+            try {
+                ProjectStore prjStore = new ProjectStore(this.ctx.xdfDataRootSys);
+                JsonElement prj = prjStore.readProjectData(this.ctx.applicationID);
+                ProjectMetadata projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
+                String[] allowableTags = projectMetadata.getAllowableTags();
+                logger.debug("Project Allowable Tags are : " + Arrays.toString(allowableTags));
+                logger.debug("Dataset Tags are : " + tags);
+                return Arrays.stream(allowableTags)
+                    .filter(aTag -> (aTag != null && !aTag.trim().isEmpty()))
+                    .map(aTag -> aTag.trim().toLowerCase())
+                    .collect(Collectors.toList())
+                    .containsAll(tags.stream()
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toList()));
+            }catch (Exception ex) {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, ex);
+            }
+        }
+
+        private Input.Dstype getOutputDatasetType() {
             String componentName = this.ctx.componentName;
             logger.debug("getOutputDatasetType() : componentName : " + componentName);
             if(componentName != null && !componentName.trim().isEmpty()){
@@ -501,12 +553,7 @@ public interface WithDataSet {
 
                 return res;
             }
-
         }
-
     }
-
-
-
 }
 

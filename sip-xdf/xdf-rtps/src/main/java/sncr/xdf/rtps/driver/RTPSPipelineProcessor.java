@@ -132,6 +132,7 @@ public class RTPSPipelineProcessor {
         NGParser component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
 		try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
@@ -157,7 +158,7 @@ public class RTPSPipelineProcessor {
 			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
 					ComponentServices.TransformationMetadata, ComponentServices.Spark };
 
-			ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+			cfg = analyzeAndValidate(configAsStr);
 			logger.debug("#### After reading config:: Parser "+ cfg.getParser());
 			logger.debug("###### Setting up ngContext services with dataset.....");
 			NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser",
@@ -201,7 +202,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg),rc, exception);
         return rc;
 	}
 
@@ -210,6 +211,7 @@ public class RTPSPipelineProcessor {
         NGTransformerComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration config = null;
 		try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
@@ -237,7 +239,7 @@ public class RTPSPipelineProcessor {
 
 			logger.debug("Starting Transformer component :" + "\n");
 
-			ComponentConfiguration config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
+			config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
 
 			NGContextServices ngTransformerCtxSvc = new NGContextServices(scs, xdfDataRootSys, config, appId,
 					"transformer", batchId);
@@ -277,7 +279,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
 	}
 
@@ -285,6 +287,7 @@ public class RTPSPipelineProcessor {
         NGSQLComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration config = null;
 		try {
 
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -315,7 +318,7 @@ public class RTPSPipelineProcessor {
 
 			logger.debug("Starting SQL component  dataSetName :" + dataSetName + "\n");
 
-			ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
+			config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
 
 			NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId, "sql", batchId);
 			ngSQLCtxSvc.initContext(); // debug
@@ -360,7 +363,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
 	}
 
@@ -368,7 +371,8 @@ public class RTPSPipelineProcessor {
         NGESLoaderComponent component = null;
         int rc= 0;
         Exception exception = null;
-		try {
+        ComponentConfiguration config = null;
+        try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
@@ -395,7 +399,7 @@ public class RTPSPipelineProcessor {
 
 			logger.debug("Starting ESLoader component :" + "\n");
 
-			ComponentConfiguration config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
+			config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
 			NGContextServices ngESCtxSvc = new NGContextServices(escs, xdfDataRootSys, config, appId, "esloader",
 					batchId);
 			ngESCtxSvc.initContext(); // debug
@@ -425,7 +429,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
 	}
 }
