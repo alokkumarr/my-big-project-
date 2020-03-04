@@ -19,7 +19,6 @@ import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
-import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as isEqual from 'lodash/isEqual';
 import * as some from 'lodash/some';
 import * as cloneDeep from 'lodash/cloneDeep';
