@@ -5,7 +5,6 @@ import { Observable, of, SubscriptionLike } from 'rxjs';
 import * as filter from 'lodash/filter';
 
 import { WorkbenchService } from '../../services/workbench.service';
-
 import { mockedData } from './index';
 
 @Component({
@@ -32,6 +31,9 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
   }
 
   getAllStreamAndTopic() {
+    this._workbench.getStreamAndTopicList().subscribe(res => {
+      console.log('stream data');
+    });
     /* this.streamData$ = of([]);
     this.resetTopicAndDataGrid();
     setTimeout(() => {

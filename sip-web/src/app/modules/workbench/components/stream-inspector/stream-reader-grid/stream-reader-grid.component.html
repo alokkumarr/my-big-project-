@@ -3,21 +3,26 @@
     #dsGrid
     fxFlex
     [dataSource]="gridData"
+    [columns]="gridColumns"
+    [customizeColumns]="customizeColumn"
     [rowAlternationEnabled]="true"
-    [height]="'100%'"
-    [width]="'100%'"
     [showBorders]="false"
     [showColumnLines]="false"
     [hoverStateEnabled]="true"
+    [showRowLines]="false"
+    [height]="'100%'"
+    [width]="'100%'"
   >
-    <dxo-selection mode="single"></dxo-selection>
-    <dxi-column caption="Color" dataField="eyeColor"></dxi-column>
-    <dxi-column caption="Balance" dataField="balance"></dxi-column>
-    <dxi-column caption="Age" dataField="age" dataType="integer"></dxi-column>
-    <dxo-scrolling
-      mode="virtual"
-      showScrollbar="always"
-      [useNative]="false"
-    ></dxo-scrolling>
+    <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
+    <dxo-paging [pageSize]="DEFAULT_PAGE_SIZE" [enabled]="true"></dxo-paging>
+    <dxo-pager
+      [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 25, 50]"
+      [showPageSizeSelector]="true"
+      [showNavigationButtons]="true"
+      [showInfo]="enaplePaging"
+      [visible]="enaplePaging"
+    ></dxo-pager>
+    <dxo-selection mode="none"></dxo-selection>
+    <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
   </dx-data-grid>
 </div>

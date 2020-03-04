@@ -312,6 +312,13 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', [])));
   }
 
+  getStreamAndTopicList(): Observable<any> {
+    const endpoint = `${this.api}/stream/inspector/url/goes/here`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.
