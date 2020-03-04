@@ -473,15 +473,24 @@ public interface WithDataSet {
                 JsonElement prj = prjStore.readProjectData(this.ctx.applicationID);
                 ProjectMetadata projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
                 String[] allowableTags = projectMetadata.getAllowableTags();
-                logger.debug("Project Allowable Tags are : " + Arrays.toString(allowableTags));
                 logger.debug("Dataset Tags are : " + tags);
-                return Arrays.stream(allowableTags)
-                    .filter(aTag -> (aTag != null && !aTag.trim().isEmpty()))
-                    .map(aTag -> aTag.trim().toLowerCase())
-                    .collect(Collectors.toList())
-                    .containsAll(tags.stream()
-                        .map(String::toLowerCase)
-                        .collect(Collectors.toList()));
+                if(tags != null && !tags.isEmpty()){
+                    if(allowableTags != null && allowableTags.length != 0){
+                        logger.debug("Project Allowable Tags are : " + Arrays.toString(allowableTags));
+                        return Arrays.stream(allowableTags)
+                            .filter(aTag -> (aTag != null && !aTag.trim().isEmpty()))
+                            .map(aTag -> aTag.trim().toLowerCase())
+                            .collect(Collectors.toList())
+                            .containsAll(tags.stream()
+                                .map(String::toLowerCase)
+                                .collect(Collectors.toList()));
+                    }else{
+                        logger.debug("Project Allowable Tags are : " + allowableTags);
+                        return false;
+                    }
+                }else{
+                    return true;
+                }
             }catch (Exception ex) {
                 throw new XDFException(XDFReturnCode.INTERNAL_ERROR, ex);
             }
