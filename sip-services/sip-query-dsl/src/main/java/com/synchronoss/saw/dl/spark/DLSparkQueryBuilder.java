@@ -1,7 +1,6 @@
 package com.synchronoss.saw.dl.spark;
 
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
@@ -20,7 +19,6 @@ import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,6 +52,7 @@ public class DLSparkQueryBuilder {
   public static final String JOIN = "JOIN";
   public static final String SPACE = " ";
   public static final String ORDER_BY = "ORDER BY";
+  private StringBuilder filterQuery = new StringBuilder();
 
   List<String> groupByColumns = new ArrayList<>();
 
@@ -65,9 +64,11 @@ public class DLSparkQueryBuilder {
     String finalSelect = String.join(", ", selectList);
     select = select.concat(finalSelect);
     select = select.concat(" FROM " + buildFrom(sipQuery));
-    String filter = buildFilter(sipQuery.getFilters());
+//    String filter = buildFilter(sipQuery.getFilters());
+    //TODO: Collect old filters and put it into a List and prepare old query then and BoolCriteria(AND) and append the if sipQuery has new nested structure
+    String filter = buildSipFilters(sipQuery.getFilters().get(0));
     if (filter != null && !StringUtils.isEmpty(filter)) {
-      select = select.concat(" WHERE (").concat(filter).concat(")");
+      select = select.concat(" WHERE ").concat(filter);
     }
     select = select.concat(buildGroupBy());
 
@@ -236,6 +237,53 @@ public class DLSparkQueryBuilder {
       }
     }
     return StringUtils.join(whereFilters, " " + booleanCriteria.value() + " ");
+  }
+
+  /**
+   * Build sql query for Filters.
+   *
+   * @param  {@link List} of {@link Filter}
+   * @return String where clause
+   */
+  private StringBuilder buildFilter(Filter sipFilter) {
+    Filter filter = new Filter();
+    filter.setType(sipFilter.getType());
+    filter.setColumnName(sipFilter.getColumnName());
+    filter.setModel(sipFilter.getModel());
+    filter.setIsRuntimeFilter(sipFilter.getIsRuntimeFilter());
+    filter.setAggregate(sipFilter.getAggregate());
+    filter.setAggregationFilter(sipFilter.getAggregationFilter());
+    filter.setIsOptional(sipFilter.getIsOptional());
+    Model model = filter.getModel();
+    boolean inValidFilter = model == null ? true : model.isEmpty();
+    if (filter.getType() == null) {
+      throw new SipDslProcessingException("Filter Type is missing");
+    } else if (!inValidFilter) {
+      switch (filter.getType()) {
+        case DATE:
+          filterQuery.append(buildDateTimestampFilter(filter));
+          break;
+        case TIMESTAMP:
+          filterQuery.append(buildDateTimestampFilter(filter));
+          break;
+        case DOUBLE:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case FLOAT:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case LONG:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case INTEGER:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case STRING:
+          filterQuery.append(buildStringFilter(filter));
+          break;
+      }
+    }
+    return filterQuery;
   }
 
   /**
@@ -746,6 +794,48 @@ public class DLSparkQueryBuilder {
       dskquery.insert(0, "(").append(")");
     }
     return dskquery.toString();
+  }
+
+  public String buildSipFilters(Filter sipFilter) {
+    boolean flag = true;
+    String booleanCriteria = null;
+    if (sipFilter == null) {
+      return filterQuery.toString();
+    }
+    if (sipFilter.getBooleanCriteria() == null && sipFilter.getFilters() == null) {
+      logger.error("Invalid sipFilter object");
+      return filterQuery.toString();
+    }
+    if (sipFilter.getBooleanCriteria() != null) {
+      booleanCriteria = " " + sipFilter.getBooleanCriteria() + " ";
+    }
+    for (Filter filterAttribute : sipFilter.getFilters()) {
+      if (filterAttribute.getFilters() != null) {
+        String childQuery = buildSipFilters(filterAttribute);
+        if (childQuery != null && !StringUtils.isEmpty(childQuery)) {
+          if (filterQuery != null && filterQuery.length() > 0) {
+            filterQuery.append(booleanCriteria);
+          }
+          filterQuery.append(childQuery);
+          flag = false;
+        }
+      } else {
+//        String columnName = filterAttribute.getFilter().getColumnName();
+//        Model model = filterAttribute.getFilter().getModel();
+        if (!flag) {
+          filterQuery.append(booleanCriteria);
+        }
+//        filterAttribute
+//            .getFilter().setColumnName(
+//            filterAttribute.getFilter().getArtifactsName().concat(".").concat(columnName));
+        filterQuery = buildFilter(filterAttribute);
+        flag = false;
+      }
+    }
+    if (filterQuery.length() != 0) {
+      filterQuery.insert(0, "(").append(")");
+    }
+    return filterQuery.toString();
   }
 
   private static StringBuilder prepareQueryWithCondition(

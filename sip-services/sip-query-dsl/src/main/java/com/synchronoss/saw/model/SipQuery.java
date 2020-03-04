@@ -25,9 +25,6 @@ public class SipQuery {
   @JsonProperty("filters")
   private List<Filter> filters = null;
 
-  @JsonProperty("sipFilter")
-  private SipFilter sipFilter;
-
   @JsonProperty("sorts")
   private List<Sort> sorts = null;
 
@@ -66,16 +63,6 @@ public class SipQuery {
   @JsonProperty("filters")
   public List<Filter> getFilters() {
     return filters;
-  }
-
-  @JsonProperty("sipFilter")
-  public SipFilter getSipFilter() {
-    return sipFilter;
-  }
-
-  @JsonProperty("sipFilter")
-  public void setSipFilter(SipFilter sipFilter) {
-    this.sipFilter = sipFilter;
   }
 
   @JsonProperty("filters")
@@ -139,7 +126,6 @@ public class SipQuery {
         .append("artifacts", artifacts)
         .append("booleanCriteria", booleanCriteria)
         .append("filters", filters)
-        .append("sipFilter",sipFilter)
         .append("sorts", sorts)
         .append("joins", joins)
         .append("store", store)
@@ -153,7 +139,6 @@ public class SipQuery {
         .append(booleanCriteria)
         .append(sorts)
         .append(filters)
-        .append(sipFilter)
         .append(joins)
         .append(artifacts)
         .toHashCode();
@@ -174,7 +159,6 @@ public class SipQuery {
         .append(sorts, rhs.sorts)
         .append(joins, rhs.joins)
         .append(filters, rhs.filters)
-        .append(sipFilter, rhs.sipFilter)
         .append(artifacts, rhs.artifacts)
         .isEquals();
   }

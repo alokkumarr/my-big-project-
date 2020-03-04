@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.synchronoss.bda.sip.dsk.BooleanCriteria;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -49,6 +52,36 @@ public class Filter {
 
   @JsonProperty("model")
   private Model model;
+
+  @JsonProperty("booleanCriteria")
+  @ApiModelProperty(notes = "Conjunction used", name = "booleanCriteria")
+  private BooleanCriteria booleanCriteria;
+
+  @JsonProperty("filters")
+  @ApiModelProperty(
+      notes = "List of attributes on which boolean criteria has to be applied",
+      name = "filters")
+  private List<Filter> filters;
+
+  @JsonProperty("booleanCriteria")
+  public BooleanCriteria getBooleanCriteria() {
+    return booleanCriteria;
+  }
+
+  @JsonProperty("booleanCriteria")
+  public void setBooleanCriteria(BooleanCriteria booleanCriteria) {
+    this.booleanCriteria = booleanCriteria;
+  }
+
+  @JsonProperty("filters")
+  public List<Filter> getFilters() {
+    return filters;
+  }
+
+  @JsonProperty("filters")
+  public void setFilters(List<Filter> filters) {
+    this.filters = filters;
+  }
 
   @JsonProperty("type")
   public Type getType() {
