@@ -1097,10 +1097,7 @@ export class ChartService {
     const dataCategoryFormat =
       dateField.groupInterval === 'month' ? 'MMM' : '[Q]Q';
     forEach(gridData, row => {
-      const momentDate = moment(
-        row[dateField.alias || dateField.columnName],
-        'YYYY-MM'
-      );
+      const momentDate = moment(row[dateField.columnName], 'YYYY-MM');
       const year = `${momentDate.year()}`;
       let yearSeries = series.find(s => s.name === year);
       if (!yearSeries) {
