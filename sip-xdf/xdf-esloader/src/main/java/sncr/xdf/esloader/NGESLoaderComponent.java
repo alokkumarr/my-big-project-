@@ -72,6 +72,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         NGESLoaderComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
         try {
             long start_time = System.currentTimeMillis();
 
@@ -107,7 +108,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             };
 
 
-            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
+            cfg = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
             ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
@@ -128,7 +129,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg),rc, exception);
         System.exit(rc);
     }
 

@@ -7,20 +7,15 @@ import static sncr.bda.base.MetadataStore.delimiter;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import com.google.gson.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.joda.DateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
 import sncr.bda.context.ContextMetadata;
@@ -29,7 +24,6 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.datasets.conf.Dataset;
 import sncr.bda.exceptions.BDAException;
 import sncr.bda.metastore.DataSetStore;
-import java.util.Optional;
 
 
 /**
@@ -172,30 +166,33 @@ public class DLDataSetService {
 
     private JsonObject checkAndUpdateSystemParams(String id, JsonObject oldSystem, JsonObject newSystem) throws Exception {
         boolean status = false;
-
         for (Map.Entry<String, JsonElement> entry : newSystem.entrySet()) {
             String key = entry.getKey();
-
             newSystem.addProperty(DataSetProperties.CreatedTime.toString(), oldSystem.get(DataSetProperties.CreatedTime.toString()).getAsLong());
             newSystem.addProperty(DataSetProperties.ModifiedTime.toString(), oldSystem.get(DataSetProperties.ModifiedTime.toString()).getAsLong());
-
             logger.debug("Key = " + key);
-
-            JsonPrimitive newValue = entry.getValue().getAsJsonPrimitive();
-
-            JsonPrimitive oldValue = oldSystem.getAsJsonPrimitive(key);
-
-            logger.debug("Old value = " + oldValue + ". New value = " + newValue);
-
-            if(oldValue != null && !oldValue.getAsString().equalsIgnoreCase(newValue.getAsString())) {
-                logger.debug("Value updated for " + key);
-
-                oldSystem.add(key, newValue);
-
-                status = true;
+            JsonElement value = entry.getValue();
+            if(value.isJsonArray()){
+                JsonArray oldValue = oldSystem.getAsJsonArray(key);
+                JsonArray newValue = value.getAsJsonArray();
+                logger.debug("Old value = " + oldValue + ". New value = " + newValue);
+                boolean isValueChanged = isValueChanged(oldValue, newValue);
+                if(isValueChanged){
+                    logger.debug("Value updated for " + key);
+                    oldSystem.add(key, newValue);
+                    status = true;
+                }
+            }else{
+                JsonPrimitive newValue = value.getAsJsonPrimitive();
+                JsonPrimitive oldValue = oldSystem.getAsJsonPrimitive(key);
+                logger.debug("Old value = " + oldValue + ". New value = " + newValue);
+                if(oldValue != null && !oldValue.getAsString().equalsIgnoreCase(newValue.getAsString())) {
+                    logger.debug("Value updated for " + key);
+                    oldSystem.add(key, newValue);
+                    status = true;
+                }
             }
         }
-
         if (status) {
             logger.debug("Property values changed");
 
@@ -203,8 +200,26 @@ public class DLDataSetService {
         } else {
             oldSystem = null;
         }
-
         return oldSystem;
+    }
+
+    private boolean isValueChanged(JsonArray oldValue, JsonArray newValue) {
+        boolean isValueChanged = false;
+        if((oldValue == null || oldValue.isJsonNull())
+            && (newValue != null && !newValue.isJsonNull())){
+            isValueChanged = true;
+        }else if( (oldValue != null && !oldValue.isJsonNull())
+            && (newValue == null || newValue.isJsonNull())){
+            isValueChanged = true;
+        }else if((oldValue != null && !oldValue.isJsonNull())
+            && (newValue != null && !newValue.isJsonNull())){
+            List<String> newVals = Arrays.asList(new Gson().fromJson(newValue, String[].class));
+            List<String> oldVals = Arrays.asList(new Gson().fromJson(oldValue, String[].class));
+            if(!new HashSet<String>(oldVals).equals(new HashSet<String>(newVals))){
+                isValueChanged = true;
+            }
+        }
+        return isValueChanged;
     }
 
     /**
@@ -242,6 +257,12 @@ public class DLDataSetService {
                 String modifiedBy = userData.get(DataSetProperties.modifiedBy.name()).getAsString();
                 logger.debug("Modified by " + DataSetProperties.modifiedBy.name() + " " + modifiedBy);
                 dl.add(DataSetProperties.modifiedBy.toString(), new JsonPrimitive(modifiedBy));
+            }
+
+            if (userData.has(DataSetProperties.Tags.name())) {
+                JsonArray tagsArray = userData.get(DataSetProperties.Tags.name()).getAsJsonArray();
+                logger.debug("tags " + DataSetProperties.Tags.name() + " " + tagsArray);
+                dl.add(DataSetProperties.Tags.toString(), tagsArray);
             }
         }
 
