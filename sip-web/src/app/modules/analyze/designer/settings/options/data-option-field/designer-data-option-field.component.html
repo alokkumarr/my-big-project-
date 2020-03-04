@@ -92,15 +92,7 @@
       >
       </designer-date-interval-selector>
     </div>
-    <div
-      *ngIf="
-        !this.supportsDateInterval ||
-        (this.supportsDateInterval &&
-          asPivotColumn(artifactColumn).groupInterval === 'day')
-      "
-      fxLayout="row"
-      fxLayoutAlign="start center"
-    >
+    <div *ngIf="supportsDateFormat" fxLayout="row" fxLayoutAlign="start center">
       <label fxFlex i18n>Format:</label>
       <designer-date-format-selector
         (change)="change.emit($event)"

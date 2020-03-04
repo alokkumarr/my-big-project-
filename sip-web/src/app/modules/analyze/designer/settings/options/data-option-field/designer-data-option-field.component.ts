@@ -62,6 +62,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
   public supportsDateInterval = false;
+  public supportsDateFormat = false;
   public isDataField = false;
   public colorPickerConfig = {};
 
@@ -75,6 +76,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     this.supportsDateInterval =
       DATE_TYPES.includes(type) &&
       (this.analysisType === 'pivot' || this.analysisSubtype === 'comparison');
+
+    this.supportsDateFormat =
+      DATE_TYPES.includes(type) &&
+      this.analysisSubtype !== 'comparison' && // no date formats supported in comparison chart
+      (this.analysisType !== 'pivot' || // all charts
+        this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
+
     this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
     );
