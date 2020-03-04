@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Location } from '@angular/common';
 
 import { Observable, of, SubscriptionLike } from 'rxjs';
 import * as filter from 'lodash/filter';
@@ -17,10 +16,7 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
   public topicData$: Observable<any>;
   public streamTopicData: Array<any> = [];
   private subscriptions: SubscriptionLike[] = [];
-  constructor(
-    private _location: Location,
-    private _workbench: WorkbenchService
-  ) {}
+  constructor(private _workbench: WorkbenchService) {}
 
   ngOnInit() {
     this.streamData$ = of(mockedData);
@@ -69,10 +65,6 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
   resetTopicAndDataGrid() {
     this.streamTopicData = [];
     this.topicData$ = of([]);
-  }
-
-  goBack() {
-    this._location.back();
   }
 
   trackByFn(index) {

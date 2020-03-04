@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
+import * as union from 'lodash/union';
 
 interface StreamGridColumns {
   caption: string;
@@ -42,7 +43,11 @@ export class StreamReaderGridComponent implements OnInit {
   }
 
   setGridColumns() {
-    const cols = keys(this.gridData[0]);
+    let cols = [];
+    forEach(this.gridData, data => {
+      cols = union(cols, keys(data));
+    });
+
     this.enaplePaging =
       this.gridData.length > this.DEFAULT_PAGE_SIZE ? true : false;
     const gridColumn: StreamGridColumns[] = [];
