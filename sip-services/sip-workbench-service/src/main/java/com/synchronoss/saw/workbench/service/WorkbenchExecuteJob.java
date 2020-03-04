@@ -85,7 +85,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     }catch (Exception ex) {
         exception = ex;
     }
-    rc = NGComponentUtil.handleErrors(Optional.ofNullable(aac), rc, exception);
+    rc = NGComponentUtil.handleErrors(Optional.ofNullable(aac),Optional.ofNullable(ngctx.componentConfiguration), rc, exception);
     if (rc != 0) {
           throw new RuntimeException("XDF returned non-zero status: " + rc);
       }

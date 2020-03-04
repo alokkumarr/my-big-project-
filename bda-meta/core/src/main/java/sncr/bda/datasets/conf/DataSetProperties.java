@@ -22,6 +22,7 @@ public enum DataSetProperties {
         MetaCreatedBy("metaCreatedBy"),
         Category("category"),
         SubCategory("subCategory"),
+        Tags("tags"),
         MetaDescription("metaDescription"),
         Mode("mode"),
         createdBy("createdBy"),
