@@ -27,8 +27,7 @@ public class PivotFields {
      * No args constructor for use in serialization
      *
      */
-    public PivotFields() {
-    }
+    public PivotFields() {}
 
     /**
      *
@@ -81,5 +80,4 @@ public class PivotFields {
             .append(aggregateColumn, rhs.aggregateColumn)
             .isEquals();
     }
-
 }
