@@ -778,7 +778,8 @@ export class DesignerState {
       switch (analysis.type) {
         case 'chart':
           const isComparisonChart =
-            (<AnalysisChartDSL>analysis).chartType === 'comparison';
+            (<AnalysisChartDSL>analysis).chartOptions.chartType ===
+            'comparison';
 
           /* Assigns default group interval. For comparison chart, we only
             support a subset of all possible group intervals, so use that */
