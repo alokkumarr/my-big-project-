@@ -18,7 +18,7 @@ export class DesignerDateIntervalSelectorComponent implements OnInit {
 
   ngOnInit() {
     const chartType = this._store.selectSnapshot(
-      state => state.designerState.analysis.chartType
+      state => state.designerState.analysis.chartOptions.chartType
     );
     this.DATE_INTERVALS =
       chartType === 'comparison'

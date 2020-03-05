@@ -21,7 +21,6 @@ import { ChartService } from '../../services';
 import {
   ArtifactColumnReport,
   AnalysisDSL,
-  SqlBuilderChart,
   AnalysisChartDSL,
   isDSLAnalysis,
   ChartOptions
@@ -184,7 +183,8 @@ export class ChartGridComponent {
           momentFormat
         } = this._chartService.getMomentDateFormat(
           columnFormat,
-          (<AnalysisChartDSL>this.analysis).chartType === 'comparison'
+          (<AnalysisChartDSL>this.analysis).chartOptions.chartType ===
+            'comparison'
             ? column.groupInterval
             : null
         );
