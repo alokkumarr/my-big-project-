@@ -1125,16 +1125,35 @@ export class ChartService {
       }
       const formattedData = momentDate.format(dataCategoryFormat);
       categoriesWithData[formattedData] = true;
+
       yearSeries.data.push({
-        x: categories.indexOf(formattedData),
+        x: formattedData,
         y: row[this.getDataFieldIdentifier(dataField)]
       });
+    });
+
+    categories = categories.filter(category => categoriesWithData[category]);
+
+    /* Covert actual string values to category indices inside data.
+      We have to do this in separate forEach, so as to fully configure
+      categories before it */
+    forEach(series, yearSeries => {
+      yearSeries.data = yearSeries.data.map(dataRow => ({
+        x: categories.indexOf(dataRow.x),
+        y: dataRow.y
+      }));
 
       yearSeries.data = fpOrderBy(
         [dataRow => dataRow.x],
         ['asc'],
         yearSeries.data
       );
+    });
+
+    /* Disables negative extrapolation of x-axis if categories are hidden */
+    changes.push({
+      path: 'xAxis.min',
+      data: 0
     });
 
     changes.push({
