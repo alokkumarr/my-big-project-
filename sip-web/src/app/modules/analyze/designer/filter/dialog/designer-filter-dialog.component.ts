@@ -70,6 +70,10 @@ export class DesignerFilterDialogComponent implements OnInit {
       if (filtr.artifactsName) {
         filtr.tableName = filtr.artifactsName;
       }
+
+      if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
+        filtr.model.modelValues = [];
+      }
     });
     this.groupedFilters = groupBy(this.filters, 'tableName');
     forEach(this.artifacts, artifact => {
