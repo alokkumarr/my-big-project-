@@ -858,7 +858,7 @@ export class ChartService {
             return (
               opts.labels.y ||
               (field.expression
-                ? field.dislplayName
+                ? field.displayName
                 : `${
                     AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
                   }(${displayNameWithoutAggregateFor(field)})`)
