@@ -11,11 +11,19 @@ const ChannelActions = require('../../pages/workbench/ChannelActions');
 const LoginPage = require('../../pages/LoginPage');
 const logger = require('../../conf/logger')(__filename);
 const Header = require('../../pages/components/Header');
+let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
 describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
+  let token;
   beforeAll(function() {
     logger.info(`started executing BIS API PULL tests`);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
+    const host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.masterAdmin.loginId,
+      users.masterAdmin.password
+    );
   });
 
   beforeEach(function(done) {
@@ -44,11 +52,16 @@ describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
         logger.warn(`Running testCase with id: ${id}`);
         logger.warn(`Data: ` + JSON.stringify(data));
 
-        data.channelInfo.channelName = `${data.channelInfo.channelName}${Utils.randomId()}`;
+        data.channelInfo.channelName = `${
+          data.channelInfo.channelName
+        }${Utils.randomId()}`;
 
-        data.channelInfo.desc = `${data.channelInfo.channelName} description created at ${Utils.randomId()}`;
+        data.channelInfo.desc = `${
+          data.channelInfo.channelName
+        } description created at ${Utils.randomId()}`;
 
-        data.channelInfo.created = users.admin.firstName + ' ' + users.admin.lastName;
+        data.channelInfo.created =
+          users.admin.firstName + ' ' + users.admin.lastName;
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user);
@@ -65,8 +78,10 @@ describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
         channelActions.clickOnChannelType(data.channelInfo.sourceType);
         channelActions.clickOnChannelNextButton();
 
-        channelActions.fillApiChannleInfo(data.channelInfo);
-        channelActions.testAndVerifyTestConnectivity(data.channelInfo.testConnectivityMessage);
+        channelActions.fillApiChannleInfo(data.channelInfo, false, token);
+        channelActions.testAndVerifyTestConnectivity(
+          data.channelInfo.testConnectivityMessage
+        );
         channelActions.clickOnCreateButton();
         // Verifications
         dataSourcesPage.verifyChannelDetailsInListView(
