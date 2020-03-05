@@ -1066,9 +1066,12 @@ public class ExternalSecurityService {
         if (valid.getValid()) {
           userDetailsResponse.setUser(
               userRepository.getUser(userDetails.getMasterLoginId(), userDetails.getCustomerId()));
-          userDetailsResponse.setValid(true);
+          if (userDetailsResponse.getUser()!=null) {
+              userDetailsResponse.setValid(true);
+              userDetailsResponse.setValidityMessage("User Details updated successfully");
+          }
         } else {
-          logger.debug("Error occurred while getting user details:{}", valid.getError());
+          logger.debug("Error occurred while updating user details:{}", valid.getError());
           userDetailsResponse.setValid(false);
           userDetailsResponse.setValidityMessage(valid.getError());
         }
@@ -1080,6 +1083,11 @@ public class ExternalSecurityService {
       userDetailsResponse.setValidityMessage(message + " Please contact server Administrator");
       userDetailsResponse.setError(e.getMessage());
       return userDetailsResponse;
+    }
+    if (userDetailsResponse.getUser()==null){
+        logger.debug("Unable to update user ");
+        userDetailsResponse.setValid(false);
+        userDetailsResponse.setValidityMessage("Unable to update user");
     }
     return userDetailsResponse;
   }
