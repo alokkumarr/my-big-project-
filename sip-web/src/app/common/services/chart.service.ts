@@ -1108,6 +1108,8 @@ export class ChartService {
     const series = [];
     const categoriesWithData = {};
 
+    let seriesId = 0;
+
     forEach(gridData, row => {
       const momentDate = moment(row[dateField.columnName], 'YYYY-MM');
       const year = `${momentDate.year()}`;
@@ -1116,6 +1118,7 @@ export class ChartService {
         yearSeries = {
           name: year,
           aggregate: dataField.aggregate,
+          color: CHART_COLORS[seriesId++],
           type: dataField.displayType || 'column',
           dataType: dataField.type,
           yAxis: 0,

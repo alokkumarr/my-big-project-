@@ -343,7 +343,7 @@ export class ChartGridComponent {
             val.data -
             (get(<AnalysisChartDSL>this.analysis, 'chartOptions.chartType') ===
             'comparison'
-              ? 24
+              ? 48
               : 0);
         }
       });
