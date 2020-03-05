@@ -293,59 +293,10 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         );
     }
 
-    this.onCategoryToggle(null, null);
+    setTimeout(() => {
+      this.onCategoryToggle(null, null);
+    }, 10);
     this.addExportSize(config);
-
-    // This is causing more problems than it solves. Updating the defaultsDeep
-    // call in ngAfterViewInit callback. Hopefully this isn't needed anymore.
-    // if (!isUndefined(this.config.xAxis)) {
-    //   this.config.xAxis.categories = [];
-    // }
-
-    const pieNegatives = this.pieHasNegatives();
-    if (pieNegatives.all) {
-      // do nothing
-    } else if (pieNegatives.some) {
-      // do nothing
-    }
-  }
-
-  /* Checks if the chart type is pie and whether the series has negative values.
-       This is necessary because pie chart can't display negative values correctly,
-       leading to all sorts of problems if not handled explicitly.
-
-       Returns {all: Boolean, some: Boolean} depending on whether all values in all
-       series are negative or only some of them.
-    */
-  pieHasNegatives() {
-    const result = { all: true, some: false };
-    if (get(this.config, 'chart.type') !== 'pie') {
-      result.all = false;
-      return result;
-    }
-
-    const series = get(this.config, 'series', []) || [];
-
-    forEach(series, pie => {
-      if (!isArray(pie.data)) {
-        return;
-      }
-
-      const positives = fpFilter(slice => slice.y > 0, pie.data);
-
-      if (positives.length === pie.data.length) {
-        result.all = false;
-        result.some = result.some || false;
-      } else if (positives.length === 0) {
-        result.all = result.all && true;
-        result.some = true;
-      } else {
-        result.all = false;
-        result.some = true;
-      }
-    });
-
-    return result;
   }
 
   onExport() {
