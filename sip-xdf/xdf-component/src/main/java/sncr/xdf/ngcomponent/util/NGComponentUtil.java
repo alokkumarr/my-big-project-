@@ -6,14 +6,23 @@ import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.context.XDFReturnCodes;
 import java.util.Optional;
+import sncr.bda.conf.ComponentConfiguration;
 
 public class NGComponentUtil {
 
     private static final Logger logger = Logger.getLogger(NGComponentUtil.class);
 
-    public static int handleErrors(Optional<AbstractComponent> optComponent, int rc, Exception e) {
+    public static int handleErrors(Optional<AbstractComponent> optComponent, Optional<ComponentConfiguration> optCfg, int rc, Exception e) {
         logger.info("handleErrors() : Return Code: " + rc +", Exception : ", e);
-        boolean isErrorHandlingEnabled = isErrorHandlingEnabled(optComponent);
+        AbstractComponent component = null;
+        ComponentConfiguration config = null;
+        if(optComponent.isPresent() &&  optComponent.get() != null){
+            component = optComponent.get();
+            config = component.getNgctx().componentConfiguration;
+        }else if(optCfg.isPresent() &&  optCfg.get() != null){
+            config = optCfg.get();
+        }
+        boolean isErrorHandlingEnabled = isErrorHandlingEnabled(Optional.ofNullable(config));
         logger.info("isErrorHandlingEnabled : "+ isErrorHandlingEnabled);
         if(isErrorHandlingEnabled) {
             try {
@@ -29,8 +38,7 @@ public class NGComponentUtil {
                     } else {
                         rc = XDFReturnCode.INTERNAL_ERROR.getCode();
                     }
-                    if (optComponent.isPresent()) {
-                        AbstractComponent component = optComponent.get();
+                    if (component != null) {
                         component.getErrors().put(rc, description);
                         try {
                             component.finalize(rc);
@@ -60,10 +68,8 @@ public class NGComponentUtil {
         return rc;
     }
 
-    public static boolean isErrorHandlingEnabled(Optional<AbstractComponent> optComponent){
-        if(optComponent.isPresent() && optComponent.get().getNgctx() != null
-            && optComponent.get().getNgctx().componentConfiguration != null
-            && optComponent.get().getNgctx().componentConfiguration.isErrorHandlingEnabled()){
+    public static boolean isErrorHandlingEnabled(Optional<ComponentConfiguration> optCfg){
+        if(optCfg.isPresent() && optCfg.get() != null && optCfg.get().isErrorHandlingEnabled()){
             return true;
         }
         return false;

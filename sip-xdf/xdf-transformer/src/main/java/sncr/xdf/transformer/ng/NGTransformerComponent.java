@@ -277,6 +277,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         NGTransformerComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
         try {
 
             long start_time = System.currentTimeMillis();
@@ -313,7 +314,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     ComponentServices.TransformationMetadata,
                     ComponentServices.Spark
                 };
-            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
+            cfg = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
                 "transformer", batchId);
 
@@ -335,7 +336,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg),rc, exception);
         System.exit(rc);
     }
 }
