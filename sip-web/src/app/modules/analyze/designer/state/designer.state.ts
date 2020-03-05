@@ -1057,7 +1057,7 @@ export class DesignerState {
         'displayName': isEmpty(filters[i]) ? '' : filters[i].displayName,
         'description': isEmpty(filters[i]) ? '' : filters[i].description,
         'model': {
-          'modelValues': isEmpty(filters[i]) ? [] : [filters[i].model.modelValues[0]],
+          'modelValues': isEmpty(filters[i]) ? [] : filters[i].model.modelValues,
           'operator': 'EQ'
         }
 
