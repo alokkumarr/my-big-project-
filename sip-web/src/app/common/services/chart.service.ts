@@ -1105,12 +1105,8 @@ export class ChartService {
       );
     }
 
-    changes.push({
-      path: 'xAxis.categories',
-      data: categories
-    });
-
     const series = [];
+    const categoriesWithData = {};
 
     forEach(gridData, row => {
       const momentDate = moment(row[dateField.columnName], 'YYYY-MM');
@@ -1127,8 +1123,10 @@ export class ChartService {
         };
         series.push(yearSeries);
       }
+      const formattedData = momentDate.format(dataCategoryFormat);
+      categoriesWithData[formattedData] = true;
       yearSeries.data.push({
-        x: categories.indexOf(momentDate.format(dataCategoryFormat)),
+        x: categories.indexOf(formattedData),
         y: row[this.getDataFieldIdentifier(dataField)]
       });
 
@@ -1137,6 +1135,11 @@ export class ChartService {
         ['asc'],
         yearSeries.data
       );
+    });
+
+    changes.push({
+      path: 'xAxis.categories',
+      data: categories.filter(category => categoriesWithData[category])
     });
 
     changes.push({
