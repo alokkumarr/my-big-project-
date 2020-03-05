@@ -88,7 +88,7 @@ RUN systemctl disable mapr-warden mapr-zookeeper
  # file size of Livy, so increase it.
  RUN echo "livy.file.upload.max.size = 500000000" >> $livy_conf
 
- RUN echo 'export CLASSPATH=$(mapr classpath):$(hadoop classpath):$(yarn classpath)' \
+ RUN echo 'export CLASSPATH=$(mapr classpath):$(hadoop classpath):$(yarn classpath):${SPARK_HOME}/jars/*' \
    >> $livy_home/conf/livy-env.sh.template
 # Workaround: The MapR "yarn classpath" command gives an error about
 # the "which" not being found, so install it here
