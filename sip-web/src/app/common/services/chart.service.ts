@@ -1115,6 +1115,7 @@ export class ChartService {
       if (!yearSeries) {
         yearSeries = {
           name: year,
+          aggregate: dataField.aggregate,
           type: dataField.displayType || 'column',
           dataType: dataField.type,
           yAxis: 0,
