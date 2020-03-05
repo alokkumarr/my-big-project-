@@ -73,6 +73,7 @@ describe('Chart Component', () => {
           data: [{ x: 0, y: 123 }]
         }
       ];
+      component.chartType = 'comparison';
       component.comparisonConfig.categories = [{ name: 'Abc', checked: true }];
       component.comparisonConfig.series = series;
 
