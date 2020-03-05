@@ -339,12 +339,7 @@ export class ChartGridComponent {
     if (parentUpdater.length > 0) {
       parentUpdater.forEach(val => {
         if (val.path === 'chart.height') {
-          chartHeight =
-            val.data -
-            (get(<AnalysisChartDSL>this.analysis, 'chartOptions.chartType') ===
-            'comparison'
-              ? 48
-              : 0);
+          chartHeight = val.data;
         }
       });
     }
