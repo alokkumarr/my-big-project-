@@ -62,7 +62,7 @@ spark:
   executor.cores: "2"
   driver.memory: "2G"
   hadoop.yarn.resourcemanager.hostname: "mapr-rd612.eng-sip.dev01.us-west.sncrcloud.net"
-  yarn.jars: "/opt/mapr/spark/spark-2.3.2/jars"
+  yarn.jars: "/opt/mapr/spark/spark-2.4.4/jars"
   yarn.archive: "/opt/bda/sip-executor/spark.zip"
   executor.instances: "1"
   driver.port: 

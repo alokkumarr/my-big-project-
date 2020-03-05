@@ -103,7 +103,7 @@ spark:
   executor.cores: "{{ spark.cores.max | default('2') }}"
   driver.memory: "{{ spark.driver.memory | default('2G') }}"
   hadoop.yarn.resourcemanager.hostname: "{{ saw_spark_yarn_resource_manager | default('sip-mapr') }}"
-  yarn.jars: "{{saw_spark_yarn_jars| default('/opt/mapr/spark/spark-2.3.2/jars') }}" 
+  yarn.jars: "{{saw_spark_yarn_jars| default('/opt/mapr/spark/spark-2.4.4/jars') }}" 
   yarn.archive: "{{saw_spark_yarn_jars| default('/opt/bda/sip-executor/spark.zip') }}"
   executor.instances: "{{ spark.executor.instances | default('1') }}"
   driver.port: 
