@@ -183,7 +183,7 @@ export class ChartGridComponent {
           momentFormat
         } = this._chartService.getMomentDateFormat(
           columnFormat,
-          (<AnalysisChartDSL>this.analysis).chartOptions.chartType ===
+          get(<AnalysisChartDSL>this.analysis, 'chartOptions.chartType') ===
             'comparison'
             ? column.groupInterval
             : null
