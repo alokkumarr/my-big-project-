@@ -108,6 +108,10 @@ export class FilterService {
 
   getCleanedRuntimeFilterValues(analysis) {
     const filters = get(analysis, 'sipQuery.filters');
+    const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
+    if (analysis.type === 'report' && reportType === 'query') {
+      return filters;
+    }
     // due to a bug, the backend sends runtimeFilters, with the values that were last used
     // so we have to delete model from runtime filters
     return fpPipe(

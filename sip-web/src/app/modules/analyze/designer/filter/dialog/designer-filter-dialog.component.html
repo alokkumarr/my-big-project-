@@ -13,13 +13,19 @@
             </mat-card>
             <div class="input-field-filters">
               <div fxLayout="row" *ngFor="let filter of data.filters;let i = index;">
-                <mat-form-field>
-                  <input
-                    matInput
-                    matInput
-                    (keyup)="createFilterRequest($event, i, 'value')"
-                    [placeholder]="data.designerPage ? 'Run-Time Filter Value' : filter.displayName"
-                  />
+                <mat-form-field class="col-12">
+                  <mat-chip-list #chipList>
+                    <mat-chip *ngFor="let opt of modelValueArray[i]" [selectable]="true"
+                              [removable]="true" (removed)="removeOpt(opt, i)">
+                      {{opt}}
+                      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+                    </mat-chip>
+                    <input [placeholder]="data.designerPage ? 'Run-Time Filter Value' : filter.displayName"
+                            [matChipInputFor]="chipList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            [matChipInputAddOnBlur]="true"
+                            (matChipInputTokenEnd)="addOpt($event, i)">
+                  </mat-chip-list>
                 </mat-form-field>
 
                 <mat-icon

@@ -10,6 +10,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as isUndefined from 'lodash/isUndefined';
+import { ENTER } from '@angular/cdk/keycodes';
 
 import {
   CUSTOM_DATE_PRESET_VALUE,
@@ -50,6 +51,8 @@ export class DesignerFilterDialogComponent implements OnInit {
   groupedFilters;
   areFiltersValid = false;
   queryWithClass;
+  readonly separatorKeysCodes: number[] = [ENTER];
+  modelValueArray: string[][] = [];
 
   constructor(
     public dialogRef: MatDialogRef<DesignerFilterDialogData>,
@@ -63,6 +66,7 @@ export class DesignerFilterDialogComponent implements OnInit {
         : '';
     this.filters = cloneDeep(this.data.filters);
     forEach(this.filters, filtr => {
+      this.modelValueArray.push([]);
       if (filtr.artifactsName) {
         filtr.tableName = filtr.artifactsName;
       }
@@ -83,6 +87,10 @@ export class DesignerFilterDialogComponent implements OnInit {
   // to the keywords present in the sql query for better understanding
   // if the query is too long
   loadQueryWithClasses() {
+    // reset filter values
+    forEach(this.filters, filter => {
+      filter.model.modelValues = [];
+    });
     let addClass = '';
     this.data.query.replace(/[\s]+/g, " ").trim().split(" ").forEach(function(val) {
       if (SQL_QUERY_KEYWORDS.indexOf(val.trim().toUpperCase()) > -1) {
@@ -271,25 +279,33 @@ export class DesignerFilterDialogComponent implements OnInit {
       case 'column':
         this.filters[i].displayName = event.srcElement.value;
         break;
-
-      case 'value':
-        if (isEmpty(event.srcElement.value)) {
-          this.filters[i].model = {
-            "modelValues":[]
-          }
-        } else {
-          this.filters[i].model = {
-            "modelValues":[
-              event.srcElement.value
-            ],
-            'operator': 'EQ'
-          }
-        }
-        break;
       case 'description':
         this.filters[i].description = event.srcElement.value;
         break;
     }
+    this.onFiltersChange();
+  }
+
+
+  addOpt(event, index: number): void {
+    const input = event.input;
+    const value = event.value;
+    if ((value || '').trim()) {
+      this.modelValueArray[index].push(value.trim());
+    }
+    if (input) {
+      input.value = '';
+    }
+    this.filters[index].model.modelValues = this.modelValueArray[index];
+    this.onFiltersChange();
+  }
+
+  removeOpt(opt: string, index: number): void {
+    const optIndex = this.modelValueArray[index].indexOf(opt);
+    if (optIndex >= 0) {
+      this.modelValueArray[index].splice(optIndex, 1);
+    }
+    this.filters[index].model.modelValues = this.modelValueArray[index];
     this.onFiltersChange();
   }
 }
