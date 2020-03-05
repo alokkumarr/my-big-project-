@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
+import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -87,14 +88,22 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
 
     if (designerEdit) {
       query = sipQuery.getQuery().concat(" ");
-      List<Object> runTimeFilters = getRunTimeFilters(sipQuery);
-      if (StringUtils.countOccurrencesOf(query,"?") != runTimeFilters.size()) {
+      List<Object> runTimeFilters = new ArrayList<>();
+      if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
+        sipQuery.getFilters().forEach(filter -> {
+          String filterValue = getRunTimeFilters(filter);
+          if (filterValue != null) {
+            runTimeFilters.add(filterValue);
+          }
+        });
+      }
+      if (StringUtils.countOccurrencesOf(query, "?") != runTimeFilters.size()) {
         throw new ResponseStatusException(
             HttpStatus.BAD_REQUEST,
             "Number of wild card filters in query and "
                 + "number of run time filter values doesn't match!!");
       }
-      query = applyRunTimeFilterForQuery(query,runTimeFilters,0);
+      query = applyRunTimeFilterForQuery(query, runTimeFilters, 0);
       queryShownTOUser = query;
       query = dlQueryBuilder.dskForManualQuery(sipQueryFromSemantic, query, dskAttribute);
     } else {
@@ -302,7 +311,6 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   }
 
   /**
-   *
    * @param query
    * @param filters
    * @param count
@@ -312,23 +320,23 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     if (!query.contains("?")) {
       return query;
     }
-    query = query.replaceFirst("\\?",String.format(" \"%s\" ",filters.get(count)));
+    query = query.replaceFirst("\\?", filters.get(count).toString());
     return applyRunTimeFilterForQuery(query, filters, ++count);
   }
 
   /**
-   *
-   * @param sipQuery
+   * @param filter
    * @return
    */
-  public List<Object> getRunTimeFilters(SipQuery sipQuery) {
-    List<Object> runTimeFilters = new ArrayList<>();
-    if (!CollectionUtils.isEmpty(sipQuery.getFilters()))
-    sipQuery.getFilters().forEach(filter -> {
-      if (Boolean.valueOf(filter.getIsRuntimeFilter())) {
-        runTimeFilters.add(filter.getModel().getModelValues().get(0));
-      }
-    });
-    return runTimeFilters;
+  public String getRunTimeFilters(Filter filter) {
+    String runTimeFilter = null;
+    if (filter != null && Boolean.valueOf(filter.getIsRuntimeFilter())) {
+      List<String> filList = new ArrayList<>();
+      filter.getModel().getModelValues().forEach(val -> {
+        filList.add(String.format("'%s'", val));
+      });
+      runTimeFilter = String.join(", ", filList);
+    }
+    return runTimeFilter;
   }
 }

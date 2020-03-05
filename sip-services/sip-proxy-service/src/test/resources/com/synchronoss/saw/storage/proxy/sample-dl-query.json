@@ -24,9 +24,10 @@
         "artifactsName": "SALES",
         "model": {
           "modelValues": [
-            "string 1"
+            "string 1",
+            "string 2"
           ],
-          "operator": "EQ"
+          "operator": "ISIN"
         }
       },
       {
@@ -55,7 +56,7 @@
       "storageType": null
     },
     "semanticId": "workbench::sample-spark",
-    "query": "select integer, string from SALES where string = ? and SALES.integer = ?"
+    "query": "select integer, string from SALES where string IN (?) and SALES.integer = ?"
   },
   "categoryId": "4",
   "metricName": "sample-spark",
