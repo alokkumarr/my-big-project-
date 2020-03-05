@@ -12,11 +12,21 @@ const LoginPage = require('../../pages/LoginPage');
 const logger = require('../../conf/logger')(__filename);
 const Header = require('../../pages/components/Header');
 const RouteActions = require('../../pages/workbench/RouteActions');
+let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
 describe('BIS API PULL tests: APIPullRouteUpdateDelete.test.js', () => {
+  let token;
   beforeAll(function() {
-    logger.info(`started executing BIS API PULL tests APIPullRouteUpdateDelete.test.js`);
+    logger.info(
+      `started executing BIS API PULL tests APIPullRouteUpdateDelete.test.js`
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
+    const host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.masterAdmin.loginId,
+      users.masterAdmin.password
+    );
   });
 
   beforeEach(function(done) {
@@ -33,7 +43,9 @@ describe('BIS API PULL tests: APIPullRouteUpdateDelete.test.js', () => {
   });
 
   afterAll(() => {
-    logger.info(`completed executing BIS API PULL tests APIPullRouteUpdateDelete.test.js`);
+    logger.info(
+      `completed executing BIS API PULL tests APIPullRouteUpdateDelete.test.js`
+    );
   });
 
   using(
@@ -44,11 +56,20 @@ describe('BIS API PULL tests: APIPullRouteUpdateDelete.test.js', () => {
       it(`${id}:${data.description}`, () => {
         logger.warn(`Running testCase with id: ${id}`);
         const time = new Date().getTime();
-        data.channelInfo.channelName = `${data.channelInfo.channelName}${Utils.randomId()}`;
-        data.channelInfo.desc = `${data.channelInfo.channelName} description created at ${Utils.randomId()}`;
-        data.channelInfo.created = users.admin.firstName + ' ' + users.admin.lastName;
-        data.routeInfo.routeName = `${data.routeInfo.routeName}${Utils.randomId()}`;
-        data.routeInfo.desc = `${data.routeInfo.routeName} description ${Utils.randomId()}`;
+        data.channelInfo.channelName = `${
+          data.channelInfo.channelName
+        }${Utils.randomId()}`;
+        data.channelInfo.desc = `${
+          data.channelInfo.channelName
+        } description created at ${Utils.randomId()}`;
+        data.channelInfo.created =
+          users.admin.firstName + ' ' + users.admin.lastName;
+        data.routeInfo.routeName = `${
+          data.routeInfo.routeName
+        }${Utils.randomId()}`;
+        data.routeInfo.desc = `${
+          data.routeInfo.routeName
+        } description ${Utils.randomId()}`;
         data.routeInfo.destination = `/dest${time}`;
 
         const loginPage = new LoginPage();
@@ -66,34 +87,22 @@ describe('BIS API PULL tests: APIPullRouteUpdateDelete.test.js', () => {
         channelActions.clickOnChannelType(data.channelInfo.sourceType);
         channelActions.clickOnChannelNextButton();
 
-        channelActions.fillApiChannleInfo(data.channelInfo);
-        channelActions.testAndVerifyTestConnectivity(data.channelInfo.testConnectivityMessage);
+        channelActions.fillApiChannleInfo(data.channelInfo, false, token);
+        channelActions.testAndVerifyTestConnectivity(
+          data.channelInfo.testConnectivityMessage
+        );
         channelActions.clickOnCreateButton();
         dataSourcesPage.clickOnCreatedChannelName(data.channelInfo.channelName);
         dataSourcesPage.clickOnAddRoute();
         // create route
         const routeActions = new RouteActions();
-        routeActions.fillApiRouteName(data.routeInfo.routeName);
-        routeActions.fillApiRouteDestination(data.routeInfo.destination);
-        channelActions.selectMethodType(data.routeInfo.method);
-        channelActions.fillEndPoint(data.routeInfo.endPoint);
-        if (data.routeInfo.method === 'POST') channelActions.fillRequestBody(JSON.stringify(data.routeInfo.body));
-        if (data.routeInfo.headers) {
-          channelActions.addHeaders(data.routeInfo.headers);
-        }
-        if (data.routeInfo.queryParams) {
-          channelActions.addQueryParams(data.routeInfo.queryParams);
-        }
-        routeActions.fillRouteDescription(data.routeInfo.desc);
-        routeActions.clickOnRouteNextBtn();
-        routeActions.clickOnScheduleTab('Hourly');
-        routeActions.clickOnFrequency('Hour', 0);
-        routeActions.clickOnFrequency('Minute', 2);
+        routeActions.fillRouteInfo(data.routeInfo, false, token);
         // test connectivity
         routeActions.clickOnTestConnectivity();
-        routeActions.verifyTestConnectivityLogs(data.routeInfo.testConnectivityMessage);
+        routeActions.verifyTestConnectivityLogs(
+          data.routeInfo.testConnectivityMessage
+        );
         routeActions.closeTestConnectivity();
-
         routeActions.setScheduleStartDate();
         routeActions.clickOnCreateRouteBtn();
 
@@ -101,33 +110,22 @@ describe('BIS API PULL tests: APIPullRouteUpdateDelete.test.js', () => {
 
         // update the route
         let updatedRouteInfo = Object.assign({}, data.routeInfo);
-        updatedRouteInfo.routeName = `${updatedRouteInfo.routeName}${Utils.randomId()}up`;
-        updatedRouteInfo.desc = `${updatedRouteInfo.routeName} udapted description ${Utils.randomId()}`;
+        updatedRouteInfo.routeName = `${
+          updatedRouteInfo.routeName
+        }${Utils.randomId()}up`;
+        updatedRouteInfo.desc = `${
+          updatedRouteInfo.routeName
+        } udapted description ${Utils.randomId()}`;
         updatedRouteInfo.destination = `/destup${time}`;
 
         dataSourcesPage.clickOnRouteAction(data.routeInfo.routeName);
         dataSourcesPage.clickOnEditRoute(data.routeInfo.routeName);
-        routeActions.fillApiRouteName(updatedRouteInfo.routeName);
-        routeActions.fillApiRouteDestination(updatedRouteInfo.destination);
-        channelActions.selectMethodType(updatedRouteInfo.method);
-        channelActions.fillEndPoint(updatedRouteInfo.endPoint);
-        if (updatedRouteInfo.method === 'POST') channelActions.fillRequestBody(JSON.stringify(updatedRouteInfo.body));
-        if (updatedRouteInfo.headers) {
-          channelActions.clearHeader();
-          channelActions.addHeaders(updatedRouteInfo.headers);
-        }
-        if (updatedRouteInfo.queryParams) {
-          channelActions.clearQueryParams();
-          channelActions.addQueryParams(updatedRouteInfo.queryParams);
-        }
-        routeActions.fillRouteDescription(updatedRouteInfo.desc);
-        routeActions.clickOnRouteNextBtn();
-        routeActions.clickOnScheduleTab('Hourly');
-        routeActions.clickOnFrequency('Hour', 1);
-        routeActions.clickOnFrequency('Minute', 3);
+        routeActions.fillRouteInfo(updatedRouteInfo, true, token);
         // test connectivity
         routeActions.clickOnTestConnectivity();
-        routeActions.verifyTestConnectivityLogs(updatedRouteInfo.testConnectivityMessage);
+        routeActions.verifyTestConnectivityLogs(
+          updatedRouteInfo.testConnectivityMessage
+        );
         routeActions.closeTestConnectivity();
 
         routeActions.setScheduleStartDate();
