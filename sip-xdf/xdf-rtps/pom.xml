@@ -44,7 +44,7 @@
     <spark-streaming-version>2.4.4.0-mapr-630</spark-streaming-version>
 		<scala.version>2.11</scala.version>
 		<mapr.client>6.1.0-mapr</mapr.client>
-		<es.version>6.3.0</es.version>
+		<es.version>7.6.0</es.version>
 		<scala.version.exclude>20_2.11</scala.version.exclude>
 
 		<junit.version>4.11</junit.version>

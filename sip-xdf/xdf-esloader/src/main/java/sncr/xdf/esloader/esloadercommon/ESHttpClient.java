@@ -246,7 +246,12 @@ public class ESHttpClient {
   public int esIndexStructure(String idx, String type, Map<String, String> mapping)
       throws Exception {
     logger.debug("Getting ES index structure");
-    String mappingString = get("/" + idx + "/_mapping/" + type);
+    String mappingString;
+    if (type != null) {
+      mappingString = get("/" + idx + "/_mapping/" + type + "?include_type_name=true");
+    } else {
+      mappingString = get("/" + idx + "/_mapping");
+    }
     JsonObject mappingJson;
     try {
       // Try to parse and access mapping section of ES JSON

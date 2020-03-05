@@ -8,9 +8,7 @@
 FROM sip-base:${project.version}
 
 # Install Elasticsearch
-# ES version should be 7.6 but seems elasticsearch-prometheus-exporter 7.6 is not avalible
-# so 7.5 considered for now
-ENV version=7.5.0
+ENV version=7.6.0
 COPY elasticsearch.repo /etc/yum.repos.d
 RUN rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 RUN yum -y -q install elasticsearch-$version
@@ -22,6 +20,5 @@ RUN echo "discovery.type: single-node" >> /etc/elasticsearch/elasticsearch.yml
 RUN sed -i -e 's/^-Xms2g$/-Xms256m/' -e 's/^-Xmx2g$/-Xmx256m/' \
     /etc/elasticsearch/jvm.options
 RUN systemctl enable elasticsearch
-# Disable the prometheus exporter to make build passing,  seems 6.3.1 version is deprecated ,
-# ToDo : Prometheus exporter Will be enabled as part of Elasticsearch version upgrade 7.x version (SIP-10144)
-#RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://distfiles.compuscene.net/elasticsearch/elasticsearch-prometheus-exporter-$version.0.zip
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b \
+    https://github.com/vvanholl/elasticsearch-prometheus-exporter/releases/download/7.6.0.0/prometheus-exporter-7.6.0.0.zip
