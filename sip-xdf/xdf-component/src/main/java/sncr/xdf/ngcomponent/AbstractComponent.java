@@ -872,7 +872,7 @@ public abstract class AbstractComponent implements WithContext{
         public TransformationService transformationMD;
     }
 
-    public void validateOutputDSCounts(long inputDSCount){
+    public void validateOutputDSCounts(long inputDSCount, boolean isPivotApplied){
         if(ngctx.componentConfiguration.isErrorHandlingEnabled()){
             logger.debug("inputDSCount : " + inputDSCount);
             String outDataSetName = null;
@@ -888,7 +888,7 @@ public abstract class AbstractComponent implements WithContext{
             logger.debug("outputDSCount : " + outputDSCount);
             if(outputDSCount == 0){
                 throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
-            }else if(inputDSCount > outputDSCount){
+            }else if(!isPivotApplied && inputDSCount > outputDSCount){
                 XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
                 errors.put(retCd.getCode(), retCd.getDescription(inputDSCount-outputDSCount));
             }

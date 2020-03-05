@@ -190,7 +190,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     return -1;
                 }
             }
-            validateOutputDSCounts(inputDSCount);
+            validateOutputDSCounts(inputDSCount, false);
         } catch (Exception e) {
             logger.error("Exception in main transformer module: ",e);
             if (e instanceof XDFException) {
