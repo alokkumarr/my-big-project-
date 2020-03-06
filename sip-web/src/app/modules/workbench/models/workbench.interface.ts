@@ -165,3 +165,16 @@ export interface WorkbenchStateModel {
   jobs: Job[];
   jobLogs: JobLog[];
 }
+
+export interface DatasetFilterData {
+  value: string;
+  displayName?: string;
+  label?: string;
+}
+export interface DatasetFilters {
+  type: string;
+  name: string;
+  label: string;
+  isMultiSelect: boolean;
+  data: DatasetFilterData[];
+}

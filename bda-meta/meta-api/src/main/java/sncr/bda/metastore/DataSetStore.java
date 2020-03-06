@@ -6,6 +6,7 @@ import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 import org.ojai.store.QueryCondition;
 import sncr.bda.base.MetadataStore;
+import org.ojai.Value;
 import sncr.bda.base.WithSearchInMetastore;
 import sncr.bda.core.file.HFileOperations;
 
@@ -14,6 +15,8 @@ import java.util.*;
 import java.util.Optional;
 import sncr.bda.datasets.conf.DataSetProperties;
 import org.apache.log4j.Logger;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Created by srya0001 on 10/30/2017.
@@ -124,31 +127,30 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
             for(Map.Entry<DataSetProperties, String[]> entry : searchParams.entrySet()){
                 DataSetProperties searchParam = entry.getKey();
                 String[] values  =  entry.getValue();
+                logger.debug("getListOfDS() : searchParam: "+searchParam+" - values: "+ Arrays.toString(values));
                 if ( values != null && values.length != 0){
-                    for(String value : values){
-                        if(value != null && !value.trim().isEmpty()){
-                            logger.debug("searchParam: "+searchParam+" - value: "+ value);
-                            switch (searchParam) {
-                                case Category:
-                                    cond = addEqOrLikeClause(cond, "userData.category", value.trim());
-                                    break;
-                                case SubCategory:
-                                    if (searchParams.get(DataSetProperties.Category) != null
-                                        && searchParams.get(DataSetProperties.Category).length != 0) {
-                                        cond = addEqOrLikeClause(cond, "userData.subCategory", value.trim());
-                                    }
-                                    break;
-                                case Catalog:
-                                    cond = addEqOrLikeClause(cond, "system.catalog", value.trim());
-                                    break;
-                                case DataSource:
-                                    cond = addEqOrLikeClause(cond, "userData.type", value.trim());
-                                    break;
-                                case Type:
-                                    cond = addEqOrLikeClause(cond, "system.dstype", value.trim());
-                                    break;
+                    switch (searchParam) {
+                        case Category:
+                            addQueryCondition(cond, "userData.category", values);
+                            break;
+                        case SubCategory:
+                            if (searchParams.get(DataSetProperties.Category) != null
+                                && searchParams.get(DataSetProperties.Category).length != 0) {
+                                addQueryCondition(cond, "userData.subCategory", values);
                             }
-                        }
+                            break;
+                        case Catalog:
+                            addQueryCondition(cond, "system.catalog", values);
+                            break;
+                        case DataSource:
+                            addQueryCondition(cond, "userData.type", values);
+                            break;
+                        case Type:
+                            addQueryCondition(cond, "system.dstype", values);
+                            break;
+                        case Tags:
+                            searchDSWithTags(cond, "system.tags[]", values);
+                            break;
                     }
                 }
             }
@@ -166,6 +168,40 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         return res.asJsonString();
     }
 
+    public void searchDSWithTags(QueryCondition cond, String key, String[] values) {
+        logger.debug("==> searchDSWithTags()");
+        final String NO_TAGS = "No Tags";
+        int length = values.length;
+        values = ArrayUtils.removeElement(values, NO_TAGS);
+        int lengthAfterRemoval = values.length;
+        logger.debug("Tags : Length - " + length  + ", Length After removal - "+ lengthAfterRemoval);
+        if(lengthAfterRemoval < length) {
+            logger.debug(NO_TAGS + " - exist in tags search values.");
+            cond.or();
+            cond.notExists(key);
+            cond.typeOf(key, Value.Type.NULL);
+            cond.sizeOf(key, QueryCondition.Op.EQUAL, 0);
+            addQueryCondition(cond, key, values);
+            cond.close();
+        }else{
+            logger.debug(NO_TAGS + " - not exist in tags search values.");
+            addQueryCondition(cond, key, values);
+        }
+    }
+
+    private void addQueryCondition(QueryCondition cond, String key, String[] values){
+        logger.debug("addQueryCondition() - Key: "+key+" - values: "+ Arrays.toString(values));
+        List<String> valuesList = Arrays.stream(values)
+            .filter(value -> (value != null && !value.trim().isEmpty()))
+            .map(value -> value.trim())
+            .collect(Collectors.toList());
+        logger.debug("addQueryCondition() - valuesList: "+ valuesList);
+        if(valuesList.size() == 1) {
+            addEqOrLikeClause(cond, key, valuesList.get(0));
+        }else if(valuesList.size() > 1){
+            addInClause(cond, key, valuesList);
+        }
+    }
     /**
      * Convenient method to start building query conditions
      * It assumes AND conjunction.
@@ -174,14 +210,15 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @param value - search value
      * @return - pre-build QC
      */
-    private QueryCondition addEqOrLikeClause(QueryCondition cond, String key, String value){
-
+    private void addEqOrLikeClause(QueryCondition cond, String key, String value){
+        logger.debug("addEqOrLikeClause() - Key: "+key+" - value: "+ value);
         if (value.indexOf('%') >= 0)
             cond.like(key, value);
         else
             cond.is(key, QueryCondition.Op.EQUAL, value);
-        return cond;
     }
-
-
+    private void addInClause(QueryCondition cond, String key, List<String> values){
+        logger.debug("addInClause() - Key: "+key+" - values: "+ values);
+        cond.in(key, values);
+    }
 }

@@ -541,3 +541,19 @@ export const getFilterDisplayName = (nameMap, filter) => {
       : columnName;
   return filterName + getFilterValue(filter);
 };
+
+export const SQL_QUERY_KEYWORDS = ['SELECT',
+'FROM',
+'WHERE',
+'LIKE',
+'BETWEEN',
+'NOT LIKE',
+'FALSE',
+'NULL',
+'FROM',
+'TRUE',
+'NOT IN'
+];
+
+export const QUERY_RUNTIME_IDENTIFIER = '?';
+
