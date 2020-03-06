@@ -40,7 +40,13 @@ import sncr.xdf.parser.spark.HeaderFilter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.Arrays;
+import java.util.Optional;
 
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
@@ -673,9 +679,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 logger.debug("Output rdd length = " + recCounter.value() + "\n");
                 logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
-                logger.debug("Dest dir for file " + " = " + destDir + "\n");
+                logger.debug("Dest dir for file " + sourcePath + " = " + destDir + "\n");
 
-                logger.debug("************************************** Dest dir for file "+ " = " + destDir + "\n");
+                logger.debug("************************************** Dest dir for file "+ sourcePath + " = " + destDir + "\n");
 
                 filterOutputDS.printSchema();
                 filterOutputDS.show(5);
