@@ -25,7 +25,7 @@ public enum XDFReturnCode {
     FATAL_INPUT_LOC_UNDEF(20, "Input file location is not defined. Please modify configuration file by adding "
         +  "application/inputOutput/dataInputLocation parameter into configuration"),
     FILE_NOT_FOUND(21, "Cannot find file: %s "),
-    INVALID_CONF_FILE(22, "Invalid configuration file"),
+    INVALID_CONF_FILE(22, "Invalid configuration file. %s"),
     INCORRECT_CALL(23, "The component was not called correctly: incorrect set of parameters"),
     INCORRECT_SCD_TYPE(24, "The SCD component does not handle such type of SCD modifications: %s "),
     INCORRECT_LOCATIONS(25, "Location either does not exist or not reachable, details: %s"),

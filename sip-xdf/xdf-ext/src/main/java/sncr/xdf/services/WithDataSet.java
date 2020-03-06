@@ -21,6 +21,7 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import java.util.UUID;
 
 import java.time.Instant;
 import java.util.*;
@@ -472,15 +473,24 @@ public interface WithDataSet {
                 JsonElement prj = prjStore.readProjectData(this.ctx.applicationID);
                 ProjectMetadata projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
                 String[] allowableTags = projectMetadata.getAllowableTags();
-                logger.debug("Project Allowable Tags are : " + Arrays.toString(allowableTags));
                 logger.debug("Dataset Tags are : " + tags);
-                return Arrays.stream(allowableTags)
-                    .filter(aTag -> (aTag != null && !aTag.trim().isEmpty()))
-                    .map(aTag -> aTag.trim().toLowerCase())
-                    .collect(Collectors.toList())
-                    .containsAll(tags.stream()
-                        .map(String::toLowerCase)
-                        .collect(Collectors.toList()));
+                if(tags != null && !tags.isEmpty()){
+                    if(allowableTags != null && allowableTags.length != 0){
+                        logger.debug("Project Allowable Tags are : " + Arrays.toString(allowableTags));
+                        return Arrays.stream(allowableTags)
+                            .filter(aTag -> (aTag != null && !aTag.trim().isEmpty()))
+                            .map(aTag -> aTag.trim().toLowerCase())
+                            .collect(Collectors.toList())
+                            .containsAll(tags.stream()
+                                .map(String::toLowerCase)
+                                .collect(Collectors.toList()));
+                    }else{
+                        logger.debug("Project Allowable Tags are : " + allowableTags);
+                        return false;
+                    }
+                }else{
+                    return true;
+                }
             }catch (Exception ex) {
                 throw new XDFException(XDFReturnCode.INTERNAL_ERROR, ex);
             }
@@ -555,5 +565,26 @@ public interface WithDataSet {
             }
         }
     }
+
+    default String  generateCheckpointLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
+        StringBuilder tempLocationBuilder = new StringBuilder(aux.ctx.xdfDataRootSys);
+
+        tempLocationBuilder.append(Path.SEPARATOR + aux.ctx.applicationID)
+            .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
+            .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
+            .append(Path.SEPARATOR + aux.ctx.batchID)
+            .append(Path.SEPARATOR + aux.ctx.componentName)
+            .append(Path.SEPARATOR + "checkpoint")
+
+            /* Creating a dynamic directory, so that components running is parallel will not
+             * run into conflicts
+             */
+            .append(Path.SEPARATOR + UUID.randomUUID().toString());
+
+        DataSetHelper.logger.debug(String.format("Generated temp location: %s",
+            tempLocationBuilder.toString()));
+        return tempLocationBuilder.toString();
+    }
+
 }
 
