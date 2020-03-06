@@ -11,4 +11,6 @@ export interface Filter {
   columnName: string;
   model?: FilterModel;
   type: string;
+  displayName?: string;
+  description?: string;
 }

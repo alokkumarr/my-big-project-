@@ -59,7 +59,8 @@ import {
   DesignerJoinsArray,
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
-  DesignerCheckAggregateFilterSupport
+  DesignerCheckAggregateFilterSupport,
+  DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -67,7 +68,8 @@ import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
-  CHART_DATE_FORMATS_OBJ
+  CHART_DATE_FORMATS_OBJ,
+  QUERY_RUNTIME_IDENTIFIER
 } from '../../consts';
 import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
@@ -1034,5 +1036,36 @@ export class DesignerState {
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
+  }
+
+  @Action(DesignerUpdateQueryFilters)
+  updateQueryFilters(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { filters } : DesignerUpdateQueryFilters
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const sqlQuery = analysis.sipQuery.query;
+    const runTimeFiltersInQueryCount = sqlQuery.split(QUERY_RUNTIME_IDENTIFIER).length - 1;
+    // const regex = new RegExp(`/[^${QUERY_RUNTIME_IDENTIFIER}]/g`);
+    // const runTimeFiltersInQueryCount = sqlQuery.replace(regex, "");
+    //check if query has runtime filters
+    const runTimeFilters = [];
+    for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
+      runTimeFilters.push({
+        'isRuntimeFilter': true,
+        'displayName': isEmpty(filters[i]) ? '' : filters[i].displayName,
+        'description': isEmpty(filters[i]) ? '' : filters[i].description,
+        'model': {
+          'modelValues': isEmpty(filters[i]) ? [] : filters[i].model.modelValues,
+          'operator': 'EQ'
+        }
+
+      });
+    }
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, filters: runTimeFilters} }
+    });
+
   }
 }
