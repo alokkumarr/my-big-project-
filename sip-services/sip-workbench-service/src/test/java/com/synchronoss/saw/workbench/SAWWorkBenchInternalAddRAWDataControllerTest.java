@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 
 import org.apache.htrace.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -54,6 +56,13 @@ public class SAWWorkBenchInternalAddRAWDataControllerTest {
    * initialization that requires MapR-DB connection */
   @MockBean
   private WorkbenchExecutionService workbenchExecutionService;
+  
+  @MockBean
+  private JavaSparkContext javaSparkContext;
+  
+  
+  @MockBean
+  private SparkConf sparkConf;
   
   @MockBean
   private WorkbenchExecutorQueue executorQueue;
