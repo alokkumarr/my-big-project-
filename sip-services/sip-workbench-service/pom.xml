@@ -26,7 +26,7 @@
 		<wire.mock>2.7.1</wire.mock>
 		<jjwt.version>0.7.0</jjwt.version>
 		<spring.swagger>2.8.0</spring.swagger>
-		<spark.version>2.3.2</spark.version>
+		<spark.version>2.4.4</spark.version>
 		<guava>19.0</guava>
 		<flyway.db>5.2.0</flyway.db>
 		<mariadb>2.3.0</mariadb>
@@ -36,7 +36,8 @@
 		<scala.major.version>2.11</scala.major.version>
 		   <jackson.core.version>2.9.6</jackson.core.version>
 		<mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
-		 <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
+		 <Json4s.latestVersion>3.5.3</Json4s.latestVersion>
+		 <spark.mapr.version>2.4.4.0-mapr-630</spark.mapr.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -220,19 +221,19 @@
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-core_${scala.major.version}</artifactId>
-			<version>2.3.2.0-mapr-1901</version>
+			<version>${spark.mapr.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-sql_${scala.major.version}</artifactId>
-			<version>2.3.2.0-mapr-1901</version>
+			<version>${spark.mapr.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
            		<groupId>org.apache.spark</groupId>
 			<artifactId>spark-yarn_2.11</artifactId>
-			<version>2.3.2.0-mapr-1901</version>
+			<version>${spark.mapr.version}</version>
 			<scope>provided</scope>
 		
 		
@@ -277,7 +278,7 @@
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>1.0.1-mapr-1803</version>
+			<version>1.1.1-mapr-1912</version>
 		</dependency>
 
 		<dependency>
