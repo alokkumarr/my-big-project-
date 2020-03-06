@@ -1,6 +1,6 @@
 <div [ngSwitch]="designerState" style="height: 100%; width: 100%;">
   <filter-chips-u
-    *ngIf="filters.length > 0"
+    *ngIf="filters.length > 0 && !isInQueryMode"
     (remove)="onRemoveFilter($event)"
     (removeAll)="onRemoveFilterAll()"
     [filters]="filters"
