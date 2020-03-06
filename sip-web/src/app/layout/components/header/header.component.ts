@@ -8,6 +8,7 @@ import {
 } from '../../../common/services';
 
 import { split } from 'lodash';
+import * as get from 'lodash/get';
 
 @Component({
   selector: 'layout-header',
@@ -64,5 +65,10 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
     // }
     this.userBGColor = toMaterialStyle(initials);
     return initials;
+  }
+
+  fetchProductName() {
+    const token = this.jwt.getTokenObj()
+    return get(token, 'ticket.products[0].productName')
   }
 }

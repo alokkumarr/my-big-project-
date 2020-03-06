@@ -5,8 +5,8 @@ After=default.target
 [Service]
 User=mapr
 Type=forking
-ExecStart=/opt/mapr/spark/spark-2.3.2/sbin/start-slaves.sh
-ExecStop=/opt/mapr/spark/spark-2.3.2/sbin/stop-slaves.sh
+ExecStart=/opt/mapr/spark/spark-2.4.4/sbin/start-slaves.sh
+ExecStop=/opt/mapr/spark/spark-2.4.4/sbin/stop-slaves.sh
 Restart=always
 
 [Install]

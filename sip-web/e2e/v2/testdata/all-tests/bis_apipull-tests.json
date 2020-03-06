@@ -6,16 +6,19 @@
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
-          "headers": null,
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
-          "status": 1
+          "status": 1,
+          "headers": {
+            "Authorization": "application/json"
+          }
         },
         "description": "Admin should be able to create and delete an api pull channel with GET"
       },
@@ -44,60 +47,39 @@
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
-          "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
+          "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": null,
-          "endPoint": "/posts",
-          "body": null,
-          "status": 1
-        },
-        "description": "Admin should be able to create and delete an api pull channel GET request with headers"
-      },
-      "APCHANNEL004": {
-        "suites": ["regression"],
-        "user": "admin",
-        "channelInfo": {
-          "sourceType": "API",
-          "testConnectivityMessage": "Connection Status = 200",
-          "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
-          "port": "",
-          "method": "GET",
-          "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
         "description": "Admin should be able to create and delete an api pull channel GET request with headers and query params"
       },
-      "APCHANNEL005": {
+      "APCHANNEL004": {
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
           "channelName": "e2e片仮名",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
@@ -105,25 +87,28 @@
       }
     },
     "updateAndDeleteChannel": {
-      "APCHANNEL006": {
+      "APCHANNEL005": {
         "suites": ["critical", "regression"],
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "description": "Admin should be able to update and delete an api pull channel with GET"
       },
-      "APCHANNEL007": {
+      "APCHANNEL006": {
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
@@ -133,7 +118,9 @@
           "hostName": "http://sip-proxy",
           "port": "",
           "method": "POST",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
           "endPoint": "/sip/security/doAuthenticate",
           "body": {
@@ -144,64 +131,64 @@
         },
         "description": "Admin should be able to update and delete an api pull channel with POST"
       },
-      "APCHANNEL008": {
+      "APCHANNEL007": {
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "description": "Admin should be able to update and delete an api pull channel GET request with headers"
       },
-      "APCHANNEL009": {
+      "APCHANNEL008": {
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
         "description": "Admin should be able to update and delete an api pull channel GET request with headers and query params"
       },
-      "APCHANNEL010": {
+      "APCHANNEL009": {
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
           "channelName": "e2e片仮名",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
@@ -209,37 +196,43 @@
       }
     },
     "ActivateDeactivateAndDeleteChannel": {
-      "APCHANNEL011": {
+      "APCHANNEL010": {
         "suites": ["critical", "regression"],
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "description": "Admin should be able to dectivate and delete an api pull channel with GET"
       },
-      "APCHANNEL012": {
+      "APCHANNEL011": {
         "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "auth": true,
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
@@ -252,24 +245,30 @@
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2e route",
+          "auth": true,
           "destination": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -315,29 +314,33 @@
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2e route",
+          "auth": true,
           "destination": "",
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -348,30 +351,30 @@
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2e route",
+          "auth": true,
           "destination": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -383,29 +386,29 @@
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
           "channelName": "e2e片仮名",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2er片仮名",
           "destination": "",
+          "auth": true,
           "method": "GET",
           "headers": {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -414,28 +417,34 @@
     },
     "updateAndDeleteRoute": {
       "APIROUTE006": {
-        "suites": ["critical", "regression"],
+        "suites": ["critical", "regression", "development"],
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2e route",
+          "auth": true,
           "destination": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -481,29 +490,33 @@
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2e route",
           "destination": "",
+          "auth": true,
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -516,28 +529,32 @@
           "sourceType": "API",
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "auth": true,
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2e route",
           "destination": "",
+          "auth": true,
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -549,29 +566,33 @@
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
           "sourceType": "API",
+          "auth": true,
           "channelName": "e2e片仮名",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2er片仮名",
           "destination": "",
+          "auth": true,
           "method": "GET",
           "headers": {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "application/json"
           },
-          "queryParams": { "userId": 1 },
-          "endPoint": "/posts",
+          "queryParams": { "projectId": "workbench" },
+          "endPoint": "/sip/services/internal/semantic/md",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },
@@ -584,24 +605,30 @@
         "user": "admin",
         "channelInfo": {
           "sourceType": "API",
+          "auth": true,
           "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
-          "hostName": "https://jsonplaceholder.typicode.com",
+          "hostName": "http://sip-proxy",
           "port": "",
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "status": 1
         },
         "routeInfo": {
           "routeName": "e2e route",
           "destination": "",
+          "auth": true,
           "method": "GET",
-          "headers": null,
+          "headers": {
+            "Authorization": "application/json"
+          },
           "queryParams": null,
-          "endPoint": "/posts",
+          "endPoint": "/sip/security/auth/admin/v1/users/1",
           "body": null,
           "testConnectivityMessage": "Connection Status = 200"
         },

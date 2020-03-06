@@ -5,12 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.synchronoss.saw.workbench.model.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.synchronoss.saw.workbench.model.DataSet;
-import com.synchronoss.saw.workbench.model.Inspect;
-import com.synchronoss.saw.workbench.model.Project;
-import com.synchronoss.saw.workbench.model.DSSearchParams;
+import sncr.bda.conf.ProjectMetadata;
 
 public interface SAWWorkbenchService {
   
@@ -24,5 +21,6 @@ public interface SAWWorkbenchService {
   public List<DataSet> listOfDataSet(Project project, Optional<DSSearchParams> optionalSearchParams) throws Exception;
   public DataSet getDataSet(String projectId, String datasetId) throws Exception;
   public DataSet createDataSet(DataSet dataSet, String proj) throws Exception;
-
+  public ProjectMetadata getProjectMetadata(String proj) throws Exception;
+  public ProjectMetadata[] getAllProjectsMetadata() throws Exception;
 }
