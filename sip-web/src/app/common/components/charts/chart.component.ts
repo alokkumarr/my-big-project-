@@ -12,10 +12,14 @@ import * as Highcharts from 'highcharts/highcharts';
 import * as Highstock from 'highcharts/highstock';
 // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
 import * as defaultsDeep from 'lodash/defaultsDeep';
-import * as forEach from 'lodash/forEach';
-import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
+import * as isNil from 'lodash/isNil';
+import * as forEach from 'lodash/forEach';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
+import * as fpFilter from 'lodash/fp/filter';
+import * as isEqual from 'lodash/isEqual';
 import * as some from 'lodash/some';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
@@ -27,6 +31,7 @@ import {
   stockChartOptions,
   bulletChartOptions
 } from './default-chart-options';
+import { MatCheckboxChange } from '@angular/material';
 
 export const UPDATE_PATHS = {
   SERIES: 'series.0',
@@ -36,9 +41,7 @@ export const UPDATE_PATHS = {
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'chart',
-  template: `
-    <div style="width: 100%;" #container></div>
-  `
+  templateUrl: './chart.component.html'
 })
 export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
@@ -49,6 +52,13 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('container', { static: true })
   container: ElementRef;
 
+  comparisonConfig: {
+    categories: Array<{ name: string; checked: boolean }>;
+    series: Array<any>;
+  } = {
+    categories: null,
+    series: null
+  };
   /**
    * Cloning all the options to create a new copy per object.
    * Otherwise, any changes to these options will be shared between
@@ -130,7 +140,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.subscription && this.subscription.unsubscribe();
   }
 
   /**
@@ -184,6 +194,46 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
+  /**
+   * Save categories and series for comparison chart. They are used as
+   * caches to support turning on/off data points from inline filters.
+   *
+   * @param {{ path: string; data: any }} updateObj
+   * @memberof ChartComponent
+   */
+  saveComparisonConfig(updateObj: { path: string; data: any }) {
+    if (
+      this.chartType === 'comparison' &&
+      updateObj.path === 'xAxis.categories'
+    ) {
+      /* If categories already exist, and they're same as the new update, no
+      need to change them. This preserves any categories that have been turned off */
+      this.comparisonConfig.categories = isEqual(
+        fpMap(cat => cat.name, this.comparisonConfig.categories),
+        updateObj.data
+      )
+        ? this.comparisonConfig.categories
+        : fpMap(
+            category => ({
+              name: category,
+              checked: true
+            }),
+            updateObj.data
+          );
+
+      set(
+        this.config,
+        updateObj.path,
+        fpPipe(
+          fpFilter(cat => cat.checked),
+          fpMap(cat => cat.name)
+        )(this.comparisonConfig.categories)
+      );
+    } else if (this.chartType === 'comparison' && updateObj.path === 'series') {
+      this.comparisonConfig.series = updateObj.data;
+    }
+  }
+
   reflow() {
     if (this.chart) {
       this.chart.reflow();
@@ -203,6 +253,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     forEach(updates, updateObj => {
       set(this.config, updateObj.path, updateObj.data);
+      this.saveComparisonConfig(updateObj);
     });
 
     // Not using chart.update due to a bug with navigation
@@ -242,64 +293,68 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         );
     }
 
+    setTimeout(() => {
+      this.onCategoryToggle(null, null);
+    }, 10);
     this.addExportSize(config);
-
-    // This is causing more problems than it solves. Updating the defaultsDeep
-    // call in ngAfterViewInit callback. Hopefully this isn't needed anymore.
-    // if (!isUndefined(this.config.xAxis)) {
-    //   this.config.xAxis.categories = [];
-    // }
-
-    const pieNegatives = this.pieHasNegatives();
-    if (pieNegatives.all) {
-      // do nothing
-    } else if (pieNegatives.some) {
-      // do nothing
-    }
-  }
-
-  /* Checks if the chart type is pie and whether the series has negative values.
-       This is necessary because pie chart can't display negative values correctly,
-       leading to all sorts of problems if not handled explicitly.
-
-       Returns {all: Boolean, some: Boolean} depending on whether all values in all
-       series are negative or only some of them.
-    */
-  pieHasNegatives() {
-    const result = { all: true, some: false };
-    if (get(this.config, 'chart.type') !== 'pie') {
-      result.all = false;
-      return result;
-    }
-
-    const series = get(this.config, 'series', []) || [];
-
-    forEach(series, pie => {
-      if (!isArray(pie.data)) {
-        return;
-      }
-
-      const positives = filter(pie.data, slice => slice.y > 0);
-
-      if (positives.length === pie.data.length) {
-        result.all = false;
-        result.some = result.some || false;
-      } else if (positives.length === 0) {
-        result.all = result.all && true;
-        result.some = true;
-      } else {
-        result.all = false;
-        result.some = true;
-      }
-    });
-
-    return result;
   }
 
   onExport() {
     this.chart.exportChartLocal({
       type: 'application/pdf',
       filename: this.config.title.exportFilename || 'chart'
+    });
+  }
+
+  /**
+   * Handles data on chart when user chooses to turn off/on categories
+   *
+   * @param {MatCheckboxChange} event
+   * @param {number} index
+   * @memberof ChartComponent
+   */
+  onCategoryToggle(event: MatCheckboxChange, index: number) {
+    if (this.chartType !== 'comparison') {
+      return;
+    }
+    /* Save the toggle status in category cache first */
+    if (!isNil(index) && isArray(this.comparisonConfig.categories)) {
+      this.comparisonConfig.categories[index].checked = event.checked;
+    }
+
+    /* Map of all categories' status. Looks like [true, false, true]
+     if there are three categories. */
+    const allCategoryStatus = fpMap(
+      category => category.checked,
+      this.comparisonConfig.categories
+    );
+
+    /* Map of all active categories' names. Doesn't include those that
+    user has turned off */
+    const activeCategories = fpPipe(
+      fpFilter(category => category.checked),
+      fpMap(category => category.name)
+    )(this.comparisonConfig.categories);
+
+    this.chart.xAxis[0].setCategories(activeCategories);
+
+    forEach(this.comparisonConfig.series, (series, i) => {
+      let data = cloneDeep(series.data);
+      data = fpPipe(
+        fpFilter(dataPoint => allCategoryStatus[dataPoint.x]),
+        /* In each data row, replace category index with actual names */
+        fpMap(dataPoint => ({
+          x: this.comparisonConfig.categories[dataPoint.x].name,
+          y: dataPoint.y
+        })),
+        /* Then search for new index from active categories and use that index */
+        fpMap(dataPoint => ({
+          x: activeCategories.indexOf(dataPoint.x),
+          y: dataPoint.y
+        }))
+      )(data);
+
+      this.chart.series[i].setData(data);
     });
   }
 }

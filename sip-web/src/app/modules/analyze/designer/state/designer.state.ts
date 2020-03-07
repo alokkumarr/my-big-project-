@@ -73,6 +73,10 @@ import {
 } from '../../consts';
 import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
+import {
+  COMPARISON_CHART_DATE_INTERVALS,
+  COMPARISON_CHART_DATE_INTERVALS_OBJ
+} from 'src/app/common/consts';
 
 // setAutoFreeze(false);
 
@@ -775,10 +779,24 @@ export class DesignerState {
     if (artifactColumn.type === 'date') {
       switch (analysis.type) {
         case 'chart':
-          groupInterval.groupInterval =
-            CHART_DATE_FORMATS_OBJ[
-              artifactColumn.dateFormat || <string>artifactColumn.format
-            ].groupInterval;
+          const isComparisonChart =
+            (<AnalysisChartDSL>analysis).chartOptions.chartType ===
+            'comparison';
+
+          /* Assigns default group interval. For comparison chart, we only
+            support a subset of all possible group intervals, so use that */
+          groupInterval.groupInterval = isComparisonChart
+            ? artifactColumn.groupInterval ||
+              COMPARISON_CHART_DATE_INTERVALS[0].value
+            : CHART_DATE_FORMATS_OBJ[
+                artifactColumn.dateFormat || <string>artifactColumn.format
+              ].groupInterval;
+
+          /* Adds a default date format for comparison chart */
+          artifactColumn.format = isComparisonChart
+            ? COMPARISON_CHART_DATE_INTERVALS_OBJ[groupInterval.groupInterval]
+                .formatForBackEnd
+            : artifactColumn.dateFormat;
           break;
         case 'pivot':
           groupInterval.groupInterval = 'day';
@@ -851,7 +869,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 

@@ -316,6 +316,15 @@ export const ANALYSIS_METHODS = [
             },
             type: 'chart:tsPane',
             typeOnBackEnd: 'chart:tsareaspline'
+          },
+          {
+            label: 'Comparison',
+            icon: {
+              font: 'icon-vert-bar-chart',
+              svg: 'column-chart-col'
+            },
+            type: 'chart:comparison',
+            typeOnBackEnd: 'chart:comparison'
           }
         ]
       },
