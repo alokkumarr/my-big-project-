@@ -38,7 +38,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   public isJoinEligible = false;
   public selectedDPDetails: any = [];
   public dpID = '';
-  public isDateTypeMatched = false;
+  public isDateTypeMatched = true;
 
   constructor(
     public router: Router,
@@ -116,6 +116,9 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
           if (!has(col, 'include')) {
             set(col, 'include', false);
           }
+        });
+        this.isDateTypeMatched = some(this.selectedDPData[0].columns, obj => {
+          return DATE_TYPES.includes(obj.type);
         });
       });
     });
