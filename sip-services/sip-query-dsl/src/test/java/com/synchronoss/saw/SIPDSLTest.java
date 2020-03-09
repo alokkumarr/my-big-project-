@@ -11,8 +11,6 @@ import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.Type;
 import com.synchronoss.saw.model.Filter;
@@ -308,19 +306,45 @@ public class SIPDSLTest {
     model.setValue(Double.valueOf(1));
 
     List<Filter> filterList = sipdsl.getSipQuery().getFilters();
+    Filter oldFilter1 = new Filter();
+    oldFilter1.setArtifactsName("SALES");
+    oldFilter1.setColumnName("integer");
+    oldFilter1.setIsGlobalFilter(false);
+    oldFilter1.setType(Filter.Type.INTEGER);
+    model = new Model();
+    model.setOperator(Operator.GTE);
+    model.setValue((double) 1);
+    oldFilter1.setModel(model);
+    filterList.add(oldFilter1);
+
     Filter filter = new Filter();
-    filter.setArtifactsName("SALES");
-    filter.setColumnName("double");
-    filter.setIsGlobalFilter(false);
-    filter.setType(Filter.Type.DOUBLE);
-    filter.setModel(model);
+    Filter filter1 = new Filter();
+    filter1.setArtifactsName("SALES");
+    filter1.setColumnName("double");
+    filter1.setIsGlobalFilter(false);
+    filter1.setType(Filter.Type.DOUBLE);
+    filter1.setModel(model);
+    filter.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.OR);
+    Filter filter2 = new Filter();
+    filter2.setArtifactsName("SALES");
+    filter2.setColumnName("string");
+    filter2.setIsGlobalFilter(false);
+    filter2.setType(Filter.Type.STRING);
+    model = new Model();
+    model.setOperator(Operator.ISIN);
+    model.setModelValues(Collections.singletonList("string 123"));
+    filter2.setModel(model);
+    List<Filter> filterSubList = new ArrayList<>();
+    filterSubList.add(filter1);
+    filterSubList.add(filter2);
+    filter.setFilters(filterSubList);
     filterList.add(filter);
 
     sipdsl.getSipQuery().setFilters(filterList);
 
     String assertQuerytFilter = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String queryWithFilter =
-        "SELECT SALES.string, SALES.integer FROM SALES WHERE (SALES.double >= 1.0)";
+        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0) AND SALES.double >= 1.0 OR SALES.string IN ('string 123') )";
     Assert.assertEquals(queryWithFilter, assertQuerytFilter);
   }
 
@@ -344,36 +368,48 @@ public class SIPDSLTest {
   public void testDlWithDSK() throws IOException {
     SIPDSL sipdsl = getSipDsl(dlFileName);
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
-    DataSecurityKey dsk = new DataSecurityKey();
-    List<String> values = new ArrayList<>();
-    DataSecurityKeyDef dskDef = new DataSecurityKeyDef();
-    dskDef.setName("SALES.string");
-    values.add("String 1");
-    values.add("str");
-    dskDef.setValues(values);
-    List<DataSecurityKeyDef> dskDefList = new ArrayList<>();
-    dskDefList.add(dskDef);
-    DataSecurityKeyDef dskDef1 = new DataSecurityKeyDef();
-    dskDef1.setName("SALES.string");
-    List<String> values1 = new ArrayList<>();
-    values1.add("String 123");
-    values1.add("string 456");
-    dskDef1.setValues(values1);
-    dskDefList.add(dskDef1);
-    dsk.setDataSecuritykey(dskDefList);
-    String query = dlSparkQueryBuilder.buildDskDataQuery(sipdsl.getSipQuery(), dsk);
-    String assertQuery = "SELECT "
-        + "SALES.string AS `String`, "
-        + "avg(SALES.integer), "
-        + "avg(SALES.long), "
-        + "SALES.date, "
-        + "avg(SALES.double), "
-        + "count(distinct SALES.float) as `distinctCount(float)` "
-        + "FROM SALES "
-        + "INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE (SALES.long = 1000.0 AND "
-        + "SALES.Double = 2000.0) AND SALES.string in ('String 1', 'str') AND "
-        + "SALES.string in ('String 123', 'string 456') GROUP BY SALES.string, SALES.date "
-        + "ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+
+    SipDskAttribute sipDskAttribute = new SipDskAttribute();
+    sipDskAttribute.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.AND);
+
+    SipDskAttribute subAtt = new SipDskAttribute();
+    subAtt.setColumnName("string");
+    subAtt.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.AND);
+    com.synchronoss.bda.sip.dsk.Model model = new com.synchronoss.bda.sip.dsk.Model();
+    model.setOperator(com.synchronoss.bda.sip.dsk.Operator.ISIN);
+    List<String> modelValues = new ArrayList<>();
+    modelValues.add("String 1");
+    modelValues.add("str");
+    model.setValues(modelValues);
+    subAtt.setModel(model);
+    List<SipDskAttribute> dskAttributes = new ArrayList<>();
+    dskAttributes.add(subAtt);
+
+    subAtt = new SipDskAttribute();
+    subAtt.setColumnName("string");
+    subAtt.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.AND);
+    model = new com.synchronoss.bda.sip.dsk.Model();
+    model.setOperator(com.synchronoss.bda.sip.dsk.Operator.ISIN);
+    modelValues = new ArrayList<>();
+    modelValues.add("String 123");
+    modelValues.add("string 456");
+    model.setValues(modelValues);
+    subAtt.setModel(model);
+    dskAttributes.add(subAtt);
+    sipDskAttribute.setBooleanQuery(dskAttributes);
+
+    String query = dlSparkQueryBuilder.buildDskQuery(sipdsl.getSipQuery(), sipDskAttribute);
+    String assertQuery = "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long),"
+        + " SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)`"
+        + " FROM SALES"
+        + " INNER JOIN"
+        + " PRODUCT ON"
+        + " SALES.string = PRODUCT.string_2"
+        + " WHERE (SALES.long = 1000.0 AND SALES.Double = 2000.0) "
+        + " AND  (upper(SALES.string) IN (upper('String 1'), upper('str') )"
+        + " AND upper(SALES.string) IN (upper('String 123'), upper('string 456') ))"
+        + " GROUP BY SALES.string, SALES.date"
+        + " ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(query,assertQuery);
   }
 }
