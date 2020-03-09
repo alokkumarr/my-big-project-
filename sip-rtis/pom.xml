@@ -36,7 +36,6 @@
         <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
         <app.varDir>/var/bda/${app.name}</app.varDir>
 
-        <!--spark-version>1.6.1</spark-version-->
         <!--es-spark-version>5.1.2</es-spark-version-->
         <slf4j.version>1.7.21</slf4j.version>
         <java.version>1.8</java.version>
@@ -50,7 +49,7 @@
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
         <io.netty.version>4.0.42.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
-        <jackson.core.version>2.7.1</jackson.core.version>
+        <jackson.core.version>2.9.8</jackson.core.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

@@ -10,7 +10,7 @@ for i in `ls ${sip_executor_home}/lib/*.jar`; do
 lib_classpath=${lib_classpath}:"${i}"
 done
 
-for j in `ls /opt/mapr/spark/spark-2.3.2/jars/*.jar`; do
+for j in `ls /opt/mapr/spark/spark-2.4.4/jars/*.jar`; do
  lib_classpath=${lib_classpath}:"${j}"
 done
 

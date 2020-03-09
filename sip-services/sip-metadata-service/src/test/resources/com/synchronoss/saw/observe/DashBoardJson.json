@@ -1,29 +1,23 @@
-{
-    "contents": {
-    "observe": [
-    {
-    "entityId": "string",
-    "categoryId": "string",
-    "name": "string",
-    "description": "string",
-    "createdBy": "string",
-    "updatedBy": "string",
-    "createdAt": "string",
-    "updatedAt": "string",
+{"contents": {"observe": [{
+    "entityId": "e40e6294-80b3-412a-a694-c4c506af2ebe::PortalDataSet::1578377726203",
+    "categoryId": "2",
+    "name": "Test3",
+    "description": "",
+    "createdBy": "1",
+    "createdByName": "system sncr admin",
+    "createdAt": "2020-01-07 06:42:44",
+    "updatedBy": "1",
+    "updatedByName": "system sncr admin",
+    "updatedAt": "2020-01-07 06:48:26",
     "options": [],
-    "tiles": [
-    {
-    "type": "analysis",
-    "id": "analysisId - string",
-    "cols": 3,
-    "rows": 4,
-    "x": 5,
-    "y": 6,
-    "options": ""
-    }
-    ],
+    "tiles": [{
+        "type": "analysis",
+        "id": "analysisId - string",
+        "cols": 3,
+        "rows": 4,
+        "x": 5,
+        "y": 6,
+        "options": ""
+    }],
     "filters": []
-    }
-    ]
-    }
-    }
+}]}}

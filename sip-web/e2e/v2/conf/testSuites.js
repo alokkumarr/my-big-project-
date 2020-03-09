@@ -59,7 +59,11 @@ const CRITICAL = [
   'bis/APIPullRouteCreateDelete.test.js',
   'bis/APIPullRouteUpdateDelete.test.js',
   'reports/DLReportQuery.test.js',
-  'pivots/UpdateAndDeletePivot.test.js'
+  'pivots/UpdateAndDeletePivot.test.js',
+  'schedule/createDeleteSchedule.test.js',
+  'alert/addAlert.test.js',
+  'alert/editDeleteAlerts.test.js',
+  'admin/create-user.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];
@@ -67,7 +71,7 @@ const REGRESSION = [...CRITICAL];
 const DEVELOPMENT = [
   //'dummy/dummyDevelopmentTests1.js',
   //'dummy/dummyDevelopmentTests2.js'
-];
+  ];
 
 module.exports = {
   SMOKE: SMOKE.map(path => TEST_BASE_DIR + path),

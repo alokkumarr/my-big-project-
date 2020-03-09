@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
+import * as isNil from 'lodash/isNil';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
 import * as flatMap from 'lodash/flatMap';
@@ -28,6 +29,7 @@ import { Store, Select } from '@ngxs/store';
 import { Observable, Subscription } from 'rxjs';
 import { takeWhile, finalize, map as map$ } from 'rxjs/operators';
 import * as fpFilter from 'lodash/fp/filter';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {
   flattenPivotData,
@@ -100,12 +102,16 @@ import {
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
-  DesignerUpdateAggregateInSorts
+  DesignerUpdateAggregateInSorts,
+  DesignerCheckAggregateFilterSupport,
+  DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
 import { MatDialog } from '@angular/material';
 import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
+import { findDuplicateColumns } from 'src/app/common/components/report-grid/report-grid.component';
+import { FilterService } from '../../services/filter.service';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -126,6 +132,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
   );
+  dslFilters$: Observable<Filter[]> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.sipQuery.filters)
+  );
 
   sipQuery$: Observable<QueryDSL> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery)
@@ -145,6 +154,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
+  public queryRunTimeFilters = [];
   private subscriptions: Subscription[] = [];
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
@@ -159,6 +169,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
     public _analyzeService: AnalyzeService,
+    private filterService: FilterService,
     private dialog: MatDialog,
     private _store: Store,
     private _jwtService: JwtService
@@ -188,23 +199,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           ? this.mapTableWithFields(this.analysis)
           : this.analysis;
         isDSLAnalysis(this.analysis) &&
-          this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
+        this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
         this._store.dispatch(new ConstructDesignerJoins(this.analysis));
         this.initExistingAnalysis();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.layoutConfiguration = this.getLayoutConfiguration(this.analysis);
 
         this._analyzeService
-          .getSemanticObject(this.analysis.semanticId)
-          .toPromise()
-          .then(semanticObj => {
-            this._store.dispatch(
-              new DesignerMergeMetricColumns(semanticObj.artifacts[0].columns)
-            );
-            this._store.dispatch(
-              new DesignerMergeSupportsIntoAnalysis(semanticObj.supports)
-            );
-          });
+        .getSemanticObject(this.analysis.semanticId)
+        .toPromise()
+        .then(semanticObj => {
+          this._store.dispatch(
+            new DesignerMergeMetricColumns(semanticObj.artifacts[0].columns)
+          );
+          this._store.dispatch(
+            new DesignerMergeSupportsIntoAnalysis(semanticObj.supports)
+          );
+        });
 
         if (!isReport) {
           this.requestDataIfPossible();
@@ -220,13 +231,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
           this.layoutConfiguration = this.getLayoutConfiguration(this.analysis);
           this._analyzeService
-            .getSemanticObject(this.analysis.semanticId)
-            .toPromise()
-            .then(semanticObj => {
-              this._store.dispatch(
-                new DesignerMergeSupportsIntoAnalysis(semanticObj.supports)
-              );
-            });
+          .getSemanticObject(this.analysis.semanticId)
+          .toPromise()
+          .then(semanticObj => {
+            this._store.dispatch(
+              new DesignerMergeSupportsIntoAnalysis(semanticObj.supports)
+            );
+          });
           if (!isReport) {
             this.requestDataIfPossible();
           }
@@ -284,8 +295,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   initNewAnalysis() {
     const { type, semanticId, chartType } = this.analysisStarter;
     const artifacts$ = this._analyzeService
-      .getArtifactsForDataSet(semanticId)
-      .toPromise();
+    .getArtifactsForDataSet(semanticId)
+    .toPromise();
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
     return Promise.all([artifacts$, newAnalysis$]).then(
       ([metric, newAnalysis]) => {
@@ -308,15 +319,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           ...this.analysisStarter
         };
         isDSLAnalysis(this.analysis) &&
-          this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
+        this._store.dispatch(new DesignerInitNewAnalysis(this.analysis));
 
         if (!isDSLAnalysis(this.analysis)) {
           this.analysis.edit = this.analysis.edit || false;
           this.analysis.supports = this.analysisStarter.supports;
           !this.analysis.sqlBuilder &&
-            (this.analysis.sqlBuilder = {
-              joins: []
-            });
+          (this.analysis.sqlBuilder = {
+            joins: []
+          });
         } else if (this.analysis.type === 'chart') {
           this._store.dispatch(
             new DesignerUpdateAnalysisSubType(this.analysisStarter.chartType)
@@ -382,7 +393,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.isInQueryMode = this._store.selectSnapshot(
       DesignerState
     ).analysis.designerEdit;
-
+    this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
     this.initAuxSettings();
 
     this.addDefaultSorts();
@@ -503,10 +514,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     if ((this.analysisStarter || this.analysis).type !== 'chart') {
       return;
     }
-
+    const fields = get(
+      <AnalysisDSL>this.analysis,
+      'sipQuery.artifacts[0].fields'
+    );
     const dimensionGroupFields = fpFilter(({ area }) => {
       return area !== 'y';
-    })((<AnalysisDSL>this.analysis).sipQuery.artifacts[0].fields);
+    })(fields);
     forEach(dimensionGroupFields, node => {
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
@@ -522,7 +536,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       });
     });
     isDSLAnalysis(this.analysis) &&
-      this._store.dispatch(new DesignerUpdateSorts(this.sorts));
+    this._store.dispatch(new DesignerUpdateSorts(this.sorts));
   }
 
   addDefaultSorts() {
@@ -551,31 +565,30 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const analysis = this.analysis;
     this.analysis = null;
     return this._designerService
-      .createAnalysis(semanticId, type)
-      .then((newAnalysis: Analysis | AnalysisDSL) => {
-        this.analysis = {
-          ...omit(analysis, 'category'),
-          id: newAnalysis.id,
-          ...(isDSLAnalysis(newAnalysis)
-            ? {
-                id: newAnalysis.id,
-                semanticId: newAnalysis.semanticId,
-                createdTime: newAnalysis.createdTime,
-                createdBy: newAnalysis.createdBy,
-                userId: newAnalysis.userId,
-                parentAnalysisId: analysis.id
-              }
-            : {
-                metric: newAnalysis.metric,
-                createdTimestamp: newAnalysis.createdTimestamp,
-                userId: newAnalysis.userId,
-                userFullName: newAnalysis.userFullName,
-                metricName: newAnalysis.metricName
-              })
-        };
-        isDSLAnalysis(this.analysis) &&
-          this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
-      });
+    .createAnalysis(semanticId, type)
+    .then((newAnalysis: Analysis | AnalysisDSL) => {
+      this.analysis = {
+        ...omit(analysis, 'category'),
+        id: newAnalysis.id,
+        ...(isDSLAnalysis(newAnalysis)
+          ? {
+            id: newAnalysis.id,
+            semanticId: newAnalysis.semanticId,
+            createdTime: newAnalysis.createdTime,
+            createdBy: newAnalysis.createdBy,
+            userId: newAnalysis.userId
+          }
+          : {
+            metric: newAnalysis.metric,
+            createdTimestamp: newAnalysis.createdTimestamp,
+            userId: newAnalysis.userId,
+            userFullName: newAnalysis.userFullName,
+            metricName: newAnalysis.metricName
+          })
+      };
+      isDSLAnalysis(this.analysis) &&
+      this._store.dispatch(new DesignerInitForkAnalysis(this.analysis));
+    });
   }
 
   loadGridWithoutData(column, type) {
@@ -654,14 +667,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       if (isDSLAnalysis(this.analysis)) {
         this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
         const subscription = this._store
-          .select(DesignerState.canRequestData)
-          .pipe(
-            takeWhile(canRequestData => !canRequestData),
-            finalize(() => {
-              this.requestData();
-            })
-          )
-          .subscribe();
+        .select(DesignerState.canRequestData)
+        .pipe(
+          takeWhile(canRequestData => !canRequestData),
+          finalize(() => {
+            this.requestData();
+          })
+        )
+        .subscribe();
         this.subscriptions.push(subscription);
       } else {
         this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
@@ -731,7 +744,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             response.data,
             this.analysis.type,
             (<AnalysisDSL>this.analysis).sipQuery ||
-              (<Analysis>this.analysis).sqlBuilder
+            (<Analysis>this.analysis).sqlBuilder
           )
         ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
@@ -772,47 +785,46 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   onToolbarAction(action: DesignerToolbarAciton) {
+    const analysis = this._store.selectSnapshot(DesignerState.analysis);
     switch (action) {
       case 'sort':
         // TODO update sorts for multiple artifacts
         this._analyzeDialogService
-          .openSortDialog(
-            this._store.selectSnapshot(DesignerState.analysis).sipQuery.sorts,
-            this._store.selectSnapshot(DesignerState.analysis).sipQuery
-              .artifacts
-          )
-          .afterClosed()
-          .subscribe((result: IToolbarActionResult) => {
-            if (result) {
-              this._store.dispatch(new DesignerUpdateSorts(result.sorts));
-              this.sorts = result.sorts;
-              this.onSettingsChange({ subject: 'sort' });
-            }
-          });
+        .openSortDialog(analysis.sipQuery.sorts, analysis.sipQuery.artifacts)
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
+          if (result) {
+            this._store.dispatch(new DesignerUpdateSorts(result.sorts));
+            this.sorts = result.sorts;
+            this.onSettingsChange({ subject: 'sort' });
+          }
+        });
         break;
       case 'filter':
         const supportsGlobalFilters = GLOBAL_FILTER_SUPPORTED.includes(
           (this.analysis || this.analysisStarter).type
         );
         this._analyzeDialogService
-          .openFilterDialog(
-            this.filters,
-            this.artifacts,
-            this.booleanCriteria,
-            supportsGlobalFilters
-          )
-          .afterClosed()
-          .subscribe((result: IToolbarActionResult) => {
-            if (result) {
-              this._store.dispatch(new DesignerUpdateFilters(result.filters));
-              this.filters = this.generateDSLDateFilters(result.filters);
-              this._store.dispatch(
-                new DesignerUpdatebooleanCriteria(result.booleanCriteria)
-              );
-              this.booleanCriteria = result.booleanCriteria;
-              this.onSettingsChange({ subject: 'filter' });
-            }
-          });
+        .openFilterDialog(
+          this._store.selectSnapshot(DesignerState.analysisFilters),
+          this.artifacts,
+          this.booleanCriteria,
+          analysis.type,
+          supportsGlobalFilters,
+          this.filterService.supportsAggregatedFilters(analysis)
+        )
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
+          if (result) {
+            this._store.dispatch(new DesignerUpdateFilters(result.filters));
+            this.filters = this.generateDSLDateFilters(result.filters);
+            this._store.dispatch(
+              new DesignerUpdatebooleanCriteria(result.booleanCriteria)
+            );
+            this.booleanCriteria = result.booleanCriteria;
+            this.onSettingsChange({ subject: 'filter' });
+          }
+        });
         break;
       case 'preview':
         const analysisForPreview = isDSLAnalysis(this.analysis)
@@ -824,13 +836,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'description':
         this._analyzeDialogService
-          .openDescriptionDialog(this.analysis.description)
-          .afterClosed()
-          .subscribe((result: IToolbarActionResult) => {
-            if (result) {
-              this.analysis.description = result.description;
-            }
-          });
+        .openDescriptionDialog(this.analysis.description)
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
+          if (result) {
+            this.analysis.description = result.description;
+          }
+        });
         break;
       case 'save':
         this.openSaveDialogIfNeeded().then((result: IToolbarActionResult) => {
@@ -841,8 +853,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
               analysis:
                 result.analysis.type === 'report'
                   ? this._designerService.generateReportPayload(
-                      cloneDeep(result.analysis)
-                    )
+                  cloneDeep(result.analysis)
+                  )
                   : result.analysis
             });
 
@@ -868,14 +880,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         .designerEdit;
       if (this.isInQueryMode && !designerEdit) {
         this._analyzeDialogService
-          .openQueryConfirmationDialog()
-          .afterClosed()
-          .subscribe(result => {
-            if (result) {
-              this.changeToQueryModePermanently();
-              resolve(this.openSaveDialog());
-            }
-          });
+        .openQueryConfirmationDialog()
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.changeToQueryModePermanently();
+            resolve(this.openSaveDialog());
+          }
+        });
       } else {
         resolve(this.openSaveDialog());
       }
@@ -903,12 +915,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       : this.analysis;
 
     return this._analyzeDialogService
-      .openSaveDialog(
-        <Analysis | AnalysisDSL>analysisForSave,
-        this.designerMode
-      )
-      .afterClosed()
-      .toPromise();
+    .openSaveDialog(
+      <Analysis | AnalysisDSL>analysisForSave,
+      this.designerMode
+    )
+    .afterClosed()
+    .toPromise();
   }
 
   toggleDesignerQueryModes() {
@@ -1018,7 +1030,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this._store.dispatch(new DesignerAddArtifactColumn(event.column));
           this.loadGridWithoutData(event.column, 'add');
         } else {
-          this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
+          this._store.dispatch([
+            new DesignerRemoveArtifactColumn(event.column),
+            new DesignerCheckAggregateFilterSupport()
+          ]);
           this.loadGridWithoutData(event.column, 'remove');
         }
         this.cleanSorts();
@@ -1026,13 +1041,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.areMinRequirmentsMet = this.canRequestData();
         break;
       case 'aggregate':
-        this._store.dispatch(
+        this._store.dispatch([
           new DesignerUpdateArtifactColumn({
             columnName: event.column.columnName,
             table: event.column.table || event.column['tableName'],
             aggregate: event.column.aggregate
-          })
-        );
+          }),
+          new DesignerCheckAggregateFilterSupport()
+        ]);
         forEach(this.analysis.artifacts, artifactcolumns => {
           forEach(artifactcolumns.columns, col => {
             if (col.name === event.column.name) {
@@ -1042,9 +1058,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
         if (!isEmpty(this.data)) {
           const rowKeys = keys(this.data[0]);
+          const columnIdentifier =
+            this.analysis.type === 'report'
+              ? event.column.alias || event.column.name
+              : event.column.name;
           this.data.map(row => {
-            const key = find(rowKeys, k => includes(k, event.column.name));
-            if (row[key]) {
+            const key = find(rowKeys, k => includes(k, columnIdentifier));
+            if (!isNil(row[key])) {
               row[key] = '';
             }
           });
@@ -1074,8 +1094,21 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'submitQuery':
         this.changeToQueryModePermanently();
-        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
-        this.requestDataIfPossible();
+        this._store.dispatch(new DesignerUpdateQueryFilters(this.queryRunTimeFilters));
+        const analysis = this._store.selectSnapshot(state => state.designerState.analysis);
+        this.filterService.getRuntimeFilterValuesIfAvailable(analysis, 'preview', true).then(
+          model => {
+            if (isUndefined(model)) {
+              this.areMinRequirmentsMet = false;
+            } else {
+              this._store.dispatch(new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters')));
+              this.queryRunTimeFilters = get(model, 'sipQuery.filters');
+              this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+              this.areMinRequirmentsMet = this.canRequestData();
+              this.requestDataIfPossible();
+            }
+          }
+        )
         break;
       case 'filter':
       case 'sort':
@@ -1113,6 +1146,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.analysis.sqlBuilder = { ...this.analysis.sqlBuilder };
         }
         this.artifacts = [...this.artifacts];
+
+        this.areMinRequirmentsMet = this.canRequestData();
         break;
       case 'artifactPosition':
     }
@@ -1121,6 +1156,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   changeToQueryModePermanently() {
     this._store.dispatch(new DesignerUpdateEditMode(true));
     this.filters = [];
+
     this.sorts = [];
   }
 
@@ -1212,10 +1248,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'labelOptions':
         isDSLAnalysis(this.analysis)
           ? this._store.dispatch(
-              new DesignerUpdateAnalysisChartLabelOptions(
-                event.data.labelOptions
-              )
-            )
+          new DesignerUpdateAnalysisChartLabelOptions(
+            event.data.labelOptions
+          )
+          )
           : ((<any>this.analysis).labelOptions = event.data.labelOptions);
         this.auxSettings = { ...this.auxSettings, ...event.data };
         this.refreshDataObject();
@@ -1226,8 +1262,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
         isDSLAnalysis(this.analysis)
           ? this._store.dispatch(
-              new DesignerUpdateAnalysisChartLegend(event.data.legend)
-            )
+          new DesignerUpdateAnalysisChartLegend(event.data.legend)
+          )
           : ((<any>this.analysis).legend = event.data.legend);
         this.auxSettings = { ...this.auxSettings, ...event.data };
         this.artifacts = [...this.artifacts];
@@ -1238,8 +1274,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
         isDSLAnalysis(this.analysis)
           ? this._store.dispatch(
-              new DesignerUpdateAnalysisChartInversion(event.data.isInverted)
-            )
+          new DesignerUpdateAnalysisChartInversion(event.data.isInverted)
+          )
           : ((<any>this.analysis).isInverted = event.data.isInverted);
         this.auxSettings = { ...this.auxSettings, ...event.data };
         this.artifacts = [...this.artifacts];
@@ -1250,8 +1286,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
         isDSLAnalysis(this.analysis)
           ? this._store.dispatch(
-              new DesignerUpdateAnalysisChartTitle(event.data.title)
-            )
+          new DesignerUpdateAnalysisChartTitle(event.data.title)
+          )
           : ((<AnalysisChart>this.analysis).chartTitle = event.data.title);
         this.auxSettings = { ...this.auxSettings, ...event.data };
         this.artifacts = [...this.artifacts];
@@ -1405,6 +1441,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         ];
         return every(requestCondition, Boolean);
       case 'report':
+        const duplicateColumns = findDuplicateColumns(
+          this._store.selectSnapshot(
+            state => state.designerState.analysis.sipQuery.artifacts
+          )
+        );
+        if (Object.keys(duplicateColumns).length > 0) {
+          return false;
+        }
+        return this.canRequestReport(this.analysis.artifacts);
       case 'esReport':
         return this.canRequestReport(this.analysis.artifacts);
     }

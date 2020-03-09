@@ -1,5 +1,4 @@
 import { Component, Input, ViewChild, OnInit } from '@angular/core';
-
 import { SidenavMenuService } from './sidenav-menu.service';
 
 @Component({
@@ -11,7 +10,8 @@ export class SidenavComponent implements OnInit {
   @Input() menu: any;
   @Input() id: any;
 
-  constructor(public _sidenav: SidenavMenuService) {}
+  constructor(
+    public _sidenav: SidenavMenuService) {}
   @ViewChild('sidenav', { static: true }) public sidenav;
 
   public unregister: any;

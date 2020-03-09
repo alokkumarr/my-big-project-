@@ -80,4 +80,22 @@ describe('Workbench Service', () => {
       workbenchService.updateSemanticDetails({}) instanceof Observable
     ).toBeTruthy();
   });
+
+  it('getdataset with filters should exist and return an Observable', () => {
+    expect(
+      workbenchService.getFilteredDatasets({}) instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('should fetch allowable tags for workbench module', () => {
+    expect(
+      workbenchService.getWorkbenchAllowableTagsList() instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('should fetch allowable tags for all projects metadata', () => {
+    expect(
+      workbenchService.getAllProjectsAllowableTagList() instanceof Observable
+    ).toBeTruthy();
+  });
 });

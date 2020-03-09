@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import * as find from 'lodash/find';
-import * as first from 'lodash/first';
+import * as flatMap from 'lodash/flatMap';
 
 import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../common/services';
@@ -46,6 +45,14 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
       });
   }
 
+  get publishableSubCategories(): any[] {
+    if (!this.categories) {
+      return [];
+    }
+
+    return flatMap(this.categories, category => category.children);
+  }
+
   checkPublishableCategoriesPresent() {
     let publishableCategoriesCount = 0;
     this.categories.forEach(
@@ -59,20 +66,20 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
   }
 
   get categoryId() {
-    return this.data.analysis.category;
+    return (this.data.analysis.category || '').toString();
   }
 
   setDefaultCategory() {
     const analysis = this.data.analysis;
-    const categoryId = analysis.category;
-    if (!categoryId) {
-      const defaultCategory = find(
-        this.categories,
-        category => category.children.length > 0
-      );
+    const categoryId = analysis.category.toString();
+    const publishableCategoryIds = this.publishableSubCategories.map(subcat =>
+      subcat.id.toString()
+    );
+    if (!categoryId || !publishableCategoryIds.includes(categoryId)) {
+      const defaultCategory = publishableCategoryIds[0];
 
       if (defaultCategory) {
-        analysis.category = first(defaultCategory.children).id;
+        analysis.category = defaultCategory;
       }
     }
   }

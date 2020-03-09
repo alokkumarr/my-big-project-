@@ -49,6 +49,9 @@ public class NSSOProperties {
   @Value("${user.maxUnsuccessfulLoginAttemptAllowed}")
   private int maxInvalidPwdLimit;
 
+  @Value("${id3.base.url}")
+  private String id3BaseUrl;
+
   public String getRefreshTokenValidityMins() {
     return refreshTokenValidityMins;
   }
@@ -87,22 +90,30 @@ public class NSSOProperties {
     this.mailPort = mailPort;
   }
 
-  /** @return the mailFrom */
+  /**
+   * @return the mailFrom
+   */
   public String getMailFrom() {
     return mailFrom;
   }
 
-  /** @param mailFrom the mailFrom to set */
+  /**
+   * @param mailFrom the mailFrom to set
+   */
   public void setMailFrom(String mailFrom) {
     this.mailFrom = mailFrom;
   }
 
-  /** @return the mailSubject */
+  /**
+   * @return the mailSubject
+   */
   public String getMailSubject() {
     return mailSubject;
   }
 
-  /** @param mailSubject the mailSubject to set */
+  /**
+   * @param mailSubject the mailSubject to set
+   */
   public void setMailSubject(String mailSubject) {
     this.mailSubject = mailSubject;
   }
@@ -132,7 +143,9 @@ public class NSSOProperties {
     return ssoSecretKey;
   }
 
-  /** Sets ssoSecretKey */
+  /**
+   * Sets ssoSecretKey
+   */
   public void setSsoSecretKey(String ssoSecretKey) {
     this.ssoSecretKey = ssoSecretKey;
   }
@@ -169,5 +182,19 @@ public class NSSOProperties {
   /** Sets Max number of attempts the user can retry */
   public void setMaxInvalidPwdLimit(int maxInvalidPwdLimit) {
     this.maxInvalidPwdLimit = maxInvalidPwdLimit;
+  }
+
+  /**
+   * Get the id3 base url.
+   * @return string */
+  public String getId3BaseUrl() {
+    return id3BaseUrl;
+  }
+
+  /**
+   * set the id3 base url.
+   *  @param id3BaseUrl */
+  public void setId3BaseUrl(String id3BaseUrl) {
+    this.id3BaseUrl = id3BaseUrl;
   }
 }

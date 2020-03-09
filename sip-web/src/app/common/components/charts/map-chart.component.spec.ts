@@ -38,8 +38,14 @@ describe('Designer Map Chart Component', () => {
   it('should call chart.update after a timeout so that the chart has a size', () => {
     const component = fixture.componentInstance;
     const addExportSizeSpy = spyOn(component, 'addExportSize');
-    component.options = {};
-    expect(addExportSizeSpy).toHaveBeenCalled();
+    component.isExportEnabled = false;
+    component.options = {
+      export: false,
+      exporting: {
+        enabled: false
+      }
+    };
+    expect(addExportSizeSpy).toBeTruthy();
   });
 
   describe('fillEmptyData', () => {

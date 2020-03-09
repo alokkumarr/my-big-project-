@@ -8,7 +8,7 @@
 FROM sip-base:${project.version}
 
 # Install Elasticsearch
-ENV version=6.3.1
+ENV version=7.6.0
 COPY elasticsearch.repo /etc/yum.repos.d
 RUN rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 RUN yum -y -q install elasticsearch-$version
@@ -20,4 +20,5 @@ RUN echo "discovery.type: single-node" >> /etc/elasticsearch/elasticsearch.yml
 RUN sed -i -e 's/^-Xms2g$/-Xms256m/' -e 's/^-Xmx2g$/-Xmx256m/' \
     /etc/elasticsearch/jvm.options
 RUN systemctl enable elasticsearch
-RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://distfiles.compuscene.net/elasticsearch/elasticsearch-prometheus-exporter-$version.0.zip
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b \
+    https://github.com/vvanholl/elasticsearch-prometheus-exporter/releases/download/7.6.0.0/prometheus-exporter-7.6.0.0.zip

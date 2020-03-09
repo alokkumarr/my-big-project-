@@ -1,0 +1,32 @@
+.filter {
+  &__form {
+    width: 95%;
+
+    &__title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    mat-form-field {
+      max-width: 215px;
+      min-width: 215px;
+    }
+
+    ::ng-deep .mat-form-field-infix {
+      padding: 0.3em 0 0.3em 0;
+    }
+
+    ::ng-deep .mat-form-field-label {
+      margin-top: -0.3em;
+    }
+  }
+}
+
+.remove-filter {
+  color: red;
+  width: 7px;
+  height: 7px;
+  margin-top: -2em;
+  margin-left: 1em;
+}

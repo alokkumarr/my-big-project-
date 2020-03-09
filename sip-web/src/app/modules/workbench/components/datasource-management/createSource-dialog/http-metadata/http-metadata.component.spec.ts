@@ -162,5 +162,9 @@ describe('HttpMetadataComponent', () => {
       ]);
       expect(component.provisionalHeaders.length).toEqual(1);
     });
+
+    it('addQueryParam should be called', () => {
+      expect(typeof component.generateHeaderAutoCompleteFilter).toEqual('function');
+    });
   });
 });

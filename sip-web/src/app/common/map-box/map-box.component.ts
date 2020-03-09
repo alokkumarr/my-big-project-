@@ -19,8 +19,8 @@ import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { environment } from '../../../environments/environment';
 import { MarkerDataPoint } from './types';
-import { AGGREGATE_TYPES_OBJ } from '../consts';
 
+export const DEFAULT_MAP_BOX_ZOOM = 6;
 @Component({
   selector: 'map-box',
   templateUrl: './map-box.component.html',
@@ -31,7 +31,7 @@ export class MapBoxComponent implements OnChanges {
   dataFields: any[];
   coordinateField: any;
   center: number[];
-  zoom = 6;
+  zoom = DEFAULT_MAP_BOX_ZOOM;
   mapStyle: string;
   geoJson: GeoJSON.GeoJSON;
 
@@ -54,7 +54,7 @@ export class MapBoxComponent implements OnChanges {
 
   constructor(private _elemRef: ElementRef) {}
 
-  ngOnChanges(changes) {
+  ngOnChanges() {
     if (this.data && this.coordinateField && this.dataFields) {
       setTimeout(() => {
         this.setGeoJson(this.data, this.coordinateField, this.dataFields);
@@ -94,7 +94,7 @@ export class MapBoxComponent implements OnChanges {
 
     // set center if possible
     if (features.length > 0) {
-      const centerIndex = Math.ceil(features.length / 2);
+      const centerIndex = Math.floor(features.length / 2);
       this.center = features[centerIndex].geometry['coordinates'];
     }
   }
@@ -119,7 +119,7 @@ export class MapBoxComponent implements OnChanges {
       },
       {}
     );
-    return map(data, (datum, index) => {
+    return map(data, datum => {
       const [coordinatesKey] = split(coordinateField.columnName, '.');
       const [lng, lat] = split(datum[coordinatesKey], ',');
       const lnglat = [parseFloat(lng), parseFloat(lat)];
@@ -127,9 +127,8 @@ export class MapBoxComponent implements OnChanges {
         fpToPairs,
         fpFilter(([key]) => key !== coordinatesKey),
         fpMap(([key, value]) => {
-          const { alias, displayName, aggregate } = get(fieldsMap, key);
-          const aggregateFun = AGGREGATE_TYPES_OBJ[aggregate].designerLabel;
-          const label = alias ? alias : `${aggregateFun}(${displayName})`;
+          const { alias, displayName } = get(fieldsMap, key);
+          const label = alias || displayName;
           return {
             key,
             value,

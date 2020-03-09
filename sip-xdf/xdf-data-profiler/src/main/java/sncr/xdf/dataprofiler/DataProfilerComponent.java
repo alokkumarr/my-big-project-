@@ -67,7 +67,6 @@ public class DataProfilerComponent extends Component implements WithSparkContext
             }
 
         } catch(Exception e){
-            e.printStackTrace();
             return -1;
         }
 

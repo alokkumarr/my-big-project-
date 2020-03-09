@@ -12,6 +12,8 @@ import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.parser.NGParser;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.transformer.ng.NGTransformerComponent;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import java.util.Optional;
 
 public class WorkbenchExecuteJob implements Job<Integer> {
   private static final long serialVersionUID = 1L;
@@ -56,30 +58,37 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     Logger log = LoggerFactory.getLogger(getClass().getName());
     log.info("Start execute job");
     AbstractComponent aac = null;
-    switch (ngctx.componentName) {
-      case "sql":
-        aac = new NGSQLComponent(ngctx);
-        break;
-      case "parser":
-        aac = new NGParser(ngctx);
-        break;
-      case "transformer":
-        aac = new NGTransformerComponent(ngctx);
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown component: " + ngctx.componentName);
+    Exception exception = null;
+    int rc = 0;
+    try {
+        switch (ngctx.componentName) {
+            case "sql":
+                aac = new NGSQLComponent(ngctx);
+                break;
+            case "parser":
+                aac = new NGParser(ngctx);
+                break;
+            case "transformer":
+                aac = new NGTransformerComponent(ngctx);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown component: " + ngctx.componentName);
+        }
+        if (aac.initComponent(jobContext.sc())) {
+            log.info("Starting Workbench job");
+            rc = aac.run();
+            log.info("Workbench job completed, result: " + rc + " error: " + aac.getError());
+        }else{
+            log.error("Could not initialize component");
+            throw new RuntimeException("Could not initialize component:");
+        }
+    }catch (Exception ex) {
+        exception = ex;
     }
-    if (!aac.initComponent(jobContext.sc())) {
-      log.error("Could not initialize component");
-      throw new RuntimeException("Could not initialize component:");
-    }
-    log.info("Starting Workbench job");
-    int rc = aac.run();
-    log.info("Workbench job completed, result: " + rc + " error: " + aac.getError());
-
+    rc = NGComponentUtil.handleErrors(Optional.ofNullable(aac),Optional.ofNullable(ngctx.componentConfiguration), rc, exception);
     if (rc != 0) {
-      throw new RuntimeException("XDF returned non-zero status: " + rc);
-    }
+          throw new RuntimeException("XDF returned non-zero status: " + rc);
+      }
     return rc;
   }
 }

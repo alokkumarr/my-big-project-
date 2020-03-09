@@ -44,7 +44,7 @@ export class ExecuteService {
     navigateBack: string = null
   ) {
     return this._filterService
-      .getRuntimeFilterValues(analysis, navigateBack)
+      .getRuntimeFilterValuesIfAvailable(analysis, navigateBack, false)
       .then(model => {
         if (model) {
           this.doExecute(model, mode);
@@ -59,7 +59,7 @@ export class ExecuteService {
     navigateBack: string = null
   ) {
     return this._filterService
-      .getRuntimeFilterValues(analysis, navigateBack)
+      .getRuntimeFilterValuesIfAvailable(analysis, navigateBack, false)
       .then(model => {
         if (model) {
           return this.doExecute(model, mode);

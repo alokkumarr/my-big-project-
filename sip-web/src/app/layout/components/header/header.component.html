@@ -8,7 +8,9 @@
           class="left-side-nav"
           flex="none"
         ></app-sidenav>
-        <div class="company-logo"></div>
+        <!-- <div class="company-logo"></div> -->
+        <app-branding-logo class="branding-logo" [page]="'others'"></app-branding-logo>
+        <span class="product-name">{{ fetchProductName() }}</span>
       </div>
 
       <div fxLayout="row" fxLayoutAlign="center center">

@@ -117,7 +117,7 @@ class JobUtil {
         try {
 	        factoryBean.afterPropertiesSet();
 	    } catch (ParseException e) {
-	        e.printStackTrace();
+        	logger.error("Error while create cron trigger {}", e.getMessage());
 	    }
 	    if(endTime != null)
 	        return factoryBean.getObject().getTriggerBuilder().endAt(endTime).build();

@@ -24,6 +24,7 @@ public class Customer implements Serializable {
     private String modifiedBy;              // DEFAULT NULL
     private Integer passwordExpiryDate;     // NOT NULL
     private String domainName;              // NOT NULL
+    private int isJvCustomer;
 
 
     public Long getCustId() {
@@ -137,4 +138,12 @@ public class Customer implements Serializable {
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
+
+  public int getIsJvCustomer() {
+    return isJvCustomer;
+  }
+
+  public void setIsJvCustomer(int isJvCustomer) {
+    this.isJvCustomer = isJvCustomer;
+  }
 }

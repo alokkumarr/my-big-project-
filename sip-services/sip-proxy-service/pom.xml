@@ -6,8 +6,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.2.RELEASE</version>
-		<relativePath/>
+    <version>2.1.5.RELEASE</version>
+    <relativePath/>
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
@@ -25,7 +25,7 @@
 		<json-core>1.2.5</json-core>
 		<metadata.api>${revision}</metadata.api>
     <mapr.db.version>6.1.0-mapr</mapr.db.version>
-		<es.version>6.3.0</es.version>
+		<es.version>7.6.0</es.version>
 		<surefire-api>2.19.1</surefire-api>
     <kafka.driver.version>1.1.1-mapr-1808</kafka.driver.version>
     <mapr.streams.version>6.1.0-mapr</mapr.streams.version>

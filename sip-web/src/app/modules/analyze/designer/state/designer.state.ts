@@ -58,7 +58,9 @@ import {
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
-  DesignerUpdateAggregateInSorts
+  DesignerUpdateAggregateInSorts,
+  DesignerCheckAggregateFilterSupport,
+  DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -66,10 +68,15 @@ import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
-  CHART_DATE_FORMATS_OBJ
+  CHART_DATE_FORMATS_OBJ,
+  QUERY_RUNTIME_IDENTIFIER
 } from '../../consts';
 import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
+import {
+  COMPARISON_CHART_DATE_INTERVALS,
+  COMPARISON_CHART_DATE_INTERVALS_OBJ
+} from 'src/app/common/consts';
 
 // setAutoFreeze(false);
 
@@ -128,19 +135,16 @@ export class DesignerState {
     /* If this is a report, and query is present, we can request data */
     if (analysis.type === 'report' && !!sipQuery.query) {
       return true;
-    } else {
-      /* Else, there should be at least one field selected in artifacts */
-      return (
-        (
-          fpFlatMap(
-            artifact => artifact.fields,
-            get(state, 'analysis.sipQuery.artifacts')
-          ) || []
-        ).length > 0
-      );
     }
-
-    return false;
+    /* Else, there should be at least one field selected in artifacts */
+    return (
+      (
+        fpFlatMap(
+          artifact => artifact.fields,
+          get(state, 'analysis.sipQuery.artifacts')
+        ) || []
+      ).length > 0
+    );
   }
 
   @Selector()
@@ -170,6 +174,11 @@ export class DesignerState {
   @Selector()
   static analysis(state: DesignerStateModel) {
     return state.analysis;
+  }
+
+  @Selector()
+  static analysisFilters(state: DesignerStateModel) {
+    return get(state.analysis, 'sipQuery.filters', []);
   }
 
   @Selector()
@@ -267,21 +276,24 @@ export class DesignerState {
     const artifactColumnIndex = findIndex(
       artifacts[artifactIndex].fields,
       ({ columnName, dataField, area }) =>
-        dataField
+        artifactColumn.dataField
           ? dataField === artifactColumn.dataField
-          : columnName === artifactColumn.columnName
+          : columnName === artifactColumn.columnName &&
+            area === artifactColumn.area
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
-    const sortedArtifacts = filter(
+    let sortedArtifacts = filter(
       artifacts,
       artifact => !isEmpty(artifact.fields)
     );
 
     // if sort is applied for the field that is removed, remove sort from SIPQUERY
-    const sorts = filter(sipQuery.sorts, sort =>
-      sort.columnName !== artifactColumn.columnName
+    const sorts = filter(
+      sipQuery.sorts,
+      sort => sort.columnName !== artifactColumn.columnName
     );
+    sortedArtifacts = DesignerService.setSeriesColorForColumns(sortedArtifacts);
     patchState({
       analysis: {
         ...analysis,
@@ -359,7 +371,6 @@ export class DesignerState {
         adapter.marker ===
         artifacts[artifactIndex].fields[artifactColumnIndex].area
     );
-
     // In case of reports, there's no concept of group adapters. Check for that here.
     if (targetAdapterIndex >= 0) {
       const targetAdapter = groupAdapters[targetAdapterIndex];
@@ -387,6 +398,42 @@ export class DesignerState {
     });
   }
 
+  @Action(DesignerCheckAggregateFilterSupport)
+  checkAggregateFilterSupport({
+    getState,
+    dispatch
+  }: StateContext<DesignerStateModel>) {
+    const { analysis } = getState();
+    const isReport = ['report', 'esReport'].includes(analysis.type);
+    if (!isReport) {
+      return;
+    }
+
+    const allFields: ArtifactColumnDSL[] = fpFlatMap(
+      artifact => artifact.fields || [],
+      get(analysis, 'sipQuery.artifacts', [])
+    );
+
+    /* If selected artifacts has an aggregated field, no need to do anything. */
+    if (allFields.some(field => !!field.aggregate)) {
+      return;
+    }
+
+    /* Otherwise, remove aggregation filters. We don't support aggregation
+       filters in reports if no aggregated field is present */
+    const analysisFilters = get(analysis, 'sipQuery.filters', []);
+    const hasAggregationFilters = analysisFilters.find(
+      f => f.isAggregationFilter
+    );
+    if (hasAggregationFilters) {
+      return dispatch(
+        new DesignerUpdateFilters(
+          analysisFilters.filter(f => !f.isAggregationFilter)
+        )
+      );
+    }
+  }
+
   @Action(DesignerApplyChangesToArtifactColumns)
   reorderArtifactColumns({
     getState,
@@ -400,14 +447,18 @@ export class DesignerState {
     const areaIndexMap = fpPipe(
       fpFlatMap(adapter => adapter.artifactColumns),
       fpReduce((accumulator, artifactColumn) => {
-        accumulator[artifactColumn.columnName] = artifactColumn.areaIndex;
+        const { dataField, columnName, area } = artifactColumn;
+        const key = dataField || `${columnName}:${area}`;
+        accumulator[key] = artifactColumn.areaIndex;
         return accumulator;
       }, {})
     )(groupAdapters);
 
     forEach(artifacts, artifact => {
       forEach(artifact.fields, field => {
-        field.areaIndex = areaIndexMap[field.columnName];
+        const { dataField, columnName, area } = field;
+        const key = dataField || `${columnName}:${area}`;
+        field.areaIndex = areaIndexMap[key];
       });
     });
 
@@ -728,10 +779,24 @@ export class DesignerState {
     if (artifactColumn.type === 'date') {
       switch (analysis.type) {
         case 'chart':
-          groupInterval.groupInterval =
-            CHART_DATE_FORMATS_OBJ[
-              artifactColumn.dateFormat || <string>artifactColumn.format
-            ].groupInterval;
+          const isComparisonChart =
+            (<AnalysisChartDSL>analysis).chartOptions.chartType ===
+            'comparison';
+
+          /* Assigns default group interval. For comparison chart, we only
+            support a subset of all possible group intervals, so use that */
+          groupInterval.groupInterval = isComparisonChart
+            ? artifactColumn.groupInterval ||
+              COMPARISON_CHART_DATE_INTERVALS[0].value
+            : CHART_DATE_FORMATS_OBJ[
+                artifactColumn.dateFormat || <string>artifactColumn.format
+              ].groupInterval;
+
+          /* Adds a default date format for comparison chart */
+          artifactColumn.format = isComparisonChart
+            ? COMPARISON_CHART_DATE_INTERVALS_OBJ[groupInterval.groupInterval]
+                .formatForBackEnd
+            : artifactColumn.dateFormat;
           break;
         case 'pivot':
           groupInterval.groupInterval = 'day';
@@ -794,6 +859,7 @@ export class DesignerState {
     remove(sipQuery.artifacts, artifact => {
       return isEmpty(artifact.fields);
     });
+    artifacts = DesignerService.setSeriesColorForColumns(artifacts);
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
@@ -803,7 +869,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
@@ -826,11 +892,7 @@ export class DesignerState {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
     const column = adapter.artifactColumns[columnIndex];
-    adapter.reverseTransform(column);
     groupAdapters[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // const updatedGroupAdapters = produce(groupAdapters, draft => {
-    //   draft[adapterIndex].artifactColumns.splice(columnIndex, 1);
-    // });
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
@@ -867,17 +929,17 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    filters.forEach(filter => {
-      filter.artifactsName = filter.tableName;
+    filters.forEach(filt => {
+      filt.artifactsName = filt.tableName || filt.artifactsName;
       if (
-        filter.type === 'date' &&
-        !filter.isRuntimeFilter &&
-        !filter.isGlobalFilter &&
-        filter.model.preset === CUSTOM_DATE_PRESET_VALUE
+        filt.type === 'date' &&
+        !filt.isRuntimeFilter &&
+        !filt.isGlobalFilter &&
+        filt.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
-        filter.model = {
-          gte: filter.model.gte,
-          lte: filter.model.lte,
+        filt.model = {
+          gte: filt.model.gte,
+          lte: filt.model.lte,
           format: 'yyyy-MM-dd HH:mm:ss',
           preset: CUSTOM_DATE_PRESET_VALUE
         };
@@ -992,5 +1054,36 @@ export class DesignerState {
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
+  }
+
+  @Action(DesignerUpdateQueryFilters)
+  updateQueryFilters(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { filters } : DesignerUpdateQueryFilters
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const sqlQuery = analysis.sipQuery.query;
+    const runTimeFiltersInQueryCount = sqlQuery.split(QUERY_RUNTIME_IDENTIFIER).length - 1;
+    // const regex = new RegExp(`/[^${QUERY_RUNTIME_IDENTIFIER}]/g`);
+    // const runTimeFiltersInQueryCount = sqlQuery.replace(regex, "");
+    //check if query has runtime filters
+    const runTimeFilters = [];
+    for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
+      runTimeFilters.push({
+        'isRuntimeFilter': true,
+        'displayName': isEmpty(filters[i]) ? '' : filters[i].displayName,
+        'description': isEmpty(filters[i]) ? '' : filters[i].description,
+        'model': {
+          'modelValues': isEmpty(filters[i]) ? [] : filters[i].model.modelValues,
+          'operator': 'EQ'
+        }
+
+      });
+    }
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, filters: runTimeFilters} }
+    });
+
   }
 }

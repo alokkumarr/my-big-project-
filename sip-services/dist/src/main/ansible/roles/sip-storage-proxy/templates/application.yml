@@ -3,6 +3,9 @@ info:
 spring:
   application:
     name: saw-storage-proxy-service
+  elasticsearch:
+    rest:
+      uris: {{ saw_elasticsearch_host }}:{{ saw_elasticsearch_port | default('9200') }}
 logging:
   level:
     com.synchronoss: INFO
@@ -92,7 +95,7 @@ executor:
 metadata:
   service:
     host: ${connector}://localhost:9501
-    execution-migration-flag: true
+    execution-migration-flag: false
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:

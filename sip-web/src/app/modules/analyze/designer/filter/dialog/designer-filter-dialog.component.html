@@ -1,46 +1,161 @@
 <header class="dialog__header">
   <strong i18n e2e="filter-dialog-header-text">Filter</strong>
 </header>
-<div class="dialog__content">
-  <div class="filter-container">
-    <div *ngFor="let artifact of data.artifacts; trackBy: trackByIndex">
-      <div class="filter__table-name">
-        {{ artifact.artifactName }}
+
+<div [ngSwitch]="data.analysisType === 'report' && data.analysisReportType === 'query'">
+    <div class="query-runtime-filters" *ngSwitchCase="true">
+      <div class="dialog__content">
+          <mat-card class="query-card">
+              <mat-card-subtitle>Query</mat-card-subtitle>
+              <mat-card-content>
+                <span [innerHtml]="queryWithClass"></span>
+              </mat-card-content>
+            </mat-card>
+            <div class="input-field-filters">
+              <div fxLayout="row" *ngFor="let filter of data.filters;let i = index;">
+                <mat-form-field class="col-12">
+                  <mat-chip-list #chipList>
+                    <mat-chip *ngFor="let opt of modelValueArray[i]" [selectable]="true"
+                              [removable]="true" (removed)="removeOpt(opt, i)">
+                      {{opt}}
+                      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+                    </mat-chip>
+                    <input [placeholder]="data.designerPage ? 'Run-Time Filter Value' : filter.displayName"
+                            [matChipInputFor]="chipList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            [matChipInputAddOnBlur]="true"
+                            (matChipInputTokenEnd)="addOpt($event, i)">
+                  </mat-chip-list>
+                </mat-form-field>
+
+                <mat-icon
+                  class="info"
+                  *ngIf="!data.designerPage && filter.description.length > 0"
+                  fontIcon="icon-info-solid"
+                  [matTooltip]="filter.description"
+                  matTooltipClass="filter-tooltips"
+                  matTooltipPosition='right'
+                >
+                </mat-icon>
+
+                <div *ngIf="data.designerPage">
+                  <mat-form-field>
+                    <input
+                      matInput
+                      (keyup)="createFilterRequest($event, i, 'column')"
+                      [value]="filter.displayName"
+                      placeholder="Run-Time Filter"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <input
+                      matInput
+                      (keyup)="createFilterRequest($event, i, 'description')"
+                      [value]="filter.description"
+                      placeholder="Run-Time Filter Description"
+                    />
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
       </div>
-      <mat-divider></mat-divider>
-      <div class="filter__list">
-        <designer-filter-row
-          *ngFor="
-            let filter of groupedFilters[
-              artifact.artifactName || artifact.artifactsName
-            ];
-            let i = index;
-            trackBy: filterRowTrackBy
-          "
-          (removeRequest)="
-            removeFilter(i, artifact.artifactName || artifact.artifactsName)
-          "
-          (filterChange)="onFilterChange()"
-          (filterModelChange)="onFilterModelChange()"
-          [filter]="filter"
-          [supportsGlobalFilters]="data.supportsGlobalFilters"
-          [isInRuntimeMode]="data.isInRuntimeMode"
-          [artifactColumns]="artifact.columns || artifact.fields"
-          [showFilterOptions]="data.showFilterOptions"
-        >
-        </designer-filter-row>
-      </div>
-      <button
-        mat-icon-button
-        *ngIf="!data.isInRuntimeMode"
-        [attr.e2e]="'filter-add-btn-' + artifact.artifactName"
-        (click)="addFilter(artifact.artifactName)"
-      >
-        <mat-icon fontIcon="icon-plus"></mat-icon>
-      </button>
     </div>
-  </div>
+    <div *ngSwitchCase="false">
+        <div class="dialog__content">
+          <div class="filter-container">
+            <div *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn">
+              <div class="filter__table-name">
+                {{ artifact.artifactName }}
+              </div>
+              <mat-divider></mat-divider>
+              <div class="filter__list">
+                <designer-filter-row
+                  *ngFor="
+                    let filter of nonAggregatedFiltersFor(
+                      artifact.artifactName || artifact.artifactsName
+                    );
+                    let i = index;
+                    trackBy: filterRowTrackBy
+                  "
+                  (removeRequest)="
+                    removeFilter(
+                      i,
+                      artifact.artifactName || artifact.artifactsName,
+                      false
+                    )
+                  "
+                  (filterChange)="onFilterChange()"
+                  (filterModelChange)="onFilterModelChange()"
+                  [filter]="filter"
+                  [supportsGlobalFilters]="data.supportsGlobalFilters"
+                  [isInRuntimeMode]="data.isInRuntimeMode"
+                  [artifactColumns]="artifact.columns || artifact.fields"
+                  [showFilterOptions]="data.showFilterOptions"
+                >
+                </designer-filter-row>
+              </div>
+              <button
+                mat-icon-button
+                *ngIf="!data.isInRuntimeMode"
+                [attr.e2e]="'filter-add-btn-' + artifact.artifactName"
+                (click)="addFilter(artifact.artifactName)"
+              >
+                <mat-icon fontIcon="icon-plus"></mat-icon>
+              </button>
+            </div>
+          </div>
+          <h3 *ngIf="data.supportsAggregationFilters">Aggregated Filters</h3>
+          <div
+            *ngIf="data.supportsAggregationFilters"
+            class="filter-container filter-container__aggregated"
+          >
+            <div *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn">
+              <div class="filter__table-name">
+                {{ artifact.artifactName }}
+              </div>
+              <mat-divider></mat-divider>
+              <div class="filter__list">
+                <designer-filter-row
+                  *ngFor="
+                    let filter of aggregatedFiltersFor(
+                      artifact.artifactName || artifact.artifactsName
+                    );
+                    let i = index;
+                    trackBy: filterRowTrackBy
+                  "
+                  (removeRequest)="
+                    removeFilter(
+                      i,
+                      artifact.artifactName || artifact.artifactsName,
+                      true
+                    )
+                  "
+                  (filterChange)="onFilterChange()"
+                  (filterModelChange)="onFilterModelChange()"
+                  [analysisType]="data.analysisType"
+                  [filter]="filter"
+                  [supportsGlobalFilters]="false"
+                  [isInRuntimeMode]="data.isInRuntimeMode"
+                  [artifactColumns]="artifact.columns || artifact.fields"
+                  [showFilterOptions]="data.showFilterOptions"
+                >
+                </designer-filter-row>
+              </div>
+              <button
+                mat-icon-button
+                *ngIf="!data.isInRuntimeMode"
+                [attr.e2e]="'filter-add-btn-' + artifact.artifactName"
+                (click)="addFilter(artifact.artifactName, false, true)"
+              >
+                <mat-icon fontIcon="icon-plus"></mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+    </div>
 </div>
+
 <div class="dialog__actions" fxLayout="column" fxLayoutAlign="start start">
   <div
     *ngIf="!data.isInRuntimeMode"

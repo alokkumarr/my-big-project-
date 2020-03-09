@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   display: block;
@@ -21,8 +21,14 @@
 
   .filter-container {
     width: 800px;
-    min-height: 300px;
+    min-height: 200px;
     display: block;
+
+    &__aggregated {
+      ::ng-deep .filter__number-field {
+        max-width: 60px;
+      }
+    }
 
     .filter__table-name {
       color: $primary-blue-b2;
@@ -39,4 +45,54 @@
 .dialog__actions {
   padding-top: 10px;
   border-top: 1px solid $primary-grey-g2;
+}
+
+.query-runtime-filters {
+  padding: 20px;
+  font-size: 18px;
+
+
+  div {
+    font-size: 13px;
+  }
+}
+
+.query-card {
+  height: 84px;
+  overflow: auto;
+  margin-bottom: 10px;
+  word-break: break-all;
+  width: 550px;
+}
+
+.input-field-filters {
+  height: 300px;
+  overflow: auto;
+
+  div mat-form-field {
+    margin-left: 10px;
+  }
+}
+
+::ng-deep .filter-tooltips {
+  color: white;
+  background-color: var(--theme-primary-500);
+  font-size: 15px;
+}
+
+::ng-deep .sql-keyword {
+  color: rgb(127, 0, 85);
+  font-weight: bold;
+}
+
+::ng-deep .runtime-indicator {
+  color: #ff9000;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+mat-icon.info {
+  font-size: 20px;
+  padding: 13px;
+  color: var(--theme-primary-500);
 }

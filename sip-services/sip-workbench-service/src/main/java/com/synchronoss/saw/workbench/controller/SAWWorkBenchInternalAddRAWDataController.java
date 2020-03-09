@@ -2,10 +2,7 @@ package com.synchronoss.saw.workbench.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import javax.servlet.ServletException;
 import javax.validation.constraints.NotNull;
@@ -32,6 +29,8 @@ import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;
+import com.synchronoss.saw.workbench.model.DSSearchParams;
+import sncr.bda.conf.ProjectMetadata;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
@@ -242,16 +241,33 @@ public class SAWWorkBenchInternalAddRAWDataController {
     Project project = new Project();
     project.setProjectId(projectId);
     try {
-      datasets = sawWorkbenchService.listOfDataSet(project);
+      datasets = sawWorkbenchService.listOfDataSet(project, Optional.empty());
     } catch (Exception e) {
       logger.error("Exception occured while reading list of datasets", e);
       throw new ReadEntitySAWException("Exception occured while reading list of datasets", e);
     }
     return datasets;
-  } 
+  }
 
-  
-  /**
+    @RequestMapping(value = "{projectId}/datasets/search", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<DataSet> searchDataSets(
+        @PathVariable(name = "projectId", required = true) String projectId, @RequestBody DSSearchParams dsSearchParams) throws JSONException, Exception {
+        logger.debug("Retrieve project details By Id {} ", projectId);
+        List<DataSet> datasets = null;
+        Project project = new Project();
+        project.setProjectId(projectId);
+        try {
+            datasets = sawWorkbenchService.listOfDataSet(project, Optional.ofNullable(dsSearchParams));
+        } catch (Exception e) {
+            logger.error("Exception occured while reading list of datasets", e);
+            throw new ReadEntitySAWException("Exception occured while reading list of datasets", e);
+        }
+        return datasets;
+    }
+
+
+    /**
    * This method is used to get the data based on the storage type<br/>
    * perform conversion based on the specification asynchronously
    * @param Id
@@ -338,6 +354,49 @@ public class SAWWorkBenchInternalAddRAWDataController {
     logger.trace("createRGeneratedDataSet ends here : ", returnData.toString());
     return returnData;
   }
+
+    /**
+     *
+     * Retrieve the properties of a given Project id
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "{project}/metadata",
+        method = RequestMethod.GET,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectMetadata getProjectMetadata(
+        @PathVariable(name="project", required = true) String project) {
+        logger.debug("Get the properties of a  project {}", project);
+
+        ProjectMetadata projectMetadata = null;
+        try {
+            projectMetadata = sawWorkbenchService.getProjectMetadata(project);
+        } catch(Exception ex) {
+            logger.error("Error occurred while retriving the dataset properties " + ex);
+        }
+        return projectMetadata;
+    }
+
+    /**
+     *
+     * Retrieve the properties of a given Project id
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "all/metadata",
+        method = RequestMethod.GET,
+        produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectMetadata[] getAllProjectsMetadata() {
+        ProjectMetadata[] projectsMetadata = null;
+        try {
+            projectsMetadata = sawWorkbenchService.getAllProjectsMetadata();
+        } catch(Exception ex) {
+            logger.error("Error occurred while retriving the dataset properties " + ex);
+        }
+        return projectsMetadata;
+    }
   
 }
   

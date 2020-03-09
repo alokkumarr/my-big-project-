@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.export.generate.ExportServiceImpl;
 import com.synchronoss.saw.export.generate.XlsxExporter;
@@ -38,6 +39,7 @@ public class XlsxExporterTest {
   static Long LimittoExport = Long.valueOf(50000);
   XlsxExporter xlsxExporter;
   private List<Field> fields = new LinkedList<>();
+  private Analysis analysis = new Analysis();
   private SipQuery sipQuery = new SipQuery();
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporterTest.class);
 
@@ -123,6 +125,7 @@ public class XlsxExporterTest {
     artifactList.add(artifact);
 
     sipQuery.setArtifacts(artifactList);
+    analysis.setSipQuery(sipQuery);
   }
 
   @Test
@@ -130,8 +133,8 @@ public class XlsxExporterTest {
     Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
     SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
-    xlsxExporter.buildXlsxSheet(sipQuery, exportBean, workBook, sheet, dataResponse.getData(), 3l, 10l);
-    assertEquals(sheet.getPhysicalNumberOfRows(), 5);
+    xlsxExporter.buildXlsxSheet(analysis, exportBean, workBook, sheet, dataResponse.getData(), 3l, 10l);
+    assertEquals(5,sheet.getPhysicalNumberOfRows());
   }
 
   @Test
@@ -140,13 +143,13 @@ public class XlsxExporterTest {
     try {
       // test for esReport
       String analysisType = "esReport";
-      boolean haveSheetCreated = exportService.streamToXlsxReport(sipQuery, analysisId, analysisType, LimittoExport, exportBean, restTemplate);
-      assertEquals(haveSheetCreated, Boolean.TRUE);
+      boolean haveSheetCreated = exportService.streamToXlsxReport(analysis, analysisId, analysisType, LimittoExport, exportBean);
+      assertEquals(Boolean.TRUE, haveSheetCreated);
 
       // test for report
       analysisType = "report";
-      haveSheetCreated = exportService.streamToXlsxReport(sipQuery, analysisId, analysisType, LimittoExport, exportBean, restTemplate);
-      assertEquals(haveSheetCreated, Boolean.TRUE);
+      haveSheetCreated = exportService.streamToXlsxReport(analysis, analysisId, analysisType, LimittoExport, exportBean);
+      assertEquals(Boolean.TRUE, haveSheetCreated);
 
     } catch (IOException e) {
       logger.error(" Error in streamToXlsxReport : {}", ExceptionUtils.getStackTrace(e));

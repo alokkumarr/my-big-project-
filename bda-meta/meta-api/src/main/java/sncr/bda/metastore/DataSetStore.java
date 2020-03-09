@@ -6,11 +6,17 @@ import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 import org.ojai.store.QueryCondition;
 import sncr.bda.base.MetadataStore;
+import org.ojai.Value;
 import sncr.bda.base.WithSearchInMetastore;
 import sncr.bda.core.file.HFileOperations;
 
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.Optional;
+import sncr.bda.datasets.conf.DataSetProperties;
+import org.apache.log4j.Logger;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Created by srya0001 on 10/30/2017.
@@ -20,7 +26,7 @@ import java.util.*;
  *
  */
 public class DataSetStore extends MetadataStore implements WithSearchInMetastore {
-
+    private static final Logger logger = Logger.getLogger(DataSetStore.class);
     public static String TABLE_NAME = "datasets";
     public final String STATUS_SECTION = "asOfNow";
     public final String USER_DATA = "userData";
@@ -77,7 +83,10 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @throws Exception
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
-        JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId);
+        updateStatus(id, status, startTS, finishedTS, aleId, batchSessionId,Optional.empty(),Optional.empty());
+    }
+    public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
+        JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId, returnCode, errorDesc);
         _updatePath(id, null, "asOfNow", src);
     }
 
@@ -91,7 +100,6 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         newList.forEach( tid -> ja.add( new JsonPrimitive(tid)));
         _updatePath(id, "transformations", "asInput", ja);
     }
-
     /**
      * The method queries Data Set Meta store to get all datasets as List of serialized JSON by
      * - project AND
@@ -102,34 +110,51 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @return  - List of serialized JSON documents
      * @throws Exception
      */
-    public List<String> getListOfDS(
-            String project,
-            String dataSource,
-            String catalog,
-            String category,
-            String subCategory
-    ) throws Exception {
-        if (project.isEmpty()) {
+    public List<String> getListOfDS(String project, Map<DataSetProperties, String[]> searchParams) throws Exception
+    {
+        if (project == null || project.trim().isEmpty()) {
             throw new Exception("ProjectService is empty");
         }
         QueryCondition cond = MapRDB.newCondition();
         cond.and();
-        
         // The below has been commented for the JIRA-ID SIP-5727 & it will be activated when workbench module
         // will start using project metadata store & dynamically retrieve the project store
         //cond.is("system.project", QueryCondition.Op.EQUAL, project);
         
         // The below code is to skip filters irrespective of any project
         cond.like("system.project", "%");
-        if ( category != null && !category.isEmpty()) cond = addEqOrLikeClause(cond, "userData.category", category);
-
-        if ( subCategory != null && !subCategory.isEmpty()
-             && category != null && !category.isEmpty())
-            cond = addEqOrLikeClause(cond, "userData.subCategory", subCategory);
-
-        if ( catalog != null && !catalog.isEmpty()) cond = addEqOrLikeClause(cond, "system.catalog", catalog);
-        if ( dataSource != null && !dataSource.isEmpty()) cond = addEqOrLikeClause(cond, "userData.type", dataSource);
-
+        if(searchParams != null && !searchParams.isEmpty()) {
+            for(Map.Entry<DataSetProperties, String[]> entry : searchParams.entrySet()){
+                DataSetProperties searchParam = entry.getKey();
+                String[] values  =  entry.getValue();
+                logger.debug("getListOfDS() : searchParam: "+searchParam+" - values: "+ Arrays.toString(values));
+                if ( values != null && values.length != 0){
+                    switch (searchParam) {
+                        case Category:
+                            addQueryCondition(cond, "userData.category", values);
+                            break;
+                        case SubCategory:
+                            if (searchParams.get(DataSetProperties.Category) != null
+                                && searchParams.get(DataSetProperties.Category).length != 0) {
+                                addQueryCondition(cond, "userData.subCategory", values);
+                            }
+                            break;
+                        case Catalog:
+                            addQueryCondition(cond, "system.catalog", values);
+                            break;
+                        case DataSource:
+                            addQueryCondition(cond, "userData.type", values);
+                            break;
+                        case Type:
+                            addQueryCondition(cond, "system.dstype", values);
+                            break;
+                        case Tags:
+                            searchDSWithTags(cond, "system.tags[]", values);
+                            break;
+                    }
+                }
+            }
+        }
         cond.close();
         cond.build();
         return convertToString(searchAsList(table, cond));
@@ -143,6 +168,40 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         return res.asJsonString();
     }
 
+    public void searchDSWithTags(QueryCondition cond, String key, String[] values) {
+        logger.debug("==> searchDSWithTags()");
+        final String NO_TAGS = "No Tags";
+        int length = values.length;
+        values = ArrayUtils.removeElement(values, NO_TAGS);
+        int lengthAfterRemoval = values.length;
+        logger.debug("Tags : Length - " + length  + ", Length After removal - "+ lengthAfterRemoval);
+        if(lengthAfterRemoval < length) {
+            logger.debug(NO_TAGS + " - exist in tags search values.");
+            cond.or();
+            cond.notExists(key);
+            cond.typeOf(key, Value.Type.NULL);
+            cond.sizeOf(key, QueryCondition.Op.EQUAL, 0);
+            addQueryCondition(cond, key, values);
+            cond.close();
+        }else{
+            logger.debug(NO_TAGS + " - not exist in tags search values.");
+            addQueryCondition(cond, key, values);
+        }
+    }
+
+    private void addQueryCondition(QueryCondition cond, String key, String[] values){
+        logger.debug("addQueryCondition() - Key: "+key+" - values: "+ Arrays.toString(values));
+        List<String> valuesList = Arrays.stream(values)
+            .filter(value -> (value != null && !value.trim().isEmpty()))
+            .map(value -> value.trim())
+            .collect(Collectors.toList());
+        logger.debug("addQueryCondition() - valuesList: "+ valuesList);
+        if(valuesList.size() == 1) {
+            addEqOrLikeClause(cond, key, valuesList.get(0));
+        }else if(valuesList.size() > 1){
+            addInClause(cond, key, valuesList);
+        }
+    }
     /**
      * Convenient method to start building query conditions
      * It assumes AND conjunction.
@@ -151,14 +210,15 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @param value - search value
      * @return - pre-build QC
      */
-    private QueryCondition addEqOrLikeClause(QueryCondition cond, String key, String value){
-
+    private void addEqOrLikeClause(QueryCondition cond, String key, String value){
+        logger.debug("addEqOrLikeClause() - Key: "+key+" - value: "+ value);
         if (value.indexOf('%') >= 0)
             cond.like(key, value);
         else
             cond.is(key, QueryCondition.Op.EQUAL, value);
-        return cond;
     }
-
-
+    private void addInClause(QueryCondition cond, String key, List<String> values){
+        logger.debug("addInClause() - Key: "+key+" - values: "+ values);
+        cond.in(key, values);
+    }
 }

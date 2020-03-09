@@ -101,6 +101,7 @@ published:
 ftp:
   details:
     file: /opt/bda/saw-export-service/conf/ftp-details.json
+    privatekeyDir: /etc/bda/sftpkeys
 
 s3:
   details:

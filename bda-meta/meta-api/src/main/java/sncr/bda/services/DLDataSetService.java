@@ -7,20 +7,15 @@ import static sncr.bda.base.MetadataStore.delimiter;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import com.google.gson.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.joda.DateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
 import sncr.bda.context.ContextMetadata;
@@ -171,30 +166,33 @@ public class DLDataSetService {
 
     private JsonObject checkAndUpdateSystemParams(String id, JsonObject oldSystem, JsonObject newSystem) throws Exception {
         boolean status = false;
-
         for (Map.Entry<String, JsonElement> entry : newSystem.entrySet()) {
             String key = entry.getKey();
-
             newSystem.addProperty(DataSetProperties.CreatedTime.toString(), oldSystem.get(DataSetProperties.CreatedTime.toString()).getAsLong());
             newSystem.addProperty(DataSetProperties.ModifiedTime.toString(), oldSystem.get(DataSetProperties.ModifiedTime.toString()).getAsLong());
-
             logger.debug("Key = " + key);
-
-            JsonPrimitive newValue = entry.getValue().getAsJsonPrimitive();
-
-            JsonPrimitive oldValue = oldSystem.getAsJsonPrimitive(key);
-
-            logger.debug("Old value = " + oldValue + ". New value = " + newValue);
-
-            if(oldValue != null && !oldValue.getAsString().equalsIgnoreCase(newValue.getAsString())) {
-                logger.debug("Value updated for " + key);
-
-                oldSystem.add(key, newValue);
-
-                status = true;
+            JsonElement value = entry.getValue();
+            if(value.isJsonArray()){
+                JsonArray oldValue = oldSystem.getAsJsonArray(key);
+                JsonArray newValue = value.getAsJsonArray();
+                logger.debug("Old value = " + oldValue + ". New value = " + newValue);
+                boolean isValueChanged = isValueChanged(oldValue, newValue);
+                if(isValueChanged){
+                    logger.debug("Value updated for " + key);
+                    oldSystem.add(key, newValue);
+                    status = true;
+                }
+            }else{
+                JsonPrimitive newValue = value.getAsJsonPrimitive();
+                JsonPrimitive oldValue = oldSystem.getAsJsonPrimitive(key);
+                logger.debug("Old value = " + oldValue + ". New value = " + newValue);
+                if(oldValue != null && !oldValue.getAsString().equalsIgnoreCase(newValue.getAsString())) {
+                    logger.debug("Value updated for " + key);
+                    oldSystem.add(key, newValue);
+                    status = true;
+                }
             }
         }
-
         if (status) {
             logger.debug("Property values changed");
 
@@ -202,8 +200,26 @@ public class DLDataSetService {
         } else {
             oldSystem = null;
         }
-
         return oldSystem;
+    }
+
+    private boolean isValueChanged(JsonArray oldValue, JsonArray newValue) {
+        boolean isValueChanged = false;
+        if((oldValue == null || oldValue.isJsonNull())
+            && (newValue != null && !newValue.isJsonNull())){
+            isValueChanged = true;
+        }else if( (oldValue != null && !oldValue.isJsonNull())
+            && (newValue == null || newValue.isJsonNull())){
+            isValueChanged = true;
+        }else if((oldValue != null && !oldValue.isJsonNull())
+            && (newValue != null && !newValue.isJsonNull())){
+            List<String> newVals = Arrays.asList(new Gson().fromJson(newValue, String[].class));
+            List<String> oldVals = Arrays.asList(new Gson().fromJson(oldValue, String[].class));
+            if(!new HashSet<String>(oldVals).equals(new HashSet<String>(newVals))){
+                isValueChanged = true;
+            }
+        }
+        return isValueChanged;
     }
 
     /**
@@ -241,6 +257,12 @@ public class DLDataSetService {
                 String modifiedBy = userData.get(DataSetProperties.modifiedBy.name()).getAsString();
                 logger.debug("Modified by " + DataSetProperties.modifiedBy.name() + " " + modifiedBy);
                 dl.add(DataSetProperties.modifiedBy.toString(), new JsonPrimitive(modifiedBy));
+            }
+
+            if (userData.has(DataSetProperties.Tags.name())) {
+                JsonArray tagsArray = userData.get(DataSetProperties.Tags.name()).getAsJsonArray();
+                logger.debug("tags " + DataSetProperties.Tags.name() + " " + tagsArray);
+                dl.add(DataSetProperties.Tags.toString(), tagsArray);
             }
         }
 
@@ -296,38 +318,39 @@ public class DLDataSetService {
     }
 
     public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size) throws Exception {
-      
-      /**
-       * Commented below code as this block is stopping 
-       * some entries in updating status to maprDB
-       */
+        return updateDS(id, ctx, ds, schema, recordCount, size,Optional.empty(),Optional.empty());
+    }
+    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
+
+        /**
+         * Commented below code as this block is stopping
+         * some entries in updating status to maprDB
+         */
       /*if (schema == null || ds == null)
           throw new IllegalArgumentException("Schema/DS descriptor must not be null");*/
 
-      JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
+        JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
 
-      DateTime currentTime = new DateTime();
-      long modifiedTime = currentTime.getMillis() / 1000;
-      logger.debug("Dataset modified at = " + modifiedTime);
+        DateTime currentTime = new DateTime();
+        long modifiedTime = currentTime.getMillis() / 1000;
+        logger.debug("Dataset modified at = " + modifiedTime);
 
-      system.addProperty(DataSetProperties.ModifiedTime.toString(), modifiedTime);
-      ds.getAsJsonObject().add(DataSetProperties.System.toString(), system);
+        system.addProperty(DataSetProperties.ModifiedTime.toString(), modifiedTime);
+        ds.getAsJsonObject().add(DataSetProperties.System.toString(), system);
 
-      JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID);
-      JsonObject trans = new JsonObject();
-      trans.addProperty("asOutput", ctx.transformationID);
-      if (schema != null) {
-          ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
-      }
-      ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
-      ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), format(size, 2));
-      ds.getAsJsonObject().add("transformations", trans);
-      ds.getAsJsonObject().add("asOfNow", status);
-
-      dsStore.update(id, ds);
-      return ds;
-  }
-    
+        JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID,returnCode,errorDesc);
+        JsonObject trans = new JsonObject();
+        trans.addProperty("asOutput", ctx.transformationID);
+        if (schema != null) {
+            ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+        }
+        ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
+        ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), format(size, 2));
+        ds.getAsJsonObject().add("transformations", trans);
+        ds.getAsJsonObject().add("asOfNow", status);
+        dsStore.update(id, ds);
+        return ds;
+    }
     
     private String format(double bytes, int digits) {
       String[] dictionary = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };

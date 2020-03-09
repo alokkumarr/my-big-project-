@@ -4,7 +4,8 @@ import {
   AdminExportLoadMenu,
   CommonLoadAllMetrics,
   CommonStateScheuleJobs,
-  CommonResetStateOnLogout
+  CommonResetStateOnLogout,
+  CommonLoadUpdatedMetrics
 } from '../actions/common.actions';
 import { CommonStateModel, Menu } from './common.state.model';
 import { forkJoin } from 'rxjs';
@@ -96,5 +97,18 @@ export class CommonState {
   @Action(CommonResetStateOnLogout)
   resetState({ patchState }: StateContext<CommonStateModel>) {
     return patchState(cloneDeep(initialState));
+  }
+
+  /**
+   * When any datapod is created/updated, make it available in Analyze module without any page refresh.
+   * Added as a part of SIP-9482
+   */
+  @Action(CommonLoadUpdatedMetrics)
+  commonLoadUpdatedMetrics({
+    patchState,
+    dispatch
+  }: StateContext<CommonStateModel>) {
+    patchState({ metrics: [] });
+    dispatch(new CommonLoadAllMetrics());
   }
 }

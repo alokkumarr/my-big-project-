@@ -7,19 +7,44 @@ const SideNav = require('./SideNav');
 class Header extends SideNav {
   constructor() {
     super();
-    this._accountSettingIcon = element(by.css(`[e2e='account-settings-menu-btn']`));
-    this._accountChangePasswordLink = element(by.css(`[e2e='account-settings-selector-change-password']`));
-    this._accountLogoutLink = element(by.css(`[e2e='account-settings-selector-logout']`));
+    this._accountSettingIcon = element(
+      by.css(`[e2e='account-settings-menu-btn']`)
+    );
+    this._accountChangePasswordLink = element(
+      by.css(`[e2e='account-settings-selector-change-password']`)
+    );
+    this._accountLogoutLink = element(
+      by.css(`[e2e='account-settings-selector-logout']`)
+    );
 
     this._companyLogo = element(by.css('.company-logo'));
     this._categoryMenuIcon = element(by.css(`[e2e="main-menu-expand-btn"]`));
 
-    this._launcherButton = element(by.css('[class="header__module-launcher-button"]'));
-    this._observeLink = element(by.xpath('//a[contains(@class,"module-observe")]'));
-    this._analyzeLink = element(by.xpath('//a[contains(@class,"module-analyze")]'));
-    this._progressBar = element(by.css('mat-progress-bar[mode="indeterminate"]'));
-    this._workbenchLink = element(by.xpath('//a[contains(@class,"module-workbench")]'));
+    this._launcherButton = element(
+      by.css('[class="header__module-launcher-button"]')
+    );
+    this._observeLink = element(
+      by.xpath('//a[contains(@class,"module-observe")]')
+    );
+    this._analyzeLink = element(
+      by.xpath('//a[contains(@class,"module-analyze")]')
+    );
+    this._progressBar = element(
+      by.css('mat-progress-bar[mode="indeterminate"]')
+    );
+    this._workbenchLink = element(
+      by.xpath('//a[contains(@class,"module-workbench")]')
+    );
     this._toastMessage = element(by.css(`[id="toast-container"]`));
+    this._configureAlert = element(
+      by.xpath(`//a[contains(text()," Configure Alerts ")]`)
+    );
+    this._alertsLink = element(
+      by.xpath('//a[contains(@class,"module-alerts")]')
+    );
+    this._adminLink = element(
+      by.xpath('//a[contains(@class,"module-admin")]')
+    );
   }
 
   clickOnModuleLauncher() {
@@ -78,6 +103,34 @@ class Header extends SideNav {
 
   clickOnToastMessage() {
     commonFunctions.clickOnElement(this._toastMessage);
+  }
+
+  clickOnAlertsLink() {
+    commonFunctions.clickOnElement(this._alertsLink);
+  }
+
+  clickOnConfigureAlert() {
+    commonFunctions.clickOnElement(this._configureAlert);
+  }
+
+  clickOnAdminLink() {
+    commonFunctions.clickOnElement(this._adminLink);
+  }
+
+  statusOfAdminLink(role) {
+    if(role === "ADMIN") {
+      this.visibilityOfAdminLink();
+    }else {
+      this.invisibilityOfAdminLink();
+    }
+  }
+
+  invisibilityOfAdminLink() {
+    commonFunctions.waitFor.elementToBeNotVisible(this._adminLink);
+  }
+
+  visibilityOfAdminLink() {
+    commonFunctions.waitFor.elementToBeVisible(this._adminLink);
   }
 }
 module.exports = Header;

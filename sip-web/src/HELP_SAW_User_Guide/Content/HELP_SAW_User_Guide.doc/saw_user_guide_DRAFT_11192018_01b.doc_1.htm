@@ -16,34 +16,32 @@
         <link href="../../Skins/Fluid/Stylesheets/Tablet.css" rel="stylesheet" type="text/css" data-mc-generated="True" />
         <link href="../../Skins/Fluid/Stylesheets/Mobile.css" rel="stylesheet" type="text/css" data-mc-generated="True" /><title>4.2.1 Add a User</title>
         <link href="../Resources/Stylesheets/saw_user_guide_DRAFT_11192018_01b.doc.css" rel="stylesheet" />
-        <script src="../../Resources/Scripts/custom.modernizr.js" type="text/javascript">
-        </script>
         <script src="../../Resources/Scripts/jquery.min.js" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/require.config.js" type="text/javascript">
+        <script src="../../Resources/Scripts/require.config.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" type="text/javascript">
+        <script src="../../Resources/Scripts/foundation.6.2.3_custom.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/plugins.min.js" type="text/javascript">
+        <script src="../../Resources/Scripts/plugins.min.js" defer="defer" type="text/javascript">
         </script>
-        <script src="../../Resources/Scripts/MadCapAll.js" type="text/javascript">
+        <script src="../../Resources/Scripts/MadCapAll.js" defer="defer" type="text/javascript">
         </script>
     </head>
     <body>
         <div class="foundation-wrap off-canvas-wrapper">
             <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper="">
-                <aside class="off-canvas position-right" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
+                <aside class="off-canvas position-right" role="navigation" id="offCanvas" data-off-canvas="" data-position="right" data-mc-ignore="true">
                     <ul class="off-canvas-accordion vertical menu off-canvas-list" data-accordion-menu="" data-mc-back-link="Back" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="True" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True">
                     </ul>
                 </aside>
                 <div class="off-canvas-content inner-wrap" data-off-canvas-content="">
                     <div data-sticky-container="" class="title-bar-container">
-                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true">
+                        <nav class="title-bar tab-bar sticky" data-sticky="" data-options="marginTop:0" style="width:100%" data-sticky-on="only screen and (max-width: 1279px)" data-mc-ignore="true"><a class="skip-to-content fluid-skip showOnFocus" href="#">Skip To Main Content</a>
                             <div class="middle title-bar-section outer-row clearfix">
                                 <div class="menu-icon-container relative clearfix">
-                                    <button class="menu-icon" data-toggle="offCanvas"><span></span>
+                                    <button class="menu-icon" aria-label="Show Navigation Panel" data-toggle="offCanvas"><span></span>
                                     </button>
                                 </div>
                             </div>
@@ -60,18 +58,21 @@
                                     <div class="nav-search row">
                                         <form class="search" action="#">
                                             <div class="search-bar search-bar-container needs-pie">
-                                                <input class="search-field needs-pie" type="search" placeholder="Search" />
-                                                <div class="search-filter-wrapper">
-                                                    <div class="search-filter">
-                                                        <div class="search-filter-content">
-                                                            <ul>
-                                                                <li>All Files</li>
-                                                            </ul>
-                                                        </div>
+                                                <input class="search-field needs-pie" type="search" aria-label="Search Field" placeholder="Search" />
+                                                <div class="search-filter-wrapper"><span class="invisible-label" id="search-filters-label">Filter: </span>
+                                                    <div class="search-filter" aria-haspopup="true" aria-controls="sf-content" aria-expanded="false" aria-label="Search Filter" title="All Files" role="button" tabindex="0">
+                                                    </div>
+                                                    <div class="search-filter-content" id="sf-content">
+                                                        <ul>
+                                                            <li>
+                                                                <button class="mc-dropdown-item" aria-labelledby="search-filters-label filterSelectorLabel-00001"><span id="filterSelectorLabel-00001">All Files</span>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                                 <div class="search-submit-wrapper" dir="ltr">
-                                                    <div class="search-submit" title="Search">
+                                                    <div class="search-submit" title="Search" role="button" tabindex="0"><span class="invisible-label">Submit Search</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -81,81 +82,83 @@
                             </div>
                         </nav>
                     </div>
-                    <section class="main-section">
+                    <div class="main-section">
                         <div class="row outer-row sidenav-layout">
-                            <div class="sidenav-wrapper">
+                            <nav class="sidenav-wrapper">
                                 <div class="sidenav-container">
                                     <ul class="off-canvas-accordion vertical menu sidenav" data-accordion-menu="" data-mc-css-tree-node-expanded="is-accordion-submenu-parent" data-mc-css-tree-node-collapsed="is-accordion-submenu-parent" data-mc-css-sub-menu="vertical menu accordion-menu is-accordion-submenu nested" data-mc-include-indicator="False" data-mc-include-icon="False" data-mc-include-parent-link="False" data-mc-include-back="False" data-mc-defer-expand-event="True" data-mc-expand-event="click.zf.accordionMenu" data-mc-toc="True" data-mc-side-nav-menu="True">
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="body-container" data-mc-content-body="True">
-                                <h3 class="Heading3"><a name="_Toc530387615"></a><span class="span_2"><span style="font-size: 13pt;">4.2.1</span></span> Add a User</h3>
-                                <p class="Howto">&#160;</p>
-                                <p class="Howto"><a name="kanchor40"></a>How to <a name="Add_a_User"></a>Add a User</p>
-                                <p class="Default_1"><a name="kanchor41"></a><span style="font-family: Calibri;"><span style="font-size: 11pt;">F</span><span style="color: #000000;">rom the User Management screen (refer to</span><span style="font-size: 11pt;"> </span></span><a href="How to Access the User Management.htm#Access_User_Mgmt" class="ParaTextOnly MCXref xref xrefParaTextOnly" style="font-family: Calibri;font-size: 11pt;">How to Access&#160;the&#160;User&#160;Management Screen</a>) </p>
-                                <p class="FigurePic_1" style="margin-bottom: 0;">
-                                    <img src="../Resources/Images/User Mgmt Add User sel_739x196.png" style="width: 739;height: 196;" />
-                                </p>
-                                <p class="Caption">Figure 17 User Management_Add User</p>
-                                <ol>
-                                    <li value="1">Click on the ‘Add New User’ icon (<img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Add a user select_53x22.png" style="width: 53;height: 22;" />) on the upper right-hand side of the screen below the Account Settings icon.&#160; The following fields are displayed on the <span class="Strong">Add </span><span class="Strong">New</span><span class="Strong"> User</span> screen:</li>
-                                </ol>
-                                <ol start="1" class="ol_2">
-                                    <li class="NormalNumList" value="1">Role* - Assigned user role</li>
-                                    <li class="NormalNumList" value="2">First name* - First name of user</li>
-                                    <li class="NormalNumList" value="3">Middle name</li>
-                                    <li class="NormalNumList" value="4">Last name* - Last name of user</li>
-                                    <li class="NormalNumList" value="5">Login ID* - Login identification for the user</li>
-                                    <li class="NormalNumList" value="6">Password* - Password for user</li>
-                                </ol>
-                                <table class="table_1">
-                                    <col style="width: 41pt;" />
-                                    <col style="width: 630pt;" />
-                                    <tr style="height: 32pt;">
-                                        <td class="td_10">
-                                            <p class="p_6">
-                                                <img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS within the User_3_38x38.png" style="width: 38;height: 38;" />
-                                            </p>
-                                        </td>
-                                        <td class="td_10">
-                                            <p class="p_6"><span class="Strong">NOTE:</span>&#160; Passwords must have a minimum of 8 alphanumeric characters with 1 uppercase letter and 1 special character. Enter a generic password and have users change their passwords upon login.</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <ol start="7" class="ol_2">
-                                    <li class="NormalNumList" value="7">Email* - User’s email address</li>
-                                    <li class="NormalNumList" value="8">Status* - current status of the user must be selected (Active or Inactive)</li>
-                                </ol>
-                                <table class="table_1">
-                                    <col style="width: 41pt;" />
-                                    <col style="width: 628pt;" />
-                                    <tr style="height: 32pt;">
-                                        <td class="td_10">
-                                            <p class="p_6">
-                                                <img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS within the User_3_38x38.png" style="width: 38;height: 38;" />
-                                            </p>
-                                        </td>
-                                        <td class="td_10">
-                                            <p class="p_6"><span class="Strong">NOTE:</span>&#160; All fields marked with an * are required</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <p>&#160;</p>
-                                <p style="text-align: center;margin-bottom: 0;">
-                                    <img src="../Resources/Images/Add New User Page selected_387x414.png" style="border-left-style: solid;border-left-width: 1px;border-right-style: solid;border-right-width: 1px;border-top-style: solid;border-top-width: 1px;border-bottom-style: solid;border-bottom-width: 1px;width: 387;height: 414;" />
-                                </p>
-                                <p class="Caption"><a name="Figure_18_Add_New_User"></a>Figure 18 Add New User</p>
-                                <p>2. Select <b>Create User</b> to save the information that was entered.</p>
-                                <p class="NormalNumList">&#160;</p>
-                                <p class="NormalNumList">
-                                </p>
+                            </nav>
+                            <div class="body-container">
+                                <div id="mc-main-content" role="main" data-mc-content-body="True">
+                                    <h3 class="Heading3"><a name="_Toc530387615"></a><span class="span_2"><span style="font-size: 13pt;">4.2.1</span></span> Add a User</h3>
+                                    <p class="Howto">&#160;</p>
+                                    <p class="Howto"><a name="kanchor6"></a>How to <a name="Add_a_User"></a>Add a User</p>
+                                    <p class="Default_1"><a name="kanchor7"></a><span style="font-family: Calibri;"><span style="font-size: 11pt;">F</span><span style="color: #000000;">rom the User Management screen (refer to</span><span style="font-size: 11pt;"> </span></span><a href="How to Access the User Management.htm#Access_User_Mgmt" class="ParaTextOnly MCXref xref xrefParaTextOnly" style="font-family: Calibri;font-size: 11pt;">How to Access&#160;the&#160;User&#160;Management Screen</a>) </p>
+                                    <p class="Default_1">&#160;</p>
+                                    <p class="Figure">
+                                        <img src="../Resources/Images/New Add User 1_769x139.png" style="width: 769;height: 139;" />
+                                    </p>
+                                    <p class="Caption">Figure 17 User Management_Add User</p>
+                                    <ol>
+                                        <li value="1">Click on the ‘Add New User’ icon (<img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Add a user select_53x22.png" style="width: 53;height: 22;" />) on the upper right-hand side of the screen below the Account Settings icon.&#160; The following fields are displayed on the <span class="Strong">Add </span><span class="Strong">New</span><span class="Strong"> User</span> screen:</li>
+                                    </ol>
+                                    <ol start="1" class="ol_2">
+                                        <li class="NormalNumList" value="1">Role* - Assigned user role</li>
+                                        <li class="NormalNumList" value="2">First name* - First name of user</li>
+                                        <li class="NormalNumList" value="3">Middle name</li>
+                                        <li class="NormalNumList" value="4">Last name* - Last name of user</li>
+                                        <li class="NormalNumList" value="5">Login ID* - Login identification for the user</li>
+                                        <li class="NormalNumList" value="6">Password* - Password for user</li>
+                                    </ol>
+                                    <table class="table_1">
+                                        <col style="width: 41pt;" />
+                                        <col style="width: 630pt;" />
+                                        <tr style="height: 32pt;">
+                                            <td class="td_10">
+                                                <p class="p_6">
+                                                    <img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS within the User_3_38x38.png" style="width: 38;height: 38;" />
+                                                </p>
+                                            </td>
+                                            <td class="td_10">
+                                                <p class="p_6"><span class="Strong">NOTE:</span>&#160; Passwords must have a minimum of 8 alphanumeric characters with 1 uppercase letter and 1 special character. Enter a generic password and have users change their passwords upon login.</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <ol start="7" class="ol_2">
+                                        <li class="NormalNumList" value="7">Email* - User’s email address</li>
+                                        <li class="NormalNumList" value="8">Status* - current status of the user must be selected (Active or Inactive)</li>
+                                    </ol>
+                                    <table class="table_1">
+                                        <col style="width: 41pt;" />
+                                        <col style="width: 628pt;" />
+                                        <tr style="height: 32pt;">
+                                            <td class="td_10">
+                                                <p class="p_6">
+                                                    <img src="../Resources/Images/saw_user_guide_DRAFT_11192018_01b.doc/Table ICONS within the User_3_38x38.png" style="width: 38;height: 38;" />
+                                                </p>
+                                            </td>
+                                            <td class="td_10">
+                                                <p class="p_6"><span class="Strong">NOTE:</span>&#160; All fields marked with an * are required</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <p>&#160;</p>
+                                    <p style="text-align: center;margin-bottom: 0;">
+                                        <img src="../Resources/Images/Add New User Page selected_387x414.png" style="border-left-style: solid;border-left-width: 1px;border-right-style: solid;border-right-width: 1px;border-top-style: solid;border-top-width: 1px;border-bottom-style: solid;border-bottom-width: 1px;width: 387;height: 414;" />
+                                    </p>
+                                    <p class="Caption"><a name="Figure_18_Add_New_User"></a>Figure 18 Add New User</p>
+                                    <p>2. Select <b>Create User</b> to save the information that was entered.</p>
+                                    <p class="NormalNumList">&#160;</p>
+                                    <p class="NormalNumList">
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </section><a data-close="true"></a>
+                    </div><a data-close="true"></a>
                 </div>
             </div>
-            <script>/* <![CDATA[ */$(document).foundation();/* ]]> */</script>
         </div>
     </body>
 </html>

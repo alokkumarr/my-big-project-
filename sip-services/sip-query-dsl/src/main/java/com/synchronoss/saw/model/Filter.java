@@ -35,6 +35,9 @@ public class Filter {
   @JsonProperty("columnName")
   private String columnName;
 
+  @JsonProperty("displayName")
+  private String displayName;
+
   @JsonProperty("isRuntimeFilter")
   private Boolean isRuntimeFilter;
 
@@ -44,8 +47,14 @@ public class Filter {
   @JsonProperty("isAggregationFilter")
   private Boolean isAggregationFilter;
 
+  @JsonProperty("aggregate")
+  private Aggregate aggregate;
+
   @JsonProperty("model")
   private Model model;
+
+  @JsonProperty("description")
+  private String description;
 
   @JsonProperty("type")
   public Type getType() {
@@ -87,6 +96,16 @@ public class Filter {
     this.columnName = columnName;
   }
 
+  @JsonProperty("displayName")
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  @JsonProperty("displayName")
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
+  }
+
   @JsonProperty("isRuntimeFilter")
   public Boolean getIsRuntimeFilter() {
     return isRuntimeFilter;
@@ -121,7 +140,17 @@ public class Filter {
     isAggregationFilter = aggregationFilter;
   }
 
-    @JsonProperty("model")
+  @JsonProperty("aggregate")
+  public Aggregate getAggregate() {
+    return aggregate;
+  }
+
+  @JsonProperty("aggregate")
+  public void setAggregate(Aggregate aggregate) {
+    this.aggregate = aggregate;
+  }
+
+  @JsonProperty("model")
   public Model getModel() {
     return model;
   }
@@ -131,6 +160,16 @@ public class Filter {
     this.model = model;
   }
 
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -138,9 +177,11 @@ public class Filter {
         .append("artifactsName", artifactsName)
         .append("isOptional", isOptional)
         .append("columnName", columnName)
+        .append("displayName",displayName)
         .append("isRuntimeFilter", isRuntimeFilter)
         .append("isGlobalFilter", isGlobalFilter)
         .append("isAggregationFilter",isAggregationFilter)
+        .append("aggregate",aggregate)
         .append("model", model)
         .toString();
   }
@@ -152,8 +193,10 @@ public class Filter {
         .append(isRuntimeFilter)
         .append(artifactsName)
         .append(columnName)
+        .append(displayName)
         .append(isGlobalFilter)
         .append(isAggregationFilter)
+        .append(aggregate)
         .append(type)
         .append(isOptional)
         .toHashCode();
@@ -173,8 +216,10 @@ public class Filter {
         .append(isRuntimeFilter, rhs.isRuntimeFilter)
         .append(artifactsName, rhs.artifactsName)
         .append(columnName, rhs.columnName)
+        .append(displayName, rhs.displayName)
         .append(isGlobalFilter, rhs.isGlobalFilter)
         .append(isAggregationFilter,rhs.isAggregationFilter)
+        .append(aggregate,rhs.aggregate)
         .append(type, rhs.type)
         .append(isOptional, rhs.isOptional)
         .isEquals();

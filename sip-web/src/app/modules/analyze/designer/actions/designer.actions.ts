@@ -176,6 +176,11 @@ export class DesignerRemoveArtifactColumn {
   ) {}
 }
 
+export class DesignerCheckAggregateFilterSupport {
+  static readonly type =
+    '[Designer] Remove aggregate filters if no aggregate is selected';
+}
+
 /**
  * Merges metric's artifacts columns to analysis artifacts fields.
  * This fills out any missing data in both sides.
@@ -213,4 +218,10 @@ export class DesignerUpdateAggregateInSorts {
   static readonly type =
     '[Designer] update aggregate in sorts on change of aggregagte';
   constructor(public column: any) {}
+}
+
+export class DesignerUpdateQueryFilters {
+  static readonly type =
+    '[Designer] update query with runtime filters';
+    constructor(public filters: any) {}
 }

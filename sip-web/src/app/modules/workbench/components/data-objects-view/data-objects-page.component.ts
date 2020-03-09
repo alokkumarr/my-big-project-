@@ -2,14 +2,22 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
-import { BehaviorSubject ,  timer } from 'rxjs';
+import { BehaviorSubject, timer } from 'rxjs';
 import * as get from 'lodash/get';
 import * as orderBy from 'lodash/orderBy';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as isEmpty from 'lodash/isEmpty';
+import * as set from 'lodash/set';
+import * as forEach from 'lodash/forEach';
+import * as concat from 'lodash/concat';
 
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { SearchBoxComponent } from '../../../../common/components/search-box';
+
+import { DATASET_CATEGORIES_TYPE } from '../../consts';
+import { DatasetFilters } from '../../models/workbench.interface';
 
 @Component({
   selector: 'data-objects-page',
@@ -33,8 +41,26 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   public timerSubscription;
   public poll = false;
   public interval = 20000;
+  public dsTypeFilters: DatasetFilters = {
+    type: 'string',
+    name: 'dstype',
+    label: 'Filter By Dataset Type',
+    isMultiSelect: false,
+    data: cloneDeep(DATASET_CATEGORIES_TYPE)
+  };
+  public dsTagFilter: DatasetFilters = {
+    type: 'string',
+    name: 'tags',
+    label: 'Filter By Dataset Tags',
+    isMultiSelect: true,
+    data: []
+  };
+  public searchFilters = [];
+  public filterList = {};
 
-  @ViewChild(SearchBoxComponent, { static: true }) searchBox: SearchBoxComponent;
+  @ViewChild(SearchBoxComponent, { static: true })
+  searchBox: SearchBoxComponent;
+  @ViewChild('dsFilterSideNav', { static: true }) dsFilterSideNav;
 
   constructor(
     public router: Router,
@@ -47,6 +73,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getDatasets();
+    this.getListOfAllowableTags();
   }
 
   ngOnDestroy() {
@@ -58,7 +85,6 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   startPolling() {
     /**
      * Calls list datasets/datapods api every 10 seconds or whatever set interval
-     *
      * @memberof DatasetsComponent
      */
     this.timer = timer(0, this.interval);
@@ -73,8 +99,16 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
     this.poll = false;
   }
 
+  /**
+   * Make different api call based on the filters.
+   * Added as part of SIP-10023.
+   */
   getDatasets(): void {
-    this.workBench.getDatasets().subscribe((data: any[]) => {
+    const subscribedObj = isEmpty(this.filterList)
+      ? this.workBench.getDatasets()
+      : this.workBench.getFilteredDatasets(this.filterList);
+
+    subscribedObj.subscribe(data => {
       this.availableSets = orderBy(data, 'system.modifiedTime', 'desc');
       this.updateData(this.availableSets);
     });
@@ -208,6 +242,27 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   }
 
   togglePoll() {
-    this.poll === true ? this.stopPolling() : this.startPolling();
+    this.poll ? this.stopPolling() : this.startPolling();
+  }
+
+  applyOrResetDSFilters(event) {
+    this.filterList = event.data;
+    this.dsFilterSideNav.close();
+    this.getDatasets();
+  }
+
+  // Get the list of allowable tags for all projects. Added as part of SIP-8963
+  getListOfAllowableTags() {
+    this.workBench.getAllProjectsAllowableTagList().subscribe(result => {
+      let allowableTags = [];
+      forEach(result, res => {
+        if( res.allowableTags ){
+          allowableTags = concat(allowableTags, res.allowableTags);
+        }
+      });
+      allowableTags.unshift('No Tags');
+      set(this.dsTagFilter, 'data', allowableTags);
+      this.searchFilters = [this.dsTypeFilters, this.dsTagFilter];
+    });
   }
 }

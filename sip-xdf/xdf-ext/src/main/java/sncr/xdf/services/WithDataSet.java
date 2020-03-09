@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
@@ -17,11 +18,16 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.DLDataSetService;
 import sncr.xdf.context.DSMapKey;
 import sncr.xdf.context.NGContext;
+import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import java.util.UUID;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import sncr.bda.metastore.ProjectStore;
+import sncr.bda.conf.ProjectMetadata;
 
 
 /**
@@ -30,7 +36,7 @@ import java.util.*;
  *
  */
 public interface WithDataSet {
-	
+
 	static final String SQL_COMPONENT  = "sql";
 
     /**
@@ -96,7 +102,7 @@ public interface WithDataSet {
 
         for (Input in: input) {
             if (in.getDataSet() == null)
-                throw new XDFException(XDFException.ErrorCodes.ConfigError, "DataSet parameter cannot be null");
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "DataSet parameter cannot be null");
             retval.put(in.getDataSet(), discoverDataSetWithInput(aux, in));
         }
 
@@ -112,7 +118,7 @@ public interface WithDataSet {
 
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
             if (in.getDataSet() == null)
-                throw new XDFException(XDFException.ErrorCodes.ConfigError, "DataSet parameter cannot be null");
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "DataSet parameter cannot be null");
 
             retval.put(in.getDataSet(), discoverDataSetWithMetaData(aux, project, in.getDataSet()));
         }
@@ -151,7 +157,7 @@ public interface WithDataSet {
         DataSetHelper.logger.debug("is running in pipeline::"+ aux.ctx.runningPipeLine);
         if (!aux.ctx.runningPipeLine && !HFileOperations.exists(sb.toString())) {
             //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
-            throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, in.getDataSet());
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, in.getDataSet());
         } else {
             DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 
@@ -225,10 +231,10 @@ public interface WithDataSet {
                 return res;
             }
             else {
-                throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
+                throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
             }
         } else {
-            throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
         }
     }
 
@@ -260,7 +266,7 @@ public interface WithDataSet {
             //Check partitioning structure and match it with metadata/input
             if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
                 trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
-                throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
+                throw new XDFException(XDFReturnCode.UNSUPPORTED_PARTITIONING, trgDSPartitioning._4().toString(), dataset);
             }
 
             List<String> pk = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
@@ -269,7 +275,7 @@ public interface WithDataSet {
                 if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && trgDSPartitioning._2() != null) {
                     for (int i = 0; i < pk.size(); i++)
                         if (!pk.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
-                            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
+                            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
                         }
                 }
             } else  //No key were provided in Output Dataset configuration: add them from existing dataset
@@ -383,6 +389,9 @@ public interface WithDataSet {
                 resOutput.put(DataSetProperties.Name.name(), output.getDataSet());
 
                 Integer nof = (output.getNumberOfFiles() != null)? output.getNumberOfFiles() :1;
+                Input.Dstype dsType = getOutputDatasetType();
+                logger.debug("Output DS Type : " + dsType);
+                output.setDstype(dsType);
                 resOutput.put(DataSetProperties.Type.name(), output.getDstype().toString() );
                 resOutput.put(DataSetProperties.Catalog.name(), catalog);
                 resOutput.put(DataSetProperties.Format.name(), format);
@@ -392,18 +401,7 @@ public interface WithDataSet {
 
                 //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
                 resOutput.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
-
-                //Extract User Information
-                Object userDataObject = output.getUserdata();
-                logger.debug("UserDataobject = " + userDataObject);
-
-                JsonObject userData = null;
-                if (userDataObject != null) {
-                    userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
-                    if (userData != null) {
-                        resOutput.put(DataSetProperties.UserData.name(), userData);
-                    }
-                }
+                resOutput.put(DataSetProperties.UserData.name(), getUserDataJsonObject(output.getUserdata()));
 
                 //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>(output.getPartitionKeys());
@@ -428,11 +426,97 @@ public interface WithDataSet {
             return resMap;
         }
 
+        private JsonObject getUserDataJsonObject(Object userDataObject){
+            logger.debug("UserDataobject = " + userDataObject);
+            JsonObject userData = null;
+            if (userDataObject == null) {
+                userData = new JsonObject();
+            }else {
+                userData = new Gson().toJsonTree((LinkedTreeMap) userDataObject).getAsJsonObject();
+            }
+            addDatasetTags(userData);
+            return userData;
+        }
 
+        private void addDatasetTags(JsonObject userData){
+            logger.debug("addDatasetCategory(): userData : "+ userData);
+            if(userData.has(DataSetProperties.Tags.toString())) {
+                JsonElement tagsElement = userData.get(DataSetProperties.Tags.toString());
+                if (tagsElement != null) {
+                    JsonArray tagsArray = tagsElement.getAsJsonArray();
+                    if (tagsArray != null && tagsArray.size() != 0) {
+                        List<String> tags = new ArrayList<>();
+                        for (JsonElement tagElement : tagsArray) {
+                            String tag = tagElement.getAsString();
+                            if(tag != null && !tag.trim().isEmpty()) {
+                                tags.add(tag.trim());
+                            }
+                        }
+                        if(tags != null && !tags.isEmpty()) {
+                            if(isProjectContainsTags(tags)) {
+                                JsonArray dsTagsArray = new JsonArray();
+                                for(String tag : tags) {
+                                    dsTagsArray.add(new JsonPrimitive(tag));
+                                }
+                                userData.add(DataSetProperties.Tags.name(),dsTagsArray);
+                            }else{
+                                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Dataset Tags - "+ tags + " - configured are not exist in Project Metadata.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private boolean isProjectContainsTags(List<String> tags){
+            try {
+                ProjectStore prjStore = new ProjectStore(this.ctx.xdfDataRootSys);
+                JsonElement prj = prjStore.readProjectData(this.ctx.applicationID);
+                ProjectMetadata projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
+                String[] allowableTags = projectMetadata.getAllowableTags();
+                logger.debug("Dataset Tags are : " + tags);
+                if(tags != null && !tags.isEmpty()){
+                    if(allowableTags != null && allowableTags.length != 0){
+                        logger.debug("Project Allowable Tags are : " + Arrays.toString(allowableTags));
+                        return Arrays.stream(allowableTags)
+                            .filter(aTag -> (aTag != null && !aTag.trim().isEmpty()))
+                            .map(aTag -> aTag.trim().toLowerCase())
+                            .collect(Collectors.toList())
+                            .containsAll(tags.stream()
+                                .map(String::toLowerCase)
+                                .collect(Collectors.toList()));
+                    }else{
+                        logger.debug("Project Allowable Tags are : " + allowableTags);
+                        return false;
+                    }
+                }else{
+                    return true;
+                }
+            }catch (Exception ex) {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, ex);
+            }
+        }
+
+        private Input.Dstype getOutputDatasetType() {
+            String componentName = this.ctx.componentName;
+            logger.debug("getOutputDatasetType() : componentName : " + componentName);
+            if(componentName != null && !componentName.trim().isEmpty()){
+                switch(componentName.trim().toUpperCase()){
+                    case "PARSER" :
+                        return Input.Dstype.RAW_DATA_SET;
+                    case "TRANSFORMER" :
+                        return Input.Dstype.ENRICHED_DATA_SET;
+                    case "SQL" :
+                        return Input.Dstype.AGGREGATED_DATA_SET;
+                    default:
+                        return Input.Dstype.BASE;
+                }
+            }
+            return Input.Dstype.BASE;
+        }
 
         private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system, DataSetHelper aux) throws Exception {
             if (!aux.ctx.runningPipeLine && !HFileOperations.exists(location)) {
-                throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
+                throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
             } else {
                 Map<String, Object> res = new HashMap();
 
@@ -449,7 +533,7 @@ public interface WithDataSet {
                     //Check partitioning structure and match it with metadata/input
                     if (srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
                         srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
-                        throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, srcPartitioning._4().toString(), dataset);
+                        throw new XDFException(XDFReturnCode.UNSUPPORTED_PARTITIONING, srcPartitioning._4().toString(), dataset);
                     }
 
                     if (system != null && system.get(DataSetProperties.PartitionKeys.toString()) != null) {
@@ -458,7 +542,7 @@ public interface WithDataSet {
                         if (srcPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && srcPartitioning._2() != null) {
                             for (int i = 0; i < mdKeyListJa.size(); i++)
                                 if (!mdKeyListJa.get(i).getAsString().equalsIgnoreCase(srcPartitioning._2().get(i))) {
-                                    throw new XDFException(XDFException.ErrorCodes.ConfigError, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
+                                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
                                 }
                             res.put(DataSetProperties.PartitionKeys.name(), srcPartitioning._2());
                         }
@@ -479,12 +563,28 @@ public interface WithDataSet {
 
                 return res;
             }
-
         }
-
     }
 
+    default String  generateCheckpointLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
+        StringBuilder tempLocationBuilder = new StringBuilder(aux.ctx.xdfDataRootSys);
 
+        tempLocationBuilder.append(Path.SEPARATOR + aux.ctx.applicationID)
+            .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
+            .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
+            .append(Path.SEPARATOR + aux.ctx.batchID)
+            .append(Path.SEPARATOR + aux.ctx.componentName)
+            .append(Path.SEPARATOR + "checkpoint")
+
+            /* Creating a dynamic directory, so that components running is parallel will not
+             * run into conflicts
+             */
+            .append(Path.SEPARATOR + UUID.randomUUID().toString());
+
+        DataSetHelper.logger.debug(String.format("Generated temp location: %s",
+            tempLocationBuilder.toString()));
+        return tempLocationBuilder.toString();
+    }
 
 }
 

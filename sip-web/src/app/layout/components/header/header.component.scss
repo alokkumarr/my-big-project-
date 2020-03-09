@@ -167,13 +167,18 @@ mat-toolbar {
   }
 }
 
-header .company-logo {
+header .branding-logo {
   margin-left: 36px;
-  height: 50px;
-  width: 145px;
 }
 
 .mat-icon-help {
   color: $primary-black;
   font-size: 20px;
+}
+
+.product-name {
+  margin: 15px 0px 0px 20px;
+  color: var(--theme-primary-600);
+  font-size: 15px;
+  font-weight: 600;
 }
