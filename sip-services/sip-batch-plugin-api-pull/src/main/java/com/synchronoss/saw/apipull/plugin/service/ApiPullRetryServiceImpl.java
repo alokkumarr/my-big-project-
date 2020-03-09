@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.extensions.SipRetryContract;
 import com.synchronoss.saw.batch.model.BisComponentState;
@@ -62,8 +63,11 @@ public class ApiPullRetryServiceImpl implements SipRetryContract {
         BisRouteEntity bisRouteEntity = routeEntity.get();
 
         if (bisRouteEntity.getStatus() > 0) {
+          String routeMetadata = bisRouteEntity.getRouteMetadata();
+          String santitzedRouteMetadata = JsonSanitizer.sanitize(routeMetadata);
+
           ObjectNode rootNode =
-              (ObjectNode) objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+              (ObjectNode) objectMapper.readTree(santitzedRouteMetadata);
 
           BisJobEntity job = sipLogService.retriveJobById(jobId);
           job.setJobStatus("INPROGRESS");

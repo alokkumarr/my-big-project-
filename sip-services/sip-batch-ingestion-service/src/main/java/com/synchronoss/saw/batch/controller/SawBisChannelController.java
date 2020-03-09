@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisChannelDto;
@@ -108,7 +109,10 @@ public class SawBisChannelController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode nodeEntity = null;
     ObjectNode rootNode = null;
-    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+    String channelMetadata = requestBody.getChannelMetadata();
+    String sanitizedChannelMetadata = JsonSanitizer.sanitize(channelMetadata);
+
+    nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
     rootNode = (ObjectNode) nodeEntity;
     String channelName = rootNode.get("channelName").asText();
     if (bisChannelService.isChannelNameExists(channelName)) {
@@ -305,7 +309,12 @@ public class SawBisChannelController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode nodeEntity = null;
     ObjectNode rootNode = null;
-    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+
+    String channelMetadata = requestBody.getChannelMetadata();
+
+    String sanitizedChannelMetadata = JsonSanitizer.sanitize(channelMetadata);
+
+    nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
     rootNode = (ObjectNode) nodeEntity;
 
     String channelType = requestBody.getChannelType();

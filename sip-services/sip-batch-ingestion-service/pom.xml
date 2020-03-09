@@ -207,7 +207,12 @@
       <artifactId>sip-common-components</artifactId>
       <version>${revision}</version>
     </dependency>
-	</dependencies>
+    <dependency>
+      <groupId>com.mikesamuel</groupId>
+      <artifactId>json-sanitizer</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>

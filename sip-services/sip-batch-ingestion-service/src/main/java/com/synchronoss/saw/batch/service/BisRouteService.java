@@ -2,6 +2,7 @@ package com.synchronoss.saw.batch.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
@@ -217,7 +218,8 @@ public class BisRouteService {
           Long lastFired = null;
           Long nextFired = null;
           try {
-            rootNode = objectMapper.readTree(response);
+            String sanitizedResponse = JsonSanitizer.sanitize(response);
+            rootNode = objectMapper.readTree(sanitizedResponse);
             dataNode = rootNode.get("data");
             logger.info("data node from response " + dataNode);
             if (dataNode.isArray() && dataNode.size() > 0) {
