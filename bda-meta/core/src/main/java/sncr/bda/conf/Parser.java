@@ -29,10 +29,6 @@ public class Parser {
   @Expose
   private List<Field> fields = new ArrayList<Field>();
 
-  @SerializedName("outputFieldsList")
-  @Expose
-  private List<OutputFieldsList> outputFieldsList = new ArrayList<OutputFieldsList>();
-
   @SerializedName("lineSeparator")
   @Expose
   private String lineSeparator;
@@ -105,7 +101,6 @@ public class Parser {
       boolean multiLine ) {
     this.file = file;
     this.fields = fields;
-    this.outputFieldsList = outputFieldsList;
     this.lineSeparator = lineSeparator;
     this.delimiter = delimiter;
     this.quoteChar = quoteChar;
@@ -172,22 +167,6 @@ public class Parser {
     this.fields = fields;
     return this;
   }
-
-    /** @return The outputFieldsList */
-    public List<OutputFieldsList> getOutputFieldsList() {
-        return outputFieldsList;
-    }
-
-    /** @param fields The outputFieldsList */
-    public void setOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
-        this.outputFieldsList = outputFieldsList;
-    }
-
-    public Parser withOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
-        this.outputFieldsList = outputFieldsList;
-        return this;
-    }
-
 
   /** @return The lineSeparator */
   public String getLineSeparator() {
@@ -362,7 +341,6 @@ public class Parser {
         .append(parserInputFileFormat)
         .append(schemaValidationRequired)
         .append(fields)
-        .append(outputFieldsList)
         .append(lineSeparator)
         .append(delimiter)
         .append(quoteChar)
@@ -389,7 +367,6 @@ public class Parser {
         .append(parserInputFileFormat, rhs.parserInputFileFormat)
         .append(schemaValidationRequired, rhs.schemaValidationRequired)
         .append(fields, rhs.fields)
-        .append(outputFieldsList,rhs.outputFieldsList)
         .append(lineSeparator, rhs.lineSeparator)
         .append(delimiter, rhs.delimiter)
         .append(quoteChar, rhs.quoteChar)
