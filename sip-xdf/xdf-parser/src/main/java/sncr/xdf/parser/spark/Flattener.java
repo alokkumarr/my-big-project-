@@ -12,6 +12,7 @@ import static org.apache.spark.sql.functions.explode_outer;
 import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.size;
 import java.util.Arrays;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class Flattener {
     private static final Logger logger = Logger.getLogger(Flattener.class);
@@ -21,7 +22,10 @@ public class Flattener {
     public Dataset<Row> flattenDataset(Dataset<Row> dataset){
         StructType dsSchema = dataset.schema();
         logger.debug("DS Schema : "+ dsSchema);
-        StructField[] dsFields = dsSchema.fields();
+        StructType sanitizedSchema = NGComponentUtil.getSanitizedStructType(dsSchema);
+        logger.debug("Sanitized DS Schema : "+ sanitizedSchema);
+        dataset = NGComponentUtil.changeDatasetSchema(dataset, sanitizedSchema);
+        StructField[] dsFields = sanitizedSchema.fields();
         logger.debug("DS Fields : "+ Arrays.toString(dsFields));
         for(StructField field : dsFields){
             String name = field.name();
@@ -29,9 +33,9 @@ public class Flattener {
             DataType datatype = field.dataType();
             logger.debug("Field Type : "+ datatype);
             if(datatype instanceof StructType){
-                dataset = processStructType(dataset, field.name(), (StructType)datatype);
+                dataset = processStructType(dataset, name, (StructType)datatype);
             }else if(datatype instanceof ArrayType){
-                dataset = processArrayType(dataset, field.name(), (ArrayType)datatype);
+                dataset = processArrayType(dataset, name, (ArrayType)datatype);
             }
         }
         return dataset;
