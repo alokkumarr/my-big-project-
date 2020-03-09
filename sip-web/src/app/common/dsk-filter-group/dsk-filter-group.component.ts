@@ -10,7 +10,7 @@ import {
 import { PopperContent } from 'ngx-popper';
 import { MatChipInputEvent } from '@angular/material';
 import { JwtService } from 'src/app/common/services';
-import { DataSecurityService, DskEligibleField } from '../datasecurity.service';
+import { DskFiltersService, DskEligibleField } from './../services/dsk-filters.service';
 
 import * as toString from 'lodash/toString';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -40,9 +40,9 @@ export class DskFilterGroupComponent implements OnInit {
 
   constructor(
     jwtService: JwtService,
-    datasecurityService: DataSecurityService
+    dskFilterService: DskFiltersService
   ) {
-    datasecurityService
+    dskFilterService
       .getEligibleDSKFieldsFor(jwtService.customerId, jwtService.productId)
       .subscribe(fields => {
         this.dskEligibleFields = fields;

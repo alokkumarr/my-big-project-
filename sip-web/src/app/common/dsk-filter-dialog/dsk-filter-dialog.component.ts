@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { DataSecurityService } from './../datasecurity.service';
+import { DskFiltersService } from './../services/dsk-filters.service';
 import * as get from 'lodash/get';
 import * as debounce from 'lodash/debounce';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -22,7 +22,7 @@ export class DskFilterDialogComponent implements OnInit {
   debouncedValidator = debounce(this.validateFilterGroup.bind(this), 200);
   constructor(
     private _dialogRef: MatDialogRef<DskFilterDialogComponent>,
-    private datasecurityService: DataSecurityService,
+    private datasecurityService: DskFiltersService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       groupSelected;
