@@ -34,6 +34,7 @@ export interface DesignerFilterDialogData {
   analysisReportType?: string;
   designerPage?: boolean;
   query?: string;
+  mode?: string;
 }
 export interface DesignerFilterDialogResult {
   filters: Filter[];

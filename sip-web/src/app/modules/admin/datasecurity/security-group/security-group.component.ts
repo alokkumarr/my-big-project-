@@ -124,7 +124,8 @@ export class SecurityGroupComponent implements OnInit {
   updateDskFilters() {
     const data = {
       groupSelected: this.groupSelected,
-      filterGroup: cloneDeep(this.groupFilters)
+      filterGroup: cloneDeep(this.groupFilters),
+      mode: 'DSK'
     };
     return this._dialog
       .open(DskFilterDialogComponent, {
