@@ -46,6 +46,7 @@ import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.componen
 import { ObserveService } from '../../services/observe.service';
 import { AnalyzeService } from 'src/app/modules/analyze/services/analyze.service';
 import { isDSLAnalysis } from 'src/app/common/types';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -58,7 +59,34 @@ export const DASHBOARD_MODES = {
 @Component({
   selector: 'dashboard-grid',
   templateUrl: './dashboard-grid.component.html',
-  styleUrls: ['./dashboard-grid.component.scss']
+  styleUrls: ['./dashboard-grid.component.scss'],
+  animations: [
+    trigger('inOutAnimation', [
+      transition(':enter', [
+        style({
+          width: 0,
+          height: 0,
+          opacity: 0,
+          top: '14px',
+          left: '45px'
+        }),
+        animate(
+          '200ms ease-out',
+          style({
+            width: '100%',
+            height: '100%',
+            opacity: 1,
+            top: 0,
+            left: 0
+          })
+        )
+      ]),
+      transition(':leave', [
+        style({ opacity: 1 }),
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class DashboardGridComponent
   implements OnInit, OnChanges, AfterViewInit, OnDestroy {

@@ -17,12 +17,34 @@ gridster.dashboard-gridster {
   width: auto;
 
   gridster-item {
-    .zoom-icon {
+    .header-action-icon {
       position: absolute;
+      display: flex;
       margin: 15px;
-      cursor: pointer;
       font-size: 18px;
       font-weight: 800;
+
+      * {
+        cursor: pointer;
+        margin-right: 10px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
+    .analysis-description {
+      background: rgba(0, 0, 0, 0.76);
+      box-sizing: border-box;
+      color: white;
+      font-size: 18px;
+      height: 100%;
+      overflow-y: scroll;
+      padding: 18px;
+      position: absolute;
+      width: 100%;
+      z-index: 1;
     }
 
     .backdrop {
