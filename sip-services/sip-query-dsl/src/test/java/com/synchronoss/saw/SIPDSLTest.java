@@ -324,7 +324,7 @@ public class SIPDSLTest {
     filter1.setIsGlobalFilter(false);
     filter1.setType(Filter.Type.DOUBLE);
     filter1.setModel(model);
-    filter.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.OR);
+    filter.setBooleanCriteria(BooleanCriteria.OR);
     Filter filter2 = new Filter();
     filter2.setArtifactsName("SALES");
     filter2.setColumnName("string");
@@ -345,7 +345,7 @@ public class SIPDSLTest {
     String assertQuerytFilter = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String queryWithFilter =
         "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0) AND SALES.double >= 1.0 OR SALES.string IN ('string 123') )";
-    Assert.assertEquals(queryWithFilter, assertQuerytFilter);
+    Assert.assertEquals(queryWithFilter, assertQuerytFilter.trim());
   }
 
   @Test
@@ -355,8 +355,8 @@ public class SIPDSLTest {
 
     String query = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertion =
-        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE ((SALES.long = 1000.0) AND SALES.Double = 2000.0) GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
-    Assert.assertEquals(query, assertion);
+        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE ((SALES.long = 1000.0) AND SALES.Double = 2000.0)  GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+    Assert.assertEquals(assertion, query);
 
     sipdsl.getSipQuery().setFilters(new ArrayList<Filter>());
     String queryWithoutFilters = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
@@ -403,11 +403,10 @@ public class SIPDSLTest {
     String assertQuery = "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long),"
         + " SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)`"
         + " FROM SALES"
-        + " INNER JOIN"
-        + " PRODUCT ON"
-        + " SALES.string = PRODUCT.string_2"
-        + " WHERE (SALES.long = 1000.0 AND SALES.Double = 2000.0) "
-        + " AND  (upper(SALES.string) IN (upper('String 1'), upper('str') )"
+        + " INNER JOIN PRODUCT"
+        + " ON SALES.string = PRODUCT.string_2"
+        + " WHERE (((SALES.long = 1000.0) AND SALES.Double = 2000.0))"
+        + "  AND  (upper(SALES.string) IN (upper('String 1'), upper('str') )"
         + " AND upper(SALES.string) IN (upper('String 123'), upper('string 456') ))"
         + " GROUP BY SALES.string, SALES.date"
         + " ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";

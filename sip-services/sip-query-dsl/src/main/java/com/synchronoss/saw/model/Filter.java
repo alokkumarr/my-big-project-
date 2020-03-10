@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.synchronoss.bda.sip.dsk.BooleanCriteria;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.HashMap;
 import java.util.List;
