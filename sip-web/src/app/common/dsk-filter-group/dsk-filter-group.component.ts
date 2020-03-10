@@ -29,7 +29,7 @@ export class DskFilterGroupComponent implements OnInit {
   filterGroup: DSKFilterGroup = cloneDeep(defaultFilters);
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   dskEligibleFields: Array<DskEligibleField> = [];
-
+  @Input() data;
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || cloneDeep(defaultFilters);
     this.onChange.emit(this.filterGroup);
@@ -50,6 +50,7 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log(this.data);
     this.onChange.emit(this.filterGroup);
   }
 
@@ -148,5 +149,15 @@ export class DskFilterGroupComponent implements OnInit {
       this.filterGroup.booleanQuery[childId]
     )).model.values.splice(valueId, 1);
     this.onChange.emit(this.filterGroup);
+  }
+
+  artifactSelect(artifact) {
+    console.log(artifact);
+  }
+
+  artifactTrackByFn(_, artifact: Artifact | ArtifactDSL) {
+    return (
+      (<Artifact>artifact).artifactName || (<ArtifactDSL>artifact).artifactsName
+    );
   }
 }

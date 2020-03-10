@@ -95,6 +95,12 @@ import { DskFilterDialogComponent } from './dsk-filter-dialog/dsk-filter-dialog.
 import { DskFilterGroupViewComponent } from './dsk-filter-group-view/dsk-filter-group-view.component';
 import { DskFiltersService } from './services/dsk-filters.service';
 
+import { DesignerFilterRowComponent } from './../modules/analyze/designer/filter/row';
+import { DesignerStringFilterComponent } from './../modules/analyze/designer/filter/string';
+import { DesignerDateFilterComponent } from './../modules/analyze/designer/filter/date';
+import { DesignerNumberFilterComponent } from './../modules/analyze/designer/filter/number';
+import { FilterChipsComponent } from './../modules/analyze/designer/filter/chips-u';
+
 import {
   RemoteFolderSelectorComponent,
   CreatefolderDialogComponent
@@ -184,7 +190,12 @@ const COMPONENTS = [
   CustomColorPickerComponent,
   DskFilterDialogComponent,
   DskFilterGroupComponent,
-  DskFilterGroupViewComponent
+  DskFilterGroupViewComponent,
+  DesignerFilterRowComponent,
+  DesignerStringFilterComponent,
+  DesignerDateFilterComponent,
+  DesignerNumberFilterComponent,
+  FilterChipsComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
