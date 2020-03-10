@@ -59,8 +59,8 @@
   ></dsk-filter-group>
 
   <ng-template #attributeFields>
-    <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center" *ngIf="data.mode === 'DSK'">
-      <div fxLayout="column" fxFlex="30" fxLayoutAlign="start stretch">
+    <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center">
+      <div fxLayout="column" fxFlex="30" fxLayoutAlign="start stretch" *ngIf="data.mode === 'DSK'">
         <mat-form-field appearance="outline">
           <mat-label>Attribute</mat-label>
           <input
@@ -87,7 +87,7 @@
         >
       </div>
 
-      <div fxLayout="column" fxFlex fxLayoutAlign="start stretch">
+      <div fxLayout="column" fxFlex fxLayoutAlign="start stretch" *ngIf="data.mode === 'DSK'">
         <mat-form-field>
           <mat-chip-list
             #chipList
@@ -116,6 +116,33 @@
           >At least 1 value is <strong>required</strong>.</mat-error
         >
       </div>
+
+      <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center" *ngIf="data.mode === 'ANALYZE'">
+        <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+            <mat-label>Artifacts</mat-label>
+            <mat-select (selectionChange)="artifactSelect($event.value, childId)"
+                        [value]="">
+              <mat-option *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn"
+                          [value]="artifact.artifactName">
+                {{ artifact.artifactName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <designer-filter-row
+            *ngFor="
+              let filter of nonAggregatedFiltersFor(childId);
+              let i = index;
+              trackBy: filterRowTrackBy
+            "
+            [filter]="filterGroup.booleanQuery[childId]"
+            [supportsGlobalFilters]="data.supportsGlobalFilters"
+            [isInRuntimeMode]="data.isInRuntimeMode"
+            [artifactColumns]="fetchColumns(childId)"
+            [showFilterOptions]="data.showFilterOptions"
+          >
+          </designer-filter-row>
+      </div>
       <button
         mat-icon-button
         aria-label="Remove dsk field attribute"
@@ -124,19 +151,6 @@
       >
         <mat-icon fontIcon="icon-close"></mat-icon>
       </button>
-    </div>
-    <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center" *ngIf="data.mode === 'ANALYZE'">
-      sample here
-      <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
-          <mat-label>Artifacts</mat-label>
-          <mat-select (selectionChange)="artifactSelect($event.value)"
-                      [value]="">
-            <mat-option *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn"
-                        [value]="artifact.artifactName">
-              {{ artifact.artifactName }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
     </div>
   </ng-template>
 </div>

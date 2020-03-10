@@ -14,6 +14,11 @@ import { DskFiltersService, DskEligibleField } from './../services/dsk-filters.s
 
 import * as toString from 'lodash/toString';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as forEach from 'lodash/forEach';
+import * as groupBy from 'lodash/groupBy';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpToPairs from 'lodash/fp/toPairs';
+import * as fpFlatMap from 'lodash/fp/flatMap';
 
 export const defaultFilters: DSKFilterGroup = {
   booleanCriteria: DSKFilterBooleanCriteria.AND,
@@ -29,6 +34,9 @@ export class DskFilterGroupComponent implements OnInit {
   filterGroup: DSKFilterGroup = cloneDeep(defaultFilters);
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   dskEligibleFields: Array<DskEligibleField> = [];
+  filteredColumns: [];
+  groupedFilters;
+  filters;
   @Input() data;
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || cloneDeep(defaultFilters);
@@ -51,6 +59,8 @@ export class DskFilterGroupComponent implements OnInit {
 
   ngOnInit() {
     console.log(this.data);
+    this.filters = cloneDeep(this.data.filters);
+    this.groupedFilters = groupBy(this.data.filters, 'tableName');
     this.onChange.emit(this.filterGroup);
   }
 
@@ -76,11 +86,13 @@ export class DskFilterGroupComponent implements OnInit {
     popper.hide();
     this.filterGroup.booleanQuery.push({
       columnName: '',
+      artifactsName: '',
       model: {
         operator: DSKFilterOperator.ISIN,
         values: []
       }
     });
+    console.log(this.filterGroup);
     this.onChange.emit(this.filterGroup);
   }
 
@@ -101,6 +113,7 @@ export class DskFilterGroupComponent implements OnInit {
       booleanCriteria: DSKFilterBooleanCriteria.AND,
       booleanQuery: []
     });
+    console.log(this.filterGroup);
     this.onChange.emit(this.filterGroup);
   }
 
@@ -151,13 +164,63 @@ export class DskFilterGroupComponent implements OnInit {
     this.onChange.emit(this.filterGroup);
   }
 
-  artifactSelect(artifact) {
+  artifactSelect(artifact, childId) {
     console.log(artifact);
+    this.addFilter(artifact, true);
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).artifactsName = artifact;
+    console.log(this.filterGroup);
+    this.onChange.emit(this.filterGroup);
+  }
+
+  fetchColumns(childId) {
+    let dropDownData = this.data.artifacts.find((data: any) => data.artifactName === this.filterGroup.booleanQuery[childId].artifactsName);
+    return dropDownData.columns;
   }
 
   artifactTrackByFn(_, artifact: Artifact | ArtifactDSL) {
     return (
       (<Artifact>artifact).artifactName || (<ArtifactDSL>artifact).artifactsName
     );
+  }
+
+  nonAggregatedFiltersFor(childId): Filter[] {
+    const allFilters = this.groupedFilters[(<DSKFilterField>this.filterGroup.booleanQuery[childId]).artifactsName];
+    return allFilters
+      ? allFilters.filter((f: Filter) => !f.isAggregationFilter)
+      : [];
+  }
+
+  filterRowTrackBy(index, filterRow) {
+    return `${index}:${filterRow.columnName}`;
+  }
+
+  addFilter(tableName, initialAdd = false, isAggregationFilter = false) {
+    const newFilter: Filter = {
+      type: null,
+      tableName,
+      isOptional: false,
+      columnName: null,
+      isRuntimeFilter: false,
+      isAggregationFilter,
+      isGlobalFilter: false,
+      model: null
+    };
+    if (!this.groupedFilters[tableName]) {
+      this.groupedFilters[tableName] = [];
+    }
+    this.groupedFilters[tableName] = [
+      ...this.groupedFilters[tableName],
+      newFilter
+    ];
+    if (!initialAdd) {
+      this.onFiltersChange();
+    }
+  }
+
+  onFiltersChange() {
+    this.filters = fpPipe(
+      fpToPairs,
+      fpFlatMap(([_, filters]) => filters)
+    )(this.groupedFilters);
   }
 }

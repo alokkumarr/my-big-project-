@@ -57,6 +57,7 @@ export class DskFilterDialogComponent implements OnInit {
 
   updateFilter(filter: DSKFilterGroup) {
     this.dskFilterObject = filter;
+    console.log(this.dskFilterObject);
     this.debouncedValidator();
   }
 
