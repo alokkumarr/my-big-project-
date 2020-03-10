@@ -94,9 +94,10 @@ public class SIPDSLTest {
       List<Filter> filters = sipdsl.getSipQuery().getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
 
-      builder = elasticSearchQueryBuilder.buildFilters(filters, builder);
       boolQueryBuilder1 =
-          elasticSearchQueryBuilder.buildBooleanQuery(sipdsl.getSipQuery(), builder);
+          elasticSearchQueryBuilder.buildFilterQuery(
+              elasticSearchQueryBuilder.buildSingleFilter(
+                  filters, sipdsl.getSipQuery().getBooleanCriteria()));
       searchSourceBuilder.query(boolQueryBuilder1);
     }
     Assert.assertNotNull(boolQueryBuilder1);

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang.StringUtils;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -86,15 +87,13 @@ public class ElasticSearchQueryBuilder {
     }
     // The below code to build filters
 
-    if (sipQuery.getBooleanCriteria() != null) {
+    if (sipQuery.getFilters() != null && sipQuery.getFilters().size() > 0) {
       List<Filter> filters = sipQuery.getFilters();
-      List<QueryBuilder> builder = new ArrayList<>();
-      builder = buildFilters(filters, builder);
-      BoolQueryBuilder boolQueryBuilderFilter = new BoolQueryBuilder();
-        boolQueryBuilderFilter = buildBooleanQuery(sipQuery.getBooleanCriteria(), builder,boolQueryBuilderFilter);
-        boolQueryBuilder.must(boolQueryBuilderFilter);
+      BoolQueryBuilder newBooleanQuery =
+          buildFilterQuery(buildSingleFilter(filters, sipQuery.getBooleanCriteria()));
+      boolQueryBuilder.must(newBooleanQuery);
     }
-      searchSourceBuilder.query(boolQueryBuilder);
+    searchSourceBuilder.query(boolQueryBuilder);
 
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
     // rearrange data field based upon sort
@@ -120,6 +119,17 @@ public class ElasticSearchQueryBuilder {
             sipQuery.getBooleanCriteria());
 
     return searchSourceBuilder.toString();
+  }
+
+  public Filter buildSingleFilter(List<Filter> filters, BooleanCriteria booleanCriteria) {
+    if (filters.size() > 1) {
+      Filter filter = new Filter();
+      booleanCriteria = booleanCriteria != null ? booleanCriteria : BooleanCriteria.AND;
+      filter.setBooleanCriteria(booleanCriteria);
+      filter.setFilters(filters);
+      return filter;
+    }
+    return filters.get(0);
   }
 
   /**
@@ -312,254 +322,6 @@ public class ElasticSearchQueryBuilder {
   }
 
   /**
-   * @param filters
-   * @param builder
-   * @return
-   */
-  public List<QueryBuilder> buildFilters(List<Filter> filters, List<QueryBuilder> builder) {
-    for (Filter item : filters) {
-      if ((item.getIsRuntimeFilter() == null || !item.getIsRuntimeFilter())
-          && (item.getIsGlobalFilter() == null || !item.getIsGlobalFilter())
-          // skip the Aggregated filter since it will added based on aggregated data.
-          && (item.getAggregationFilter() == null || !item.getAggregationFilter())) {
-
-        if (item.getType().value().equals(Filter.Type.DATE.value())
-            || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
-          if (item.getModel().getPreset() != null
-              && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString())) {
-            DynamicConvertor dynamicConvertor =
-                BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            if (item.getType().value().equals(Filter.Type.DATE.value())) {
-              rangeQueryBuilder.format(DATE_FORMAT);
-            }
-
-            rangeQueryBuilder.lte(dynamicConvertor.getLte());
-            rangeQueryBuilder.gte(dynamicConvertor.getGte());
-            builder.add(rangeQueryBuilder);
-          } else if (item.getModel().getPresetCal() != null) {
-            DynamicConvertor dynamicConvertor =
-                BuilderUtil.getDynamicConvertForPresetCal(item.getModel().getPresetCal());
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            if (item.getType().value().equals(Filter.Type.DATE.value())) {
-              rangeQueryBuilder.format(DATE_FORMAT);
-            }
-            rangeQueryBuilder.lte(dynamicConvertor.getLte());
-            rangeQueryBuilder.gte(dynamicConvertor.getGte());
-            builder.add(rangeQueryBuilder);
-          } else if ((item.getModel().getFormat() != null)
-              && ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
-                  || (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)))) {
-            if (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)) {
-              logger.info("Filter format : epoch");
-              logger.info("TimeStamp in Epoch(in seconds),Value " + item.getModel().getValue());
-              item.getModel().setValue(item.getModel().getValue() * 1000);
-              logger.info(
-                  "Convert TimeStamp to milliseconds, Value  :" + item.getModel().getValue());
-              if (item.getModel().getOtherValue() != null) {
-                logger.info(
-                    "TimeStamp in Epoch(in seconds), OtherValue "
-                        + item.getModel().getOtherValue());
-                item.getModel().setOtherValue(item.getModel().getOtherValue() * 1000);
-                logger.info(
-                    "Convert TimeStamp to milliseconds, OtherValue  :"
-                        + item.getModel().getOtherValue());
-              }
-            }
-            logger.debug("recieved value :" + item.getModel().getValue().longValue());
-            Date date = new Date(item.getModel().getValue().longValue());
-            logger.info("Date object created :" + date);
-            DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-
-            if ((item.getType().value().equals(Filter.Type.DATE.value()))
-                || ((item.getType().value().equals(Type.TIMESTAMP.value())))) {
-              logger.info(
-                  "rangeQueryBuilder.format(dateFormat.format(date)) : " + dateFormat.format(date));
-              rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
-            }
-
-            if (item.getModel().getOperator().equals(Model.Operator.EQ)) {
-              logger.info("dateFormat (SimpleDateFormat) :" + dateFormat);
-              rangeQueryBuilder.lte(dateFormat.format(DateUtils.addMilliseconds(date, 1)));
-              rangeQueryBuilder.gte(dateFormat.format(DateUtils.addMilliseconds(date, -1)));
-              builder.add(rangeQueryBuilder);
-              logger.info("Builder Obj : " + builder);
-
-            } else if (item.getModel().getOperator().equals(Model.Operator.BTW)) {
-              logger.info(
-                  "Filter for values - Operator: 'BTW', Timestamp(asLong) : "
-                      + item.getModel().getValue().longValue());
-              rangeQueryBuilder.gte(dateFormat.format(date));
-              date = new Date(item.getModel().getOtherValue().longValue());
-              rangeQueryBuilder.lte(dateFormat.format(date));
-              builder.add(rangeQueryBuilder);
-              logger.debug("Builder Obj : " + builder);
-            } else {
-              if (item.getType().value().equals(Filter.Type.DATE.value())) {
-                rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
-              }
-              rangeQueryBuilder = filterByOperator(item, date);
-              builder.add(rangeQueryBuilder);
-              logger.debug("Builder Obj : " + builder);
-            }
-          } else if ((item.getModel().getFormat() != null)
-              && (item.getModel().getFormat().equalsIgnoreCase(ONLY_YEAR_FORMAT))) {
-            DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            GregorianCalendar startDate =
-                new GregorianCalendar(item.getModel().getValue().intValue(), 0, 1, 0, 0, 0);
-            GregorianCalendar endDate;
-
-            if ((item.getType().value().equals(Filter.Type.DATE.value()))
-                || ((item.getType().value().equals(Type.TIMESTAMP.value())))) {
-              rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
-            }
-
-            if (item.getModel().getOperator().equals(Model.Operator.EQ)) {
-              endDate =
-                  new GregorianCalendar(item.getModel().getValue().intValue(), 11, 31, 23, 59, 59);
-
-              logger.info("Start Date :" + startDate.getTime());
-              logger.info("End Date :" + endDate.getTime());
-              rangeQueryBuilder.gte(dateFormat.format(startDate.getTime()));
-              rangeQueryBuilder.lte(dateFormat.format(endDate.getTime()));
-              builder.add(rangeQueryBuilder);
-              logger.info("Builder Obj : " + builder);
-            } else if (item.getModel().getOperator().equals(Model.Operator.BTW)) {
-              endDate =
-                  new GregorianCalendar(
-                      item.getModel().getOtherValue().intValue(), 11, 31, 23, 59, 59);
-              logger.info("Start Date :" + startDate.getTime());
-              logger.info("End Date :" + endDate.getTime());
-              rangeQueryBuilder.gte(dateFormat.format(startDate.getTime()));
-              rangeQueryBuilder.lte(dateFormat.format(endDate.getTime()));
-              builder.add(rangeQueryBuilder);
-              logger.info("Builder Obj : " + builder);
-            } else {
-              rangeQueryBuilder = filterByOperator(item, startDate.getTime());
-              builder.add(rangeQueryBuilder);
-              logger.info("Builder Obj : " + builder);
-            }
-
-          } else {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            if ((item.getType().value().equals(Filter.Type.DATE.value()))
-                || ((item.getType().value().equals(Type.TIMESTAMP.value())))) {
-              if (item.getModel().getFormat() == null) {
-                rangeQueryBuilder.format(DATE_FORMAT);
-              } else {
-                rangeQueryBuilder.format(item.getModel().getFormat());
-              }
-            }
-            if (item.getModel().getLt() != null) {
-              rangeQueryBuilder.lt(item.getModel().getLt());
-            }
-            if (item.getModel().getGt() != null) {
-              /*In yyyy-MM format GT is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
-               * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
-               * */
-              if ((item.getModel().getFormat() != null)
-                  && (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
-                String date = item.getModel().getGt();
-                date = date + appenderForGTLTE;
-                rangeQueryBuilder.gt(date);
-
-              } else {
-                rangeQueryBuilder.gt(item.getModel().getGt());
-              }
-            }
-            if (item.getModel().getLte() != null) {
-              /*In yyyy-MM format LTE is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
-               * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
-               * */
-              if ((item.getModel().getFormat() != null)
-                  && (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
-                String date = item.getModel().getLte();
-                date = date + appenderForGTLTE;
-                rangeQueryBuilder.lte(date);
-              } else {
-                rangeQueryBuilder.lte(item.getModel().getLte());
-              }
-            }
-            if (item.getModel().getGte() != null) {
-              rangeQueryBuilder.gte(item.getModel().getGte());
-            }
-            builder.add(rangeQueryBuilder);
-          }
-        }
-        // make the query based on the filter given
-        if (item.getType().value().equals(Filter.Type.STRING.value())) {
-          builder = QueryBuilderUtil.stringFilter(item, builder);
-        }
-
-        if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
-                || item.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
-            || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
-            || item.getType()
-                .value()
-                .toLowerCase()
-                .equals(Filter.Type.LONG.value().toLowerCase())) {
-          builder = QueryBuilderUtil.numericFilter(item, builder);
-        }
-      }
-      if (item.getIsRuntimeFilter() != null
-          && item.getIsRuntimeFilter()
-          && item.getModel() != null
-          && (item.getAggregationFilter() == null || !item.getAggregationFilter())) {
-        if (item.getType().value().equals(Filter.Type.DATE.value())
-            || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
-          if (item.getModel().getPreset() != null
-              && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString())) {
-            DynamicConvertor dynamicConvertor =
-                BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            if (item.getType().value().equals(Filter.Type.DATE.value())) {
-              rangeQueryBuilder.format(DATE_FORMAT);
-            }
-            rangeQueryBuilder.lte(dynamicConvertor.getLte());
-            rangeQueryBuilder.gte(dynamicConvertor.getGte());
-            builder.add(rangeQueryBuilder);
-
-          } else if (item.getModel().getPresetCal() != null
-              && !StringUtils.isEmpty(item.getModel().getPresetCal())) {
-            DynamicConvertor dynamicConvertor =
-                BuilderUtil.getDynamicConvertForPresetCal(item.getModel().getPresetCal());
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            if (item.getType().value().equals(Filter.Type.DATE.value())) {
-              rangeQueryBuilder.format(DATE_FORMAT);
-            }
-            rangeQueryBuilder.lte(dynamicConvertor.getLte());
-            rangeQueryBuilder.gte(dynamicConvertor.getGte());
-            builder.add(rangeQueryBuilder);
-          } else {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            if (item.getType().value().equals(Filter.Type.DATE.value())) {
-              rangeQueryBuilder.format(DATE_FORMAT);
-            }
-            rangeQueryBuilder.lte(item.getModel().getLte());
-            rangeQueryBuilder.gte(item.getModel().getGte());
-            builder.add(rangeQueryBuilder);
-          }
-        }
-        if (item.getType().value().equals(Filter.Type.STRING.value())) {
-          builder = QueryBuilderUtil.stringFilter(item, builder);
-        }
-        if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
-                || item.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
-            || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
-            || item.getType()
-                .value()
-                .toLowerCase()
-                .equals(Filter.Type.LONG.value().toLowerCase())) {
-          builder = QueryBuilderUtil.numericFilter(item, builder);
-        }
-      }
-    }
-    return builder;
-  }
-
-  /**
    * Prepare sum calculated fields required for percentage aggregation.
    *
    * @param sipQuery SIP Query.
@@ -575,12 +337,11 @@ public class ElasticSearchQueryBuilder {
       BoolQueryBuilder boolQueryBuilderDsk = queryDSKBuilder(dskAttribute);
       boolQueryBuilder.must(boolQueryBuilderDsk);
       }
-    if (sipQuery.getBooleanCriteria() != null) {
+    if (sipQuery.getFilters() != null && sipQuery.getFilters().size() > 0) {
       List<Filter> filters = sipQuery.getFilters();
-      List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-      builder = buildFilters(filters, builder);
-      BoolQueryBuilder boolQueryBuilderFilter = buildBooleanQuery(sipQuery, builder);
-      boolQueryBuilder.must(boolQueryBuilderFilter);
+      BoolQueryBuilder newBooleanQuery =
+          buildFilterQuery(buildSingleFilter(filters, sipQuery.getBooleanCriteria()));
+      boolQueryBuilder.must(newBooleanQuery);
     }
       searchSourceBuilder.query(boolQueryBuilder);
     QueryBuilderUtil.getAggregationBuilder(
@@ -609,5 +370,300 @@ public class ElasticSearchQueryBuilder {
                     columnName + SUM,
                     String.valueOf(jsonNode.get("aggregations").get(columnName).get(VALUE)));
         });
+  }
+
+  public BoolQueryBuilder buildFilterQuery(Filter filter) {
+    BoolQueryBuilder boolQuery = new BoolQueryBuilder();
+    BooleanCriteria booleanCriteria = null;
+    if (filter == null) {
+      return boolQuery;
+    }
+    if (filter.getBooleanCriteria() == null && filter.getFilters() == null) {
+      return boolQuery;
+    }
+    if (filter.getBooleanCriteria() != null) {
+      booleanCriteria = filter.getBooleanCriteria();
+    }
+    for (Filter sipFilter : filter.getFilters()) {
+      if (sipFilter.getFilters() != null) {
+        QueryBuilder childQuery = buildFilterQuery(sipFilter);
+        if (childQuery != null) {
+          switch (booleanCriteria) {
+            case AND:
+              boolQuery.must(childQuery);
+              break;
+            case OR:
+              boolQuery.should(childQuery);
+              break;
+          }
+        }
+      } else {
+        Optional<QueryBuilder> queryBuilder = buildFilter(sipFilter);
+        if (queryBuilder.isPresent()) {
+          switch (booleanCriteria) {
+            case AND:
+              boolQuery.must(queryBuilder.get());
+              break;
+            case OR:
+              boolQuery.should(queryBuilder.get());
+              break;
+          }
+        }
+      }
+    }
+    return boolQuery;
+  }
+
+  public Optional<QueryBuilder> buildFilter(Filter filter) {
+    if ((filter.getIsRuntimeFilter() == null || !filter.getIsRuntimeFilter())
+        && (filter.getIsGlobalFilter() == null || !filter.getIsGlobalFilter())
+        // skip the Aggregated filter since it will added based on aggregated data.
+        && (filter.getAggregationFilter() == null || !filter.getAggregationFilter())) {
+
+      if (filter.getType().value().equals(Filter.Type.DATE.value())
+          || filter.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
+        Optional<String> formatForDate = Optional.empty();
+        if (filter.getModel().getPreset() != null
+            && !(filter.getModel().getPreset() == Model.Preset.NA)) {
+          DynamicConvertor dynamicConvertor =
+              BuilderUtil.dynamicDecipher(filter.getModel().getPreset().value());
+          if (filter.getType() == Type.DATE) {
+            formatForDate = Optional.of(DATE_FORMAT);
+          }
+          return Optional.of(
+              buildRangeQueryBuilder(
+                  filter.getColumnName(),
+                  formatForDate,
+                  dynamicConvertor.getLte(),
+                  dynamicConvertor.getGte()));
+        } else if (filter.getModel().getPresetCal() != null) {
+          DynamicConvertor dynamicConvertor =
+              BuilderUtil.getDynamicConvertForPresetCal(filter.getModel().getPresetCal());
+          if (filter.getType().value().equals(Filter.Type.DATE.value())) {
+            formatForDate = Optional.of(DATE_FORMAT);
+          }
+          return Optional.of(
+              buildRangeQueryBuilder(
+                  filter.getColumnName(),
+                  formatForDate,
+                  dynamicConvertor.getLte(),
+                  dynamicConvertor.getGte()));
+        } else if ((filter.getModel().getFormat() != null)
+            && ((filter.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
+                || (filter.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)))) {
+          if (filter.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)) {
+            logger.debug("TimeStamp in Epoch(in seconds),Value " + filter.getModel().getValue());
+            filter.getModel().setValue(filter.getModel().getValue() * 1000);
+            if (filter.getModel().getOtherValue() != null) {
+              filter.getModel().setOtherValue(filter.getModel().getOtherValue() * 1000);
+              logger.trace(
+                  "Convert TimeStamp to milliseconds, OtherValue  :"
+                      + filter.getModel().getOtherValue());
+            }
+          }
+          Date date = new Date(filter.getModel().getValue().longValue());
+          logger.trace("Date object created :" + date);
+          DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
+          if ((filter.getType().value().equals(Filter.Type.DATE.value()))
+              || ((filter.getType().value().equals(Type.TIMESTAMP.value())))) {
+            formatForDate = Optional.of(EPOCH_TO_DATE_FORMAT);
+          }
+
+          if (filter.getModel().getOperator() == Model.Operator.EQ) {
+            logger.info("dateFormat (SimpleDateFormat) :" + dateFormat);
+            return Optional.of(
+                buildRangeQueryBuilder(
+                    filter.getColumnName(),
+                    formatForDate,
+                    dateFormat.format(DateUtils.addMilliseconds(date, 1)),
+                    dateFormat.format(DateUtils.addMilliseconds(date, -1))));
+
+          } else if (filter.getModel().getOperator() == Model.Operator.BTW) {
+            logger.trace(
+                "Filter for values - Operator: 'BTW', Timestamp(asLong) : {}",
+                filter.getModel().getValue().longValue());
+            Date fromDate = new Date(filter.getModel().getOtherValue().longValue());
+            return Optional.of(
+                buildRangeQueryBuilder(
+                    filter.getColumnName(),
+                    formatForDate,
+                    dateFormat.format(date),
+                    dateFormat.format(fromDate)));
+          } else {
+            return Optional.of(filterByOperator(filter, date));
+          }
+        } else if ((filter.getModel().getFormat() != null)
+            && (filter.getModel().getFormat().equalsIgnoreCase(ONLY_YEAR_FORMAT))) {
+          return Optional.of(buildFilterQueryWithYearFormat(filter));
+        } else {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(filter.getColumnName());
+          if ((filter.getType().value().equals(Filter.Type.DATE.value()))
+              || ((filter.getType().value().equals(Type.TIMESTAMP.value())))) {
+            if (filter.getModel().getFormat() == null) {
+              rangeQueryBuilder.format(DATE_FORMAT);
+            } else {
+              rangeQueryBuilder.format(filter.getModel().getFormat());
+            }
+          }
+          if (filter.getModel().getLt() != null) {
+            rangeQueryBuilder.lt(filter.getModel().getLt());
+          }
+          if (filter.getModel().getGt() != null) {
+            /*In yyyy-MM format GT is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
+             * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
+             * */
+            if ((filter.getModel().getFormat() != null)
+                && (filter.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
+              String date = filter.getModel().getGt();
+              date = date + appenderForGTLTE;
+              rangeQueryBuilder.gt(date);
+
+            } else {
+              rangeQueryBuilder.gt(filter.getModel().getGt());
+            }
+          }
+          if (filter.getModel().getLte() != null) {
+            /*In yyyy-MM format LTE is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
+             * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
+             * */
+            if ((filter.getModel().getFormat() != null)
+                && (filter.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
+              String date = filter.getModel().getLte();
+              date = date + appenderForGTLTE;
+              rangeQueryBuilder.lte(date);
+            } else {
+              rangeQueryBuilder.lte(filter.getModel().getLte());
+            }
+          }
+          if (filter.getModel().getGte() != null) {
+            rangeQueryBuilder.gte(filter.getModel().getGte());
+          }
+          return Optional.of(rangeQueryBuilder);
+        }
+      }
+      // make the query based on the filter given
+      if (filter.getType().value().equals(Filter.Type.STRING.value())) {
+        return Optional.of(QueryBuilderUtil.stringFilter(filter));
+      }
+
+      if ((filter.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
+              || filter.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
+          || filter.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
+          || filter
+              .getType()
+              .value()
+              .toLowerCase()
+              .equals(Filter.Type.LONG.value().toLowerCase())) {
+        return Optional.of(QueryBuilderUtil.buildNumericFilter(filter));
+      }
+    }
+    if (filter.getIsRuntimeFilter() != null
+        && filter.getIsRuntimeFilter()
+        && filter.getModel() != null
+        && (filter.getAggregationFilter() == null || !filter.getAggregationFilter())) {
+      if (filter.getType().value().equals(Filter.Type.DATE.value())
+          || filter.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
+          Optional<String> formatingForDate=Optional.empty();
+        if (filter.getModel().getPreset() != null
+            && !filter.getModel().getPreset().value().equals(Model.Preset.NA.toString())) {
+          DynamicConvertor dynamicConvertor =
+              BuilderUtil.dynamicDecipher(filter.getModel().getPreset().value());
+          if (filter.getType().value().equals(Filter.Type.DATE.value())) {
+            formatingForDate = Optional.of(DATE_FORMAT);
+          }
+          return Optional.of(
+              buildRangeQueryBuilder(
+                  filter.getColumnName(),
+                  formatingForDate,
+                  dynamicConvertor.getLte(),
+                  dynamicConvertor.getGte()));
+
+        } else if (filter.getModel().getPresetCal() != null
+            && !StringUtils.isEmpty(filter.getModel().getPresetCal())) {
+          DynamicConvertor dynamicConvertor =
+              BuilderUtil.getDynamicConvertForPresetCal(filter.getModel().getPresetCal());
+          if (filter.getType().value().equals(Filter.Type.DATE.value())) {
+            formatingForDate = Optional.of(DATE_FORMAT);
+          }
+          return Optional.of(
+              buildRangeQueryBuilder(
+                  filter.getColumnName(),
+                  formatingForDate,
+                  dynamicConvertor.getLte(),
+                  dynamicConvertor.getGte()));
+        } else {
+          if (filter.getType() == Filter.Type.DATE) {
+            formatingForDate = Optional.of(DATE_FORMAT);
+          }
+          return Optional.of(
+              buildRangeQueryBuilder(
+                  filter.getColumnName(),
+                  formatingForDate,
+                  filter.getModel().getLte(),
+                  filter.getModel().getGte()));
+        }
+      }
+      if (filter.getType().value().equals(Filter.Type.STRING.value())) {
+        return Optional.of(QueryBuilderUtil.stringFilter(filter));
+      }
+      if ((filter.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
+              || filter.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
+          || filter.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
+          || filter
+              .getType()
+              .value()
+              .toLowerCase()
+              .equals(Filter.Type.LONG.value().toLowerCase())) {
+        return Optional.of(QueryBuilderUtil.buildNumericFilter(filter));
+      }
+    }
+    return Optional.empty();
+  }
+
+  private QueryBuilder buildFilterQueryWithYearFormat(Filter filter) {
+    logger.info("Format select is year format");
+    DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
+    Optional<String> formatForDate = Optional.empty();
+    GregorianCalendar startDate =
+        new GregorianCalendar(filter.getModel().getValue().intValue(), 0, 1, 0, 0, 0);
+    GregorianCalendar endDate;
+
+    if ((filter.getType() == Filter.Type.DATE) || ((filter.getType() == Type.TIMESTAMP))) {
+      formatForDate = Optional.of(EPOCH_TO_DATE_FORMAT);
+    }
+
+    if (filter.getModel().getOperator() == Model.Operator.EQ) {
+      endDate = new GregorianCalendar(filter.getModel().getValue().intValue(), 11, 31, 23, 59, 59);
+      logger.debug("Start Date :" + startDate.getTime());
+      logger.debug("End Date :" + endDate.getTime());
+      return buildRangeQueryBuilder(
+          filter.getColumnName(),
+          formatForDate,
+          dateFormat.format(endDate.getTime()),
+          dateFormat.format(startDate.getTime()));
+    } else if (filter.getModel().getOperator() == Model.Operator.BTW) {
+      endDate =
+          new GregorianCalendar(filter.getModel().getOtherValue().intValue(), 11, 31, 23, 59, 59);
+      logger.info("Start Date :" + startDate.getTime());
+      logger.info("End Date :" + endDate.getTime());
+      return buildRangeQueryBuilder(
+          filter.getColumnName(),
+          formatForDate,
+          dateFormat.format(endDate.getTime()),
+          dateFormat.format(startDate.getTime()));
+    } else {
+      return filterByOperator(filter, startDate.getTime());
+    }
+  }
+
+  private QueryBuilder buildRangeQueryBuilder(
+      String columnName, Optional<String> dateFormat, String lte, String gte) {
+    RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(columnName);
+    if (dateFormat.isPresent()) {
+      rangeQueryBuilder.format(DATE_FORMAT);
+    }
+    rangeQueryBuilder.lte(lte);
+    rangeQueryBuilder.gte(gte);
+    return rangeQueryBuilder;
   }
 }

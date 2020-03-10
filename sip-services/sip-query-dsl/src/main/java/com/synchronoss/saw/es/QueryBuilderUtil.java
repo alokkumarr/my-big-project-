@@ -204,50 +204,49 @@ public class QueryBuilderUtil {
    * Build numeric filter to handle different preset values.
    *
    * @param item
-   * @param builder
    * @return
    */
-  public static List<QueryBuilder> numericFilter(Filter item, List<QueryBuilder> builder) {
+  public static QueryBuilder buildNumericFilter(Filter item) {
 
     if (item.getModel().getOperator().value().equals(Model.Operator.BTW.value())) {
       RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
       rangeQueryBuilder.lte(item.getModel().getValue());
       rangeQueryBuilder.gte(item.getModel().getOtherValue());
-      builder.add(rangeQueryBuilder);
+      return rangeQueryBuilder;
     }
     if (item.getModel().getOperator().value().equals(Model.Operator.GT.value())) {
       RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
       rangeQueryBuilder.gt(item.getModel().getValue());
-      builder.add(rangeQueryBuilder);
+      return rangeQueryBuilder;
     }
     if (item.getModel().getOperator().value().equals(Model.Operator.GTE.value())) {
       RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
       rangeQueryBuilder.gte(item.getModel().getValue());
-      builder.add(rangeQueryBuilder);
+      return rangeQueryBuilder;
     }
     if (item.getModel().getOperator().value().equals(Model.Operator.LT.value())) {
 
       RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
       rangeQueryBuilder.lt(item.getModel().getValue());
-      builder.add(rangeQueryBuilder);
+      return rangeQueryBuilder;
     }
     if (item.getModel().getOperator().value().equals(Model.Operator.LTE.value())) {
       RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
       rangeQueryBuilder.lte(item.getModel().getValue());
-      builder.add(rangeQueryBuilder);
+      return rangeQueryBuilder;
     }
     if (item.getModel().getOperator().value().equals(Model.Operator.EQ.value())) {
       TermQueryBuilder termQueryBuilder =
           new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-      builder.add(termQueryBuilder);
+      return termQueryBuilder;
     }
     if (item.getModel().getOperator().value().equals(Model.Operator.NEQ.value())) {
       BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
       boolQueryBuilderIn.mustNot(
           new TermQueryBuilder(item.getColumnName(), item.getModel().getValue()));
-      builder.add(boolQueryBuilderIn);
+      return boolQueryBuilderIn;
     }
-    return builder;
+    return null;
   }
 
   /**
@@ -320,10 +319,9 @@ public class QueryBuilderUtil {
    * Build String filter to handle case insensitive filter.
    *
    * @param item
-   * @param builder
    * @return
    */
-  public static List<QueryBuilder> stringFilter(Filter item, List<QueryBuilder> builder) {
+  public static QueryBuilder stringFilter(Filter item) {
     if (item.getModel().getOperator().value().equals(Model.Operator.EQ.value())
         || item.getModel().getOperator().value().equals(Model.Operator.ISIN.value())) {
       TermsQueryBuilder termsQueryBuilder =
@@ -334,7 +332,7 @@ public class QueryBuilderUtil {
       BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
       boolQueryBuilder.should(termsQueryBuilder);
       boolQueryBuilder.should(termsQueryBuilder1);
-      builder.add(boolQueryBuilder);
+      return boolQueryBuilder;
     }
 
     if (item.getModel().getOperator().value().equals(Model.Operator.NEQ.value())
@@ -347,7 +345,7 @@ public class QueryBuilderUtil {
       QueryBuilder qeuryBuilder1 =
           new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
       boolQueryBuilder.mustNot(qeuryBuilder1);
-      builder.add(boolQueryBuilder);
+      return boolQueryBuilder;
     }
 
     // prefix query builder - not analyzed
@@ -362,7 +360,7 @@ public class QueryBuilderUtil {
       BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
       boolQueryBuilder.should(pqb);
       boolQueryBuilder.should(pqb1);
-      builder.add(boolQueryBuilder);
+      return boolQueryBuilder;
     }
 
     // using wildcard as there's no suffix query type provided by
@@ -378,7 +376,7 @@ public class QueryBuilderUtil {
       BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
       boolQueryBuilder.should(wqb);
       boolQueryBuilder.should(wqb1);
-      builder.add(boolQueryBuilder);
+      return boolQueryBuilder;
     }
 
     // same for contains clause - not analyzed query
@@ -395,12 +393,11 @@ public class QueryBuilderUtil {
       BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
       boolQueryBuilder.should(wqb);
       boolQueryBuilder.should(wqb1);
-      builder.add(boolQueryBuilder);
+      return boolQueryBuilder;
     }
 
-    return builder;
+    return null;
   }
-
   /**
    * Build the terms values to support case insensitive search options.
    *
