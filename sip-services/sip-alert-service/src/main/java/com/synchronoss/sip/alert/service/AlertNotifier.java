@@ -9,10 +9,16 @@ import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.sip.alert.modal.AlertNotificationLog;
 import com.synchronoss.sip.alert.modal.AlertResult;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
+import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import com.synchronoss.sip.alert.modal.Notification;
+import com.synchronoss.sip.alert.modal.Subscriber;
+import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -59,23 +65,31 @@ public class AlertNotifier {
   @NotNull
   private String alertRulesMetadata;
 
+  @Value("${sip.service.alert.unsubscribe.url}")
+  private String alertUnsubscribePath;
+
+  @Value("${subscriber.secret.key}")
+  private String secretKey;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
   private RestTemplate restTemplate = null;
+
 
   /**
    * Send Alert notification.
    *
    * @param alertRule Alert Rule.
+   * @param alertTriggerSysId alertTriggerSysId
    */
-  public void sendNotification(AlertRuleDetails alertRule) {
+  public void sendNotification(AlertRuleDetails alertRule, String alertTriggerSysId) {
     logger.info("Inside send notification method");
     try {
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
         Notification notification = alertRule.getNotification();
         if (notification != null && notification.getEmail() != null) {
-          sendMailNotification(alertRule);
+          sendMailNotification(alertRule, alertTriggerSysId);
         } else {
           String msg =
               "Notification mechanism is not configured for alertRule :"
@@ -117,27 +131,38 @@ public class AlertNotifier {
    * Sends email notification.
    *
    * @param alertRulesDetails AlertRulesDetails
+   * @param alertTriggerSysId alertTriggerSysId
    */
-  public void sendMailNotification(AlertRuleDetails alertRulesDetails) {
+  public void sendMailNotification(AlertRuleDetails alertRulesDetails, String alertTriggerSysId) {
     logger.info("sending email notification");
     AlertNotificationLog notificationLog = new AlertNotificationLog();
     notificationLog.setAlertRuleName(alertRulesDetails.getAlertRuleName());
     notificationLog.setThresholdValue(alertRulesDetails.getThresholdValue());
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
-    List<String> recipientsList = alertRulesDetails.getNotification().getEmail().getRecipients();
+    List<String> recipientsList =
+        getActiveSubscribers(
+            alertRulesDetails.getNotification().getEmail().getRecipients(),
+            alertRulesDetails.getAlertRulesSysId());
     try {
-      if (recipientsList != null) {
-        String recipients = String.join(",", recipientsList);
-        Boolean notifiedStatus = sendMail(alertRulesDetails, recipients);
-        notificationLog.setNotifiedStatus(notifiedStatus);
-        if (notifiedStatus) {
-          logger.debug("Successfully sent email notification");
-          notificationLog.setMessage("Successfully sent email notification");
-        } else {
-          logger.debug("error occured while sending email notification");
-          notificationLog.setMessage("error occured while sending email notification");
-        }
+      if (recipientsList != null && recipientsList.size() > 0) {
+        // String recipients = String.join(",", recipientsList);
+        recipientsList.stream()
+            .forEach(
+                recipient -> {
+                  AlertSubscriberToken subscriber =
+                      new AlertSubscriberToken(
+                          alertRulesDetails.getAlertRulesSysId(),
+                          alertRulesDetails.getAlertRuleName(),
+                          alertRulesDetails.getAlertRuleDescription(),
+                          alertTriggerSysId,
+                          recipient);
+                  sendMail(
+                      alertRulesDetails,
+                      recipient,
+                      AlertUtils.getSubscriberToken(subscriber, secretKey));
+                });
+        notificationLog.setNotifiedStatus(Boolean.TRUE);
       } else {
         notificationLog.setMessage(
             "Receipients are missing for the alertRuleId:"
@@ -153,17 +178,33 @@ public class AlertNotifier {
     }
   }
 
+  private List<String> getActiveSubscribers(Set<String> recipients, String alertRulesSysId) {
+    List<String> recipientsList = new ArrayList<String>();
+    recipientsList.addAll(recipients);
+    List<Subscriber> subscribers = alertService.fetchInactiveSubscriberByAlertId(alertRulesSysId);
+    subscribers.forEach(
+        subscriber -> {
+          if (subscriber.getActive() == Boolean.FALSE
+              && recipientsList.contains(subscriber.getEmail())) {
+            recipientsList.remove(subscriber.getEmail());
+          }
+        });
+    return recipientsList;
+  }
+
   /**
    * sends mail.
    *
    * @param alertRulesDetails AlertRulesDetails
    * @return status of mail notification
    */
-  public boolean sendMail(AlertRuleDetails alertRulesDetails, String recipients) {
+  public boolean sendMail(
+      AlertRuleDetails alertRulesDetails, String recipients, String subscriberToken) {
     ObjectNode mailRequestPayload = objectMapper.createObjectNode();
     mailRequestPayload.put("recipients", recipients);
     mailRequestPayload.put("subject", mailSubject);
-    String preparedMailBody = prepareMailBody(alertRulesDetails, mailBody, alertDashboardPath);
+    String preparedMailBody =
+        prepareMailBody(alertRulesDetails, mailBody, alertDashboardPath, subscriberToken);
     mailRequestPayload.put("content", preparedMailBody);
     String mailRequestBody = null;
     try {
@@ -189,9 +230,11 @@ public class AlertNotifier {
    * @param alertRulesDetails AlertRulesDetails
    * @param body mailbody
    * @param alertLink link for alert dashboard
+   * @param subscriberToken subscriberToken
    * @return prepared mail body
    */
-  public String prepareMailBody(AlertRuleDetails alertRulesDetails, String body, String alertLink) {
+  public String prepareMailBody(
+      AlertRuleDetails alertRulesDetails, String body, String alertLink, String subscriberToken) {
     logger.debug("prepare mail body starts here :" + body);
     if (alertRulesDetails.getNotification().getEmail().getTemplate() != null) {
       // override the Body template if its configured for specific alerts.
@@ -266,6 +309,12 @@ public class AlertNotifier {
       }
       body = body.replaceAll("\\" + MailBodyResolver.LOOKBACK_PERIOD, lookBackperiod);
     }
+    if (body.contains(MailBodyResolver.UNSUBSCRIBE_LINK)) {
+      body =
+          body.replaceAll(
+              "\\" + MailBodyResolver.UNSUBSCRIBE_LINK,
+              "\"" + String.format(alertUnsubscribePath, subscriberToken) + "\"");
+    }
     logger.debug("prepare mail body ends here :" + this.getClass().getName() + ": " + body);
     return body;
   }
@@ -304,5 +353,6 @@ public class AlertNotifier {
     String ATTRIBUTE_NAME = "$attributeName";
     String ATTRIBUTE_VALUE = "$attributeValue";
     String LOOKBACK_PERIOD = "$lookbackPeriod";
+    String UNSUBSCRIBE_LINK = "$unsubscribeLink";
   }
 }

@@ -53,7 +53,6 @@ import {
   SSOAuthGuard
 } from './guards';
 import { MaterialModule } from '../material.module';
-import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
 import { PivotGridComponent } from './components/pivot-grid/pivot-grid.component';
 import { FieldDetailsComponent } from './components/field-details/field-details.component';
@@ -112,7 +111,8 @@ import {
   DynamicModuleService,
   CustomIconService,
   DndPubsubService,
-  CommonSemanticService
+  CommonSemanticService,
+  CookiesService
 } from './services';
 import { ShowPasswordDirective } from './directives/show-password.directive';
 
@@ -189,7 +189,6 @@ const DIRECTIVES = [
 ];
 
 const SERVICES = [
-  ChartService,
   ConfigService,
   DxDataGridService,
   DynamicModuleService,
@@ -206,7 +205,8 @@ const SERVICES = [
   WindowService,
   CustomIconService,
   DndPubsubService,
-  CommonSemanticService
+  CommonSemanticService,
+  CookiesService
 ];
 
 const INTERCEPTORS = [

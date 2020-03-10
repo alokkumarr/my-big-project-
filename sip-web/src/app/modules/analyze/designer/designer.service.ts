@@ -17,6 +17,8 @@ import * as toLower from 'lodash/toLower';
 import * as toUpper from 'lodash/toUpper';
 import * as some from 'lodash/some';
 import * as split from 'lodash/split';
+import * as set from 'lodash/set';
+import * as flatMap from 'lodash/flatMap';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -49,6 +51,8 @@ import {
   CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
+import { DATA_AXIS } from './consts';
+import { CHART_COLORS } from 'src/app/common/consts';
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
@@ -199,6 +203,24 @@ export class DesignerService {
         analysisSubtype
       ).length > 0
     );
+  }
+
+  /**
+   *  Adjusting the default series color to newly selected column.
+   * Added a part of SIP-10225.
+   */
+  static setSeriesColorForColumns(sortedArtifacts) {
+    const selectedColumns = flatMap(sortedArtifacts, x => x.fields);
+    const dataColumn = fpFilter(
+      col => DATA_AXIS.includes(col.area) && !col.colorSetFromPicker
+    )(selectedColumns);
+
+    forEach(dataColumn, (col, index) => {
+      set(col, 'seriesColor', CHART_COLORS[index]);
+      set(col, 'colorSetFromPicker', false);
+    });
+
+    return sortedArtifacts;
   }
 
   constructor(private _analyzeService: AnalyzeService) {}
@@ -487,6 +509,7 @@ export class DesignerService {
     chartType
   ): IDEsignerSettingGroupAdapter[] {
     const isStockChart = chartType.substring(0, 2) === 'ts';
+    const isComparisonChart = chartType === 'comparison';
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn['checked'] = false;
       artifactColumn.alias = '';
@@ -580,11 +603,12 @@ export class DesignerService {
       groupByRejectFn
     );
 
-    const canAcceptDimensionType = isStockChart
-      ? canAcceptDateType
-      : chartType === 'packedbubble'
-      ? canAcceptStringType
-      : canAcceptAnyType;
+    const canAcceptDimensionType =
+      isStockChart || isComparisonChart
+        ? canAcceptDateType
+        : chartType === 'packedbubble'
+        ? canAcceptStringType
+        : canAcceptAnyType;
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
     const applyDataFieldDefaults = (
@@ -611,7 +635,7 @@ export class DesignerService {
         artifactColumn.comboType = chartType;
       } else if (['tsspline', 'tsPane'].includes(chartType)) {
         artifactColumn.comboType = 'line';
-      } else if (['combo', 'bar'].includes(chartType)) {
+      } else if (['combo', 'bar', 'comparison'].includes(chartType)) {
         artifactColumn.comboType = 'column';
       }
     };
@@ -627,7 +651,9 @@ export class DesignerService {
       type: 'chart',
       marker: 'y',
       maxAllowed: () =>
-        ['pie', 'bubble', 'stack', 'packedbubble'].includes(chartType)
+        ['pie', 'bubble', 'stack', 'packedbubble', 'comparison'].includes(
+          chartType
+        )
           ? 1
           : Infinity,
       artifactColumns: [],
@@ -710,10 +736,8 @@ export class DesignerService {
     const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
       metricAdapter,
       dimensionAdapter,
-      /* prettier-ignore */
-      chartType === 'bubble' ?
-        sizeAdapter : null,
-      groupByAdapter
+      chartType === 'bubble' ? sizeAdapter : null,
+      isComparisonChart ? null : groupByAdapter
     ]);
 
     this._distributeArtifactColumnsIntoGroups(
@@ -779,7 +803,7 @@ export class DesignerService {
             aggregate: isDataArea ? artifactColumn.aggregate : null,
             // the name propertie is needed for the elastic search
             name: isDataArea ? artifactColumn.columnName : null,
-            dateInterval: isDateType ? artifactColumn.dateInterval : null,
+            dateInterval: isDateType ? artifactColumn.groupInterval : null,
             // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {

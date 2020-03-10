@@ -28,9 +28,9 @@ public class ESResponseParser {
   private String[] groupByFields;
   private List<Field> aggregationFields;
 
-  public ESResponseParser(List<Field> aggregationFields) {
+  public ESResponseParser(List<Field> aggregationFields,String[] groupByFields) {
     this.aggregationFields = aggregationFields;
-    this.groupByFields = ElasticSearchQueryBuilder.groupByFields;
+    this.groupByFields = groupByFields;
   }
 
   /**
@@ -105,7 +105,6 @@ public class ESResponseParser {
       Map<String, Object> flatValues = new LinkedHashMap<>();
       flatValues.putAll(dataObj);
       aggregationFields.forEach(field -> {
-        logger.debug("Data field = {}", field);
 
         String fieldName = field.getDataField() == null
             ? field.getColumnName()
@@ -115,7 +114,6 @@ public class ESResponseParser {
             ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
             : fieldName;
 
-        logger.trace("Column Name : {},  Child Node  : {}", fieldName, childNode);
         flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
       });
       flatStructure.add(flatValues);

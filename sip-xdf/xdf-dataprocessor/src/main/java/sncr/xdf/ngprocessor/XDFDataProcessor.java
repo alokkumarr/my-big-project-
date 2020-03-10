@@ -26,6 +26,7 @@ import sncr.xdf.rtps.driver.NGRTPSComponent;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
 import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import java.util.Optional;
 
 @SuppressWarnings("rawtypes")
 public class XDFDataProcessor  extends AbstractComponent {
@@ -55,20 +56,18 @@ public class XDFDataProcessor  extends AbstractComponent {
 
     public static void main(String[] args)  {
         int rc = 0;
+        XDFDataProcessor processor = null;
         try {
             long start_time = System.currentTimeMillis();
-            XDFDataProcessor processor = new XDFDataProcessor();
+            processor = new XDFDataProcessor();
             rc = processor.processData(args);
             long end_time = System.currentTimeMillis();
             long difference = end_time - start_time;
             logger.debug("Pipeline total time for processing all the components : " + difference);
             logger.debug("Return Code : " + rc);
         }catch(Exception e){
-            if (e instanceof XDFException) {
-                rc = ((XDFException)e).getReturnCode().getCode();
-            } else {
-                rc = XDFReturnCode.INTERNAL_ERROR.getCode();
-            }
+            logger.debug("Exception : ", e);
+            rc=-1;
         }
         System.exit(rc);
     }
@@ -170,6 +169,7 @@ public class XDFDataProcessor  extends AbstractComponent {
     private int processRtps(Map<String, Object> parameters, String configPath,boolean persistFlag) {
     	 logger.debug("###### Starting RTPS #####"  );
         NGRTPSComponent component = null;
+        ComponentConfiguration cfg = null;
         int rc= 0;
         Exception exception = null;
         try {
@@ -205,7 +205,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             };
             
             logger.debug("###### Analize and validate...#####" + configAsStr  );
-            ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+            cfg = analyzeAndValidate(configAsStr);
             logger.debug("###### Analize and validate completed ...#####"  );
             NGContextServices ngRtpsCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "rtps", batchId);
             ngRtpsCtxSvc.initContext();
@@ -247,7 +247,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processRTPS() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg), rc, exception);
         return rc;
 	}
 
@@ -277,6 +277,7 @@ public class XDFDataProcessor  extends AbstractComponent {
         NGParser component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
         try {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
@@ -306,7 +307,7 @@ public class XDFDataProcessor  extends AbstractComponent {
                 ComponentServices.Spark
             };
 
-            ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+            cfg = analyzeAndValidate(configAsStr);
             NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
             ngParserCtxSvc.initContext();
             ngParserCtxSvc.registerOutputDataSet();
@@ -352,7 +353,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg), rc, exception);
         return rc;
     }
 
@@ -361,6 +362,7 @@ public class XDFDataProcessor  extends AbstractComponent {
         NGTransformerComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration config = null;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -394,7 +396,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("Starting Transformer component :" + "\n" );
 
-            ComponentConfiguration config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
+            config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
 
             NGContextServices ngTransformerCtxSvc = new NGContextServices(scs, xdfDataRootSys, config, appId,
                 "transformer", batchId);
@@ -428,7 +430,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
     }
 
@@ -438,6 +440,7 @@ public class XDFDataProcessor  extends AbstractComponent {
         NGSQLComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration config = null;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -472,7 +475,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("Starting SQL component  dataSetName :" + dataSetName +  "\n" );
 
-            ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
+            config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
 
             NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId,
                 "sql", batchId);
@@ -511,7 +514,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
     }
 
@@ -520,6 +523,7 @@ public class XDFDataProcessor  extends AbstractComponent {
         NGESLoaderComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration config = null;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -552,7 +556,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("Starting ESLoader component :" + "\n" );
 
-            ComponentConfiguration config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
+            config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
             NGContextServices ngESCtxSvc = new NGContextServices(escs, xdfDataRootSys, config, appId,
                 "esloader", batchId);
             ngESCtxSvc.initContext(); // debug
@@ -579,7 +583,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
     }
 

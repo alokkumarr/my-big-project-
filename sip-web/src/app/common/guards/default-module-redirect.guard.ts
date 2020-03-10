@@ -3,7 +3,6 @@ import { CanActivate, Router } from '@angular/router';
 
 import { CONFIG_KEY, PREFERENCES } from '../services/configuration.service';
 
-const DEFAULT_ROUTE = '/analyze';
 import { JwtService } from './../../common/services/jwt.service';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
@@ -13,24 +12,21 @@ import * as fpPipe from 'lodash/fp/pipe';
 
 @Injectable()
 export class DefaultModuleGuard implements CanActivate {
-  constructor(
-    private router: Router,
-    public jwt: JwtService
-  ) {}
+  constructor(private router: Router, public jwt: JwtService) {}
 
   canActivate() {
+    const defaultModulePath = `/analyze/${this.jwt.findDefaultCategoryId}`;
     const config = localStorage.getItem(CONFIG_KEY);
     if (!config) {
-      this.router.navigate([DEFAULT_ROUTE]);
+      this.router.navigate([defaultModulePath]);
       return false;
     }
 
     try {
       const pref = JSON.parse(config);
 
-
       if (!Array.isArray(pref.preferences)) {
-        this.router.navigate([DEFAULT_ROUTE]);
+        this.router.navigate([defaultModulePath]);
         return false;
       }
 
@@ -51,7 +47,7 @@ export class DefaultModuleGuard implements CanActivate {
         !defaultDashboardCat.preferenceValue ||
         !isObservePrivileged
       ) {
-        this.router.navigate([DEFAULT_ROUTE]);
+        this.router.navigate([defaultModulePath]);
         return false;
       }
 
@@ -62,7 +58,7 @@ export class DefaultModuleGuard implements CanActivate {
       });
       return false;
     } catch (err) {
-      this.router.navigate([DEFAULT_ROUTE]);
+      this.router.navigate([defaultModulePath]);
       return false;
     }
   }
@@ -80,7 +76,7 @@ export class DefaultModuleGuard implements CanActivate {
       fpFlatMap(module => module.prodModFeature),
       fpFlatMap(subModule => subModule.productModuleSubFeatures),
       fpFilter(({ prodModFeatureID }) => {
-        return parseInt(prodModFeatureID) == parseInt(categoryId)
+        return parseInt(prodModFeatureID) == parseInt(categoryId);
       })
     )(product.productModules);
     return modules.includes('OBSERVE') && checkPermissionForSubCat.length > 0;

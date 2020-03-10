@@ -41,15 +41,16 @@ export const CUSTOM_JWT_CONFIG = {
 export class JwtService {
   constructor(public _http: HttpClient) {}
 
-  _refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
+  private _localStorage = window.localStorage;
+  private _refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
 
   set(accessToken, refreshToken) {
-    window.localStorage[AppConfig.login.jwtKey] = accessToken;
-    window.localStorage[this._refreshTokenKey] = refreshToken;
+    this._localStorage[AppConfig.login.jwtKey] = accessToken;
+    this._localStorage[this._refreshTokenKey] = refreshToken;
   }
 
   get() {
-    return window.localStorage[AppConfig.login.jwtKey];
+    return this._localStorage[AppConfig.login.jwtKey];
   }
 
   getCategories(moduleName = 'ANALYZE') {
@@ -80,7 +81,7 @@ export class JwtService {
   }
 
   getRefreshToken() {
-    return window.localStorage[this._refreshTokenKey];
+    return this._localStorage[this._refreshTokenKey];
   }
 
   get refreshTokenObject() {
@@ -96,6 +97,26 @@ export class JwtService {
 
   validity() {
     return new Date(this.getTokenObj().ticket.validUpto);
+  }
+
+  /**
+   * Returns the id first subcategory id in the auth token.
+   *
+   * @readonly
+   * @type {number}
+   * @memberof JwtService
+   */
+  get findDefaultCategoryId() {
+    const token = this.getTokenObj();
+    const product = get(token, 'ticket.products.[0]');
+    const checkPermissionForSubCat = fpPipe(
+      fpFlatMap(module => module.prodModFeature),
+      fpFlatMap(subModule => subModule.productModuleSubFeatures),
+      fpFilter(({ prodModFeatureID }) => {
+        return parseInt(prodModFeatureID)
+      })
+    )(product.productModules);
+    return checkPermissionForSubCat[0].prodModFeatureID;
   }
 
   /**
@@ -133,8 +154,8 @@ export class JwtService {
   }
 
   destroy() {
-    window.localStorage.removeItem(AppConfig.login.jwtKey);
-    window.localStorage.removeItem(this._refreshTokenKey);
+    this._localStorage.removeItem(AppConfig.login.jwtKey);
+    this._localStorage.removeItem(this._refreshTokenKey);
   }
 
   parseJWT(jwt) {
@@ -386,7 +407,7 @@ export class JwtService {
       fpFlatMap(module => module.prodModFeature),
       fpFlatMap(subModule => subModule.productModuleSubFeatures),
       fpFilter(({ prodModFeatureID }) => {
-        return parseInt(prodModFeatureID) == parseInt(categoryId);
+        return parseInt(prodModFeatureID, 10) === parseInt(categoryId, 10);
       })
     )(product.productModules);
   }

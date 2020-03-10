@@ -9,6 +9,9 @@
   template: src=application.yml dest=/opt/bda/saw-export-service/conf
   notify:
     - restart sip-export
+- name: Copy SFTP keys
+  copy: src="{{ item }}" dest=/etc/bda/sftpkeys/ mode=664
+  with_fileglob: ["../../../../sftpkeys/*"]
 - name: Install SAW export Service ftp details file
   template: src=ftp-details.json dest=/opt/bda/saw-export-service/conf
 - name: Install SAW export Service s3 details file

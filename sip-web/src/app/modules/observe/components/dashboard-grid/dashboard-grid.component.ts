@@ -246,8 +246,15 @@ export class DashboardGridComponent
       return;
     }
 
+    const headerHeight = 48; // px
+    const comparisonOptionsHeight =
+      get(item, 'analysis.chartOptions.chartType') === 'comparison' ? 48 : 0;
+
     item.updater.next([
-      { path: 'chart.height', data: dimensions.height },
+      {
+        path: 'chart.height',
+        data: dimensions.height - (headerHeight + comparisonOptionsHeight)
+      },
       { path: 'chart.width', data: dimensions.width }
     ]);
   }

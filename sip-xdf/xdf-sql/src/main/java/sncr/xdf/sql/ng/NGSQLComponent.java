@@ -23,6 +23,7 @@ import sncr.xdf.sql.SQLDescriptor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
@@ -165,6 +166,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
         NGSQLComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
         try {
             long start_time = System.currentTimeMillis();
 
@@ -200,7 +202,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                     ComponentServices.TransformationMetadata,
                     ComponentServices.Spark
                 };
-            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
+            cfg = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
                 "sql", batchId);
 
@@ -222,7 +224,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg), rc, exception);
         System.exit(rc);
     }
 }

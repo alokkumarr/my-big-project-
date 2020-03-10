@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 
 import * as forEach from 'lodash/forEach';
+import * as set from 'lodash/set';
 import { BehaviorSubject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -28,6 +29,12 @@ export class CustomColorPickerComponent implements OnInit {
 
   @Input('config') set setConfig(data) {
     this.config = data;
+  }
+
+  @Input('bgColor') set setBgColor(data) {
+    if (this.config && data) {
+      set(this.config, 'bgColor', data);
+    }
   }
 
   constructor(private elRef: ElementRef, private renderer: Renderer2) {}

@@ -163,15 +163,13 @@ public class StorageProxyUtil {
       try {
         SemanticNode semanticNode = fetchSemantic(semanticId, metaDataServiceExport, restUtil);
         List<Object> artifactList = semanticNode.getArtifacts();
-        logger.info("artifact List: " + artifactList);
-
+        logger.trace("artifact List: " + artifactList);
         List<Artifact> artifacts = new ArrayList<>();
 
         for (Object artifact : artifactList) {
           List<Field> fields = new ArrayList<>();
           Artifact dslArtifact = new Artifact();
           Gson gson = new Gson();
-          logger.info("Gson String " + gson.toJson(artifact));
           JsonObject artifactObj = gson.toJsonTree(artifact).getAsJsonObject();
           dslArtifact.setArtifactsName(artifactObj.get("artifactName").getAsString());
           JsonArray columns = artifactObj.getAsJsonArray("columns");

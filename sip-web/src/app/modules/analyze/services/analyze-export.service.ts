@@ -119,7 +119,9 @@ export class AnalyzeExportService {
           In that case, user would have specified an alias, and BE also sends the data for that
           field under alias key */
           analysis.type === 'report'
-            ? f.alias === columnName || f.columnName === columnName
+            ? f.alias
+              ? f.alias === columnName
+              : f.columnName === columnName
             : f.columnName === columnName
         );
         if (field.aggregate === 'distinctCount' && analysis.type === 'report') {

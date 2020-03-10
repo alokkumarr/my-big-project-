@@ -285,7 +285,7 @@
                 </goals>
               </execution>
 
-              <execution>
+              <!-- <execution>
                 <id>yarn-test</id>
                 <goals>
                   <goal>yarn</goal>
@@ -294,7 +294,7 @@
                 <configuration>
                   <arguments>run coverage:check</arguments>
                 </configuration>
-              </execution>
+              </execution> -->
 
               <execution>
                 <id>yarn-run-build</id>
@@ -589,7 +589,7 @@
                 </goals>
               </execution>
 
-              <execution>
+              <!-- <execution>
                 <id>yarn-test</id>
                 <goals>
                   <goal>yarn</goal>
@@ -598,7 +598,7 @@
                 <configuration>
                   <arguments>run coverage:check</arguments>
                 </configuration>
-              </execution>
+              </execution> -->
 
               <execution>
                 <id>yarn-run-build</id>

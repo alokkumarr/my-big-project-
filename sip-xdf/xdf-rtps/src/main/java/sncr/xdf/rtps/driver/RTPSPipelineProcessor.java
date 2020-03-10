@@ -26,6 +26,7 @@ import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import java.util.Optional;
 
 public class RTPSPipelineProcessor {
 
@@ -52,7 +53,7 @@ public class RTPSPipelineProcessor {
 	String error;
 	String[] args;
 
-	public int processDataWithDataFrame(JSONObject pipeLineConfig, Map<String, Object> pipelineParams, String type) {
+	public void processDataWithDataFrame(JSONObject pipeLineConfig, Map<String, Object> pipelineParams, String type) {
 		logger.info("###### Starting pipeline with dataset.....:) for event type "+ type);
 		Dataset<Row> dataset = null;
 		int rc = 0;
@@ -63,66 +64,61 @@ public class RTPSPipelineProcessor {
 		JSONObject jsonConfig = null;
 		try {
             dataset = this.datafileDFmap.get("DATA_STREAM");
-            logger.debug("###### Dataset display completed.....:"+ dataset);
-			config =  pipeLineConfig.get("pipeline");
-			if( config instanceof JSONObject) {
-			    jsonConfig = (JSONObject)config;
-				rtaConfig = (JSONObject)jsonConfig.get("rta");
-			    logger.debug("### Pipeline config in RTPS pipeline ::"+ rtaConfig);
-			} else if( config instanceof JSONArray){
-				 pipeline = (JSONArray)config;
-				 logger.debug("### Pipeline config in RTPS pipeline ::"+ pipeLineConfig);
-			}
-			logger.debug("###### rta config "+ rtaConfig);
-    		if(rtaConfig ==null){
-    			logger.info("is Multiple doesnt exists ::");
-				logger.debug("### Pipeline configuration retrived successfully starting processing");
-				/**
-				 * If single pipeline, then need not process
-				 * first pipeline entry i.e rtps
-				 */
-				pipeLinStartIndex = 1;
-    		} else {
-    			logger.info("is Multiple  exists ::");
-    			pipeline = (JSONArray) jsonConfig.get(type);
-    			logger.debug("#######pipeline"  + pipeline);
-    		}
-			if(pipeline == null) {
-				logger.error("####No pipeline defined for event type "+ type);
-			} else {
-				for (int i = pipeLinStartIndex; i < pipeline.size() && rc == 0; i++) {
-					logger.info("### Pipeline starting from ::"+ pipeLinStartIndex);
-					JSONObject pipeObj = (JSONObject) pipeline.get(i);
-					String component = pipeObj.get("component").toString();
-					boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-					logger.debug("######## Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
-					logger.debug("######## Config   ---> " + pipeObj.get("configuration").toString() );
-					logger.debug("######## Params   ---> " + pipelineParams );
-					switch (component) {
-					case "parser":
-						rc = processParser(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-					case "transformer":
-						rc = processTransformer(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-					case "sql":
-						rc = processSQL(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-					case "esloader":
-						rc = processESLoader(pipelineParams, pipeObj.get("configuration").toString(), persist);
-						break;
-					}
-				}
-			}
-        } catch(Exception e){
-            logger.error("RTPSPipelineProcessor:processData() Exception is : ",e);
-            if (e instanceof XDFException) {
-                rc = ((XDFException)e).getReturnCode().getCode();
-            } else {
-                rc = XDFReturnCode.INTERNAL_ERROR.getCode();
+            logger.debug("###### Dataset display completed.....:" + dataset);
+            config = pipeLineConfig.get("pipeline");
+            if (config instanceof JSONObject) {
+                jsonConfig = (JSONObject) config;
+                rtaConfig = (JSONObject) jsonConfig.get("rta");
+                logger.debug("### Pipeline config in RTPS pipeline ::" + rtaConfig);
+            } else if (config instanceof JSONArray) {
+                pipeline = (JSONArray) config;
+                logger.debug("### Pipeline config in RTPS pipeline ::" + pipeLineConfig);
             }
+            logger.debug("###### rta config " + rtaConfig);
+            if (rtaConfig == null) {
+                logger.info("is Multiple doesnt exists ::");
+                logger.debug("### Pipeline configuration retrived successfully starting processing");
+                /**
+                 * If single pipeline, then need not process
+                 * first pipeline entry i.e rtps
+                 */
+                pipeLinStartIndex = 1;
+            } else {
+                logger.info("is Multiple  exists ::");
+                pipeline = (JSONArray) jsonConfig.get(type);
+                logger.debug("#######pipeline" + pipeline);
+            }
+            if (pipeline == null) {
+                logger.error("####No pipeline defined for event type " + type);
+            } else {
+                for (int i = pipeLinStartIndex; i < pipeline.size() && rc == 0; i++) {
+                    logger.info("### Pipeline starting from ::" + pipeLinStartIndex);
+                    JSONObject pipeObj = (JSONObject) pipeline.get(i);
+                    String component = pipeObj.get("component").toString();
+                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+                    logger.debug("######## Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
+                    logger.debug("######## Config   ---> " + pipeObj.get("configuration").toString());
+                    logger.debug("######## Params   ---> " + pipelineParams);
+                    switch (component) {
+                        case "parser":
+                            rc = processParser(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                        case "transformer":
+                            rc = processTransformer(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                        case "sql":
+                            rc = processSQL(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                        case "esloader":
+                            rc = processESLoader(pipelineParams, pipeObj.get("configuration").toString(), persist);
+                            break;
+                    }
+                }
+            }
+        }catch(Exception e){
+            logger.error("XDFDataProcessor:processData() Exception is : " + e.getMessage() + "\n");
+            //System.exit(rc);
         }
-        return rc;
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception {
@@ -136,6 +132,7 @@ public class RTPSPipelineProcessor {
         NGParser component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
 		try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
@@ -161,7 +158,7 @@ public class RTPSPipelineProcessor {
 			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
 					ComponentServices.TransformationMetadata, ComponentServices.Spark };
 
-			ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+			cfg = analyzeAndValidate(configAsStr);
 			logger.debug("#### After reading config:: Parser "+ cfg.getParser());
 			logger.debug("###### Setting up ngContext services with dataset.....");
 			NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser",
@@ -205,7 +202,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(cfg),rc, exception);
         return rc;
 	}
 
@@ -214,6 +211,7 @@ public class RTPSPipelineProcessor {
         NGTransformerComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration config = null;
 		try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
@@ -241,7 +239,7 @@ public class RTPSPipelineProcessor {
 
 			logger.debug("Starting Transformer component :" + "\n");
 
-			ComponentConfiguration config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
+			config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
 
 			NGContextServices ngTransformerCtxSvc = new NGContextServices(scs, xdfDataRootSys, config, appId,
 					"transformer", batchId);
@@ -281,7 +279,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
 	}
 
@@ -289,6 +287,7 @@ public class RTPSPipelineProcessor {
         NGSQLComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration config = null;
 		try {
 
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -319,7 +318,7 @@ public class RTPSPipelineProcessor {
 
 			logger.debug("Starting SQL component  dataSetName :" + dataSetName + "\n");
 
-			ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
+			config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
 
 			NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId, "sql", batchId);
 			ngSQLCtxSvc.initContext(); // debug
@@ -364,7 +363,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
 	}
 
@@ -372,7 +371,8 @@ public class RTPSPipelineProcessor {
         NGESLoaderComponent component = null;
         int rc= 0;
         Exception exception = null;
-		try {
+        ComponentConfiguration config = null;
+        try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
@@ -399,7 +399,7 @@ public class RTPSPipelineProcessor {
 
 			logger.debug("Starting ESLoader component :" + "\n");
 
-			ComponentConfiguration config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
+			config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
 			NGContextServices ngESCtxSvc = new NGContextServices(escs, xdfDataRootSys, config, appId, "esloader",
 					batchId);
 			ngESCtxSvc.initContext(); // debug
@@ -429,7 +429,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(component, rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), Optional.ofNullable(config),rc, exception);
         return rc;
 	}
 }
