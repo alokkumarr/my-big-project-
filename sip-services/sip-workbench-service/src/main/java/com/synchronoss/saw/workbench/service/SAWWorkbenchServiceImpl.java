@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+
+import com.synchronoss.saw.workbench.model.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -40,14 +42,9 @@ import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.SAWWorkBenchUtils;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.workbench.model.DataSet;
-import com.synchronoss.saw.workbench.model.Inspect;
-import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.model.Project.ResultFormat;
-import com.synchronoss.saw.workbench.model.StorageProxy;
 import com.synchronoss.saw.workbench.model.StorageProxy.Storage;
 import com.synchronoss.sip.utils.RestUtil;
-import com.synchronoss.saw.workbench.model.StorageType;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
@@ -58,7 +55,9 @@ import sncr.bda.services.DLMetadata;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
-import com.synchronoss.saw.workbench.model.DSSearchParams;
+import sncr.bda.conf.ProjectMetadata;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -140,7 +139,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         ps.readProjectData(defaultProjectId);
     } catch (Exception e) {
         logger.info("Creating default project: {}", defaultProjectId);
-        ps.createProjectRecord(defaultProjectId, "{}");
+        ps.createProjectRecord(defaultProjectId, "{\"allowableTags\":[\"cloud\",\"iot\"]}");
     }
 
     if (defaultProjectRoot.startsWith(prefix)) {
@@ -381,6 +380,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
               addSearchParamToMap(searchParams, DataSetProperties.Catalog, dsSearchParams.getCatalog());
               addSearchParamToMap(searchParams, DataSetProperties.DataSource, dsSearchParams.getDataSource());
               addSearchParamToMap(searchParams, DataSetProperties.Type, dsSearchParams.getDstype());
+              addSearchParamToMap(searchParams, DataSetProperties.Tags, dsSearchParams.getTags());
           }
           return searchParams;
       }else{
@@ -605,5 +605,35 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     System.out.println("Dataset : " +dataset.getSystem());
     System.out.println(DataSetProperties.UserData.toString());
   }
+
+    @Override
+    public ProjectMetadata getProjectMetadata(String proj) throws Exception {
+        logger.trace("Getting details of a project {} " + proj);
+        ProjectStore ps = new ProjectStore(defaultProjectRoot);
+        JsonElement prj = ps.readProjectData(proj);
+        ProjectMetadata projectMetadata = null;
+        if(prj != null){
+            projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
+        }
+        return projectMetadata;
+    }
+
+    @Override
+    public ProjectMetadata[] getAllProjectsMetadata() throws Exception {
+        logger.trace("Getting details of all projects");
+        ProjectStore ps = new ProjectStore(defaultProjectRoot);
+        String[] jsons = ps.readAllProjectsMetadata();
+        logger.debug("projects Metadata Json " + jsons);
+        ProjectMetadata[] projectsMetadata = null;
+        if(jsons != null){
+            projectsMetadata = new ProjectMetadata[jsons.length];
+            int index = 0;
+            for(String json : jsons){
+                projectsMetadata[index] = new Gson().fromJson(json, ProjectMetadata.class);
+                index++;
+            }
+        }
+        return projectsMetadata;
+    }
 
 }

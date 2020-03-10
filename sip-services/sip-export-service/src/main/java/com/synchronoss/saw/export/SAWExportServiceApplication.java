@@ -1,8 +1,17 @@
 package com.synchronoss.saw.export;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import info.faljse.SDNotify.SDNotify;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -21,6 +30,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class SAWExportServiceApplication {
 
+  @Value("${ftp.details.file}")
+  private String ftpDetailsFile;
+
+  @Value("${ftp.details.privatekeyDir}")
+  private String privateKeyDir;
+
   private static final Logger LOG = LoggerFactory.getLogger(SAWExportServiceApplication.class);
 
   @Bean(name="workExecutor")
@@ -31,12 +46,47 @@ public class SAWExportServiceApplication {
       taskExecutor.afterPropertiesSet();
       return taskExecutor;
   }
-  
-  public static void main(String[] args) {
+
+  public static void main(String[] args) throws IOException {
     ConfigurableApplicationContext ctx =
         SpringApplication.run(SAWExportServiceApplication.class, args);
     LOG.info(ctx.getApplicationName() + " has started.");
+  }
+  
+  public boolean validatePrivateKeys()
+      throws IOException {
+    boolean status = false;
 
+    ObjectMapper mapper = new ObjectMapper();
+
+    String content = new String(Files.readAllBytes(Paths.get(ftpDetailsFile)));
+
+    ObjectNode ftpDetails = (ObjectNode) mapper.readTree(content);
+
+    ArrayNode ftpList = (ArrayNode) ftpDetails.path("ftpList");
+
+    for (JsonNode ftpJsonNode : ftpList) {
+      ObjectNode ftpNode = (ObjectNode) ftpJsonNode;
+      JsonNode privateKeyNode = ftpNode.get("privatekeyFile");
+
+      if (privateKeyNode != null) {
+        String privateKeyFile = ftpNode.get("privatekeyFile").asText();
+
+        String privateKeyPath = privateKeyDir + File.separator + privateKeyFile;
+
+        if (!checkIfPrivateKeyExists(privateKeyPath)) {
+          throw new IOException("Private key " + privateKeyPath + " not found");
+        }
+      }
+    }
+
+    return status;
+  }
+
+  private static boolean checkIfPrivateKeyExists(String privateKeyFullPath) {
+    File privateKeyFile = new File(privateKeyFullPath);
+
+    return privateKeyFile.exists();
   }
 
   @EventListener

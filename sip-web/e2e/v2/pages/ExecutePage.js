@@ -84,6 +84,13 @@ class ExecutePage extends ConfirmationModel {
     this._publishAnalysis = element(by.xpath(`//span[text()=' Publish ']`));
     this._editAnalysis = element(by.css(`[e2e="actions-menu-selector-edit"]`));
     this._toastMessageInfo = element(by.css(`[class="toast toast-info"]`));
+    this._selectReport = selectReport => element(
+        by.xpath(
+            `//a[text()="${selectReport}"]/following::button[@e2e="actions-menu-toggle"]`));
+    this._navigateBackButton = element(by.css(`[fonticon="icon-arrow-left"]`));
+    this._ScheduleButton = element(by.css(`[e2e="actions-menu-selector-schedule"]`));
+    this._previousversionTab = element(by.cssContainingText('span','Previous Versions'));
+    this._scheduledInPreviousVersionTab = element(by.xpath('//td[text()="scheduled"]'));
   }
 
   verifyTitle(title) {
@@ -107,10 +114,12 @@ class ExecutePage extends ConfirmationModel {
     commonFunctions.waitFor.elementToBeVisible(this._actionMenuContents);
   }
 
+  clickReportActionLink(reportName) {
+    commonFunctions.clickOnElement(this._selectReport(reportName));
+  }
   clickOnDetails() {
     commonFunctions.clickOnElement(this._actionDetailsLink);
   }
-
   verifyDescription(description) {
     commonFunctions.waitFor.elementToBeVisible(this._description(description));
   }
@@ -246,7 +255,40 @@ class ExecutePage extends ConfirmationModel {
     });
   }
 
-  verifyAnalysisDetailsAndDelete(reportName, reportDescription) {
+  /*Method to click on schedule option*/
+  clickSchedule() {
+    commonFunctions.clickOnElement(this._ScheduleButton);
+  }
+  /*Method to click on previous version tab*/
+  clickPreviousVersions() {
+    commonFunctions.clickOnElement(this._previousversionTab);
+  }
+  /*Method to verify report is scheduled*/
+  verifyScheduleDetails() {
+    element(
+      this._scheduledInPreviousVersionTab.getText().then(value => {
+        if (value) {
+          expect(value.trim().toUpperCase()).toEqual('SCHEDULED');
+        } else {
+          expect(false).toBe(
+            true,
+            'Scheduled, it was expected to be present but found false'
+          );
+        }
+      })
+    );
+  }
+
+  verifyScheduleDetailsNotPresent() {
+    commonFunctions.waitFor.elementToBeNotVisible(this._scheduledInPreviousVersionTab);
+  }
+
+  closeDetails() {
+    commonFunctions.clickOnElement(this._navigateBackButton);
+    commonFunctions.waitFor.elementToBeNotVisible(this._navigateBackButton);
+  }
+
+  verifyAnalysisDetailsAndDelete(reportName, reportDescription){
     this.verifyTitle(reportName);
     this.clickOnActionLink();
     this.clickOnDetails();

@@ -26,11 +26,7 @@ class AnalyzePage extends CreateAnalysisModel {
     this._deleteButton = element(
       by.css(`[e2e="actions-menu-selector-delete"]`)
     );
-    this._scheduleButton = element(
-      by.xpath(
-        `//*[@e2e="actions-menu-selector-publish" and contains(text(),"Schedule")]`
-      )
-    );
+    this._scheduleButton = element(by.css(`[e2e="actions-menu-selector-schedule"]`));
     this._actionMenuOptions = element(
       by.xpath('//div[contains(@class,"mat-menu-panel")]')
     );
@@ -78,6 +74,12 @@ class AnalyzePage extends CreateAnalysisModel {
           `//a[contains(text(),'${name}')]/following::button[@e2e='action-fork-btn']`
         )
       );
+    this._scheduledTimingsInListView = reportName =>
+      element(
+      by.xpath(`//a[text()='${reportName}']/following::td[2]`));
+    this._scheduledTimingsInCardView = reportName =>
+      element(
+      by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
   }
 
   goToView(viewName) {
@@ -200,6 +202,40 @@ class AnalyzePage extends CreateAnalysisModel {
 
   clickOnForkButtonFromCardView(name) {
     commonFunctions.clickOnElement(this._forkButtonByAnalysis(name));
+  }
+
+  /*Method to verify report is scheduled*/
+  verifyScheduledTimingsInCardView(reportName,scheduledTime) {
+    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInCardView(reportName));
+    element(
+      this._scheduledTimingsInCardView(reportName).getText().then(value => {
+        if (value) {
+          expect(value.trim()).toEqual(scheduledTime);
+        } else {
+          expect(false).toBe(
+            true,
+            'Scheduled Timings did not match'
+          );
+        }
+      })
+    );
+  }
+
+  /*Method to verify report is scheduled*/
+  verifyScheduledTimingsInListView(reportName,scheduledTime) {
+    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInListView(reportName));
+    element(
+      this._scheduledTimingsInListView(reportName).getText().then(value => {
+        if (value) {
+          expect(value.trim()).toEqual(scheduledTime);
+        } else {
+          expect(false).toBe(
+            true,
+            'Scheduled Timings did not match'
+          );
+        }
+      })
+    );
   }
 
   goToDesignerPage(view, analysisType, dataPods) {

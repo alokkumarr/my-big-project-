@@ -17,7 +17,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     "subCategory",
     "catalog",
     "dataSource",
-    "dsType"
+    "dsType",
+    "tags"
 })
 public class DSSearchParams {
     @JsonProperty("category")
@@ -30,6 +31,8 @@ public class DSSearchParams {
     private String[] dataSource;
     @JsonProperty("dstype")
     private String[] dstype;
+    @JsonProperty("tags")
+    private String[] tags;
 
     @JsonProperty("category")
     public String[] getCategory() {
@@ -76,6 +79,11 @@ public class DSSearchParams {
         this.dstype = dstype;
     }
 
+    @JsonProperty("tags")
+    public String[] getTags() { return tags;  }
+    @JsonProperty("tags")
+    public void setTags(String[] tags) { this.tags = tags; }
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     @JsonAnyGetter
@@ -87,6 +95,7 @@ public class DSSearchParams {
         this.additionalProperties.put(name, value);
     }
 
+
     @Override
     public String toString() {
         return "DSSearchParams{" +
@@ -95,6 +104,7 @@ public class DSSearchParams {
             ", catalog=" + Arrays.toString(catalog) +
             ", dataSource=" + Arrays.toString(dataSource) +
             ", dstype=" + Arrays.toString(dstype) +
+            ", tags=" + Arrays.toString(tags) +
             ", additionalProperties=" + additionalProperties +
             '}';
     }
