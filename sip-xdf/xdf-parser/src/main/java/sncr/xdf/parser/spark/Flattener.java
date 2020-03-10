@@ -41,7 +41,7 @@ public class Flattener {
         return dataset;
     }
 
-    private Dataset<Row> processStructType(Dataset<Row> dataset, String parentColName, StructType structType){
+    public Dataset<Row> processStructType(Dataset<Row> dataset, String parentColName, StructType structType){
         logger.debug("Processing StructType Field");
         logger.debug("Parent Column Name : "+ parentColName);
         StructField[] subFields = structType.fields();
@@ -73,7 +73,7 @@ public class Flattener {
         return dataset;
     }*/
 
-    private Dataset<Row> processArrayType(Dataset<Row> dataset, String parentColName, ArrayType arrayType){
+    public Dataset<Row> processArrayType(Dataset<Row> dataset, String parentColName, ArrayType arrayType){
         logger.debug("Processing ArrayType Field");
         logger.debug("Parent Column Name : "+ parentColName);
         int arrSize = getArrayFieldMaxSize(dataset, parentColName);
@@ -98,7 +98,7 @@ public class Flattener {
         return dataset;
     }
 
-    private int getArrayFieldMaxSize(Dataset<Row> dataset, String arrayColName){
+    public int getArrayFieldMaxSize(Dataset<Row> dataset, String arrayColName){
         String newSizeColumn = arrayColName + NEW_COLUMN_NAME_DELIMITER + "arrSize";
         Dataset<Row> arraySizeDS = dataset.withColumn(newSizeColumn,size(dataset.col(arrayColName)));
         int arrSize = arraySizeDS.agg(max(arraySizeDS.col(newSizeColumn))).head().getInt(0);
