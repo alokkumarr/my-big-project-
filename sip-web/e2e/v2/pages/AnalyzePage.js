@@ -147,12 +147,22 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   clickOnAnalysisLink(name) {
+    commonFunctions.waitFor.elementToBeVisible(this._analysisTitleLink(name));
     commonFunctions.clickOnElement(this._analysisTitleLink(name));
     commonFunctions.waitFor.pageToBeReady(/executed/);
   }
 
   verifyToastMessagePresent(message) {
-    commonFunctions.waitFor.elementToBeVisible(this._toastMessage(message));
+    this._toastMessage(message).isDisplayed().then(()=>{
+      this._toastMessage(message).getText().then(value=>{
+        if(value){
+          expect(value.trim()).toEqual(message);
+          commonFunctions.clickOnElement(this._toastMessage(message));
+          browser.sleep(2000); // Need to wait else logout button will not be visible
+        }
+      })
+    }).catch(()=>{
+    });
   }
 
   verifyAnalysisDeleted(name) {
@@ -183,7 +193,8 @@ class AnalyzePage extends CreateAnalysisModel {
     commonFunctions.clickOnElement(this._analyzeExecuteButton);
   }
 
-  clickOnActionLinkByAnalysisName(name) {
+    clickOnActionLinkByAnalysisName(name) {
+    commonFunctions.waitFor.elementToBeVisible(this._actionLinkByAnalysisName(name));
     commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
   }
 
@@ -199,5 +210,6 @@ class AnalyzePage extends CreateAnalysisModel {
     this.clickOnDataPods(dataPods);
     this.clickOnCreateButton();
   }
+
 }
 module.exports = AnalyzePage;

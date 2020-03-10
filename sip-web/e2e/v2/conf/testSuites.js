@@ -37,6 +37,7 @@ const CRITICAL = [
   'prompt-filter/reportPromptFilters.test.js',
   'reports/createAndDeleteReport.test.js',
   'charts/topNForCharts.test.js',
+  'charts/topNForCharts.test.js',
   'charts/bottomNForCharts.test.js',
   'charts/SortingWithCharts.test.js',
   'bis/APIPullRouteSchedule.test.js',
@@ -61,7 +62,11 @@ const CRITICAL = [
   'reports/DLReportQuery.test.js',
   'pivots/UpdateAndDeletePivot.test.js',
   'alert/addAlert.test.js',
-  'alert/editDeleteAlerts.test.js'
+  'alert/editDeleteAlerts.test.js',
+  'publish/publishPivot.test.js',
+  'publish/publishReports.test.js',
+  'publish/publishCharts.test.js'
+
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];

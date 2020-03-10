@@ -70,6 +70,13 @@ class ChartsDesignerPage extends Designer {
     this._regionInput = element(by.css(`[formcontrolname='regionCtrl']`));
     this._regionByValue = region =>
       element(by.xpath(`//span[contains(text(),'${region}')]`));
+    this._pivotFieldValues = (dataType, value) =>
+      element(
+        by.xpath(
+          `//legend[contains(text(),'${dataType} Fields')]/following::mat-chip[contains(text(),"${value}")]`
+        )
+      );
+    this._validateFields = value => element(by.xpath(`//*[@text-anchor="middle"]/*[contains(text(),'${value}')]`));
   }
 
   searchAttribute(attribute) {
@@ -186,6 +193,24 @@ class ChartsDesignerPage extends Designer {
   selectRegion(region) {
     commonFunctions.clickOnElement(this._regionInput);
     commonFunctions.clickOnElement(this._regionByValue(region));
+  }
+
+  verifyPivotFields(dataType,value) {
+    commonFunctions.waitFor.elementToBeVisible(this._pivotFieldValues(dataType,value));
+  }
+
+  verifyFields(fieldValue) {
+    browser.sleep(2000); //Need to add otherwise element not found exception will be displayed
+    this._validateFields(fieldValue).getText().then(value=>{
+      if(value) {
+        expect(value.trim()).toContain(fieldValue);
+      }else {
+        expect(false).toBe(
+          true,
+          'Fields Validation not Successful'
+        );
+      }
+    });
   }
 }
 module.exports = ChartsDesignerPage;

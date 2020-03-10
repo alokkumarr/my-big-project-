@@ -10,71 +10,80 @@ class ExecutePage extends ConfirmationModel {
     super();
     this._actionMenuLink = element(by.css(`[e2e='actions-menu-toggle']`));
     this._actionMenuContents = element(
-      by.xpath(`//*[@class="mat-menu-content"]`)
+       by.xpath(`//*[@class="mat-menu-content"]`)
     );
     this._analysisTitle = element(by.css(`[class="analysis__title"]`));
     this._actionDetailsLink = element(
-      by.css(`[e2e="actions-menu-selector-details"]`)
+       by.css(`[e2e="actions-menu-selector-details"]`)
     );
     this._description = value =>
-      element(by.xpath(`//p[contains(text(),"${value}")]`));
+        element(by.xpath(`//p[contains(text(),"${value}")]`));
     this._drawer = element(
-      by.xpath(`//div[contains(@class," mat-drawer-shown")]`)
+        by.xpath(`//div[contains(@class," mat-drawer-shown")]`)
     );
     this._delete = element(by.css(`[e2e='actions-menu-selector-delete']`));
     this._editLink = element(by.css(`[e2e="action-edit-btn"]`));
     this._forkAndEditLink = element(by.css(`[e2e="action-fork-btn"]`));
     this._executeButton = element(
-      by.css(`button[e2e="actions-menu-selector-execute"]`)
+        by.css(`button[e2e="actions-menu-selector-execute"]`)
     );
     this._selectedFilter = value =>
-      element(by.css(`[e2e="filters-execute-${value}"]`));
+        element(by.css(`[e2e="filters-execute-${value}"]`));
     this._reportColumnChooser = element(by.css(`[title="Column Chooser"]`));
     this._pivotData = element(
-      by.xpath(`//pivot-grid[contains(@class,'executed-view-pivot')]`)
+        by.xpath(`//pivot-grid[contains(@class,'executed-view-pivot')]`)
     );
     this._chartData = element(
-      by.xpath(
-        `//executed-chart-view[contains(@class,'executed-chart-analysis')]`
-      )
+        by.xpath(
+            `//executed-chart-view[contains(@class,'executed-chart-analysis')]`
+        )
     );
     this._toastSuccess = element(by.css(`[class*='toast-success']`));
-
     this._aggregate = name => element(by.css(`[class*=' icon-${name}']`));
     this._previousVersion = element(
-      by.xpath(`//span[text()='Previous Versions']`)
+        by.xpath(`//span[text()='Previous Versions']`)
     );
     this._firstHistory = element(by.xpath(`(//tr)[2]`));
     this._executeButtonInDetailPage = element(
-      by.xpath(`//span[contains(text(),'Execute')]/parent::button`)
+        by.xpath(`//span[contains(text(),'Execute')]/parent::button`)
     );
     this._gridViewIcon = element(by.css(`[mattooltip='Toggle to Grid']`));
     this._perPageSizeSection = element(by.css(`[class='dx-page-sizes']`));
     this._itemPerPageSizeSection = element(by.css(`[class='dx-page-sizes']`));
     this._totalPerPageOptions = element.all(
-      by.xpath(
-        `//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')]`
-      )
+        by.xpath(
+            `//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')]`
+        )
     );
     this._itemPerPageOptions = item =>
-      element(
-        by.xpath(
-          `(//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')])[${item}]`
-        )
-      );
+        element(
+            by.xpath(
+                `(//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')])[${item}]`
+            )
+        );
 
     this._pagesSection = element(by.css(`[class='dx-pages']`));
     this._totalPages = element.all(
-      by.xpath(
-        `//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')]`
-      )
+        by.xpath(
+            `//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')]`
+        )
     );
     this._paginationPage = number =>
-      element(
-        by.xpath(
-          `(//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')])[${number}]`
-        )
-      );
+        element(
+            by.xpath(
+                `(//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')])[${number}]`
+            )
+        );
+    this._publishLink = element(by.css(`[e2e="actions-menu-selector-publish"]`));
+    this._listBox = element(by.xpath(`(//span[text()=' Publish ']/preceding::mat-select[@role='listbox'])[last()]`));
+    this._selectCategory = subCategory =>
+        element(
+            by.xpath(
+                `//*[@class='mat-option-text' and contains(text(),'${subCategory}')]`
+            ));
+    this._publishAnalysis = element(by.xpath(`//span[text()=' Publish ']`));
+    this._editAnalysis = element(by.css(`[e2e="actions-menu-selector-edit"]`));
+    this._toastMessageInfo = element(by.css(`[class="toast toast-info"]`));
   }
 
   verifyTitle(title) {
@@ -247,6 +256,41 @@ class ExecutePage extends ConfirmationModel {
     this.clickOnActionLink();
     this.clickOnDelete();
     this.confirmDelete();
+  }
+
+  clickOnPublishLink() {
+    commonFunctions.clickOnElement(this._publishLink);
+  }
+
+  clickCategoryList() {
+    commonFunctions.clickOnElement(this._listBox);
+  }
+
+  selectSubCategoryFromList(subCategory) {
+    commonFunctions.clickOnElement(this._selectCategory(subCategory));
+  }
+
+  clickPublish() {
+    commonFunctions.waitFor.elementToBeVisible(this._publishAnalysis);
+    commonFunctions.clickOnElement(this._publishAnalysis);
+    browser.sleep(2000); //Need to add otherwise it will interrupt clicking on Toast Message
+  }
+
+  deleteAnalysis() {
+    this.clickOnActionLink();
+    this.clickOnDelete();
+    this.confirmDelete();
+  }
+
+  publishAnalysis(publishCategory) {
+    this.clickOnPublishLink();
+    this.clickCategoryList();
+    this.selectSubCategoryFromList(publishCategory);
+    this.clickPublish();
+  }
+
+  editAnalysis() {
+    commonFunctions.clickOnElement(this._editAnalysis);
   }
 }
 module.exports = ExecutePage;
