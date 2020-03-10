@@ -68,7 +68,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
       try {
         String channelMetadata = bisChannelEntity.getChannelMetadata();
         String sanitizedChannelMetadata = JsonSanitizer.sanitize(channelMetadata);
-        nodeEntity = objectMapper.readTree(channelMetadata);
+        nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
         rootNode = (ObjectNode) nodeEntity;
         String hostname = rootNode.get("hostName").asText();
         defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
