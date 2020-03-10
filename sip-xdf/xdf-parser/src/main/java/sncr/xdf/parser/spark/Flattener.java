@@ -13,11 +13,17 @@ import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.size;
 import java.util.Arrays;
 import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import sncr.xdf.context.InternalContext;
+import sncr.xdf.services.WithDataSet;
 
 public class Flattener {
     private static final Logger logger = Logger.getLogger(Flattener.class);
     private static final String SPARK_COLUMN_NAME_DELIMITER = ".";
     private static final String NEW_COLUMN_NAME_DELIMITER = "_";
+
+    public Flattener(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper){
+        NGComponentUtil.setCheckpointDir(ctx, withDataSet, datasetHelper);
+    }
 
     public Dataset<Row> flattenDataset(Dataset<Row> dataset){
         StructType dsSchema = dataset.schema();

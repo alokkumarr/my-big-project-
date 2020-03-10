@@ -16,6 +16,12 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder;
+import sncr.xdf.context.InternalContext;
+import sncr.xdf.services.WithDataSet;
+import sncr.bda.core.file.HFileOperations;
+import org.apache.hadoop.fs.Path;
+import sncr.bda.base.MetadataBase;
+import java.util.UUID;
 
 public class NGComponentUtil {
 
@@ -134,5 +140,23 @@ public class NGComponentUtil {
                 .replaceAll("\\s+", "_").toUpperCase();
         }
         return fieldName;
+    }
+
+    public static void setCheckpointDir(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper) {
+        try {
+            String checkpointDir = withDataSet.generateCheckpointLocation(datasetHelper, null, null);
+            if (ctx.fs.exists(new Path(checkpointDir))) {
+                HFileOperations.deleteEnt(checkpointDir);
+            }
+            HFileOperations.createDir(checkpointDir);
+            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
+        }catch (Exception e) {
+            logger.error("Exception in creating checkpoint Dir : ", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException) e);
+            } else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
+        }
     }
 }

@@ -103,7 +103,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private boolean isFlatteningEnabled;
     private boolean isPivotApplied;
     private boolean isSchemaContainsJsonType;
-    private boolean isAlreadyCheckpointDirSet;
+    private DataSetHelper datasetHelper = null;
+    private Flattener flattner = null;
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
@@ -145,10 +146,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
         sourcePath = ngctx.componentConfiguration.getParser().getFile();
-        tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
-                                      null, null);
-
-        archiveDir = generateArchiveLocation(new DataSetHelper(ngctx, services.md));
+        datasetHelper = new DataSetHelper(ngctx, services.md);
+        tempDir = generateTempLocation(datasetHelper, null, null);
+        archiveDir = generateArchiveLocation(datasetHelper);
 
         Map<String, Object> outputDataset = getOutputDatasetDetails();
         logger.debug("Output dataset details = " + outputDataset);
@@ -1060,8 +1060,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     logger.debug("Field isFlatteningEnabled : "+ field.isFlatteningEnabled());
                     dataset = dataset.withColumn(jsonFieldName, from_json(dataset.col(jsonFieldName), sanitizedSchema));
                     if(!isFlatteningEnabled && field.isFlatteningEnabled()){
-                        if(!isAlreadyCheckpointDirSet) {setCheckpointDir();}
-                        dataset = new Flattener().processStructType(dataset, jsonFieldName, sanitizedSchema);
+                        if(flattner == null) {flattner = new Flattener(ctx, this, datasetHelper);}
+                        dataset = flattner.processStructType(dataset, jsonFieldName, sanitizedSchema);
                     }
                     dataset.show();
                     logger.debug("Dataset Schema after Json String field - " + jsonFieldName + " - to Struct Type : " + dataset.schema());
@@ -1084,28 +1084,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
         return dataset;
     }
-    public void setCheckpointDir() {
-        try {
-            String checkpointDir = generateCheckpointLocation(new DataSetHelper(ngctx, services.md), null, null);
-            if (ctx.fs.exists(new Path(checkpointDir))) {
-                HFileOperations.deleteEnt(checkpointDir);
-            }
-            HFileOperations.createDir(checkpointDir);
-            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
-            isAlreadyCheckpointDirSet = true;
-        }catch (Exception e) {
-            logger.error("Exception in creating checkpoint Dir : ", e);
-            if (e instanceof XDFException) {
-                throw ((XDFException) e);
-            } else {
-                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
-            }
-        }
-    }
 
     public Dataset<Row> flattenDataset(Dataset<Row> dataset) {
-        if(!isAlreadyCheckpointDirSet) {setCheckpointDir();}
-        return new Flattener().flattenDataset(dataset);
+        if(flattner == null) {flattner = new Flattener(ctx, this, datasetHelper);}
+        return flattner.flattenDataset(dataset);
     }
 
     public Dataset<Row> sortColumnNames(Dataset<Row> dataset){
