@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.google.json.JsonSanitizer;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
@@ -192,7 +193,9 @@ public class SftpServiceImpl extends SipPluginContract {
       SessionFactory<LsEntry> sessionFactory =
           delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId());
       try (Session<?> session = sessionFactory.getSession()) {
-        nodeEntity = objectMapper.readTree(entity.getRouteMetadata());
+        String routeMetadataStr = entity.getRouteMetadata();
+        String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+        nodeEntity = objectMapper.readTree(sanitizedRouteMetadataStr);
         rootNode = (ObjectNode) nodeEntity;
         String destinationLoc = this.constructDestinationPath(
             rootNode.get("destinationLocation").asText());
@@ -703,7 +706,9 @@ public class SftpServiceImpl extends SipPluginContract {
           if (bisRouteEntity.getStatus() > 0) {
             JsonNode nodeEntity = null;
             ObjectNode rootNode = null;
-            nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+            String routeMetadataStr = bisRouteEntity.getRouteMetadata();
+            String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+            nodeEntity = objectMapper.readTree(sanitizedRouteMetadataStr);
             rootNode = (ObjectNode) nodeEntity;
             String sourceLocation = rootNode.get("sourceLocation").asText();
             if (rootNode.get("batchSize") != null) {
@@ -1240,8 +1245,9 @@ public class SftpServiceImpl extends SipPluginContract {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode;
         try {
-          rootNode = objectMapper.readTree(
-                route.getRouteMetadata());
+          String routeMetadataStr = route.getRouteMetadata();
+          String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+          rootNode = objectMapper.readTree(sanitizedRouteMetadataStr);
           filePattern = rootNode.get("filePattern").asText();
           logger.trace("File pattern::" + filePattern);
         } catch (IOException exception) {
@@ -1279,8 +1285,10 @@ public class SftpServiceImpl extends SipPluginContract {
               .enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
           BisRouteEntity bisRouteEntity = routeEntity.get();
 
+          String routeMetadataStr = bisRouteEntity.getRouteMetadata();
+          String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
           JsonNode nodeEntity = objectMapper
-              .readTree(bisRouteEntity.getRouteMetadata());
+              .readTree(sanitizedRouteMetadataStr);
           JsonNode rootNode = (ObjectNode) nodeEntity;
           String sourceLocation = rootNode.get("sourceLocation").asText();
           if (rootNode.get("batchSize") != null) {

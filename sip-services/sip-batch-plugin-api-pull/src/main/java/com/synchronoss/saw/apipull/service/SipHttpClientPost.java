@@ -1,6 +1,7 @@
 package com.synchronoss.saw.apipull.service;
 
 import com.google.gson.Gson;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import java.util.Map;
@@ -53,8 +54,9 @@ public class SipHttpClientPost extends SipBaseHttpClient {
    */
   public static boolean isJSONValid(String jsonInString) {
     try {
+      String sanitizedJsonInString = JsonSanitizer.sanitize(jsonInString);
       Gson gson = new Gson();
-      gson.fromJson(jsonInString, Object.class);
+      gson.fromJson(sanitizedJsonInString, Object.class);
       logger.debug("Request body is a Valid Json");
       return true;
     } catch (com.google.gson.JsonSyntaxException ex) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.json.JsonSanitizer;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
@@ -80,7 +81,9 @@ public class SftpRetryServiceImpl implements SipRetryContract {
               if (bisRouteEntity.getStatus() > 0) {
                 JsonNode nodeEntity = null;
                 ObjectNode rootNode = null;
-                nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+                String routeMetadataStr = bisRouteEntity.getRouteMetadata();
+                String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+                nodeEntity = objectMapper.readTree(sanitizedRouteMetadataStr);
                 rootNode = (ObjectNode) nodeEntity;
                 // The below change has been made for the task SIP-6292
                 

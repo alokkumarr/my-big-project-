@@ -1,5 +1,6 @@
 package com.synchronoss.saw.workbench.service;
 
+import com.google.json.JsonSanitizer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -484,7 +485,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         fields.addPOJO(obj);
       } // end of internal for loop to read storeField
       schema.putArray("fields").addAll(fields);
-      esDataSet = objectMapper.readValue(objectMapper.writeValueAsString(node), DataSet.class);
+      String nodeStr = objectMapper.writeValueAsString(node);
+      String sanitizedNodeStr = JsonSanitizer.sanitize(nodeStr);
+      esDataSet = objectMapper.readValue(sanitizedNodeStr, DataSet.class);
       esDataSet.setStorageType(StorageType.ES.name());
       esDataSet.setJoinEligible(false);
       esDataSet.setRecordCount(Long.parseLong(perAliasResponse.getBody().getCount()));
@@ -514,7 +517,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonNode node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
+    String datasetStr = objectMapper.writeValueAsString(dataSet);
+    String sanitizedDatasetStr = JsonSanitizer.sanitize(datasetStr);
+    JsonNode node = objectMapper.readTree(sanitizedDatasetStr);
     ObjectNode rootNode = (ObjectNode) node;
     Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
@@ -561,7 +566,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     //ArrayNode inputPath = objectMapper.createArrayNode();
     //inputPath.addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
     //systemNode.putArray("inputPath").addAll(inputPath);
-    DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class);
+    String nodeStr = node.toString();
+    String sanitizedNodeStr = JsonSanitizer.sanitize(nodeStr);
+    DataSet dataSetNode = objectMapper.readValue(sanitizedNodeStr, DataSet.class);
     try {
       List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode,
           basePath, id, Action.create, Category.DataSet);

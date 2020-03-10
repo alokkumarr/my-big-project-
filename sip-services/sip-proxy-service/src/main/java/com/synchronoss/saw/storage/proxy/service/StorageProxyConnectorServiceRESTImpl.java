@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.google.common.io.CharStreams;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.model.Store;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
@@ -23,6 +25,9 @@ import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
@@ -133,7 +138,14 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         HttpEntity entity = response.getEntity();
-        searchResponse = objectMapper.readValue(entity.getContent(), SearchESResponse.class);
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+
+        searchResponse = objectMapper.readValue(sanitizedContentStr, SearchESResponse.class);
         client.close();
     }
     finally{
@@ -164,7 +176,13 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
             objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
             objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
             HttpEntity entity = response.getEntity();
-            jsonNode = objectMapper.readTree(entity.getContent());
+
+            // Test this thoroughly
+            InputStream contentStream = entity.getContent();
+            Reader reader = new InputStreamReader(contentStream);
+
+            String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+            jsonNode = objectMapper.readTree(sanitizedContentStr);
         }
         finally{
             if (client !=null){
@@ -191,7 +209,15 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         HttpEntity entity = response.getEntity();
-        createAndDeleteESResponse = objectMapper.readValue(entity.getContent(), CreateAndDeleteESResponse.class);
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+
+        createAndDeleteESResponse = objectMapper
+            .readValue(sanitizedContentStr, CreateAndDeleteESResponse.class);
         client.close();
     }
     finally{
@@ -224,7 +250,14 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         objectMapper.disable((DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
         HttpEntity entity = response.getEntity();
-        createAndDeleteESResponse = objectMapper.readValue(entity.getContent(), CreateAndDeleteESResponse.class);
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+
+        createAndDeleteESResponse = objectMapper.readValue(sanitizedContentStr, CreateAndDeleteESResponse.class);
         client.close();
     }
     finally{
@@ -254,7 +287,14 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         HttpEntity entity = response.getEntity();
-        countResponse = objectMapper.readValue(entity.getContent(), CountESResponse.class);
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+
+        countResponse = objectMapper.readValue(sanitizedContentStr, CountESResponse.class);
         client.close();
     }
     finally{
@@ -281,7 +321,15 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         HttpEntity entity = response.getEntity();
-        catClusterIndexResponse = objectMapper.readValue(entity.getContent(), new TypeReference<List<ClusterIndexResponse>>(){});;
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+
+        catClusterIndexResponse = objectMapper
+            .readValue(sanitizedContentStr, new TypeReference<List<ClusterIndexResponse>>(){});;
     }
     finally{
       if (client !=null){
@@ -306,7 +354,15 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         HttpEntity entity = response.getEntity();
-        catClusterIndexResponse = objectMapper.readValue(entity.getContent(), new TypeReference<List<ClusterAliasesResponse>>(){});;
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+
+        catClusterIndexResponse = objectMapper
+            .readValue(sanitizedContentStr, new TypeReference<List<ClusterAliasesResponse>>(){});
     }
     finally{
       if (client !=null){
@@ -338,7 +394,14 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         HttpEntity entity = response.getEntity();
-        JsonNode mappingNode  = objectMapper.readTree(entity.getContent());
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+
+        JsonNode mappingNode  = objectMapper.readTree(sanitizedContentStr);
         logger.trace("mappingNode: " + objectMapper.writeValueAsString(mappingNode));
         // The below query to figure the type name dynamically for ES 6.x
         String typeAggregationQuery= "{\"aggs\":{\"typeAgg\":{\"terms\":{\"field\":\"_type\",\"size\":1}}},\"size\":0}";
@@ -402,7 +465,13 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         HttpEntity entity = response.getEntity();
-        JsonNode mappingNode  = objectMapper.readTree(entity.getContent());
+
+        // Test this thoroughly
+        InputStream contentStream = entity.getContent();
+        Reader reader = new InputStreamReader(contentStream);
+
+        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        JsonNode mappingNode  = objectMapper.readTree(sanitizedContentStr);
         logger.trace("mappingNode: " + objectMapper.writeValueAsString(mappingNode));
         // The below query to figure the type name dynamically for ES 6.x
         String typeAggregationQuery= "{\"aggs\":{\"typeAgg\":{\"terms\":{\"field\":\"_type\",\"size\":1}}},\"size\":0}";
@@ -413,7 +482,9 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         ObjectNode rootNode = (ObjectNode) mappingNode;
         logger.trace("rootNode: " + objectMapper.writeValueAsString(rootNode));
         if (indexAggregationResult.getAggregations()!=null) {
-          JsonNode aggregationNode  = objectMapper.readTree(objectMapper.writeValueAsString(indexAggregationResult.getAggregations()));
+          String aggStr = objectMapper.writeValueAsString(indexAggregationResult.getAggregations());
+          String sanitizedAggStr = JsonSanitizer.sanitize(aggStr);
+          JsonNode aggregationNode  = objectMapper.readTree(sanitizedAggStr);
           logger.trace("aggregationNodeIndex: " + objectMapper.writeValueAsString(aggregationNode));
           indexbucketNode = (ArrayNode) aggregationNode.get(INDEX_AGGREGATION_NAME).get(BUCKETS);;
           logger.trace("indexBucketNode: " + objectMapper.writeValueAsString(indexbucketNode));
@@ -563,13 +634,16 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   String mappingString = "{\"mct_tmo_session\":{\"mappings\":{\"session\":{\"dynamic\":\"strict\",\"properties\":{\"APP_KEY\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\"}}},\"AVAILABLE_BYTES\":{\"type\":\"double\"}}}}}}";
   String result ="{\"took\":7,\"timed_out\":false,\"_shards\":{\"total\":5,\"successful\":5,\"skipped\":0,\"failed\":0},\"hits\":{\"total\":538335,\"max_score\":0,\"hits\":[]},\"aggregations\":{\"typeAgg\":{\"doc_count_error_upper_bound\":0,\"sum_other_doc_count\":0,\"buckets\":[{\"key\":\"session\",\"doc_count\":538335}]}}}";
 
-  JsonNode mappingNode  = objectMapper.readTree(mappingString);
+
+  String sanitizedMappingStr = JsonSanitizer.sanitize(mappingString);
+  JsonNode mappingNode  = objectMapper.readTree(sanitizedMappingStr);
   ObjectNode rootNode = (ObjectNode) mappingNode;
   ObjectNode mappingDataNode = (ObjectNode)rootNode.get("mct_tmo_session").get("mappings");
 
   System.out.println(mappingDataNode);
 
-  JsonNode aggregationNode  = objectMapper.readTree(result);
+  String sanitizedResult = JsonSanitizer.sanitize(result);
+  JsonNode aggregationNode  = objectMapper.readTree(sanitizedResult);
   ArrayNode bucketNode = (ArrayNode) aggregationNode.get("aggregations").get("typeAgg").get("buckets");
   List<String> typesOfIndex = new ArrayList<String>();
   for (JsonNode node : bucketNode) {

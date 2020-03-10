@@ -1,6 +1,7 @@
 package com.synchronoss.saw.es;
 
 import com.google.gson.Gson;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.constants.CommonQueryConstants;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Expression;
@@ -174,9 +175,10 @@ public class SIPAggregationBuilder {
              * provided field.
              */
             String expressionStr = field.getExpression();
+            String sanitizedExpressionStr = JsonSanitizer.sanitize(expressionStr);
             Gson gson = new Gson();
-            if (expressionStr != null && expressionStr.length() != 0) {
-              Expression expression = gson.fromJson(expressionStr, Expression.class);
+            if (sanitizedExpressionStr != null && sanitizedExpressionStr.length() != 0) {
+              Expression expression = gson.fromJson(sanitizedExpressionStr, Expression.class);
               String dataFieldName = field.getDataField();
               expressionEvaluator(dataFieldName, expression, aggregationBuilder);
             }

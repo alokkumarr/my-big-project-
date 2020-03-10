@@ -2,6 +2,7 @@ package com.synchronoss.saw.logs.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.models.BisFileLogDetails;
 import com.synchronoss.saw.logs.models.BisLogs;
@@ -189,7 +190,8 @@ public class SawBisFileLogsController {
     Long latFired = null;
     Long nextFired = null;
     try {
-      rootNode = objectMapper.readTree(response);
+      String sanitizedResponse = JsonSanitizer.sanitize(response);
+      rootNode = objectMapper.readTree(sanitizedResponse);
       dataNode = rootNode.get("data");
       logger.trace("data node from response " + dataNode);
       if (dataNode.isArray() && dataNode.size() > 0) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.ApiChannelMetadata;
@@ -130,15 +131,17 @@ public class ApiPullServiceImpl extends SipPluginContract {
       BisChannelEntity channelEntity = bisChannelEntity.get();
 
       String channelMetadataStr = channelEntity.getChannelMetadata();
+      String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
 
       ApiChannelMetadata apiChannelMetadata =
-          gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+          gson.fromJson(sanitizedChannelMetadataStr, ApiChannelMetadata.class);
 
       String hostAddress = apiChannelMetadata.getHostAddress();
       Integer port = apiChannelMetadata.getPort();
 
       String routeMetadataStr = entity.getRouteMetadata();
-      ApiRouteMetadata apiRouteMetadata = gson.fromJson(routeMetadataStr, ApiRouteMetadata.class);
+      String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+      ApiRouteMetadata apiRouteMetadata = gson.fromJson(sanitizedRouteMetadataStr, ApiRouteMetadata.class);
 
       String apiEndPoint = apiRouteMetadata.getApiEndPoint();
       String destinationLocation = apiRouteMetadata.getDestinationLocation();
@@ -208,6 +211,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     BisChannelEntity channelEntity = bisChannelEntity.get();
 
     String channelMetadataStr = channelEntity.getChannelMetadata();
+    String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -215,7 +219,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     Gson gson = gsonBuilder.create();
 
     ApiChannelMetadata apiChannelMetadata =
-        gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+        gson.fromJson(sanitizedChannelMetadataStr, ApiChannelMetadata.class);
 
     SipApiRequest apiRequest = new SipApiRequest();
 
@@ -314,6 +318,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     BisChannelEntity channelEntity = bisChannelEntity.get();
 
     String channelMetadataStr = channelEntity.getChannelMetadata();
+    String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -321,7 +326,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     Gson gson = gsonBuilder.create();
 
     ApiChannelMetadata apiChannelMetadata =
-        gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+        gson.fromJson(sanitizedChannelMetadataStr, ApiChannelMetadata.class);
 
     SipApiRequest apiRequest = new SipApiRequest();
 
@@ -687,9 +692,10 @@ public class ApiPullServiceImpl extends SipPluginContract {
         logger.debug("Channel Entity = " + channelEntity);
 
         String channelMetadataStr = channelEntity.getChannelMetadata();
+        String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
 
         ApiChannelMetadata apiChannelMetadata =
-            gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+            gson.fromJson(sanitizedChannelMetadataStr, ApiChannelMetadata.class);
 
         logger.debug("Channel Metadata = " + apiChannelMetadata);
 
@@ -698,7 +704,9 @@ public class ApiPullServiceImpl extends SipPluginContract {
         logger.debug("Port = " + port);
 
         String routeMetadataStr = routeEntity.getRouteMetadata();
-        ApiRouteMetadata apiRouteMetadata = gson.fromJson(routeMetadataStr, ApiRouteMetadata.class);
+        String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+        ApiRouteMetadata apiRouteMetadata =
+            gson.fromJson(sanitizedRouteMetadataStr, ApiRouteMetadata.class);
 
         logger.debug("Route metadata = " + apiRouteMetadata);
 

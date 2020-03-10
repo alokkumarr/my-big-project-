@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
@@ -124,15 +125,20 @@ public class MigrationService {
     JsonNode json = objectMapper.readTree(resource.getFile());
 
     String mdService = json.toString();
+    String sanitizedMdService = JsonSanitizer.sanitize(mdService);
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSemanticObjects contentDataLocation =
         objectMapper.readValue(dataLocation, DataSemanticObjects.class);
-    MetaDataObjects metaDataObjects = objectMapper.readValue(mdService, MetaDataObjects.class);
+    MetaDataObjects metaDataObjects =
+        objectMapper.readValue(sanitizedMdService, MetaDataObjects.class);
 
+    String analyzeStr =
+        objectMapper.writeValueAsString(metaDataObjects.getContents().get(0).getAnalyze());
+
+    String sanitizedAnalyzeStr = JsonSanitizer.sanitize(analyzeStr);
     List<BinarySemanticNode> binaryNodes =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(metaDataObjects.getContents().get(0).getAnalyze()),
+        objectMapper.readValue(sanitizedAnalyzeStr,
             new TypeReference<List<BinarySemanticNode>>() {});
     SemanticNode semanticNode = null;
     for (BinarySemanticNode binarySemanticNode : binaryNodes) {
@@ -155,9 +161,10 @@ public class MigrationService {
       if (binarySemanticNode.getEsRepository() != null) {
         semanticNode.setEsRepository(binarySemanticNode.getEsRepository());
       } else {
+        String repositoryStr = objectMapper.writeValueAsString(binarySemanticNode.getRepository());
+        String sanitizedRepositoryStr = JsonSanitizer.sanitize(repositoryStr);
         JsonNode repository =
-            objectMapper.readTree(
-                objectMapper.writeValueAsString(binarySemanticNode.getRepository()));
+            objectMapper.readTree(sanitizedRepositoryStr);
         ArrayNode repositories = (ArrayNode) repository.get("objects");
         ObjectNode newRepoNode = null;
         List<Object> repositoryObjects = new ArrayList<>();
@@ -247,10 +254,12 @@ public class MigrationService {
         && (binarySemanticStoreData.getBody().getContents() != null)
         && (binarySemanticStoreData.getBody().getContents().size() > 0))) {
       logger.trace(objectMapper.writeValueAsString(binarySemanticStoreData));
+
+      String analyzeStr = objectMapper.writeValueAsString(
+          binarySemanticStoreData.getBody().getContents().get(0).getAnalyze());
+      String sanitizedAnalyseStr = JsonSanitizer.sanitize(analyzeStr);
       List<BinarySemanticNode> binaryNodes =
-          objectMapper.readValue(
-              objectMapper.writeValueAsString(
-                  binarySemanticStoreData.getBody().getContents().get(0).getAnalyze()),
+          objectMapper.readValue(sanitizedAnalyseStr,
               new TypeReference<List<BinarySemanticNode>>() {});
       SemanticNode semanticNode = null;
       for (BinarySemanticNode binarySemanticNode : binaryNodes) {
@@ -273,9 +282,11 @@ public class MigrationService {
                   : "sipadmin@synchronoss.com");
           semanticNode.setMetricName(binarySemanticNode.getMetricName());
           if (binarySemanticNode.getEsRepository() != null) {
+            String repositoryStr = objectMapper
+                .writeValueAsString(binarySemanticNode.getEsRepository());
+            String sanitizedRepositoryStr = JsonSanitizer.sanitize(repositoryStr);
             JsonNode esRepository =
-                objectMapper.readTree(
-                    objectMapper.writeValueAsString(binarySemanticNode.getEsRepository()));
+                objectMapper.readTree(sanitizedRepositoryStr);
             String indexName = esRepository.get("indexName").asText();
             // This check has been introduced due to special case where existing pods are
             // has both esRepository & repository SIP-4960
@@ -351,8 +362,10 @@ public class MigrationService {
     List<String> listOfDataObjectIds = new ArrayList<>();
     List<String> listOfDataObjectNames = new ArrayList<>();
     ObjectMapper objectMapper = new ObjectMapper();
+    String repositoryStr = objectMapper.writeValueAsString(binarySemanticNode.getRepository());
+    String sanitizedRepositoryStr = JsonSanitizer.sanitize(repositoryStr);
     JsonNode repository =
-        objectMapper.readTree(objectMapper.writeValueAsString(binarySemanticNode.getRepository()));
+        objectMapper.readTree(sanitizedRepositoryStr);
     ArrayNode repositories = (ArrayNode) repository.get("objects");
     ObjectNode newRepoNode = null;
     HttpEntity<?> dataObjectRequestEntity = null;
@@ -376,9 +389,12 @@ public class MigrationService {
       binaryDataObjectNode =
           restTemplate.exchange(
               url, HttpMethod.POST, dataObjectRequestEntity, DataSemanticObjects.class);
+
+      String dataObjectStr = objectMapper
+          .writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0));
+      String sanitizedDataObjectStr = JsonSanitizer.sanitize(dataObjectStr);
       dataObjectData =
-          objectMapper.readTree(
-              objectMapper.writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0)));
+          objectMapper.readTree(sanitizedDataObjectStr);
       logger.trace("dataObjectData : " + objectMapper.writeValueAsString(dataObjectData));
       newRepoNode.put(
           DataSetProperties.PhysicalLocation.toString(),

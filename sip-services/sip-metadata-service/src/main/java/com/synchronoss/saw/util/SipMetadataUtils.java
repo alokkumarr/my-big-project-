@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
@@ -273,7 +274,8 @@ public class SipMetadataUtils {
     com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
     JsonElement jsonElement;
     try {
-      jsonElement = jsonParser.parse(jsonString);
+      String sanitizedJsonString = JsonSanitizer.sanitize(jsonString);
+      jsonElement = jsonParser.parse(sanitizedJsonString);
       logger.info("json element parsed successfully");
       logger.trace("Parsed String = ", jsonElement);
       return jsonElement;

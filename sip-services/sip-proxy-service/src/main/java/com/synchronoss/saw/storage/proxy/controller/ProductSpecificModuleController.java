@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.storage.proxy.model.response.ProductModuleDocs;
 import com.synchronoss.saw.storage.proxy.model.response.Valid;
 import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductSpecificModuleService;
@@ -43,8 +44,9 @@ public class ProductSpecificModuleController {
         logger.debug("toJsonElement Called: String = ",js);
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement;
+        String sanitizedJs = JsonSanitizer.sanitize(js);
         try {
-            jsonElement = jsonParser.parse(js);
+            jsonElement = jsonParser.parse(sanitizedJs);
             logger.info("Parsed String = ",jsonElement);
             return jsonElement;
         }

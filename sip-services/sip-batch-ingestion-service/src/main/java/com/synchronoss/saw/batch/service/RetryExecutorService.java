@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.extensions.SipRetryContract;
@@ -169,8 +170,11 @@ public class RetryExecutorService {
           BisRouteEntity bisRouteEntity;
           if (bisRouteEntityPresent.isPresent()) {
             bisRouteEntity = bisRouteEntityPresent.get();
+
+            String routeMetadatStr = bisRouteEntity.getRouteMetadata();
+            String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadatStr);
             nodeEntity = objectMapper
-                .readTree(bisRouteEntity.getRouteMetadata());
+                .readTree(sanitizedRouteMetadataStr);
             rootNode = (ObjectNode) nodeEntity;
             String channelType = channelTypeService
                 .findChannelTypeFromRouteId(bisRouteEntity.getBisRouteSysId());

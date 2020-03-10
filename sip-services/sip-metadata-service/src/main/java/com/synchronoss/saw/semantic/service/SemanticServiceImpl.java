@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
@@ -260,7 +261,9 @@ public class SemanticServiceImpl implements SemanticService {
     for (String dataSetId : semanticNode.getParentDataSetIds()) {
       logger.trace("Request URL to pull DataSet Details : " + requestUrl + dataSetId);
       dataSet = restTemplate.getForObject(requestUrl + dataSetId, DataSet.class);
-      node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
+      String datasetStr = objectMapper.writeValueAsString(dataSet);
+      String sanitizedDatasetStr = JsonSanitizer.sanitize(datasetStr);
+      node = objectMapper.readTree(sanitizedDatasetStr);
       rootNode = (ObjectNode) node;
       systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());
       physicalLocation = systemNode.get(DataSetProperties.PhysicalLocation.toString()).asText();

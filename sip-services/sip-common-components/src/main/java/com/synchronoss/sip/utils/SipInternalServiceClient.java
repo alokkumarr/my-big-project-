@@ -2,6 +2,7 @@ package com.synchronoss.sip.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.json.JsonSanitizer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.apache.http.HttpResponse;
@@ -54,7 +55,8 @@ public class SipInternalServiceClient {
     while ((line = rd.readLine()) != null) {
       result.append(line);
     }
-    node = mapper.readValue(result.toString(), object.getClass());
+    String sanitizedResultString = JsonSanitizer.sanitize(result.toString());
+    node = mapper.readValue(sanitizedResultString, object.getClass());
     ObjectNode rootNode = (ObjectNode) node;
     if (rootNode.get("repository") != null) {
       setDataLocation(rootNode.get("repository").get("physicalLocation").asText());

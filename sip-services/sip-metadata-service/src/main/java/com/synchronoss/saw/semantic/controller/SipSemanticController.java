@@ -2,6 +2,7 @@ package com.synchronoss.saw.semantic.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonMissingException;
@@ -191,8 +192,10 @@ public class SipSemanticController {
     SemanticNodes responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
+      String queryMapStr = objectMapper.writeValueAsString(queryMap);
+      String sanitizedQueryMapStr = JsonSanitizer.sanitize(queryMapStr);
       SemanticNode requestBody =
-          objectMapper.readValue(objectMapper.writeValueAsString(queryMap), SemanticNode.class);
+          objectMapper.readValue(sanitizedQueryMapStr, SemanticNode.class);
       logger.trace("Search Request Body : {} ", objectMapper.writeValueAsString(requestBody));
       responseObjectFuture = semanticService.search(requestBody, headers);
       logger.trace(
@@ -220,8 +223,10 @@ public class SipSemanticController {
     BackCompatibleStructure responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
+      String queryMapStr = objectMapper.writeValueAsString(queryMap);
+      String sanitizedQueryMapStr = JsonSanitizer.sanitize(queryMapStr);
       SemanticNode requestBody =
-          objectMapper.readValue(objectMapper.writeValueAsString(queryMap), SemanticNode.class);
+          objectMapper.readValue(sanitizedQueryMapStr, SemanticNode.class);
       logger.trace("Search Request Body : {} ", requestBody);
       responseObjectFuture = semanticService.list(requestBody, headers);
       logger.trace(

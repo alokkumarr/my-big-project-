@@ -3,6 +3,7 @@ package com.synchronoss.saw.observe;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.MetadataTestUtils;
 import com.synchronoss.saw.observe.controller.ObserveController;
 import com.synchronoss.saw.observe.model.Observe;
@@ -100,9 +101,10 @@ public class ObserveControllerRestTest {
    * @return Observe
    */
   public Observe getObserve(String observeString) {
+    String sanitizedObserveString = JsonSanitizer.sanitize(observeString);
     Observe mockObserve = null;
     try {
-      mockObserve = new ObjectMapper().readValue(observeString, Observe.class);
+      mockObserve = new ObjectMapper().readValue(sanitizedObserveString, Observe.class);
     } catch (IOException e) {
       logger.error(e.getCause().toString());
     }

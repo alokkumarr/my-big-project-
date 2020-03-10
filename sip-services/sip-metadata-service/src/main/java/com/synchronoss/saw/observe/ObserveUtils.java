@@ -10,6 +10,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.observe.model.Content;
 import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveNode;
@@ -46,11 +47,14 @@ public class ObserveUtils {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonNode objectNode = objectMapper.readTree(json);
+    String sanitizedJson = JsonSanitizer.sanitize(json);
+    JsonNode objectNode = objectMapper.readTree(sanitizedJson);
     JsonNode contentNode = objectNode.get(node);
     JsonNode observeNode = contentNode.get("observe").get(0);
     String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
-    JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
+    String sanitizedJsonObserve = JsonSanitizer.sanitize(jsonObserve);
+
+    JsonNode observeNodeIndependent = objectMapper.readTree(sanitizedJsonObserve);
     ObserveNode observeTreeNode =
         objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
     Observe observeTree = observeTreeNode.getObserve();

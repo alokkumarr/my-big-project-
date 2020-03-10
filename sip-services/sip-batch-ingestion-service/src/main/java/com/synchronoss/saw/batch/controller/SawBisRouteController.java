@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -140,6 +141,7 @@ public class SawBisRouteController {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
       String routeMetaData = requestBody.getRouteMetadata();
+      String sanitizedRouteMetadata = JsonSanitizer.sanitize(routeMetaData);
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -149,7 +151,7 @@ public class SawBisRouteController {
         BeanUtils.copyProperties(requestBody, routeEntity);
         routeEntity.setCreatedDate(new Date());
         routeEntity.setStatus(STATUS_ACTIVE);
-        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        routeData = (ObjectNode) objectMapper.readTree(sanitizedRouteMetadata);
 
         /**
          * Check duplicate route.
@@ -327,18 +329,20 @@ public class SawBisRouteController {
       BisRouteEntity routeEntity = new BisRouteEntity();
       routeEntity = bisRouteDataRestRepository.getOne(routeId);
       String routeMetaData = requestBody.getRouteMetadata();
+      String sanitizedRouteMetadata = JsonSanitizer.sanitize(routeMetaData);
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       ObjectNode routeData = null;
       try {
-        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
+        routeData = (ObjectNode) objectMapper.readTree(sanitizedRouteMetadata);
         requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while updating routeMetaData ", e);
         throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
       }
       String schedulerDetails = routeData.get("schedulerExpression").toString();
+      String sanitizedSchedulerDetails = JsonSanitizer.sanitize(schedulerDetails);
       JsonNode schedulerExpn = routeData.get("schedulerExpression");
       if (schedulerExpn != null) {
         logger.trace("schedulerExpression  is not null ", schedulerExpn);
@@ -352,7 +356,7 @@ public class SawBisRouteController {
         schedulerRequest.setJobGroup(String.valueOf(routeId));
         JsonNode schedulerData = null;
         try {
-          schedulerData = objectMapper.readTree(schedulerDetails);
+          schedulerData = objectMapper.readTree(sanitizedSchedulerDetails);
           logger.trace("schedulerData  is not null ", schedulerData);
         } catch (IOException e) {
           logger.error("Exception occurred while updating schedulerExpression ", e);
@@ -416,7 +420,9 @@ public class SawBisRouteController {
       }
       BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
       try {
-        routeData = (ObjectNode) objectMapper.readTree(requestBody.getRouteMetadata());
+        String routeMetadataStr = requestBody.getRouteMetadata();
+        String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetaData);
+        routeData = (ObjectNode) objectMapper.readTree(sanitizedRouteMetadataStr);
         // routeData.put("destinationLocation", destinationLocation);
         requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
