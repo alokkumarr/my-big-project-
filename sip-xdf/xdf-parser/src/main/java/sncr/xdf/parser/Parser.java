@@ -37,6 +37,7 @@ import sncr.xdf.parser.parsers.ParquetFileParser;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
+import java.util.Optional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
@@ -57,6 +59,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private char quoteChar;
     private char quoteEscapeChar;
     private int headerSize;
+    private int fieldDefRowNumber;
     private String sourcePath;
     private String tempDir;
     private String archiveDir;
@@ -155,7 +158,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
             headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
-
+            fieldDefRowNumber = ctx.componentConfiguration.getParser().getFieldDefRowNumber();
+            logger.debug("fieldDefRowNumber : "+ fieldDefRowNumber);
             lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
             delimiter = (ctx.componentConfiguration.getParser().getDelimiter() != null)? ctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
             quoteChar = (ctx.componentConfiguration.getParser().getQuoteChar() != null)? ctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
@@ -368,7 +372,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
                 '\'', recCounter, errCounter, allowInconsistentCol
-                ,ctx.componentConfiguration.getParser().getFields()));
+                ,ctx.componentConfiguration.getParser().getFields(), Optional.empty()));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
@@ -423,7 +427,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(file.toString(), 1);
-
+        String headerLine = NGComponentUtil.getLineFromRdd(rdd, headerSize, fieldDefRowNumber);
         JavaRDD<Row> parseRdd = rdd
             // Add line numbers
             .zipWithIndex()
@@ -433,7 +437,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             .keys()
             .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
                 quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
-                ,ctx.componentConfiguration.getParser().getFields()));
+                ,ctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine)));
 
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =

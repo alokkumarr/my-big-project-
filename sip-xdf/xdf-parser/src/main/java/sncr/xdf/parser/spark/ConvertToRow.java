@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
@@ -44,6 +45,7 @@ public class ConvertToRow implements Function<String, Row> {
     private CsvParser parser = null;
     private boolean allowInconsistentCol;
     List<Field> fields = null;
+    String header = null;
 
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
@@ -55,7 +57,8 @@ public class ConvertToRow implements Function<String, Row> {
                         LongAccumulator recordCounter,
                         LongAccumulator errorCounter,
                         boolean allowInconsistentCol,
-                        List<Field> fields) {
+                        List<Field> fields,
+                        Optional<String> optHeader) {
         this.schema = schema;
         this.tsFormats = tsFormats;
         this.lineSeparator = lineSeparator ;
@@ -67,6 +70,7 @@ public class ConvertToRow implements Function<String, Row> {
         this.recCounter = recordCounter;
         this.allowInconsistentCol = allowInconsistentCol;
         this.fields = fields;
+        if(optHeader.isPresent()) header = optHeader.get();
 
         df = new SimpleDateFormat();
         /*
@@ -114,6 +118,30 @@ public class ConvertToRow implements Function<String, Row> {
     }
 
     private Object[] constructRecord(String line, Object[] record, String[] parsed) {
+        boolean areFieldsContainsIndexOrName = areFieldsContainsIndexOrName();
+        logger.debug("areFieldsContainsIndexOrName :: "+ areFieldsContainsIndexOrName);
+        if(areFieldsContainsIndexOrName){
+            record = constructRecordWithIndexOrNames(line, record, parsed);
+        }else{
+            record = constructRecordFromLine(line, record, parsed);
+        }
+        return record;
+    }
+
+    private boolean areFieldsContainsIndexOrName() {
+
+
+        return false;
+
+
+    }
+
+    private Object[] constructRecordWithIndexOrNames(String line, Object[] record, String[] parsed) {
+
+        return record;
+    }
+
+    private Object[] constructRecordFromLine(String line, Object[] record, String[] parsed) {
         if(parsed.length > schema.fields().length || (!allowInconsistentCol && parsed.length != schema.fields().length)) {
             // Create record with rejected flag
             errCounter.add(1);

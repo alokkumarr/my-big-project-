@@ -17,6 +17,7 @@ import sncr.xdf.parser.TestSparkContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -56,10 +57,9 @@ public class ConvertToRowTest extends BaseTest{
 
     LongAccumulator errCounter = context.getSparkContext().longAccumulator("ParserErrorCounter");
     LongAccumulator recCounter = context.getSparkContext().longAccumulator("ParserRecCounter");
-
     ctr = new ConvertToRow(originalSchema, tsFormats, lineSeparator, delimiter,
         quoteChar, quoteEscapeChar, '\'', recCounter, errCounter, false
-        ,parser.getFields());
+        ,parser.getFields(), Optional.empty());
   }
 
   @After

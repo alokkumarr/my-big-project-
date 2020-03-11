@@ -1,10 +1,15 @@
 package sncr.xdf.ngcomponent.util;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.rdd.RDD;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.context.XDFReturnCodes;
+
+import org.apache.hadoop.fs.Path;
 import java.util.Optional;
 import sncr.bda.conf.ComponentConfiguration;
 
@@ -73,5 +78,22 @@ public class NGComponentUtil {
             return true;
         }
         return false;
+    }
+
+    public static String getLineFromRdd(JavaRDD<String> rdd, int headerSize, int lineNumber){
+        String line  = null;
+        if(headerSize == 1){
+            lineNumber = 1;
+        }
+        final int index = lineNumber-1;
+        if(rdd != null && index >= 0){
+            try{
+                line = rdd.zipWithIndex().filter(row->row._2==index).map(row->row._1).first();
+            } catch (Exception e) {
+                logger.error("Exception occurred while getting line from rdd :" + e);
+            }
+        }
+        logger.info("Line :: :" + line);
+        return line;
     }
 }

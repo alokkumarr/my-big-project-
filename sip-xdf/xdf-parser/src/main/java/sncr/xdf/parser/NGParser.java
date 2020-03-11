@@ -7,6 +7,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -34,6 +35,7 @@ import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.parser.spark.HeaderFilter;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
@@ -63,6 +65,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private char quoteChar;
     private char quoteEscapeChar;
     private int headerSize;
+    private int fieldDefRowNumber;
     private String sourcePath;
     private String tempDir;
     private String archiveDir;
@@ -215,6 +218,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
             logger.debug("header size"+ headerSize);
+
+            fieldDefRowNumber = ngctx.componentConfiguration.getParser().getFieldDefRowNumber();
+            logger.debug("fieldDefRowNumber : "+ fieldDefRowNumber);
 
             lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
             logger.debug("lineSeparator"+ lineSeparator);
@@ -499,7 +505,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
                 '\'', recCounter, errCounter, allowInconsistentCol
-                ,ngctx.componentConfiguration.getParser().getFields()));
+                ,ngctx.componentConfiguration.getParser().getFields(), Optional.empty()));
 
         logger.debug("Output rdd length = " + recCounter.value());
         logger.debug("Rejected rdd length = " + errCounter.value());
@@ -541,11 +547,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
         // Files
-
         for (FileStatus file : files) {
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
-
                 int retVal = parseSingleFile(file.getPath(), new Path(tempPath));
                 if (retVal == 0) {
                     ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
@@ -567,7 +571,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
                 .textFile(file.toString(), 1);
-
+        String headerLine = NGComponentUtil.getLineFromRdd(rdd, headerSize, fieldDefRowNumber);
         JavaRDD<String> rddWithoutHeader = rdd
                 // Add line numbers
                 .zipWithIndex()
@@ -582,7 +586,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             inputDSCount += rddCount;
             JavaRDD<Row> parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
                 quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
-                ,ngctx.componentConfiguration.getParser().getFields()));
+                ,ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine)));
             // Create output dataset
             JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
             logger.debug("####### Rejected RDD COUNT:: " + rejectedRdd.count());
@@ -618,6 +622,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Headersize is: " + headerSize);
         JavaRDD<String> rdd = dataFrame.rdd().toJavaRDD();
         JavaRDD<String> rddWithoutHeader = null;
+        String headerLine = null;
     	if (headerSize >= 1) {
             rddWithoutHeader = rdd
 					// Add line numbers
@@ -626,6 +631,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 					.filter(new HeaderFilter(headerSize))
 					// Get rid of file numbers
 					.keys();
+            headerLine = NGComponentUtil.getLineFromRdd(rdd, headerSize, fieldDefRowNumber);
 		} else {
             rddWithoutHeader = rdd;
 		}
@@ -634,7 +640,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
         JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
             '\'', recCounter, errCounter, allowInconsistentCol
-            ,ngctx.componentConfiguration.getParser().getFields()));
+            ,ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine)));
 	    // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(
@@ -664,9 +670,16 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     public int parseAndUnionFiles(FileStatus[] files, String mode){
         JavaRDD<String> combinedRdd = null;
         // Files
+        String headerLine = null;
         for (FileStatus file : files) {
             if (file.isFile()) {
-                JavaRDD<String> singleFileRdd = loadSingleFile(file.getPath());
+                logger.debug("Reading " + file.getPath() + "\n");
+                JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
+                    .textFile(file.getPath().toString(), 1);
+                if(headerLine == null){
+                    headerLine = NGComponentUtil.getLineFromRdd(rdd, headerSize, fieldDefRowNumber);
+                }
+                JavaRDD<String> singleFileRdd = loadFromSingleFileRdd(rdd);
                 if (combinedRdd == null) {
                     combinedRdd = singleFileRdd;
                 } else {
@@ -677,7 +690,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         inputDSCount = combinedRdd.count();
         JavaRDD<Row> parseRdd = combinedRdd.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
             quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
-            ,ngctx.componentConfiguration.getParser().getFields()));
+            ,ngctx.componentConfiguration.getParser().getFields(),Optional.ofNullable(headerLine)));
         // Create output dataset
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> outputDS = convertRddToDS(outputRdd);
@@ -695,13 +708,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return retval;
     }
 
-    private JavaRDD<String> loadSingleFile(Path file){
-        logger.debug("Reading " + file + "\n");
+    private JavaRDD<String> loadFromSingleFileRdd(JavaRDD<String> rdd){
         logger.debug("Header size : " + headerSize +"\n");
-
-        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(file.toString(), 1);
-
         JavaRDD<String> rddWithoutHeader = rdd
             // Add line numbers
             .zipWithIndex()

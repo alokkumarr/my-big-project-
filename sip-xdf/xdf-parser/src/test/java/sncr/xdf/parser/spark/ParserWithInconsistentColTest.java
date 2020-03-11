@@ -15,6 +15,7 @@ import sncr.bda.ConfigLoader;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Parser;
 import sncr.xdf.parser.TestSparkContext;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class ParserWithInconsistentColTest extends BaseTest {
         parser.getDelimiter().charAt(0), parser.getQuoteChar().charAt(0), parser.getQuoteChar().charAt(0),
         '\'', context.getSparkContext().longAccumulator("ParserRecCounter"),
         context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.isAllowInconsistentColumn()
-        ,parser.getFields());
+        ,parser.getFields(), Optional.empty());
     JavaRDD<Row> data = rawData.map(ctr);
     data.count();
 
@@ -95,7 +96,7 @@ public class ParserWithInconsistentColTest extends BaseTest {
         parser.getDelimiter().charAt(0), parser.getQuoteChar().charAt(0), parser.getQuoteChar().charAt(0),
         '\'', context.getSparkContext().longAccumulator("ParserRecCounter"),
         context.getSparkContext().longAccumulator("ParserErrorCounter"), false
-        ,parser.getFields());
+        ,parser.getFields(), Optional.empty());
     JavaRDD<Row> data = rawData.map(ctr);
 
     int rejectedColumn = parsedSchema.length() - 2;

@@ -30,7 +30,7 @@ public class Field {
 
     @SerializedName("sourceIndex")
     @Expose
-    private int sourceIndex;
+    private Integer sourceIndex;
 
     @SerializedName("sourceFieldName")
     @Expose
@@ -63,7 +63,7 @@ public class Field {
                  String format,
                  String model,
                  String definitionFile,
-                 int sourceIndex,
+                 Integer sourceIndex,
                  String sourceFieldName,
                  String defaultValue) {
         this.name = name;
@@ -165,15 +165,15 @@ public class Field {
         return this;
     }
 
-    public int getSourceIndex() {
+    public Integer getSourceIndex() {
         return sourceIndex;
     }
 
-    public void setSourceIndex(int sourceIndex) {
+    public void setSourceIndex(Integer sourceIndex) {
         this.sourceIndex = sourceIndex;
     }
 
-    public Field withSourceIndex(int sourceIndex) {
+    public Field withSourceIndex(Integer sourceIndex) {
         this.sourceIndex = sourceIndex;
         return this;
     }

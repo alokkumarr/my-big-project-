@@ -55,6 +55,11 @@ public class Parser {
     @SerializedName("headerSize")
     @Expose
     private Integer headerSize;
+
+    @SerializedName("fieldDefRowNumber")
+    @Expose
+    int fieldDefRowNumber;
+
     /**
      * Number of files for all output objects
      */
@@ -95,6 +100,7 @@ public class Parser {
      * @param quoteChar
      * @param quoteEscape
      * @param headerSize
+     * @param fieldDefRowNumber
      * @param numberOfFiles
      * @param multiLine
      * @param isFlatteningEnabled
@@ -110,6 +116,7 @@ public class Parser {
         String quoteChar,
         String quoteEscape,
         Integer headerSize,
+        int fieldDefRowNumber,
         Integer numberOfFiles,
         boolean multiLine,
         boolean isFlatteningEnabled,
@@ -123,6 +130,7 @@ public class Parser {
         this.quoteChar = quoteChar;
         this.quoteEscape = quoteEscape;
         this.headerSize = headerSize;
+        this.fieldDefRowNumber = fieldDefRowNumber;
         this.numberOfFiles = numberOfFiles;
         this.multiLine = multiLine;
         this.isFlatteningEnabled = isFlatteningEnabled;
@@ -292,6 +300,19 @@ public class Parser {
         return this;
     }
 
+    public int getFieldDefRowNumber() {
+        return fieldDefRowNumber;
+    }
+
+    public void setFieldDefRowNumber(int fieldDefRowNumber) {
+        this.fieldDefRowNumber = fieldDefRowNumber;
+    }
+
+    public Parser withFieldDefRowNumber(int fieldDefRowNumber) {
+        this.fieldDefRowNumber = fieldDefRowNumber;
+        return this;
+    }
+
     /**
      * Number of files for all output objects
      *
@@ -415,6 +436,7 @@ public class Parser {
             .append(quoteChar)
             .append(quoteEscape)
             .append(headerSize)
+            .append(fieldDefRowNumber)
             .append(numberOfFiles)
             .append(multiLine)
             .append(isFlatteningEnabled)
@@ -443,6 +465,7 @@ public class Parser {
             .append(quoteChar, rhs.quoteChar)
             .append(quoteEscape, rhs.quoteEscape)
             .append(headerSize, rhs.headerSize)
+            .append(fieldDefRowNumber, rhs.fieldDefRowNumber)
             .append(numberOfFiles, rhs.numberOfFiles)
             .append(multiLine, rhs.multiLine)
             .append(isFlatteningEnabled, rhs.isFlatteningEnabled)
