@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang.StringUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -90,7 +89,7 @@ public class ElasticSearchQueryBuilder {
     if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
       List<Filter> filters = sipQuery.getFilters();
       BoolQueryBuilder newBooleanQuery =
-          buildFilterQuery(buildSingleFilter(filters, sipQuery.getBooleanCriteria()));
+          buildFilterQuery(buildNestedFilter(filters, sipQuery.getBooleanCriteria()));
       boolQueryBuilder.must(newBooleanQuery);
     }
     searchSourceBuilder.query(boolQueryBuilder);
@@ -121,14 +120,17 @@ public class ElasticSearchQueryBuilder {
     return searchSourceBuilder.toString();
   }
 
-  public Filter buildSingleFilter(List<Filter> filters, BooleanCriteria booleanCriteria) {
-    if (filters.size() > 1) {
-      Filter filter = new Filter();
-      booleanCriteria = booleanCriteria != null ? booleanCriteria : BooleanCriteria.AND;
-      filter.setBooleanCriteria(booleanCriteria);
-      filter.setFilters(filters);
-      return filter;
-    } else {
+  /**
+   * This method builds the recursive filter with AND & OR conjunction.If we have multiple filter it
+   * means it is old filter which supports conjuction AND or OR but not both,So here the structure
+   * is converted into recursive structure with one filter consists of nesting.
+   *
+   * @param filters filterlist
+   * @param booleanCriteria booleanCriteria
+   * @return single nested filter
+   */
+  public Filter buildNestedFilter(List<Filter> filters, BooleanCriteria booleanCriteria) {
+    if (filters.size() == 1) {
       Filter filter = filters.get(0);
       if (filter.getBooleanCriteria() == null && filter.getFilters() == null) {
         Filter recursiveFilter = new Filter();
@@ -136,6 +138,12 @@ public class ElasticSearchQueryBuilder {
         recursiveFilter.setFilters(filters);
         return recursiveFilter;
       }
+      return filter;
+    } else {
+      Filter filter = new Filter();
+      booleanCriteria = booleanCriteria != null ? booleanCriteria : BooleanCriteria.AND;
+      filter.setBooleanCriteria(booleanCriteria);
+      filter.setFilters(filters);
       return filter;
     }
   }
@@ -327,7 +335,7 @@ public class ElasticSearchQueryBuilder {
     if (sipQuery.getFilters() != null && sipQuery.getFilters().size() > 0) {
       List<Filter> filters = sipQuery.getFilters();
       BoolQueryBuilder newBooleanQuery =
-          buildFilterQuery(buildSingleFilter(filters, sipQuery.getBooleanCriteria()));
+          buildFilterQuery(buildNestedFilter(filters, sipQuery.getBooleanCriteria()));
       boolQueryBuilder.must(newBooleanQuery);
     }
       searchSourceBuilder.query(boolQueryBuilder);
@@ -359,6 +367,12 @@ public class ElasticSearchQueryBuilder {
         });
   }
 
+  /**
+   * This method builds filter query for the nested filter structure.
+   *
+   * @param filter nested filter
+   * @return querybuilder
+   */
   public BoolQueryBuilder buildFilterQuery(Filter filter) {
     BoolQueryBuilder boolQuery = new BoolQueryBuilder();
     BooleanCriteria booleanCriteria = null;
@@ -401,7 +415,13 @@ public class ElasticSearchQueryBuilder {
     return boolQuery;
   }
 
-  public Optional<QueryBuilder> buildFilter(Filter filter) {
+  /**
+   * This method builds query for each filter.
+   *
+   * @param filter filter
+   * @return optional querybuilder
+   */
+  private Optional<QueryBuilder> buildFilter(Filter filter) {
     if ((filter.getIsRuntimeFilter() == null || !filter.getIsRuntimeFilter())
         && (filter.getIsGlobalFilter() == null || !filter.getIsGlobalFilter())
         // skip the Aggregated filter since it will added based on aggregated data.
@@ -439,6 +459,12 @@ public class ElasticSearchQueryBuilder {
     return Optional.empty();
   }
 
+  /**
+   * This method builds filter query for date type fields .
+   *
+   * @param filter filter
+   * @return querybuilder
+   */
   private QueryBuilder buildDateFilter(Filter filter) {
     Optional<String> formatForDate = Optional.empty();
     if (filter.getModel().getPreset() != null
@@ -480,8 +506,7 @@ public class ElasticSearchQueryBuilder {
       Date date = new Date(filter.getModel().getValue().longValue());
       logger.trace("Date object created :" + date);
       DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
-      if ((filter.getType()==Filter.Type.DATE)
-          || ((filter.getType()==Type.TIMESTAMP))) {
+      if ((filter.getType() == Filter.Type.DATE) || ((filter.getType() == Type.TIMESTAMP))) {
         formatForDate = Optional.of(EPOCH_TO_DATE_FORMAT);
       }
 
@@ -497,12 +522,12 @@ public class ElasticSearchQueryBuilder {
         logger.trace(
             "Filter for values - Operator: 'BTW', Timestamp(asLong) : {}",
             filter.getModel().getValue().longValue());
-        Date fromDate = new Date(filter.getModel().getOtherValue().longValue());
+        Date toDate = new Date(filter.getModel().getOtherValue().longValue());
         return buildRangeQueryBuilder(
             filter.getColumnName(),
             formatForDate,
-            dateFormat.format(date),
-            dateFormat.format(fromDate));
+            dateFormat.format(toDate),
+            dateFormat.format(date));
       } else {
         return filterByOperator(filter, date);
       }
@@ -556,6 +581,12 @@ public class ElasticSearchQueryBuilder {
     }
   }
 
+  /**
+   * This method builds filter query for date type fields with Year format.
+   *
+   * @param filter filter
+   * @return querybuilder
+   */
   private QueryBuilder buildFilterQueryWithYearFormat(Filter filter) {
     logger.info("Format select is year format");
     DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
@@ -592,11 +623,20 @@ public class ElasticSearchQueryBuilder {
     }
   }
 
+  /**
+   * This method builds the range query.
+   *
+   * @param columnName columnName
+   * @param dateFormat dateFormat
+   * @param lte lte
+   * @param gte gte
+   * @return querybuilder
+   */
   private QueryBuilder buildRangeQueryBuilder(
       String columnName, Optional<String> dateFormat, String lte, String gte) {
     RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(columnName);
     if (dateFormat.isPresent()) {
-      rangeQueryBuilder.format(DATE_FORMAT);
+      rangeQueryBuilder.format(dateFormat.get());
     }
     rangeQueryBuilder.lte(lte);
     rangeQueryBuilder.gte(gte);

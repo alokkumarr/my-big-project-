@@ -334,6 +334,8 @@ public class QueryBuilderUtil {
   public static QueryBuilder stringFilter(Filter item) {
     Operator operator = item.getModel().getOperator();
     switch (operator) {
+        /* For equal and IsIn we are build query in same way, So for EQ and ISIN call go to case
+        ISIN*/
       case EQ:
       case ISIN:
         {
@@ -347,7 +349,8 @@ public class QueryBuilderUtil {
           boolQueryBuilder.should(termsQueryBuilder1);
           return boolQueryBuilder;
         }
-
+        /*For Notequal and IsNotIn we are build query in same way, So for NEQ and ISNOTIN call go
+        to ISNOTIN case. */
       case NEQ:
       case ISNOTIN:
         {

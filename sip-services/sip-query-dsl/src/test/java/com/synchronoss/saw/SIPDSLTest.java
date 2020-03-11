@@ -96,7 +96,7 @@ public class SIPDSLTest {
 
       boolQueryBuilder1 =
           elasticSearchQueryBuilder.buildFilterQuery(
-              elasticSearchQueryBuilder.buildSingleFilter(
+              elasticSearchQueryBuilder.buildNestedFilter(
                   filters, sipdsl.getSipQuery().getBooleanCriteria()));
       searchSourceBuilder.query(boolQueryBuilder1);
     }
