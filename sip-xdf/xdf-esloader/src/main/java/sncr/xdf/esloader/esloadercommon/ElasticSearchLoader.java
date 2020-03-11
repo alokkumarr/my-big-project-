@@ -137,6 +137,7 @@ public class ElasticSearchLoader {
         configMap.put("es.net.ssl.cert.allow.self.signed","true");
         }
         logger.debug("############ ES Config Params :: ###############");
+        //Modifying as per Review Comments from
         config.getAdditionalParams().forEach((paramKey,paramVal) -> { configMap.put(paramKey,paramVal); logger.debug(paramKey+ "-->"+ paramVal); });
         logger.debug("############ End of ES Config Params :: ###############");
         return configMap;

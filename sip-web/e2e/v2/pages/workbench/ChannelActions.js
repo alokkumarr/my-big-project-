@@ -21,35 +21,22 @@ class ChannelActions extends ChannelModel {
     this.clickOnCreateButton();
   }
 
-  fillApiChannleInfo(channelInfo, update = false, token = null) {
+  fillApiChannleInfo(channelInfo, update = false) {
     this.fillChannelName(channelInfo.channelName);
     this.fillHostName(channelInfo.hostName);
     if (channelInfo.port) channelActions.fillPortNumber(channelInfo.port);
     this.selectMethodType(channelInfo.method);
     this.fillEndPoint(channelInfo.endPoint);
-    if (channelInfo.method === 'POST')
-      this.fillRequestBody(JSON.stringify(channelInfo.body));
-    const headers = this.updatedHeaders(
-      channelInfo.auth,
-      channelInfo.headers,
-      token
-    );
-    if (headers) {
+    if (channelInfo.method === 'POST') this.fillRequestBody(JSON.stringify(channelInfo.body));
+    if (channelInfo.headers) {
       if (update) this.clearHeader();
-      this.addHeaders(headers);
+      this.addHeaders(channelInfo.headers);
     }
     if (channelInfo.queryParams) {
       if (update) this.clearQueryParams();
       this.addQueryParams(channelInfo.queryParams);
     }
     this.fillDescription(channelInfo.desc);
-  }
-
-  updatedHeaders(auth, headers, token) {
-    if (!auth) return headers;
-    // add Authorization header value as Bearer token
-    headers['Authorization'] = token;
-    return headers;
   }
 
   testAndVerifyTestConnectivity(testConnectivityMessage) {

@@ -3,9 +3,6 @@ info:
 spring:
   application:
     name: saw-storage-proxy-service
-  elasticsearch:
-    rest:
-      uris: es-rd611.eng-sip.dev01.us-west.sncrcloud.net:9200
 logging:
   level:
     com.synchronoss.saw: info

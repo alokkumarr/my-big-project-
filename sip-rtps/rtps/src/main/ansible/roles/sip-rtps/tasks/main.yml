@@ -15,7 +15,7 @@
     - restart sip-rtps
 - name: Create symbolink link to current Spark version
   file:
-    src: /opt/mapr/spark/spark-2.4.4
+    src: /opt/mapr/spark/spark-2.3.2
     dest: /opt/mapr/spark/spark-current
     state: link
 # Workaround: Installing the MapR HBase client gives empty entries in

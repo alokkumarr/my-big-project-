@@ -30,7 +30,7 @@ class RouteActions extends RouteModel {
     this.clickOnCreateRouteBtn();
   }
 
-  fillRouteInfo(routeInfo, update = false, token = null) {
+  fillRouteInfo(routeInfo, update = false) {
     this.fillApiRouteName(routeInfo.routeName);
     this.fillApiRouteDestination(routeInfo.destination);
     const channelActions = new ChannelActions();
@@ -38,14 +38,9 @@ class RouteActions extends RouteModel {
     channelActions.fillEndPoint(routeInfo.endPoint);
     if (routeInfo.method === 'POST')
       channelActions.fillRequestBody(JSON.stringify(routeInfo.body));
-    const headers = channelActions.updatedHeaders(
-      routeInfo.auth,
-      routeInfo.headers,
-      token
-    );
-    if (headers) {
+    if (routeInfo.headers) {
       if (update) channelActions.clearHeader();
-      channelActions.addHeaders(headers);
+      channelActions.addHeaders(routeInfo.headers);
     }
     if (routeInfo.queryParams) {
       if (update) channelActions.clearQueryParams();

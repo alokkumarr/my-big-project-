@@ -36,6 +36,7 @@
         <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
         <app.varDir>/var/bda/${app.name}</app.varDir>
 
+        <!--spark-version>1.6.1</spark-version-->
         <!--es-spark-version>5.1.2</es-spark-version-->
         <slf4j.version>1.7.21</slf4j.version>
         <java.version>1.8</java.version>

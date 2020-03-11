@@ -1,6 +1,6 @@
 # Adding spark-current soft link
 
-sudo ln -s /opt/mapr/spark/spark-2.4.4 /opt/mapr/spark/spark-current
+sudo ln -s /opt/mapr/spark/spark-2.3.2 /opt/mapr/spark/spark-current
 
 # Moving XDA files to MapR-FS
 

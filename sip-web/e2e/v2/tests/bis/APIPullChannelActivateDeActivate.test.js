@@ -11,19 +11,11 @@ const ChannelActions = require('../../pages/workbench/ChannelActions');
 const LoginPage = require('../../pages/LoginPage');
 const logger = require('../../conf/logger')(__filename);
 const Header = require('../../pages/components/Header');
-let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
 describe('BIS API PULL tests: APIPullChannelDeActivate.test.js', () => {
-  let token;
   beforeAll(function() {
     logger.info(`started executing APIPullChannelDeActivate.test.js tests`);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
-    const host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(
-      host,
-      users.masterAdmin.loginId,
-      users.masterAdmin.password
-    );
   });
 
   beforeEach(function(done) {
@@ -45,25 +37,18 @@ describe('BIS API PULL tests: APIPullChannelDeActivate.test.js', () => {
 
   using(
     testDataReader.testData['BIS_APIPULL']['ActivateDeactivateAndDeleteChannel']
-      ? testDataReader.testData['BIS_APIPULL'][
-          'ActivateDeactivateAndDeleteChannel'
-        ]
+      ? testDataReader.testData['BIS_APIPULL']['ActivateDeactivateAndDeleteChannel']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.warn(`Running testCase with id: ${id}`);
         logger.warn(`Data: ` + JSON.stringify(data));
 
-        data.channelInfo.channelName = `${
-          data.channelInfo.channelName
-        }${Utils.randomId()}`;
+        data.channelInfo.channelName = `${data.channelInfo.channelName}${Utils.randomId()}`;
 
-        data.channelInfo.desc = `${
-          data.channelInfo.channelName
-        } description created at ${Utils.randomId()}`;
+        data.channelInfo.desc = `${data.channelInfo.channelName} description created at ${Utils.randomId()}`;
 
-        data.channelInfo.created =
-          users.admin.firstName + ' ' + users.admin.lastName;
+        data.channelInfo.created = users.admin.firstName + ' ' + users.admin.lastName;
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user);
@@ -80,10 +65,8 @@ describe('BIS API PULL tests: APIPullChannelDeActivate.test.js', () => {
         channelActions.clickOnChannelType(data.channelInfo.sourceType);
         channelActions.clickOnChannelNextButton();
 
-        channelActions.fillApiChannleInfo(data.channelInfo, false, token);
-        channelActions.testAndVerifyTestConnectivity(
-          data.channelInfo.testConnectivityMessage
-        );
+        channelActions.fillApiChannleInfo(data.channelInfo);
+        channelActions.testAndVerifyTestConnectivity(data.channelInfo.testConnectivityMessage);
         channelActions.clickOnCreateButton();
         dataSourcesPage.clickOnCreatedChannelName(data.channelInfo.channelName);
         if (data.channelInfo.status == 1) {

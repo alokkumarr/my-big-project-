@@ -13,22 +13,15 @@ curl_json() {
     curl -k -sS -X $1 -H "Content-Type: application/json" $2 --data-binary @$3
 }
 
-curl_json_raw() {
-    curl -k -sS -X $1 -H "Content-Type: application/json" $2 --data $3
-}
-
 load_data() {
-    local es_url="http://sip-elastic:8200/"
-    local index_url=${es_url}"sample"
-    local alias_url=${es_url}"_aliases"
+    local index_url="http://sip-elastic:8200/sample"
+    local alias_url="http://sip-elastic:8200/_aliases"
     echo "Loading sample Elasticsearch data"
-    curl_json PUT "${index_url}?include_type_name=true" $dir/index.json
+    curl_json PUT "$index_url" $dir/index.json
     echo "Creating alias for the index"
     curl_json POST "$alias_url" $dir/aliases.json
     data=$dir/es-data.ndjson
     curl_json POST "$index_url/sample/_bulk" $data > /dev/null
-    # set the max bucket limit to 200000.
-    curl_json_raw PUT ${es_url}"_cluster/settings" '{"transient":{"search.max_buckets":200000}}' > /dev/null
 }
 
 wait_maprfs

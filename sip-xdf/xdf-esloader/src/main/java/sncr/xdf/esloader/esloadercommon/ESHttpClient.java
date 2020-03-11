@@ -244,15 +244,9 @@ public class ESHttpClient {
     }
   }
 
-  public int esIndexStructure(String idx, String type, Map<String, String> mapping)
-      throws Exception {
+  public int esIndexStructure(String idx, String type, Map<String, String> mapping) {
     LOGGER.debug("Getting ES index structure");
-    String mappingString;
-    if (type != null) {
-      mappingString = get("/" + idx + MAPPING + type + "?include_type_name=true");
-    } else {
-      mappingString = get("/" + idx + MAPPING);
-    }
+    String mappingString = get("/" + idx + MAPPING + type);
     JsonObject mappingJson;
     try {
       // Try to parse and access mapping section of ES JSON
@@ -314,11 +308,11 @@ public class ESHttpClient {
   }
 
   // Check if index type exists
-  // Only supported in ES 7.x
+  // Only supported in ES 6.x
   public boolean esTypeExists(String idx, String type) throws Exception {
     String clusterVersion = esClusterVersion();
-    if (clusterVersion.startsWith("7.")) {
-      return head("/" + idx + MAPPING + type,false);
+    if (clusterVersion.startsWith("6.")) {
+      return head("/" + idx + MAPPING + type, false);
     } else {
       throw new Exception(
           "TypeExists operation is not supported for Elastic Search cluster version "
@@ -327,14 +321,8 @@ public class ESHttpClient {
   }
 
   // Create Index
-  public boolean esIndexCreate(String idx, String mapping ,boolean esTypeExists) {
-      boolean flag = false;
-      if (esTypeExists) {
-          flag = put("/" + idx+"?include_type_name=true", mapping);
-      } else {
-          flag = put("/" + idx, mapping);
-      }
-      return flag;
+  public boolean esIndexCreate(String idx, String mapping) {
+    return put("/" + idx, mapping);
   }
 
   /*

@@ -1,5 +1,7 @@
 package com.synchronoss.saw.es.kpi;
 
+import static com.synchronoss.saw.es.ElasticSearchQueryBuilder.buildBooleanQuery;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -130,10 +132,10 @@ public class KPIDataQueryBuilder {
       }
 
       BoolQueryBuilder boolQueryBuilderDsk;
-      if (dskAttribute != null
-          && dskAttribute.getBooleanCriteria() != null
-          && !CollectionUtils.isEmpty(dskAttribute.getBooleanQuery())) {
-        boolQueryBuilderDsk = QueryBuilderUtil.queryDSKBuilder(dskAttribute);
+      if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
+          .isEmpty(dskAttribute.getBooleanQuery())) {
+        boolQueryBuilderDsk = QueryBuilderUtil
+            .queryDSKBuilder(dskAttribute);
         boolQueryBuilder.must(boolQueryBuilderDsk);
       }
       // make the query based on the filter given
@@ -152,12 +154,12 @@ public class KPIDataQueryBuilder {
     if (booleanCriteria != null && booleanCriteria == BooleanCriteria.OR) {
       builder.forEach(
           item -> {
-            boolQueryBuilderfilter.should(item);
+              boolQueryBuilderfilter.should(item);
           });
     } else {
       builder.forEach(
           item -> {
-            boolQueryBuilderfilter.must(item);
+              boolQueryBuilderfilter.must(item);
           });
     }
     boolQueryBuilder.must(boolQueryBuilderfilter);
