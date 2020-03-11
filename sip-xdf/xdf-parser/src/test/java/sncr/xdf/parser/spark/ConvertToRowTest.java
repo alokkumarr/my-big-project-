@@ -57,9 +57,10 @@ public class ConvertToRowTest extends BaseTest{
 
     LongAccumulator errCounter = context.getSparkContext().longAccumulator("ParserErrorCounter");
     LongAccumulator recCounter = context.getSparkContext().longAccumulator("ParserRecCounter");
+
     ctr = new ConvertToRow(originalSchema, tsFormats, lineSeparator, delimiter,
         quoteChar, quoteEscapeChar, '\'', recCounter, errCounter, false
-        ,parser.getFields(), Optional.empty());
+        ,Optional.empty());
   }
 
   @After

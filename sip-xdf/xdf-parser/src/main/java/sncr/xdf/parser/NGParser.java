@@ -36,16 +36,13 @@ import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.parser.spark.HeaderFilter;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
+
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
 import sncr.xdf.context.XDFReturnCode;
@@ -103,6 +100,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private boolean isFlatteningEnabled;
     private boolean isPivotApplied;
     private boolean allowInconsistentCol;
+
+    private static final String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
@@ -501,11 +500,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
-
+        LinkedHashMap<Integer, Object> fieldsAddlConfigMap =
+            getFieldsAddlConfigMap(ngctx.componentConfiguration.getParser().getFields(), Optional.empty());
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
                 '\'', recCounter, errCounter, allowInconsistentCol
-                ,ngctx.componentConfiguration.getParser().getFields(), Optional.empty()));
+                ,Optional.ofNullable(fieldsAddlConfigMap)));
 
         logger.debug("Output rdd length = " + recCounter.value());
         logger.debug("Rejected rdd length = " + errCounter.value());
@@ -572,6 +572,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
                 .textFile(file.toString(), 1);
         String headerLine = NGComponentUtil.getLineFromRdd(rdd, headerSize, fieldDefRowNumber);
+        LinkedHashMap<Integer, Object> fieldsAddlConfigMap =
+            getFieldsAddlConfigMap(ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine));
         JavaRDD<String> rddWithoutHeader = rdd
                 // Add line numbers
                 .zipWithIndex()
@@ -586,7 +588,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             inputDSCount += rddCount;
             JavaRDD<Row> parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
                 quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
-                ,ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine)));
+                ,Optional.ofNullable(fieldsAddlConfigMap)));
             // Create output dataset
             JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
             logger.debug("####### Rejected RDD COUNT:: " + rejectedRdd.count());
@@ -622,7 +624,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Headersize is: " + headerSize);
         JavaRDD<String> rdd = dataFrame.rdd().toJavaRDD();
         JavaRDD<String> rddWithoutHeader = null;
-        String headerLine = null;
+        LinkedHashMap<Integer, Object> fieldsAddlConfigMap = null;
     	if (headerSize >= 1) {
             rddWithoutHeader = rdd
 					// Add line numbers
@@ -631,16 +633,18 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 					.filter(new HeaderFilter(headerSize))
 					// Get rid of file numbers
 					.keys();
-            headerLine = NGComponentUtil.getLineFromRdd(rdd, headerSize, fieldDefRowNumber);
+            String headerLine = NGComponentUtil.getLineFromRdd(rdd, headerSize, fieldDefRowNumber);
+            fieldsAddlConfigMap = getFieldsAddlConfigMap(ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine));
 		} else {
             rddWithoutHeader = rdd;
+            fieldsAddlConfigMap = getFieldsAddlConfigMap(ngctx.componentConfiguration.getParser().getFields(), Optional.empty());
 		}
         if(ngctx.componentConfiguration.isErrorHandlingEnabled() && rddWithoutHeader.count() == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
         JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
             '\'', recCounter, errCounter, allowInconsistentCol
-            ,ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine)));
+            ,Optional.ofNullable(fieldsAddlConfigMap)));
 	    // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(
@@ -688,9 +692,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             }
         }
         inputDSCount = combinedRdd.count();
+        LinkedHashMap<Integer, Object> fieldsAddlConfigMap =
+            getFieldsAddlConfigMap(ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine));
         JavaRDD<Row> parseRdd = combinedRdd.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
             quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
-            ,ngctx.componentConfiguration.getParser().getFields(),Optional.ofNullable(headerLine)));
+            ,Optional.ofNullable(fieldsAddlConfigMap)));
         // Create output dataset
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> outputDS = convertRddToDS(outputRdd);
@@ -916,6 +922,82 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
 
         return  new StructType(structFields);
+    }
+
+    private LinkedHashMap<Integer, Object> getFieldsAddlConfigMap(List<Field> fields, Optional<String> optHeader){
+        LinkedHashMap<Integer, Object> map = new LinkedHashMap<>();
+        List<String> fieldNames = null;
+        if(optHeader.isPresent()){
+            String header = optHeader.get().trim();
+            if(!header.isEmpty()){
+                fieldNames = Arrays.asList(header.toUpperCase().split("\\s*"+delimiter+"\\s*",-1));
+            }
+        }
+        StructField[] structFields = schema.fields();
+        int sfIndex = 0;
+        for(Field field : fields){
+            if(field.getSourceIndex() != null){
+                map.put(field.getSourceIndex(),getFieldDefaultValue(field, structFields, sfIndex));
+            }else if(field.getSourceFieldName() != null && !field.getSourceFieldName().trim().isEmpty()){
+                if(fieldNames == null){
+                    throw new XDFException(XDFReturnCode.CONFIG_ERROR,"File Header not exist. So sourceFieldName should not add to Field Config.");
+                }else{
+                    int fieldIndex = getFieldIndex(fieldNames,field.getSourceFieldName().trim());
+                    map.put(fieldIndex,getFieldDefaultValue(field, structFields, sfIndex));
+                }
+            }
+            sfIndex++;
+        }
+        if(map.isEmpty()){
+            return null;
+        }else if(map.keySet().size() == fields.size()){
+            return map;
+        }else{
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Invalid Fields sourceIndex or sourceFieldName config.");
+        }
+    }
+
+    private int getFieldIndex(List<String> fieldNames, String fieldName) {
+        int index = fieldNames.indexOf(fieldName.trim().toUpperCase());
+        if(index >= 0){
+            return index;
+        }else{
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Field sourceFieldName not exist in File Header.");
+        }
+    }
+
+    private Object getFieldDefaultValue(Field field, StructField[] structFields, int sfIndex) {
+        if(field.getDefaultValue() != null){
+            String defaultValue = field.getDefaultValue().trim();
+            StructField sf = structFields[sfIndex];
+            try {
+                if (sf.dataType().equals(DataTypes.StringType)) {
+                    if (NGComponentUtil.validateString(defaultValue,this.quoteChar)) {
+                        return defaultValue;
+                    } else {
+                        throw new Exception("Invalid default value");
+                    }
+                } else if (sf.dataType().equals(DataTypes.LongType)) {
+                    return Long.parseLong(defaultValue);
+                } else if (sf.dataType().equals(DataTypes.DoubleType)) {
+                    return Double.parseDouble(defaultValue);
+                } else if (sf.dataType().equals(DataTypes.IntegerType)) {
+                    return Integer.parseInt(defaultValue);
+                } else if (sf.dataType().equals(DataTypes.TimestampType)) {
+                    SimpleDateFormat df = new SimpleDateFormat();
+                    df.setLenient(false);
+                    if (!tsFormats.get(sfIndex).isEmpty()) {
+                        df.applyPattern(tsFormats.get(sfIndex));
+                    } else {
+                        df.applyPattern(DEFAULT_DATE_FORMAT);
+                    }
+                    return new java.sql.Timestamp(df.parse(defaultValue).getTime());
+                }
+            } catch (Exception e) {
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Invalid default value for the field - " + field.getName() +" - is : " + defaultValue);
+            }
+        }
+        return null;
     }
 
     private Map<String, Object> getOutputDatasetDetails() {

@@ -96,4 +96,45 @@ public class NGComponentUtil {
         logger.info("Line :: :" + line);
         return line;
     }
+
+    /**
+     * Validate the column string with the quote char
+     *
+     * @param inputString
+     * @return true if valid else false
+     */
+    public static boolean validateString(String inputString, char quoteChar) {
+        boolean status = validateQuoteBalance(inputString, quoteChar);
+        logger.debug("Have valid quote balanced string : " + status);
+        return status;
+    }
+
+    /**
+     * Validate string column with balance quote
+     *
+     * @param inputString
+     * @param quoteCharacter
+     * @return true if the column value valid else false
+     */
+    public static boolean validateQuoteBalance(String inputString, char quoteCharacter) {
+        int charCount = countChar(inputString, quoteCharacter);
+        return  (charCount % 2) == 0;
+    }
+
+    /**
+     * Count the number of char for balance character
+     *
+     * @param inputString
+     * @param character
+     * @return no of balance char
+     */
+    public static int countChar(String inputString, char character) {
+        int count = 0;
+        for(char c: inputString.toCharArray()) {
+            if (c == character) {
+                count += 1;
+            }
+        }
+        return count;
+    }
 }

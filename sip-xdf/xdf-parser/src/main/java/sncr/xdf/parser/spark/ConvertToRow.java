@@ -11,14 +11,11 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
-import sncr.bda.conf.Field;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 /**
  * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
@@ -44,8 +41,7 @@ public class ConvertToRow implements Function<String, Row> {
 
     private CsvParser parser = null;
     private boolean allowInconsistentCol;
-    List<Field> fields = null;
-    String header = null;
+    LinkedHashMap<Integer, Object> fieldsAddlConfigMap = null;
 
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
@@ -57,8 +53,7 @@ public class ConvertToRow implements Function<String, Row> {
                         LongAccumulator recordCounter,
                         LongAccumulator errorCounter,
                         boolean allowInconsistentCol,
-                        List<Field> fields,
-                        Optional<String> optHeader) {
+                        Optional<LinkedHashMap<Integer, Object>> optFieldsAddlConfigMap) {
         this.schema = schema;
         this.tsFormats = tsFormats;
         this.lineSeparator = lineSeparator ;
@@ -69,8 +64,7 @@ public class ConvertToRow implements Function<String, Row> {
         this.errCounter = errorCounter;
         this.recCounter = recordCounter;
         this.allowInconsistentCol = allowInconsistentCol;
-        this.fields = fields;
-        if(optHeader.isPresent()) header = optHeader.get();
+        if(optFieldsAddlConfigMap.isPresent()) this.fieldsAddlConfigMap = optFieldsAddlConfigMap.get();
 
         df = new SimpleDateFormat();
         /*
@@ -118,25 +112,15 @@ public class ConvertToRow implements Function<String, Row> {
     }
 
     private Object[] constructRecord(String line, Object[] record, String[] parsed) {
-        boolean areFieldsContainsIndexOrName = areFieldsContainsIndexOrName();
-        logger.debug("areFieldsContainsIndexOrName :: "+ areFieldsContainsIndexOrName);
-        if(areFieldsContainsIndexOrName){
-            record = constructRecordWithIndexOrNames(line, record, parsed);
-        }else{
+        if(fieldsAddlConfigMap == null || fieldsAddlConfigMap.isEmpty()){
             record = constructRecordFromLine(line, record, parsed);
+        }else{
+            record = constructRecordWithIndecies(line, record, parsed);
         }
         return record;
     }
 
-    private boolean areFieldsContainsIndexOrName() {
-
-
-        return false;
-
-
-    }
-
-    private Object[] constructRecordWithIndexOrNames(String line, Object[] record, String[] parsed) {
+    private Object[] constructRecordWithIndecies(String line, Object[] record, String[] parsed) {
 
         return record;
     }
@@ -217,37 +201,37 @@ public class ConvertToRow implements Function<String, Row> {
         return record;
     }
 
-  /**
-   * Validate the column string with the quote char
-   *
-   * @param inputString
-   * @return true if valid else false
-   */
+    /**
+     * Validate the column string with the quote char
+     *
+     * @param inputString
+     * @return true if valid else false
+     */
     private boolean validateString(String inputString) {
         boolean status = validateQuoteBalance(inputString, this.quoteChar);
         logger.debug("Have valid quote balanced string : " + status);
         return status;
     }
 
-  /**
-   * Validate string column with balance quote
-   *
-   * @param inputString
-   * @param quoteCharacter
-   * @return true if the column value valid else false
-   */
+    /**
+     * Validate string column with balance quote
+     *
+     * @param inputString
+     * @param quoteCharacter
+     * @return true if the column value valid else false
+     */
     private boolean validateQuoteBalance(String inputString, char quoteCharacter) {
         int charCount = countChar(inputString, quoteCharacter);
         return  (charCount % 2) == 0;
     }
 
-  /**
-   * Count the number of char for balance character
-   *
-   * @param inputString
-   * @param character
-   * @return no of balance char
-   */
+    /**
+     * Count the number of char for balance character
+     *
+     * @param inputString
+     * @param character
+     * @return no of balance char
+     */
     private int countChar(String inputString, char character) {
         int count = 0;
         for(char c: inputString.toCharArray()) {
