@@ -1,9 +1,20 @@
 <div class="dialog-container" #zoomAnalysisChartContainer>
-  <div class="dialog__content" fxLayout="column">
+  <div
+    class="dialog__content"
+    fxLayout="column"
+    fxLayoutAlign="start stretch"
+    fxLayoutGap="10px"
+  >
+    <div fxLayout="row" fxLayoutAlign="end center">
+      <button mat-icon-button (click)="close()">
+        <mat-icon class="close-icon" fontIcon="icon-close"></mat-icon>
+      </button>
+    </div>
     <div
       fxLayout="row"
       fxLayoutAlign="start center"
       fxLayoutGap="5px"
+      class="filter-row"
       *ngIf="(filterCount$ | async) > 0"
     >
       <div fxLayout="column">
@@ -90,11 +101,18 @@
         [updater]="data.updater"
       >
       </observe-report>
-      <mat-icon
-        (click)="close()"
-        class="close-icon"
-        fontIcon="icon-close"
-      ></mat-icon>
     </div>
+
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Description</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <p>
+          {{ data.analysis.description || 'No description provided.' }}
+        </p>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>
