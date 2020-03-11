@@ -48,7 +48,7 @@
 
 - name: Create symbolink link to current Spark version
   file:
-    src: /opt/mapr/spark/spark-2.3.2
+    src: /opt/mapr/spark/spark-2.4.4
     dest: /opt/mapr/spark/spark-current
     state: link
 - name: Enable RTIS

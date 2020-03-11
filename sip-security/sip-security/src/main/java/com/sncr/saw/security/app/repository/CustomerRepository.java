@@ -16,4 +16,5 @@ public interface CustomerRepository {
     Valid upsertCustomerBrand(Long customerId,
                               String brandColor,
                               byte[] brandLogo);
+    Customer fetchCustomerDetails(String customerCode);
 }

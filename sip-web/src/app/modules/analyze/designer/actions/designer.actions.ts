@@ -219,3 +219,9 @@ export class DesignerUpdateAggregateInSorts {
     '[Designer] update aggregate in sorts on change of aggregagte';
   constructor(public column: any) {}
 }
+
+export class DesignerUpdateQueryFilters {
+  static readonly type =
+    '[Designer] update query with runtime filters';
+    constructor(public filters: any) {}
+}

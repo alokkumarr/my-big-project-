@@ -61,7 +61,8 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
-  public hasDateInterval = false;
+  public supportsDateInterval = false;
+  public supportsDateFormat = false;
   public isDataField = false;
   public colorPickerConfig = {};
 
@@ -71,7 +72,17 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-    this.hasDateInterval = DATE_TYPES.includes(type);
+
+    this.supportsDateInterval =
+      DATE_TYPES.includes(type) &&
+      (this.analysisType === 'pivot' || this.analysisSubtype === 'comparison');
+
+    this.supportsDateFormat =
+      DATE_TYPES.includes(type) &&
+      this.analysisSubtype !== 'comparison' && // no date formats supported in comparison chart
+      (this.analysisType !== 'pivot' || // all charts
+        this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
+
     this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
     );
@@ -86,9 +97,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       ...take(DEFAULT_CHART_COLORS, 11),
       ...ADDITIONAL_PRESET_COLORS
     ];
-    if (this.isDataField) {
-      set(this.colorPickerConfig, 'bgColor', this.artifactColumn.seriesColor);
-    }
     set(this.colorPickerConfig, 'presetColors', presetColors);
     set(this.colorPickerConfig, 'iscustomStyleNeeded', true);
   }

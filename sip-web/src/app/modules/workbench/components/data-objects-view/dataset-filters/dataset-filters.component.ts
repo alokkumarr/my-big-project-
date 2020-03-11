@@ -2,6 +2,8 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isArray from 'lodash/isArray';
+import * as has from 'lodash/has';
 
 @Component({
   selector: 'dataset-filters',
@@ -10,10 +12,10 @@ import * as isEmpty from 'lodash/isEmpty';
 })
 export class DatasetFilterComponent implements OnInit {
   private filterPayload = {};
-  public categoryType;
+  public filterList;
 
-  @Input('typeFilterList') set setFilterList(data) {
-    this.categoryType = data;
+  @Input('filterList') set setFilterList(data) {
+    this.filterList = data;
   }
   @Output() change = new EventEmitter<any>();
   constructor() {}
@@ -21,7 +23,11 @@ export class DatasetFilterComponent implements OnInit {
   ngOnInit() {}
 
   filterChange(event) {
-    set(this.filterPayload, 'dstype', [event.data]);
+    set(
+      this.filterPayload,
+      event.filterType,
+      isArray(event.data) ? event.data : [event.data]
+    );
   }
 
   isFilterSelected() {
@@ -35,5 +41,19 @@ export class DatasetFilterComponent implements OnInit {
     this.change.emit({
       data: this.filterPayload
     });
+  }
+
+  // Use this function to remove/reset individual filter.
+  filterRemoved(event) {
+    if (has(this.filterPayload, event.filterType)) {
+      delete this.filterPayload[event.filterType];
+      if (this.isFilterSelected() && event.name === 'resetFilter') {
+        this.applyOrResetFilters('reset');
+      }
+    }
+  }
+
+  trackByIndex(index) {
+    return index;
   }
 }

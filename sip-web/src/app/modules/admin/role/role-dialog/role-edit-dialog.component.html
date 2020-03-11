@@ -14,6 +14,7 @@
       <input
         matInput
         autocomplete="off"
+        e2e="role-name"
         required
         type="text"
         formControlName="roleName"
@@ -25,6 +26,7 @@
       <input
         matInput
         autocomplete="off"
+        e2e="role-desc"
         type="text"
         formControlName="roleDesc"
         placeholder="Description"
@@ -33,7 +35,7 @@
 
     <mat-form-field class="select-form-field" appearance="outline">
       <mat-label i18n>Status</mat-label>
-      <mat-select class="form-field" required formControlName="activeStatusInd">
+      <mat-select e2e="role-status" class="form-field" required formControlName="activeStatusInd">
         <mat-option *ngFor="let status of statuses" [value]="status.id">
           {{ status.name }}
         </mat-option>
@@ -42,7 +44,7 @@
 
     <mat-form-field class="select-form-field" appearance="outline">
       <mat-label i18n>Role Type</mat-label>
-      <mat-select class="form-field" required formControlName="roleType">
+      <mat-select e2e="role-type" class="form-field" required formControlName="roleType">
         <mat-option
           *ngFor="let roleType of (data.formDeps.roleTypes$ | async)"
           [value]="roleType.roleName"

@@ -101,11 +101,14 @@ export class GlobalFilterService {
   }
 
   haveAnalysisFiltersChanged(filts) {
+    if (isEmpty(filts) && isEmpty(this._lastAnalysisFilters)) {
+      return false;
+    }
     return !isEqual(this._lastAnalysisFilters, filts);
   }
 
   resetLastAnalysisFiltersApplied() {
-    this._lastAnalysisFilters = {};
+    this._lastAnalysisFilters = [];
   }
 
   get lastAnalysisFilters() {

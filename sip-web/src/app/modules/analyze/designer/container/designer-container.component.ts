@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
+import * as isNil from 'lodash/isNil';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
 import * as flatMap from 'lodash/flatMap';
@@ -28,6 +29,7 @@ import { Store, Select } from '@ngxs/store';
 import { Observable, Subscription } from 'rxjs';
 import { takeWhile, finalize, map as map$ } from 'rxjs/operators';
 import * as fpFilter from 'lodash/fp/filter';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {
   flattenPivotData,
@@ -101,7 +103,8 @@ import {
   DesignerJoinsArray,
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
-  DesignerCheckAggregateFilterSupport
+  DesignerCheckAggregateFilterSupport,
+  DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
@@ -151,6 +154,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
+  public queryRunTimeFilters = [];
   private subscriptions: Subscription[] = [];
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
@@ -389,7 +393,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.isInQueryMode = this._store.selectSnapshot(
       DesignerState
     ).analysis.designerEdit;
-
+    this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
     this.initAuxSettings();
 
     this.addDefaultSorts();
@@ -1054,9 +1058,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
         if (!isEmpty(this.data)) {
           const rowKeys = keys(this.data[0]);
+          const columnIdentifier =
+            this.analysis.type === 'report'
+              ? event.column.alias || event.column.name
+              : event.column.name;
           this.data.map(row => {
-            const key = find(rowKeys, k => includes(k, event.column.name));
-            if (row[key]) {
+            const key = find(rowKeys, k => includes(k, columnIdentifier));
+            if (!isNil(row[key])) {
               row[key] = '';
             }
           });
@@ -1086,8 +1094,21 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'submitQuery':
         this.changeToQueryModePermanently();
-        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
-        this.requestDataIfPossible();
+        this._store.dispatch(new DesignerUpdateQueryFilters(this.queryRunTimeFilters));
+        const analysis = this._store.selectSnapshot(state => state.designerState.analysis);
+        this.filterService.getRuntimeFilterValuesIfAvailable(analysis, 'preview', true).then(
+          model => {
+            if (isUndefined(model)) {
+              this.areMinRequirmentsMet = false;
+            } else {
+              this._store.dispatch(new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters')));
+              this.queryRunTimeFilters = get(model, 'sipQuery.filters');
+              this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+              this.areMinRequirmentsMet = this.canRequestData();
+              this.requestDataIfPossible();
+            }
+          }
+        )
         break;
       case 'filter':
       case 'sort':
@@ -1135,6 +1156,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   changeToQueryModePermanently() {
     this._store.dispatch(new DesignerUpdateEditMode(true));
     this.filters = [];
+
     this.sorts = [];
   }
 

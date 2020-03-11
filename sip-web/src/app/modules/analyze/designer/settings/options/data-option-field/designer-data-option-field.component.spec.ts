@@ -84,5 +84,9 @@ describe('Designer Data Options', () => {
     component.change.subscribe(result => {
       expect(result).toEqual(seriesColorChange);
     });
+
+    component.artifactColumn.seriesColor = 'white';
+    component.selectedColor({});
+    expect(component.artifactColumn.seriesColor).toEqual('white');
   });
 });

@@ -166,6 +166,7 @@ public abstract class AbstractComponent implements WithContext{
                 throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR);
             }
             if(ret == 0){
+                logger.info("isErrorHandlingEnabled : "+ ngctx.componentConfiguration.isErrorHandlingEnabled());
                 ret = execute();
                 logger.info("Component execute() return code = " + ret);
                 if (ngctx.runningPipeLine) {
@@ -871,24 +872,26 @@ public abstract class AbstractComponent implements WithContext{
         public TransformationService transformationMD;
     }
 
-    public void validateOutputDSCounts(long inputDSCount){
-        logger.debug("inputDSCount : " + inputDSCount);
-        String outDataSetName = null;
-        for( Output output: ngctx.componentConfiguration.getOutputs()){
-            if (output.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
-                outDataSetName = output.getDataSet();
+    public void validateOutputDSCounts(long inputDSCount, boolean isPivotApplied){
+        if(ngctx.componentConfiguration.isErrorHandlingEnabled()){
+            logger.debug("inputDSCount : " + inputDSCount);
+            String outDataSetName = null;
+            for( Output output: ngctx.componentConfiguration.getOutputs()){
+                if (output.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
+                    outDataSetName = output.getDataSet();
+                }
             }
-        }
-        logger.debug("outDataSetName : " + outDataSetName);
-        Map<String, Object> outDS = ngctx.outputDataSets.get(outDataSetName);
-        logger.debug("outDS : " + outDS);
-        long outputDSCount = (long)outDS.get(DataSetProperties.RecordCount.name());
-        logger.debug("outputDSCount : " + outputDSCount);
-        if(outputDSCount == 0){
-            throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
-        }else if(inputDSCount > outputDSCount){
-            XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
-            errors.put(retCd.getCode(), retCd.getDescription(inputDSCount-outputDSCount));
+            logger.debug("outDataSetName : " + outDataSetName);
+            Map<String, Object> outDS = ngctx.outputDataSets.get(outDataSetName);
+            logger.debug("outDS : " + outDS);
+            long outputDSCount = (long)outDS.get(DataSetProperties.RecordCount.name());
+            logger.debug("outputDSCount : " + outputDSCount);
+            if(outputDSCount == 0){
+                throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
+            }else if(!isPivotApplied && inputDSCount > outputDSCount){
+                XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
+                errors.put(retCd.getCode(), retCd.getDescription(inputDSCount-outputDSCount));
+            }
         }
     }
 }

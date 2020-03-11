@@ -38,7 +38,7 @@ export interface ArtifactColumnChart extends ArtifactColumn {
   limitValue?: number;
   limitType?: string;
   dateFormat?: string;
-  dateInterval?: string;
+  groupInterval?: string;
   geoType?: string;
   geoRegion?: Region;
 }
@@ -46,8 +46,7 @@ export interface ArtifactColumnChart extends ArtifactColumn {
 export interface ArtifactColumnPivot extends ArtifactColumn {
   area?: 'row' | 'column' | 'data';
   areaIndex?: number;
-  dateInterval?: string;
-  // dateInterval is used instead of groupInterval
+  groupInterval?: string;
   dateFormat?: string;
 }
 

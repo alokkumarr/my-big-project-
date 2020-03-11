@@ -13,6 +13,7 @@ import sncr.xdf.parser.NGParser;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import java.util.Optional;
 
 public class WorkbenchExecuteJob implements Job<Integer> {
   private static final long serialVersionUID = 1L;
@@ -84,7 +85,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     }catch (Exception ex) {
         exception = ex;
     }
-    rc = NGComponentUtil.handleErrors(aac, rc, exception);
+    rc = NGComponentUtil.handleErrors(Optional.ofNullable(aac),Optional.ofNullable(ngctx.componentConfiguration), rc, exception);
     if (rc != 0) {
           throw new RuntimeException("XDF returned non-zero status: " + rc);
       }

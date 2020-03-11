@@ -73,6 +73,11 @@ public class MaprConnection {
     store.replace(id, document);
   }
 
+  public void insertOrUpdate(String id, Object rowData) {
+    Document document = connection.newDocument(rowData);
+    store.insertOrReplace(id, document);
+  }
+
   /**
    * Find by document ID.
    *

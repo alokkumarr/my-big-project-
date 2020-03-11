@@ -81,8 +81,8 @@ export class ExecutedListComponent {
         width: '30%',
         calculateCellValue: data =>
           !data.status || data.status.toLowerCase() === 'success'
-            ? '<i class="icon-checkmark" style="font-size: 16px; color: green; margin-left: 10px"></i>'
-            : '<i class="icon-close" style="font-size: 10px; color: red; margin-left: 10px"></i>'
+            ? '<i class="icon-checkmark" e2e="load-execution" style="font-size: 16px; color: green; margin-left: 10px"></i>'
+            : '<i class="icon-close" e2e="load-execution" style="font-size: 10px; color: red; margin-left: 10px"></i>'
       }
     ];
     return this._DxDataGridService.mergeWithDefaultConfig({
