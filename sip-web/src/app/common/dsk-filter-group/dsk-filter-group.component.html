@@ -52,6 +52,7 @@
   <dsk-filter-group
     [filterGroup]="child"
     [selfIndex]="childId"
+    [data]="data"
     (onRemoveGroup)="removeGroup($event)"
     (onChange)="onChange.emit(this.filterGroup)"
     *ngIf="child['booleanCriteria']; else attributeFields"
@@ -59,7 +60,7 @@
 
   <ng-template #attributeFields>
     <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center">
-      <div fxLayout="column" fxFlex="30" fxLayoutAlign="start stretch">
+      <div fxLayout="column" fxFlex="30" fxLayoutAlign="start stretch" *ngIf="data.mode === 'DSK'">
         <mat-form-field appearance="outline">
           <mat-label>Attribute</mat-label>
           <input
@@ -86,7 +87,7 @@
         >
       </div>
 
-      <div fxLayout="column" fxFlex fxLayoutAlign="start stretch">
+      <div fxLayout="column" fxFlex fxLayoutAlign="start stretch" *ngIf="data.mode === 'DSK'">
         <mat-form-field>
           <mat-chip-list
             #chipList
@@ -115,6 +116,96 @@
           >At least 1 value is <strong>required</strong>.</mat-error
         >
       </div>
+
+      <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center" *ngIf="data.mode === 'ANALYZE'">
+        <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+            <mat-label>Artifacts</mat-label>
+            <mat-select (selectionChange)="artifactSelect($event.value, childId)"
+                        [value]="">
+              <mat-option *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn"
+                          [value]="artifact.artifactName">
+                {{ artifact.artifactName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+            <mat-label>Columns</mat-label>
+            <mat-select (selectionChange)="columnsSelect($event.value, childId)"
+                        [value]="">
+              <mat-option *ngFor="let column of fetchColumns(childId);"
+                          [value]="column.columnName">
+                {{ column.displayName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div [ngSwitch]="TYPE_MAP[fetchType(childId)]">
+            <designer-string-filter
+              *ngSwitchCase="'string'"
+              (filterModelChange)="onFilterModelChange($event, childId)"
+            >
+            </designer-string-filter>
+            <designer-date-filter
+              *ngSwitchCase="'date'"
+              (filterModelChange)="onFilterModelChange($event, childId)"
+            >
+            </designer-date-filter>
+            <designer-number-filter
+              *ngSwitchCase="'number'"
+              (filterModelChange)="onFilterModelChange($event, childId)"
+            >
+            </designer-number-filter>
+          </div>
+      </div>
+
+
+
+      <div
+        fxLayout="row"
+        class="filter__action__space"
+        fxLayoutAlign="space-between center"
+        *ngIf="data.showFilterOptions"
+      >
+        <mat-checkbox
+          *ngIf="!data.isInRuntimeMode && data.supportsGlobalFilters"
+          (change)="onGlobalCheckboxToggle($event.checked, childId)"
+          i18n
+          e2e="filter-dialog-global-checkbox"
+        >
+          Global
+        </mat-checkbox>
+        <mat-checkbox
+          *ngIf="!data.isInRuntimeMode"
+          (change)="onRuntimeCheckboxToggle($event.checked, childId)"
+          i18n
+          e2e="filter-dialog-prompt-checkbox"
+        >
+          Prompt
+        </mat-checkbox>
+        <mat-checkbox
+          *ngIf="!data.isInRuntimeMode"
+          (change)="onOptionalCheckboxToggle($event.checked, childId)"
+          i18n
+          e2e="filter-dialog-optional-checkbox"
+        >
+          Optional
+        </mat-checkbox>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <button
         mat-icon-button
         aria-label="Remove dsk field attribute"

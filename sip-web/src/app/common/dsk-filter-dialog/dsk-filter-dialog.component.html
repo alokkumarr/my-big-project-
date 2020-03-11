@@ -27,6 +27,7 @@
       </mat-expansion-panel>
     </mat-accordion>
     <dsk-filter-group
+      [data]="data"
       [filterGroup]="dskFilterObject"
       (onChange)="updateFilter($event)"
     ></dsk-filter-group>

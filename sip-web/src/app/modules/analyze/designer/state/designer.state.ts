@@ -37,7 +37,6 @@ import {
   DesignerUpdateAnalysisSubType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria,
   DesignerUpdateAnalysisChartTitle,
   DesignerUpdateAnalysisChartInversion,
   DesignerUpdateAnalysisChartLegend,
@@ -67,7 +66,6 @@ import { AnalyzeService } from '../../services/analyze.service';
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
-  CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ,
   QUERY_RUNTIME_IDENTIFIER
 } from '../../consts';
@@ -929,36 +927,24 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    filters.forEach(filt => {
-      filt.artifactsName = filt.tableName || filt.artifactsName;
-      if (
-        filt.type === 'date' &&
-        !filt.isRuntimeFilter &&
-        !filt.isGlobalFilter &&
-        filt.model.preset === CUSTOM_DATE_PRESET_VALUE
-      ) {
-        filt.model = {
-          gte: filt.model.gte,
-          lte: filt.model.lte,
-          format: 'yyyy-MM-dd HH:mm:ss',
-          preset: CUSTOM_DATE_PRESET_VALUE
-        };
-      }
-    });
+    // filters.forEach(filt => {
+    //   filt.artifactsName = filt.tableName || filt.artifactsName;
+    //   if (
+    //     filt.type === 'date' &&
+    //     !filt.isRuntimeFilter &&
+    //     !filt.isGlobalFilter &&
+    //     filt.model.preset === CUSTOM_DATE_PRESET_VALUE
+    //   ) {
+    //     filt.model = {
+    //       gte: filt.model.gte,
+    //       lte: filt.model.lte,
+    //       format: 'yyyy-MM-dd HH:mm:ss',
+    //       preset: CUSTOM_DATE_PRESET_VALUE
+    //     };
+    //   }
+    // });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, filters } }
-    });
-  }
-
-  @Action(DesignerUpdatebooleanCriteria)
-  updatebooleanCriteria(
-    { patchState, getState }: StateContext<DesignerStateModel>,
-    { booleanCriteria }: DesignerUpdatebooleanCriteria
-  ) {
-    const analysis = getState().analysis;
-    const sipQuery = analysis.sipQuery;
-    return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria } }
     });
   }
 

@@ -20,6 +20,8 @@ import {
   DesignerFilterDialogComponent,
   DesignerFilterDialogData
 } from '../designer/filter';
+
+import { DskFilterDialogComponent } from './../../../common/dsk-filter-dialog/dsk-filter-dialog.component';
 import { DesignerPreviewDialogComponent } from '../designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
@@ -102,14 +104,24 @@ export class AnalyzeDialogService {
       supportsGlobalFilters,
       supportsAggregationFilters,
       isInRuntimeMode: false,
-      showFilterOptions: true
+      showFilterOptions: true,
+      mode: 'ANALYZE'
     };
-    return this.dialog.open(DesignerFilterDialogComponent, {
+    // return this.dialog.open(DesignerFilterDialogComponent, {
+    //   width: 'auto',
+    //   height: 'auto',
+    //   autoFocus: false,
+    //   data
+    // } as MatDialogConfig);
+
+    return this.dialog.open(DskFilterDialogComponent, {
       width: 'auto',
       height: 'auto',
       autoFocus: false,
       data
     } as MatDialogConfig);
+
+
   }
 
   openFilterPromptDialog(

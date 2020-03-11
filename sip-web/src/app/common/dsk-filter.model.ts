@@ -10,9 +10,14 @@ export enum DSKFilterBooleanCriteria {
 export interface DSKFilterField {
   attributeId?: string;
   columnName: string;
+  type?: string;
+  artifactsName?: string;
+  isGlobalFilter?: boolean;
+  isRuntimeFilter?: boolean;
+  isOptional?: boolean;
   model: {
-    operator: DSKFilterOperator;
-    values: Array<String>;
+    operator;
+    values;
   };
 }
 
