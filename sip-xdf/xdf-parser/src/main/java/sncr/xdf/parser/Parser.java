@@ -126,7 +126,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         outputDsPartitionKeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
-        allowInconsistentCol = ctx.componentConfiguration.getParser().getAllowInconsistentColumn();
+        allowInconsistentCol = ctx.componentConfiguration.getParser().isAllowInconsistentColumn();
 
         logger.debug("Input file format = " + this.parserInputFileFormat);
         logger.debug("outputDsPartitionKeys size is = " + outputDsPartitionKeys.size());

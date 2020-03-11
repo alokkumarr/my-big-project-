@@ -157,7 +157,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         pkeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
-      allowInconsistentCol = ngctx.componentConfiguration.getParser().getAllowInconsistentColumn();
+        allowInconsistentCol = ngctx.componentConfiguration.getParser().isAllowInconsistentColumn();
 
         logger.info("Input file format = " + this.parserInputFileFormat);
 
@@ -344,7 +344,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
             Dataset<Row> inputDataset = null;
-            multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
+            multiLine = ngctx.componentConfiguration.getParser().isMultiLine();
 
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
             inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);

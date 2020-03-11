@@ -68,7 +68,7 @@ public class ParserWithInconsistentColTest extends BaseTest {
     ConvertToRow ctr = new ConvertToRow(originalSchema, createTsFormatList(parser.getFields()), parser.getLineSeparator(),
         parser.getDelimiter().charAt(0), parser.getQuoteChar().charAt(0), parser.getQuoteChar().charAt(0),
         '\'', context.getSparkContext().longAccumulator("ParserRecCounter"),
-        context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.getAllowInconsistentColumn());
+        context.getSparkContext().longAccumulator("ParserErrorCounter"), parser.isAllowInconsistentColumn());
     JavaRDD<Row> data = rawData.map(ctr);
     data.count();
 
