@@ -89,7 +89,6 @@ import {
   DesignerUpdateAnalysisSubType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria,
   DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
@@ -150,7 +149,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   public sorts: Sort[] = [];
   public sortFlag = [];
   public filters: Filter[] = [];
-  public booleanCriteria = 'AND';
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
@@ -389,7 +387,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
-    this.booleanCriteria = queryBuilder.booleanCriteria;
     this.isInQueryMode = this._store.selectSnapshot(
       DesignerState
     ).analysis.designerEdit;
@@ -808,7 +805,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         .openFilterDialog(
           this._store.selectSnapshot(DesignerState.analysisFilters),
           this.artifacts,
-          this.booleanCriteria,
           analysis.type,
           supportsGlobalFilters,
           this.filterService.supportsAggregatedFilters(analysis)
@@ -816,12 +812,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         .afterClosed()
         .subscribe((result: IToolbarActionResult) => {
           if (result) {
-            this._store.dispatch(new DesignerUpdateFilters(result.filters));
-            this.filters = this.generateDSLDateFilters(result.filters);
-            this._store.dispatch(
-              new DesignerUpdatebooleanCriteria(result.booleanCriteria)
-            );
-            this.booleanCriteria = result.booleanCriteria;
+            this._store.dispatch(new DesignerUpdateFilters(result));
             this.onSettingsChange({ subject: 'filter' });
           }
         });
@@ -965,7 +956,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
 
     const sqlBuilder = {
-      booleanCriteria: this.booleanCriteria,
+      booleanCriteria: true,
       filters: this.filters,
       [sortProp]: this.sorts,
       ...partialSqlBuilder

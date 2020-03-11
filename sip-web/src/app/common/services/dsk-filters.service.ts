@@ -77,7 +77,7 @@ export class DskFiltersService {
   isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false) {
     let condition;
     condition = filter.booleanQuery.length > 0;
-
+    return true;
     return (
       filter.booleanCriteria &&
       condition &&

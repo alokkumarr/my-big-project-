@@ -7,6 +7,8 @@ import {
   DSKFilterBooleanCriteria
 } from '../dsk-filter.model';
 
+import { NUMBER_TYPES, DATE_TYPES } from './../consts';
+
 import { PopperContent } from 'ngx-popper';
 import { MatChipInputEvent } from '@angular/material';
 import { JwtService } from 'src/app/common/services';
@@ -14,16 +16,34 @@ import { DskFiltersService, DskEligibleField } from './../services/dsk-filters.s
 
 import * as toString from 'lodash/toString';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
 import * as groupBy from 'lodash/groupBy';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpToPairs from 'lodash/fp/toPairs';
-import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as isUndefined from 'lodash/isUndefined';
+import * as map from 'lodash/map';
+import * as reduce from 'lodash/reduce';
+import * as get from 'lodash/get';
+
+import { Artifact, Filter } from './../../modules/analyze/designer/types';
+import { ArtifactDSL } from '../../models';
+
 
 export const defaultFilters: DSKFilterGroup = {
   booleanCriteria: DSKFilterBooleanCriteria.AND,
   booleanQuery: []
 };
+
+const TYPE_MAP = reduce(
+  [
+    ...map(NUMBER_TYPES, type => ({ type, generalType: 'number' })),
+    ...map(DATE_TYPES, type => ({ type, generalType: 'date' })),
+    { type: 'string', generalType: 'string' }
+  ],
+  (typeMap, { type, generalType }) => {
+    typeMap[type] = generalType;
+    return typeMap;
+  },
+  {}
+);
 
 @Component({
   selector: 'dsk-filter-group',
@@ -34,9 +54,11 @@ export class DskFilterGroupComponent implements OnInit {
   filterGroup: DSKFilterGroup = cloneDeep(defaultFilters);
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   dskEligibleFields: Array<DskEligibleField> = [];
+  @Output() public filterModelChange: EventEmitter<null> = new EventEmitter();
   filteredColumns: [];
   groupedFilters;
   filters;
+  public TYPE_MAP = TYPE_MAP;
   @Input() data;
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || cloneDeep(defaultFilters);
@@ -84,16 +106,33 @@ export class DskFilterGroupComponent implements OnInit {
 
   addField(popper: PopperContent) {
     popper.hide();
-    this.filterGroup.booleanQuery.push({
-      columnName: '',
-      artifactsName: '',
-      model: {
-        operator: DSKFilterOperator.ISIN,
-        values: []
-      }
-    });
-    console.log(this.filterGroup);
-    this.onChange.emit(this.filterGroup);
+    if (this.data.mode === 'DSK') {
+      this.filterGroup.booleanQuery.push({
+        columnName: '',
+        model: {
+          operator: DSKFilterOperator.ISIN,
+          values: []
+        }
+      });
+      console.log(this.filterGroup);
+      this.onChange.emit(this.filterGroup);
+    } else if (this.data.mode === 'ANALYZE') {
+      this.filterGroup.booleanQuery.push({
+        columnName: '',
+        artifactsName: '',
+        type: '',
+        isGlobalFilter: false,
+        isRuntimeFilter: false,
+        isOptional: false,
+        model: {
+          operator: '',
+          values: ''
+        }
+      });
+      console.log(this.filterGroup);
+      this.onChange.emit(this.filterGroup);
+    }
+
   }
 
   /**
@@ -173,8 +212,30 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   fetchColumns(childId) {
-    let dropDownData = this.data.artifacts.find((data: any) => data.artifactName === this.filterGroup.booleanQuery[childId].artifactsName);
+    if (isEmpty(get(this.filterGroup.booleanQuery[childId], 'artifactsName'))) {
+      return [];
+    }
+    let dropDownData = this.data.artifacts.find((data: any) =>
+      data.artifactName === get(this.filterGroup.booleanQuery[childId], 'artifactsName')
+    );
     return dropDownData.columns;
+  }
+
+  columnsSelect(column, childId) {
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).columnName = column;
+    console.log(this.filterGroup);
+    const selectedTable =  this.data.artifacts.find((data: any) =>
+      data.artifactName === get(this.filterGroup.booleanQuery[childId], 'artifactsName')
+    );
+
+    const selectedColumn = selectedTable.columns.find((col) =>
+      col.columnName === get(this.filterGroup.booleanQuery[childId], 'columnName')
+    )
+
+    console.log(selectedColumn);
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).type = selectedColumn.type;
+
+    this.onChange.emit(this.filterGroup);
   }
 
   artifactTrackByFn(_, artifact: Artifact | ArtifactDSL) {
@@ -183,15 +244,17 @@ export class DskFilterGroupComponent implements OnInit {
     );
   }
 
-  nonAggregatedFiltersFor(childId): Filter[] {
-    const allFilters = this.groupedFilters[(<DSKFilterField>this.filterGroup.booleanQuery[childId]).artifactsName];
-    return allFilters
-      ? allFilters.filter((f: Filter) => !f.isAggregationFilter)
-      : [];
+  fetchType(childId) {
+    if (isUndefined(this.filterGroup.booleanQuery[childId])) {
+      return '';
+    }
+    return get(this.filterGroup.booleanQuery[childId], 'type');
   }
 
-  filterRowTrackBy(index, filterRow) {
-    return `${index}:${filterRow.columnName}`;
+  onFilterModelChange(filter, childId) {
+    console.log(filter);
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
+    this.onChange.emit(this.filterGroup);
   }
 
   addFilter(tableName, initialAdd = false, isAggregationFilter = false) {
@@ -212,15 +275,23 @@ export class DskFilterGroupComponent implements OnInit {
       ...this.groupedFilters[tableName],
       newFilter
     ];
-    if (!initialAdd) {
-      this.onFiltersChange();
-    }
   }
 
-  onFiltersChange() {
-    this.filters = fpPipe(
-      fpToPairs,
-      fpFlatMap(([_, filters]) => filters)
-    )(this.groupedFilters);
+  onGlobalCheckboxToggle(value, childId) {
+    if (!this.data.supportsGlobalFilters) {
+      return;
+    }
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).isGlobalFilter = value;
+    this.onChange.emit(this.filterGroup);
+  }
+
+  onRuntimeCheckboxToggle(value, childId) {
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).isRuntimeFilter = value;
+    this.onChange.emit(this.filterGroup);
+  }
+
+  onOptionalCheckboxToggle(value, childId) {
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).isOptional = value;
+    this.onChange.emit(this.filterGroup);
   }
 }
