@@ -14,14 +14,6 @@ import org.apache.spark.sql.types.ArrayType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.catalyst.encoders.RowEncoder;
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder;
-import sncr.xdf.context.InternalContext;
-import sncr.xdf.services.WithDataSet;
-import sncr.bda.core.file.HFileOperations;
-import org.apache.hadoop.fs.Path;
-import sncr.bda.base.MetadataBase;
-import java.util.UUID;
 
 public class NGComponentUtil {
 
@@ -115,20 +107,14 @@ public class NGComponentUtil {
         return sanitizedArrayType;
     }
 
-    public static Dataset<Row> changeDatasetSchema(Dataset<Row> dataset, StructType newSchema) {
-        ExpressionEncoder<Row> encoder = RowEncoder.apply(newSchema);
-        dataset = dataset.as(encoder);
-        return dataset;
-    }
-
-    public static Dataset<Row> changeColumnStructType(Dataset<Row> dataset, String colName, StructType newStructType) {
-        dataset = dataset.withColumn(colName,dataset.col(colName).cast(newStructType));
+    public static Dataset<Row> changeColumnType(Dataset<Row> dataset, String colName, DataType dataType) {
+        dataset = dataset.withColumn(colName,dataset.col(colName).cast(dataType));
         return dataset;
     }
 
     public static String getSanitizedFieldName(String fieldName) {
         if(fieldName != null && !fieldName.trim().isEmpty()){
-            fieldName = sanitizeFieldName(fieldName.replaceAll("\\.", "_"));
+            fieldName = sanitizeFieldName(fieldName.trim().replaceAll("\\.", "_"));
         }
         return fieldName;
     }
@@ -140,23 +126,5 @@ public class NGComponentUtil {
                 .replaceAll("\\s+", "_").toUpperCase();
         }
         return fieldName;
-    }
-
-    public static void setCheckpointDir(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper) {
-        try {
-            String checkpointDir = withDataSet.generateCheckpointLocation(datasetHelper, null, null);
-            if (ctx.fs.exists(new Path(checkpointDir))) {
-                HFileOperations.deleteEnt(checkpointDir);
-            }
-            HFileOperations.createDir(checkpointDir);
-            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
-        }catch (Exception e) {
-            logger.error("Exception in creating checkpoint Dir : ", e);
-            if (e instanceof XDFException) {
-                throw ((XDFException) e);
-            } else {
-                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
-            }
-        }
     }
 }

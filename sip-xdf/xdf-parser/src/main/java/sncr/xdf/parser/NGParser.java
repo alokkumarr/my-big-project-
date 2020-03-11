@@ -55,6 +55,8 @@ import java.util.stream.IntStream;
 import org.apache.spark.sql.Encoders;
 import sncr.xdf.parser.spark.Flattener;
 import static org.apache.spark.sql.functions.from_json;
+import org.apache.spark.sql.catalyst.encoders.RowEncoder;
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -397,7 +399,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 		}
 		else if(this.inputDataFrame != null)
 		{
-            inputDataFrame.show();
             inputDSCount = inputDataFrame.count();
             this.recCounter.setValue(inputDSCount);
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
@@ -970,6 +971,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 return DataTypes.IntegerType;
             case CsvInspectorRowProcessor.T_JSON:
                 return DataTypes.StringType;
+            case CsvInspectorRowProcessor.T_JSON_ARRAY:
+                return DataTypes.StringType;
             default:
                 return DataTypes.StringType;
         }
@@ -1049,26 +1052,52 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     }
 
     public Dataset<Row> convertJsonStringColToStruct(Dataset<Row> dataset, List<Field> fields) {
-        if(isSchemaContainsJsonType) {
+        if (isSchemaContainsJsonType) {
+            logger.debug("Parser isFlatteningEnabled : " + isFlatteningEnabled);
             for (Field field : fields) {
                 if (CsvInspectorRowProcessor.T_JSON.equalsIgnoreCase(field.getType().trim())) {
-                    String jsonFieldName = field.getName().trim();
-                    Dataset<Row> jsonDS = ctx.sparkSession.read().json(dataset.select(jsonFieldName).as(Encoders.STRING()));
-                    StructType dsSchema = jsonDS.schema();
-                    logger.debug("Json DS Schema : "+ dsSchema);
-                    StructType sanitizedSchema = NGComponentUtil.getSanitizedStructType(dsSchema);
-                    logger.debug("Sanitized Json DS Schema : "+ sanitizedSchema);
-                    logger.debug("Parser isFlatteningEnabled : "+ isFlatteningEnabled);
-                    logger.debug("Field isFlatteningEnabled : "+ field.isFlatteningEnabled());
-                    dataset = dataset.withColumn(jsonFieldName, from_json(dataset.col(jsonFieldName), sanitizedSchema));
-                    if(!isFlatteningEnabled && field.isFlatteningEnabled()){
-                        if(flattner == null) {flattner = new Flattener(ctx, this, datasetHelper);}
-                        dataset = flattner.processStructType(dataset, jsonFieldName, sanitizedSchema);
-                    }
-                    dataset.show();
-                    logger.debug("Dataset Schema after Json String field - " + jsonFieldName + " - to Struct Type : " + dataset.schema());
+                    dataset = processJsonColumnInCSV(dataset, field);
+                } else if (CsvInspectorRowProcessor.T_JSON_ARRAY.equalsIgnoreCase(field.getType().trim())) {
+                    dataset = processJsonArrayColumnInCSV(dataset, field);
                 }
             }
+        }
+        return dataset;
+    }
+
+    private Dataset<Row> processJsonColumnInCSV(Dataset<Row> dataset,Field field) {
+        String jsonFieldName = field.getName().trim();
+        Dataset<Row> jsonDS = ctx.sparkSession.read().json(dataset.select(jsonFieldName).as(Encoders.STRING()));
+        StructType jsonDSschema = jsonDS.schema();
+        logger.debug("Json DS Schema : "+ jsonDSschema);
+        dataset = dataset.withColumn(jsonFieldName, from_json(dataset.col(jsonFieldName), jsonDSschema));
+        StructType newStructType = NGComponentUtil.getSanitizedStructType(jsonDSschema);
+        dataset = NGComponentUtil.changeColumnType(dataset, jsonFieldName, newStructType);
+        logger.debug("Field isFlatteningEnabled : "+ field.isFlatteningEnabled());
+        if(!isFlatteningEnabled && field.isFlatteningEnabled()) {
+            if (flattner == null) {
+                flattner = new Flattener(ctx, this, datasetHelper);
+            }
+            dataset = flattner.processStructType(dataset, jsonFieldName, newStructType);
+        }
+        return dataset;
+    }
+
+    private Dataset<Row> processJsonArrayColumnInCSV(Dataset<Row> dataset, Field field) {
+        String jsonFieldName = field.getName().trim();
+        Dataset<Row> jsonDS = ctx.sparkSession.read().json(dataset.select(jsonFieldName).as(Encoders.STRING()));
+        StructType jsonDSschema = jsonDS.schema();
+        logger.debug("Json DS Schema : "+ jsonDSschema);
+        ArrayType arrayType = ArrayType.apply(jsonDSschema);
+        dataset = dataset.withColumn(jsonFieldName, from_json(dataset.col(jsonFieldName), arrayType));
+        ArrayType newArrayType = NGComponentUtil.getSanitizedArrayType(arrayType);
+        dataset = NGComponentUtil.changeColumnType(dataset, jsonFieldName, newArrayType);
+        logger.debug("Field isFlatteningEnabled : "+ field.isFlatteningEnabled());
+        if(!isFlatteningEnabled && field.isFlatteningEnabled()) {
+            if (flattner == null) {
+                flattner = new Flattener(ctx, this, datasetHelper);
+            }
+            dataset = flattner.processArrayType(dataset, jsonFieldName, newArrayType);
         }
         return dataset;
     }
@@ -1081,8 +1110,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             dataset = flattenDataset(dataset);
         }
 
-        if(isPivotApplied || isFlatteningEnabled) {
+        /*if(isPivotApplied || isFlatteningEnabled) {
             dataset = sortColumnNames(dataset);
+        }*/
+        if(logger.isDebugEnabled()){
+            dataset.show();
         }
         return dataset;
     }

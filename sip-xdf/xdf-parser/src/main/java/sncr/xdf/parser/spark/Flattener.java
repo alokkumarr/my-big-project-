@@ -12,9 +12,14 @@ import static org.apache.spark.sql.functions.explode_outer;
 import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.size;
 import java.util.Arrays;
-import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import java.util.Optional;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.services.WithDataSet;
+import sncr.bda.core.file.HFileOperations;
+import org.apache.hadoop.fs.Path;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class Flattener {
     private static final Logger logger = Logger.getLogger(Flattener.class);
@@ -22,16 +27,31 @@ public class Flattener {
     private static final String NEW_COLUMN_NAME_DELIMITER = "_";
 
     public Flattener(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper){
-        NGComponentUtil.setCheckpointDir(ctx, withDataSet, datasetHelper);
+        setCheckpointDir(ctx, withDataSet, datasetHelper);
+    }
+
+    private void setCheckpointDir(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper) {
+        try {
+            String checkpointDir = withDataSet.generateCheckpointLocation(datasetHelper, null, null);
+            if (ctx.fs.exists(new Path(checkpointDir))) {
+                HFileOperations.deleteEnt(checkpointDir);
+            }
+            HFileOperations.createDir(checkpointDir);
+            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
+        }catch (Exception e) {
+            logger.error("Exception in creating checkpoint Dir : ", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException) e);
+            } else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
+        }
     }
 
     public Dataset<Row> flattenDataset(Dataset<Row> dataset){
         StructType dsSchema = dataset.schema();
         logger.debug("DS Schema : "+ dsSchema);
-        StructType sanitizedSchema = NGComponentUtil.getSanitizedStructType(dsSchema);
-        logger.debug("Sanitized DS Schema : "+ sanitizedSchema);
-        dataset = NGComponentUtil.changeDatasetSchema(dataset, sanitizedSchema);
-        StructField[] dsFields = sanitizedSchema.fields();
+        StructField[] dsFields = dsSchema.fields();
         logger.debug("DS Fields : "+ Arrays.toString(dsFields));
         for(StructField field : dsFields){
             String name = field.name();
@@ -39,9 +59,13 @@ public class Flattener {
             DataType datatype = field.dataType();
             logger.debug("Field Type : "+ datatype);
             if(datatype instanceof StructType){
-                dataset = processStructType(dataset, name, (StructType)datatype);
+                StructType newStructType = NGComponentUtil.getSanitizedStructType((StructType)datatype);
+                dataset = NGComponentUtil.changeColumnType(dataset, name, newStructType);
+                dataset = processStructType(dataset, name, newStructType);
             }else if(datatype instanceof ArrayType){
-                dataset = processArrayType(dataset, name, (ArrayType)datatype);
+                ArrayType newArrayType = NGComponentUtil.getSanitizedArrayType((ArrayType)datatype);
+                dataset = NGComponentUtil.changeColumnType(dataset, name, newArrayType);
+                dataset = processArrayType(dataset, name, newArrayType);
             }
         }
         return dataset;
