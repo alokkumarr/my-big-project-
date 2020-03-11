@@ -115,13 +115,32 @@ public class ConvertToRow implements Function<String, Row> {
         if(fieldsAddlConfigMap == null || fieldsAddlConfigMap.isEmpty()){
             record = constructRecordFromLine(line, record, parsed);
         }else{
-            record = constructRecordWithIndecies(line, record, parsed);
+            record = constructRecordWithIndices(line, record, parsed);
         }
         return record;
     }
 
-    private Object[] constructRecordWithIndecies(String line, Object[] record, String[] parsed) {
-
+    private Object[] constructRecordWithIndices(String line, Object[] record, String[] parsed) {
+        try {
+            int parsedLength = parsed.length;
+            StructField[] structFields = schema.fields();
+            int index = 0;
+            for (Map.Entry<Integer, Object> entry : fieldsAddlConfigMap.entrySet()) {
+                if(entry.getKey() < parsedLength){
+                    record[index] = getFieldValue(parsed[entry.getKey()], structFields[index], index);
+                }else{
+                    record[index] = entry.getValue();
+                }
+                index++;
+            }
+        } catch(Exception ex){
+            errCounter.add(1);
+            if(ex instanceof  NumberFormatException){
+                record = createRejectedRecord(line, "Invalid number format " + ex.getMessage());
+            }else{
+                record = createRejectedRecord(line, ex.getMessage());
+            }
+        }
         return record;
     }
 
@@ -148,42 +167,48 @@ public class ConvertToRow implements Function<String, Row> {
                 for (StructField sf : schema.fields()) {
                     //Should accept null values unless mentioned as mandatory
                     //Reject rows with all null fields
-
-                    if (parsed[i] == null) {
-                        record[i] = parsed[i];
-                    } else {
-                        if (sf.dataType().equals(DataTypes.StringType)) {
-                            if (validateString(parsed[i])) {
-                                record[i] = parsed[i];
-                            } else {
-                                throw new Exception("Invalid string value " + parsed[i]);
-                            }
-                        } else if (sf.dataType().equals(DataTypes.LongType)) {
-                            record[i] = Long.parseLong(parsed[i]);
-                        } else if (sf.dataType().equals(DataTypes.DoubleType)) {
-                            record[i] = Double.parseDouble(parsed[i]);
-                        } else if (sf.dataType().equals(DataTypes.IntegerType)) {
-                            record[i] = Integer.parseInt(parsed[i]);
-                        } else if (sf.dataType().equals(DataTypes.TimestampType)) {
-                            if (!tsFormats.get(i).isEmpty()) {
-                                df.applyPattern(tsFormats.get(i));
-                            } else {
-                                df.applyPattern(DEFAULT_DATE_FORMAT);
-                            }
-                            record[i] = new java.sql.Timestamp(df.parse(parsed[i]).getTime());
-                        }
-                    }
+                    record[i] = getFieldValue(parsed[i], sf, i);
                     i++;
                 }
-            } catch (NumberFormatException ex){
+            } catch(Exception ex){
                 errCounter.add(1);
-                record = createRejectedRecord(line, "Invalid number format " + ex.getMessage());
-            } catch(Exception e){
-                errCounter.add(1);
-                record = createRejectedRecord(line, e.getMessage());
+                if(ex instanceof  NumberFormatException){
+                    record = createRejectedRecord(line, "Invalid number format " + ex.getMessage());
+                }else{
+                    record = createRejectedRecord(line, ex.getMessage());
+                }
             }
         }
         return record;
+    }
+
+    private Object getFieldValue(String value, StructField sf, int sfIndex) throws Exception {
+        if(value != null){
+            value = value.trim();
+            if (sf.dataType().equals(DataTypes.StringType)) {
+                if (validateString(value)) {
+                    return value;
+                } else {
+                    throw new Exception("Invalid string value " + value);
+                }
+            } else if (sf.dataType().equals(DataTypes.LongType)) {
+                return Long.parseLong(value);
+            } else if (sf.dataType().equals(DataTypes.DoubleType)) {
+                return Double.parseDouble(value);
+            } else if (sf.dataType().equals(DataTypes.IntegerType)) {
+                return Integer.parseInt(value);
+            } else if (sf.dataType().equals(DataTypes.TimestampType)) {
+                SimpleDateFormat df = new SimpleDateFormat();
+                df.setLenient(false);
+                if (!tsFormats.get(sfIndex).isEmpty()) {
+                    df.applyPattern(tsFormats.get(sfIndex));
+                } else {
+                    df.applyPattern(DEFAULT_DATE_FORMAT);
+                }
+                return new java.sql.Timestamp(df.parse(value).getTime());
+            }
+        }
+        return null;
     }
 
     /**
