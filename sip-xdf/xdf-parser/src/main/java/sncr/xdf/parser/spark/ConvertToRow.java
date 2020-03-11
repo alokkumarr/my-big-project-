@@ -11,6 +11,7 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
+import sncr.bda.conf.Field;
 
 import java.text.SimpleDateFormat;
 
@@ -42,6 +43,7 @@ public class ConvertToRow implements Function<String, Row> {
 
     private CsvParser parser = null;
     private boolean allowInconsistentCol;
+    List<Field> fields = null;
 
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
@@ -52,7 +54,8 @@ public class ConvertToRow implements Function<String, Row> {
                         char charToEscapeQuoteEscaping,
                         LongAccumulator recordCounter,
                         LongAccumulator errorCounter,
-                        boolean allowInconsistentCol) {
+                        boolean allowInconsistentCol,
+                        List<Field> fields) {
         this.schema = schema;
         this.tsFormats = tsFormats;
         this.lineSeparator = lineSeparator ;
@@ -63,6 +66,7 @@ public class ConvertToRow implements Function<String, Row> {
         this.errCounter = errorCounter;
         this.recCounter = recordCounter;
         this.allowInconsistentCol = allowInconsistentCol;
+        this.fields = fields;
 
         df = new SimpleDateFormat();
         /*
@@ -72,6 +76,7 @@ public class ConvertToRow implements Function<String, Row> {
          */
         df.setLenient(false);
     }
+
     public Row call(String line) throws Exception {
 
         if (parser == null) {
@@ -93,19 +98,23 @@ public class ConvertToRow implements Function<String, Row> {
             parser = new CsvParser(settings);
         }
 
-
         Object[] record = new Object[schema.length() + 2];
         record[schema.length()] = 0;
-
         logger.debug("Parsing line " + line);
-
         String[] parsed = parser.parseLine(line);
-
         if (parsed == null) {
             logger.info("Unable to parse the record");
             errCounter.add(1);
             record = createRejectedRecord(line, "Unable to parse the record");
-        } else if(parsed.length > schema.fields().length || (!allowInconsistentCol && parsed.length != schema.fields().length)) {
+        }else {
+            record = constructRecord(line, record, parsed);
+        }
+        recCounter.add(1);
+        return  RowFactory.create(record);
+    }
+
+    private Object[] constructRecord(String line, Object[] record, String[] parsed) {
+        if(parsed.length > schema.fields().length || (!allowInconsistentCol && parsed.length != schema.fields().length)) {
             // Create record with rejected flag
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");
@@ -155,18 +164,17 @@ public class ConvertToRow implements Function<String, Row> {
                     i++;
                 }
             } catch (NumberFormatException ex){
-              errCounter.add(1);
-              record = createRejectedRecord(line, "Invalid number format " + ex.getMessage());
+                errCounter.add(1);
+                record = createRejectedRecord(line, "Invalid number format " + ex.getMessage());
             } catch(Exception e){
-               errCounter.add(1);
-               record = createRejectedRecord(line, e.getMessage());
+                errCounter.add(1);
+                record = createRejectedRecord(line, e.getMessage());
             }
         }
-        recCounter.add(1);
-        return  RowFactory.create(record);
+        return record;
     }
 
-  /**
+    /**
    * Create the rejected records row with the reason of rejection
    *
    * @param line

@@ -203,7 +203,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             // Check what sourcePath referring
             FileSystem fs = HFileOperations.getFileSystem();
 
-            //new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter);
+            //new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter
+            //            ,ctx.componentConfiguration.getParser().getFields());
             //System.exit(0);
 
             try {
@@ -366,7 +367,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter, allowInconsistentCol));
+                '\'', recCounter, errCounter, allowInconsistentCol
+                ,ctx.componentConfiguration.getParser().getFields()));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
@@ -430,7 +432,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             // Get rid of file numbers
             .keys()
             .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol));
+                quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
+                ,ctx.componentConfiguration.getParser().getFields()));
 
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =

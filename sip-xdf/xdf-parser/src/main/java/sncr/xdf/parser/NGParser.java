@@ -498,7 +498,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter, allowInconsistentCol));
+                '\'', recCounter, errCounter, allowInconsistentCol
+                ,ngctx.componentConfiguration.getParser().getFields()));
 
         logger.debug("Output rdd length = " + recCounter.value());
         logger.debug("Rejected rdd length = " + errCounter.value());
@@ -580,7 +581,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if(!ngctx.componentConfiguration.isErrorHandlingEnabled() || rddCount > 0) {
             inputDSCount += rddCount;
             JavaRDD<Row> parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol));
+                quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
+                ,ngctx.componentConfiguration.getParser().getFields()));
             // Create output dataset
             JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
             logger.debug("####### Rejected RDD COUNT:: " + rejectedRdd.count());
@@ -631,7 +633,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
         JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-            '\'', recCounter, errCounter, allowInconsistentCol));
+            '\'', recCounter, errCounter, allowInconsistentCol
+            ,ngctx.componentConfiguration.getParser().getFields()));
 	    // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(
@@ -673,7 +676,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
         inputDSCount = combinedRdd.count();
         JavaRDD<Row> parseRdd = combinedRdd.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-            quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol));
+            quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
+            ,ngctx.componentConfiguration.getParser().getFields()));
         // Create output dataset
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> outputDS = convertRddToDS(outputRdd);
