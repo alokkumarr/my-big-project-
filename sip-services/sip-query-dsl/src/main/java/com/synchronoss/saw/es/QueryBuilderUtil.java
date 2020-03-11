@@ -207,46 +207,56 @@ public class QueryBuilderUtil {
    * @return
    */
   public static QueryBuilder buildNumericFilter(Filter item) {
-
-    if (item.getModel().getOperator().value().equals(Model.Operator.BTW.value())) {
-      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-      rangeQueryBuilder.lte(item.getModel().getValue());
-      rangeQueryBuilder.gte(item.getModel().getOtherValue());
-      return rangeQueryBuilder;
+    Operator operator = item.getModel().getOperator();
+    switch (operator) {
+      case BTW:
+        {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.lte(item.getModel().getValue());
+          rangeQueryBuilder.gte(item.getModel().getOtherValue());
+          return rangeQueryBuilder;
+        }
+      case GT:
+        {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.gt(item.getModel().getValue());
+          return rangeQueryBuilder;
+        }
+      case GTE:
+        {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.gte(item.getModel().getValue());
+          return rangeQueryBuilder;
+        }
+      case LT:
+        {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.lt(item.getModel().getValue());
+          return rangeQueryBuilder;
+        }
+      case LTE:
+        {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.lte(item.getModel().getValue());
+          return rangeQueryBuilder;
+        }
+      case EQ:
+        {
+          TermQueryBuilder termQueryBuilder =
+              new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+          return termQueryBuilder;
+        }
+      case NEQ:
+        {
+          BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+          boolQueryBuilderIn.mustNot(
+              new TermQueryBuilder(item.getColumnName(), item.getModel().getValue()));
+          return boolQueryBuilderIn;
+        }
+      default:
+        throw new RuntimeException(
+            String.format("Operator %s is not yet supported for numeric filter", operator));
     }
-    if (item.getModel().getOperator().value().equals(Model.Operator.GT.value())) {
-      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-      rangeQueryBuilder.gt(item.getModel().getValue());
-      return rangeQueryBuilder;
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.GTE.value())) {
-      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-      rangeQueryBuilder.gte(item.getModel().getValue());
-      return rangeQueryBuilder;
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.LT.value())) {
-
-      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-      rangeQueryBuilder.lt(item.getModel().getValue());
-      return rangeQueryBuilder;
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.LTE.value())) {
-      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-      rangeQueryBuilder.lte(item.getModel().getValue());
-      return rangeQueryBuilder;
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.EQ.value())) {
-      TermQueryBuilder termQueryBuilder =
-          new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-      return termQueryBuilder;
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.NEQ.value())) {
-      BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-      boolQueryBuilderIn.mustNot(
-          new TermQueryBuilder(item.getColumnName(), item.getModel().getValue()));
-      return boolQueryBuilderIn;
-    }
-    return null;
   }
 
   /**
@@ -322,81 +332,90 @@ public class QueryBuilderUtil {
    * @return
    */
   public static QueryBuilder stringFilter(Filter item) {
-    if (item.getModel().getOperator().value().equals(Model.Operator.EQ.value())
-        || item.getModel().getOperator().value().equals(Model.Operator.ISIN.value())) {
-      TermsQueryBuilder termsQueryBuilder =
-          new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-      List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
-      TermsQueryBuilder termsQueryBuilder1 =
-          new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
-      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-      boolQueryBuilder.should(termsQueryBuilder);
-      boolQueryBuilder.should(termsQueryBuilder1);
-      return boolQueryBuilder;
-    }
+    Operator operator = item.getModel().getOperator();
+    switch (operator) {
+      case EQ:
+      case ISIN:
+        {
+          TermsQueryBuilder termsQueryBuilder =
+              new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+          List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+          TermsQueryBuilder termsQueryBuilder1 =
+              new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+          BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+          boolQueryBuilder.should(termsQueryBuilder);
+          boolQueryBuilder.should(termsQueryBuilder1);
+          return boolQueryBuilder;
+        }
 
-    if (item.getModel().getOperator().value().equals(Model.Operator.NEQ.value())
-        || item.getModel().getOperator().value().equals(Model.Operator.ISNOTIN.value())) {
-      List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
-      QueryBuilder qeuryBuilder =
-          new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-      boolQueryBuilder.mustNot(qeuryBuilder);
-      QueryBuilder qeuryBuilder1 =
-          new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
-      boolQueryBuilder.mustNot(qeuryBuilder1);
-      return boolQueryBuilder;
-    }
+      case NEQ:
+      case ISNOTIN:
+        {
+          List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
+          QueryBuilder qeuryBuilder =
+              new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+          BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+          boolQueryBuilder.mustNot(qeuryBuilder);
+          QueryBuilder qeuryBuilder1 =
+              new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+          boolQueryBuilder.mustNot(qeuryBuilder1);
+          return boolQueryBuilder;
+        }
 
-    // prefix query builder - not analyzed
-    if (item.getModel().getOperator().value().equals(Model.Operator.SW.value())) {
-      PrefixQueryBuilder pqb =
-          new PrefixQueryBuilder(
-              item.getColumnName(), (String) item.getModel().getModelValues().get(0));
-      PrefixQueryBuilder pqb1 =
-          new PrefixQueryBuilder(
-              buildFilterColumn(item.getColumnName()),
-              (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
-      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-      boolQueryBuilder.should(pqb);
-      boolQueryBuilder.should(pqb1);
-      return boolQueryBuilder;
-    }
+        // prefix query builder - not analyzed
+      case SW:
+        {
+          PrefixQueryBuilder pqb =
+              new PrefixQueryBuilder(
+                  item.getColumnName(), (String) item.getModel().getModelValues().get(0));
+          PrefixQueryBuilder pqb1 =
+              new PrefixQueryBuilder(
+                  buildFilterColumn(item.getColumnName()),
+                  (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+          BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+          boolQueryBuilder.should(pqb);
+          boolQueryBuilder.should(pqb1);
+          return boolQueryBuilder;
+        }
 
-    // using wildcard as there's no suffix query type provided by
-    // elasticsearch
-    if (item.getModel().getOperator().value().equals(Model.Operator.EW.value())) {
-      WildcardQueryBuilder wqb =
-          new WildcardQueryBuilder(
-              item.getColumnName(), "*" + item.getModel().getModelValues().get(0));
-      WildcardQueryBuilder wqb1 =
-          new WildcardQueryBuilder(
-              buildFilterColumn(item.getColumnName()),
-              "*" + (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
-      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-      boolQueryBuilder.should(wqb);
-      boolQueryBuilder.should(wqb1);
-      return boolQueryBuilder;
-    }
+        // using wildcard as there's no suffix query type provided by
+        // elasticsearch
+      case EW:
+        {
+          WildcardQueryBuilder wqb =
+              new WildcardQueryBuilder(
+                  item.getColumnName(), "*" + item.getModel().getModelValues().get(0));
+          WildcardQueryBuilder wqb1 =
+              new WildcardQueryBuilder(
+                  buildFilterColumn(item.getColumnName()),
+                  "*" + (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase());
+          BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+          boolQueryBuilder.should(wqb);
+          boolQueryBuilder.should(wqb1);
+          return boolQueryBuilder;
+        }
 
-    // same for contains clause - not analyzed query
-    if (item.getModel().getOperator().value().equals(Model.Operator.CONTAINS.value())) {
-      WildcardQueryBuilder wqb =
-          new WildcardQueryBuilder(
-              item.getColumnName(), "*" + item.getModel().getModelValues().get(0) + "*");
-      WildcardQueryBuilder wqb1 =
-          new WildcardQueryBuilder(
-              buildFilterColumn(item.getColumnName()),
-              "*"
-                  + (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase()
-                  + "*");
-      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-      boolQueryBuilder.should(wqb);
-      boolQueryBuilder.should(wqb1);
-      return boolQueryBuilder;
+        // same for contains clause - not analyzed query
+      case CONTAINS:
+        {
+          WildcardQueryBuilder wqb =
+              new WildcardQueryBuilder(
+                  item.getColumnName(), "*" + item.getModel().getModelValues().get(0) + "*");
+          WildcardQueryBuilder wqb1 =
+              new WildcardQueryBuilder(
+                  buildFilterColumn(item.getColumnName()),
+                  "*"
+                      + (String) ((String) item.getModel().getModelValues().get(0)).toLowerCase()
+                      + "*");
+          BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+          boolQueryBuilder.should(wqb);
+          boolQueryBuilder.should(wqb1);
+          return boolQueryBuilder;
+        }
+      default:
+        throw new RuntimeException(
+            String.format("Operator %s is not yet supported for string filter", operator));
     }
-
-    return null;
   }
   /**
    * Build the terms values to support case insensitive search options.
