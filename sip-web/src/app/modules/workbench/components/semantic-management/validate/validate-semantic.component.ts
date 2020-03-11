@@ -9,12 +9,16 @@ import * as toLower from 'lodash/toLower';
 import * as split from 'lodash/split';
 import * as filter from 'lodash/filter';
 import * as trim from 'lodash/trim';
+import * as find from 'lodash/find';
+import * as set from 'lodash/set';
 
 import { SemanticDetailsDialogComponent } from '../semantic-details-dialog/semantic-details-dialog.component';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 import { CommonLoadUpdatedMetrics } from '../.././../../../common/actions/common.actions';
+
+import CheckBox from 'devextreme/ui/check_box';
 
 @Component({
   selector: 'validate-semantic',
@@ -137,5 +141,32 @@ export class ValidateSemanticComponent implements OnDestroy {
         });
       }
     });
+  }
+
+  cellPrepared(e) {
+    if (
+      e.rowType === 'data' &&
+      e.column.dataField === 'filterEligible' &&
+      !e.row.cells[0].value
+    ) {
+      const check = e.row.cells[0].value;
+      CheckBox.getInstance(e.cellElement.querySelector('.dx-checkbox')).option(
+        'disabled',
+        !check
+      );
+    }
+    return;
+  }
+
+  cellClick(e) {
+    if (e.rowType === 'data' && e.column.dataField === 'include') {
+      const matchedCol = find(this.selectedDS[0].schema.fields, {
+        alias: e.data.alias
+      });
+
+      const check = matchedCol && !matchedCol.include;
+      set(matchedCol, 'filterEligible', !check);
+    }
+    return;
   }
 }
