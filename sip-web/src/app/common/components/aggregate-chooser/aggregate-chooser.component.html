@@ -25,4 +25,6 @@
     </button>
   </div>
 </mat-menu>
-<button mat-button type="button" (click)="clearAggregate()">Clear</button>
+<button mat-button *ngIf="aggregate" type="button" (click)="clearAggregate()">
+  Clear
+</button>
