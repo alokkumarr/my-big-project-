@@ -10,7 +10,6 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.observe.model.Content;
 import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveNode;

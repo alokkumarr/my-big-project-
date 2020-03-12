@@ -1,7 +1,6 @@
 package com.synchronoss.saw.apipull.service;
 
 import com.google.gson.Gson;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import com.synchronoss.sip.utils.SipCommonUtils;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.ApiChannelMetadata;
@@ -28,6 +27,7 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -131,7 +131,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
       BisChannelEntity channelEntity = bisChannelEntity.get();
 
       String channelMetadataStr = channelEntity.getChannelMetadata();
-      String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
+      String sanitizedChannelMetadataStr = SipCommonUtils.sanitizeJson(channelMetadataStr);
 
       ApiChannelMetadata apiChannelMetadata =
           gson.fromJson(sanitizedChannelMetadataStr, ApiChannelMetadata.class);
@@ -140,7 +140,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
       Integer port = apiChannelMetadata.getPort();
 
       String routeMetadataStr = entity.getRouteMetadata();
-      String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+      String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
       ApiRouteMetadata apiRouteMetadata = gson.fromJson(sanitizedRouteMetadataStr, ApiRouteMetadata.class);
 
       String apiEndPoint = apiRouteMetadata.getApiEndPoint();
@@ -211,7 +211,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     BisChannelEntity channelEntity = bisChannelEntity.get();
 
     String channelMetadataStr = channelEntity.getChannelMetadata();
-    String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
+    String sanitizedChannelMetadataStr = SipCommonUtils.sanitizeJson(channelMetadataStr);
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -318,7 +318,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     BisChannelEntity channelEntity = bisChannelEntity.get();
 
     String channelMetadataStr = channelEntity.getChannelMetadata();
-    String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
+    String sanitizedChannelMetadataStr = SipCommonUtils.sanitizeJson(channelMetadataStr);
 
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -692,7 +692,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
         logger.debug("Channel Entity = " + channelEntity);
 
         String channelMetadataStr = channelEntity.getChannelMetadata();
-        String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
+        String sanitizedChannelMetadataStr = SipCommonUtils.sanitizeJson(channelMetadataStr);
 
         ApiChannelMetadata apiChannelMetadata =
             gson.fromJson(sanitizedChannelMetadataStr, ApiChannelMetadata.class);
@@ -704,7 +704,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
         logger.debug("Port = " + port);
 
         String routeMetadataStr = routeEntity.getRouteMetadata();
-        String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+        String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
         ApiRouteMetadata apiRouteMetadata =
             gson.fromJson(sanitizedRouteMetadataStr, ApiRouteMetadata.class);
 
