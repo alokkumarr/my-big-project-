@@ -22,6 +22,9 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as map from 'lodash/map';
 import * as reduce from 'lodash/reduce';
 import * as get from 'lodash/get';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
 
 import { Artifact, Filter } from './../../modules/analyze/designer/types';
 import { ArtifactDSL } from '../../models';
@@ -62,7 +65,6 @@ export class DskFilterGroupComponent implements OnInit {
   @Input() data;
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || cloneDeep(defaultFilters);
-    console.log(this.filterGroup);
     this.onChange.emit(this.filterGroup);
   }
   @Input() selfIndex: number; // stores the position inside parent (for removal)
@@ -81,7 +83,6 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.data);
     this.filters = cloneDeep(this.data.filters);
     this.groupedFilters = groupBy(this.data.filters, 'tableName');
     this.onChange.emit(this.filterGroup);
@@ -115,12 +116,11 @@ export class DskFilterGroupComponent implements OnInit {
           values: []
         }
       });
-      console.log(this.filterGroup);
       this.onChange.emit(this.filterGroup);
     } else if (this.data.mode === 'ANALYZE') {
       this.filterGroup.booleanQuery.push({
         columnName: '',
-        artifactsName: '',
+        artifactsName: this.data.artifacts[0].artifactName,
         type: '',
         isGlobalFilter: false,
         isRuntimeFilter: false,
@@ -130,7 +130,6 @@ export class DskFilterGroupComponent implements OnInit {
           values: ''
         }
       });
-      console.log(this.filterGroup);
       this.onChange.emit(this.filterGroup);
     }
 
@@ -153,7 +152,6 @@ export class DskFilterGroupComponent implements OnInit {
       booleanCriteria: DSKFilterBooleanCriteria.AND,
       booleanQuery: []
     });
-    console.log(this.filterGroup);
     this.onChange.emit(this.filterGroup);
   }
 
@@ -205,10 +203,8 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   artifactSelect(artifact, childId) {
-    console.log(artifact);
     this.addFilter(artifact, true);
     (<DSKFilterField>this.filterGroup.booleanQuery[childId]).artifactsName = artifact;
-    console.log(this.filterGroup);
     this.onChange.emit(this.filterGroup);
   }
 
@@ -224,18 +220,13 @@ export class DskFilterGroupComponent implements OnInit {
 
   columnsSelect(column, childId) {
     (<DSKFilterField>this.filterGroup.booleanQuery[childId]).columnName = column;
-    console.log(this.filterGroup);
-    const selectedTable =  this.data.artifacts.find((data: any) =>
-      data.artifactName === get(this.filterGroup.booleanQuery[childId], 'artifactsName')
-    );
-
-    const selectedColumn = selectedTable.columns.find((col) =>
-      col.columnName === get(this.filterGroup.booleanQuery[childId], 'columnName')
-    )
-
-    console.log(selectedColumn);
-    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).type = selectedColumn.type;
-
+    const { artifactsName } = (<DSKFilterField>this.filterGroup.booleanQuery[childId]);
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).type = fpPipe(
+      fpFlatMap(artifact => artifact.columns || artifact.fields),
+      fpFilter(({ columnName, table }) => {
+        return table.toLowerCase === artifactsName.toLowerCase && columnName === column;
+      })
+    )(this.data.artifacts)[0].type;
     this.onChange.emit(this.filterGroup);
   }
 

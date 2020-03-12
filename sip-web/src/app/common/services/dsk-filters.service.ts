@@ -140,8 +140,6 @@ export class DskFiltersService {
     const pEnd = '<strong class="parens">)</strong>';
     return filterGroup.booleanQuery
       .map(query => {
-        console.log(query);
-        console.log(query['booleanCriteria']);
         const statement = mode === 'ANALYZE' ? get(query, 'booleanCriteria') : query['booleanCriteria'];
         if (statement) {
           return `${pStart}${this.generatePreview(
@@ -155,7 +153,6 @@ export class DskFiltersService {
         if (isUndefined(values)) {
           return '';
         }
-        console.log(values);
         return `${field.columnName} <span class="operator">${
           field.model.operator
         }</span> [${values.join(', ')}]`;

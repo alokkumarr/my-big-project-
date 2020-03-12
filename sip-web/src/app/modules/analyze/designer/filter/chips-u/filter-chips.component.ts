@@ -4,7 +4,8 @@ import { getFilterDisplayName } from './../../../../analyze/consts';
 import { AnalyzeService } from '../../../services/analyze.service';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
-
+import * as forEach from 'lodash/forEach';
+import * as isArray from 'lodash/isArray';
 @Component({
   selector: 'filter-chips-u',
   templateUrl: './filter-chips.component.html',
@@ -13,7 +14,11 @@ import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
 export class FilterChipsComponent {
   @Output() remove: EventEmitter<number> = new EventEmitter();
   @Output() removeAll: EventEmitter<null> = new EventEmitter();
-  @Input() filters: Filter[];
+  @Input('filters')
+  set _filters(val) {
+    this.filters = [];
+    this.fetchFilters(val);
+  }
   @Input('artifacts')
   set artifacts(artifacts: Artifact[] | ArtifactDSL[]) {
     if (!artifacts) {
@@ -24,6 +29,7 @@ export class FilterChipsComponent {
   @Input() readonly: boolean;
 
   public nameMap;
+  public filters= [];
 
   constructor(private analyzeService: AnalyzeService) {}
 
@@ -37,5 +43,16 @@ export class FilterChipsComponent {
 
   onRemoveAll() {
     this.removeAll.emit();
+  }
+
+  fetchFilters(filters) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.fetchFilters(filter);
+      }
+      if (filter.columnName) {
+        this.filters.push(filter);
+      }
+    })
   }
 }
