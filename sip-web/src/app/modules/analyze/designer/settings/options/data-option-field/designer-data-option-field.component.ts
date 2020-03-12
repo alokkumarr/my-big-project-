@@ -21,7 +21,7 @@ import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 import { DEFAULT_COLOR_PICKER_OPTION } from '../../../../../../common/components/custom-color-picker/default-color-picker-options';
-import { CHART_COLORS } from 'src/app/common/consts';
+import { CHART_COLORS, NUMBER_TYPES } from 'src/app/common/consts';
 import { DATA_AXIS } from '../../../consts';
 
 const ALIAS_CHANGE_DELAY = 500;
@@ -139,6 +139,14 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     return (
       (<ArtifactColumnChart>this.artifactColumn).comboType ||
       (<any>this.artifactColumn).displayType
+    );
+  }
+
+  shouldShowAggregate(): boolean {
+    return (
+      (this.analysisSubtype === 'scatter' &&
+        NUMBER_TYPES.includes(this.artifactColumn.type)) ||
+      Boolean(this.artifactColumn.aggregate)
     );
   }
 

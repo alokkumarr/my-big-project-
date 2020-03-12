@@ -1,5 +1,6 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as toLower from 'lodash/toLower';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
@@ -131,6 +132,10 @@ export class AggregateChooserComponent implements OnInit {
 
   clearAggregate() {
     this.change.emit(null);
+  }
+
+  getAggregateObj() {
+    return AGGREGATE_TYPES_OBJ[toLower(this.aggregate)] || {};
   }
 
   checkColumn(value, sipQuery: QueryDSL) {

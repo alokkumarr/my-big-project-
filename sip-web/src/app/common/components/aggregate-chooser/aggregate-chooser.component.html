@@ -2,13 +2,11 @@
   mat-icon-button
   [matMenuTriggerFor]="aggregatemenu"
   class="aggregate-chooser__btn"
-  [attr.e2e]="AGGREGATE_TYPES_OBJ[aggregate | lowercase].value"
+  [attr.e2e]="getAggregateObj().value"
 >
   <mat-icon
     [style.width.px]="40"
-    [fontIcon]="
-      aggregate ? AGGREGATE_TYPES_OBJ[aggregate | lowercase].icon : 'icon-more'
-    "
+    [fontIcon]="aggregate ? getAggregateObj().icon : 'icon-more'"
   ></mat-icon>
 </button>
 <mat-menu #aggregatemenu="matMenu">
