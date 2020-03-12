@@ -147,7 +147,7 @@ public class BisChannelDto implements Serializable {
 
   @JsonProperty("channelMetadata")
   public void setChannelMetadata(String channelMetadata) {
-    this.channelMetadata = channelMetadata;
+    this.channelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
   }
 
   @JsonProperty("channelType")
