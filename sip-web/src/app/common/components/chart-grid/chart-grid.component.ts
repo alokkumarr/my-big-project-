@@ -205,30 +205,12 @@ export class ChartGridComponent {
         : axisName === column.name ||
           axisName === column.columnName.split('.keyword')[0];
       if (isMatchingColumn) {
-        const columnFormat =
-          column.type === 'date' ? column.dateFormat : column.format;
-
         /* If this is a data field, make it look user friendly */
         alias =
           column.alias ||
           (isDataField
             ? dataFieldToHuman(column.dataField)
             : column.displayName);
-        value =
-          column.type === 'date'
-            ? moment
-                .utc(
-                  value,
-                  this._chartService.getMomentDateFormat(columnFormat)
-                )
-                .format(
-                  columnFormat === 'MMM d YYYY'
-                    ? 'MMM DD YYYY'
-                    : columnFormat === 'MMMM d YYYY, h:mm:ss a'
-                    ? 'MMMM DD YYYY, h:mm:ss a'
-                    : columnFormat
-                )
-            : value;
         if (
           value &&
           (column.aggregate === 'percentage' || column.aggregate === 'avg')
