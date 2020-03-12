@@ -126,11 +126,14 @@ public class ConvertToRow implements Function<String, Row> {
             StructField[] structFields = schema.fields();
             int index = 0;
             for (Map.Entry<Integer, Object> entry : fieldsAddlConfigMap.entrySet()) {
+                Object fieldValue = null;
                 if(entry.getKey() < parsedLength){
-                    record[index] = getFieldValue(parsed[entry.getKey()], structFields[index], index);
-                }else{
-                    record[index] = entry.getValue();
+                    fieldValue = getFieldValue(parsed[entry.getKey()], structFields[index], index);
                 }
+                if(fieldValue == null){
+                    fieldValue = entry.getValue();
+                }
+                record[index] = fieldValue;
                 index++;
             }
         } catch(Exception ex){
@@ -183,7 +186,7 @@ public class ConvertToRow implements Function<String, Row> {
     }
 
     private Object getFieldValue(String value, StructField sf, int sfIndex) throws Exception {
-        if(value != null){
+        if(value != null && (!value.trim().isEmpty() || sf.dataType().equals(DataTypes.StringType))){
             value = value.trim();
             if (sf.dataType().equals(DataTypes.StringType)) {
                 if (validateString(value)) {
