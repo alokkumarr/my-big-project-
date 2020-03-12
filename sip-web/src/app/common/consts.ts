@@ -168,7 +168,7 @@ const NEW_DATE_FORMATS = [
     momentValue: 'MMM-YYYY'
   },
   {
-    label: 'Sept-17 (Month-day)',
+    label: 'Sept-17 (Month-year)',
     value: 'MMM-yy',
     groupInterval: 'month',
     momentValue: 'MMM-YY'
@@ -180,7 +180,7 @@ const NEW_DATE_FORMATS = [
     momentValue: 'MMMM-DD'
   },
   {
-    label: 'Sept-15 (Month-year)',
+    label: 'Sept-15 (Month-day)',
     value: 'MMM-dd',
     groupInterval: 'day',
     momentValue: 'MMM-DD'
