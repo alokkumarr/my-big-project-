@@ -102,7 +102,7 @@ public class BisRouteDto implements Serializable {
 
   @JsonProperty("routeMetadata")
   public String getRouteMetadata() {
-    return routeMetadata;
+    return SipCommonUtils.sanitizeJson(routeMetadata);
   }
 
   @JsonProperty("routeMetadata")

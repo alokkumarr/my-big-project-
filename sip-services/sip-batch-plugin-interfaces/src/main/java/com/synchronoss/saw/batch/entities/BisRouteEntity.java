@@ -104,7 +104,7 @@ public class BisRouteEntity implements Serializable {
   }
 
   public String getRouteMetadata() {
-    return routeMetadata;
+    return SipCommonUtils.sanitizeJson(routeMetadata);
   }
 
   public void setRouteMetadata(String routeMetadata) {
