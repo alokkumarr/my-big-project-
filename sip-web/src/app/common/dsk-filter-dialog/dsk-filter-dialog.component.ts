@@ -90,7 +90,7 @@ export class DskFilterDialogComponent implements OnInit {
     if (this.data.mode === 'ANALYZE') {
       this.filterQuery = cloneDeep(this.dskFilterObject);
       this.changeIndexToFilters(this.filterQuery);
-      this._dialogRef.close(this.filterQuery);
+      this._dialogRef.close([this.filterQuery]);
     } else {
         this.datasecurityService
         .updateDskFiltersForGroup(
