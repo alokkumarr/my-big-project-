@@ -5,8 +5,6 @@ import { DskFiltersService } from './../services/dsk-filters.service';
 import * as get from 'lodash/get';
 import * as debounce from 'lodash/debounce';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as forEach from 'lodash/forEach';
-import * as isArray from 'lodash/isArray';
 import * as isEmpty from 'lodash/isEmpty';
 
 import { DSKFilterGroup } from '../dsk-filter.model';
@@ -37,36 +35,24 @@ export class DskFilterDialogComponent implements OnInit {
       filters;
     }
   ) {
-    console.log(this.data);
     this.datasecurityService.clearDSKEligibleFields();
     this.operation = this.data.filterGroup ? 'Update' : 'Add';
-    this.dskFilterObject = this.data.mode === 'ANALYZE'
-      ? this.getFilterArray(this.data.filters) : this.data.filterGroup || cloneDeep(defaultFilters);
+    this.dskFilterObject = this.fetch(this.data, this.data.mode);
   }
 
   ngOnInit() {}
 
-  getFilterArray(filters) {
-    if (isEmpty(filters)) {
-      return cloneDeep(defaultFilters);
+  fetch(data, mode) {
+    switch (mode) {
+      case 'ANALYZE':
+        if (isEmpty(data.filters)) {
+          return cloneDeep(defaultFilters);
+        } else {
+          return this.changeIndexToNames2(this.data.filters, 'fiters', 'booleanQuery');
+        }
+      case 'DSK':
+        return data.filterGroup || cloneDeep(defaultFilters);
     }
-
-    const filter = filters[0];
-    if (filter.filters) {
-      filter.booleanQuery = filter.filters;
-      delete filter.filters;
-    }
-    forEach(filter.booleanQuery, obj => {
-      if (obj.filters) {
-        obj.booleanQuery = obj.filters;
-        delete obj.filters;
-      }
-      if (isArray(obj)) {
-        this.changeIndexToFilters(obj);
-      }
-    })
-    console.log(filter);
-    return filter;
   }
 
   validateFilterGroup() {
@@ -97,27 +83,27 @@ export class DskFilterDialogComponent implements OnInit {
     this.debouncedValidator();
   }
 
-  changeIndexToFilters(dskObject) {
-    if (dskObject.booleanQuery) {
-      dskObject.filters = dskObject.booleanQuery;
-      delete dskObject.booleanQuery;
-    }
-    forEach(dskObject.booleanQuery, obj => {
-      if (obj.booleanQuery) {
-        obj.filters = obj.booleanQuery;
-        delete obj.booleanQuery;
-      }
-      if (isArray(obj)) {
-        this.changeIndexToFilters(obj);
-      }
-    })
+  //Need to para'se the replace funtion;
+
+  changeIndexToNames(dskObject, source, target) {
+    const convertToString = JSON.stringify(dskObject);
+    const replaceIndex = convertToString.replace(/"booleanQuery":/g, '"filters":');
+    const convertToJson = JSON.parse(replaceIndex);
+    return convertToJson;
+  }
+
+  changeIndexToNames2(dskObject, source, target) {
+    const convertToString = JSON.stringify(dskObject);
+    const replaceIndex = convertToString.replace(/"filters":/g, '"booleanQuery":');
+    const convertToJson = JSON.parse(replaceIndex);
+    return convertToJson[0];
   }
 
   submit() {
     if (this.data.mode === 'ANALYZE') {
       this.filterQuery = cloneDeep(this.dskFilterObject);
-      this.changeIndexToFilters(this.filterQuery);
-      this._dialogRef.close([this.filterQuery]);
+      const result = this.changeIndexToNames(this.filterQuery, 'booleanQuery', 'filters' );
+      this._dialogRef.close([result]);
     } else {
         this.datasecurityService
         .updateDskFiltersForGroup(

@@ -253,7 +253,6 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   onFilterModelChange(filter, childId) {
-    console.log(filter);
     (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
     this.onChange.emit(this.filterGroup);
   }
