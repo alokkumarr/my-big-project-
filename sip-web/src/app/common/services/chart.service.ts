@@ -517,14 +517,15 @@ export class ChartService {
       comboType || displayType
     );
     const zIndex = this.getZIndex(comboType || displayType);
-    const nameWithAggregate = expression
-      ? displayName
-      : `${
-          AGGREGATE_TYPES_OBJ[aggregate].designerLabel
-        }(${displayNameWithoutAggregateFor({
-          displayName,
-          dataField
-        } as ArtifactColumnDSL)})`;
+    const nameWithAggregate =
+      expression || !aggregate
+        ? displayName
+        : `${
+            AGGREGATE_TYPES_OBJ[aggregate].designerLabel
+          }(${displayNameWithoutAggregateFor({
+            displayName,
+            dataField
+          } as ArtifactColumnDSL)})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -845,24 +846,16 @@ export class ChartService {
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
-            if (!isUndefined(field.alias)) {
-              return (
-                field.alias ||
-                (field.expression
-                  ? field.displayName
-                  : `${
-                      AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
-                    }(${displayNameWithoutAggregateFor(field)})`)
-              );
-            }
-            return (
-              opts.labels.y ||
-              (field.expression
+            const fieldDisplayName =
+              field.expression || !field.aggregate
                 ? field.displayName
                 : `${
                     AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
-                  }(${displayNameWithoutAggregateFor(field)})`)
-            );
+                  }(${displayNameWithoutAggregateFor(field)})`;
+            if (!isUndefined(field.alias)) {
+              return field.alias || fieldDisplayName;
+            }
+            return opts.labels.y || fieldDisplayName;
           }).join('<br/>');
           const isSingleField = fields.length === 1;
           return {

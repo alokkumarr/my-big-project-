@@ -129,6 +129,10 @@ export class AggregateChooserComponent implements OnInit {
     this.change.emit(value);
   }
 
+  clearAggregate() {
+    this.change.emit(null);
+  }
+
   checkColumn(value, sipQuery: QueryDSL) {
     const fields = fpFlatMap(a => a.fields, sipQuery.artifacts);
     const isGroupBy = AggregateChooserComponent.getGroupByPresent(fields);

@@ -6,7 +6,9 @@
 >
   <mat-icon
     [style.width.px]="40"
-    [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate | lowercase].icon : 'icon-more'"
+    [fontIcon]="
+      aggregate ? AGGREGATE_TYPES_OBJ[aggregate | lowercase].icon : 'icon-more'
+    "
   ></mat-icon>
 </button>
 <mat-menu #aggregatemenu="matMenu">
@@ -25,3 +27,4 @@
     </button>
   </div>
 </mat-menu>
+<button mat-button type="button" (click)="clearAggregate()">Clear</button>
