@@ -1,6 +1,6 @@
 package com.synchronoss.saw.workbench.service;
 
-import com.google.json.JsonSanitizer;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -486,7 +486,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       } // end of internal for loop to read storeField
       schema.putArray("fields").addAll(fields);
       String nodeStr = objectMapper.writeValueAsString(node);
-      String sanitizedNodeStr = JsonSanitizer.sanitize(nodeStr);
+      String sanitizedNodeStr = SipCommonUtils.sanitizeJson(nodeStr);
       esDataSet = objectMapper.readValue(sanitizedNodeStr, DataSet.class);
       esDataSet.setStorageType(StorageType.ES.name());
       esDataSet.setJoinEligible(false);
@@ -518,7 +518,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     String datasetStr = objectMapper.writeValueAsString(dataSet);
-    String sanitizedDatasetStr = JsonSanitizer.sanitize(datasetStr);
+    String sanitizedDatasetStr = SipCommonUtils.sanitizeJson(datasetStr);
     JsonNode node = objectMapper.readTree(sanitizedDatasetStr);
     ObjectNode rootNode = (ObjectNode) node;
     Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
@@ -567,7 +567,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     //inputPath.addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
     //systemNode.putArray("inputPath").addAll(inputPath);
     String nodeStr = node.toString();
-    String sanitizedNodeStr = JsonSanitizer.sanitize(nodeStr);
+    String sanitizedNodeStr = SipCommonUtils.sanitizeJson(nodeStr);
     DataSet dataSetNode = objectMapper.readValue(sanitizedNodeStr, DataSet.class);
     try {
       List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode,

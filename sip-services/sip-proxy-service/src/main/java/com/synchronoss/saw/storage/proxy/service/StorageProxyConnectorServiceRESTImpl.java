@@ -1,7 +1,5 @@
 package com.synchronoss.saw.storage.proxy.service;
 
-import static java.util.Collections.emptyMap;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -11,7 +9,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.model.Store;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
@@ -22,6 +19,7 @@ import com.synchronoss.saw.storage.proxy.model.response.ClusterIndexResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -143,7 +141,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
 
         searchResponse = objectMapper.readValue(sanitizedContentStr, SearchESResponse.class);
         client.close();
@@ -181,7 +179,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
             InputStream contentStream = entity.getContent();
             Reader reader = new InputStreamReader(contentStream);
 
-            String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+            String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
             jsonNode = objectMapper.readTree(sanitizedContentStr);
         }
         finally{
@@ -214,7 +212,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
 
         createAndDeleteESResponse = objectMapper
             .readValue(sanitizedContentStr, CreateAndDeleteESResponse.class);
@@ -255,7 +253,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
 
         createAndDeleteESResponse = objectMapper.readValue(sanitizedContentStr, CreateAndDeleteESResponse.class);
         client.close();
@@ -292,7 +290,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
 
         countResponse = objectMapper.readValue(sanitizedContentStr, CountESResponse.class);
         client.close();
@@ -326,7 +324,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
 
         catClusterIndexResponse = objectMapper
             .readValue(sanitizedContentStr, new TypeReference<List<ClusterIndexResponse>>(){});;
@@ -359,7 +357,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
 
         catClusterIndexResponse = objectMapper
             .readValue(sanitizedContentStr, new TypeReference<List<ClusterAliasesResponse>>(){});
@@ -399,7 +397,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
 
         JsonNode mappingNode  = objectMapper.readTree(sanitizedContentStr);
         logger.trace("mappingNode: " + objectMapper.writeValueAsString(mappingNode));
@@ -470,7 +468,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         InputStream contentStream = entity.getContent();
         Reader reader = new InputStreamReader(contentStream);
 
-        String sanitizedContentStr = JsonSanitizer.sanitize(CharStreams.toString(reader));
+        String sanitizedContentStr = SipCommonUtils.sanitizeJson(CharStreams.toString(reader));
         JsonNode mappingNode  = objectMapper.readTree(sanitizedContentStr);
         logger.trace("mappingNode: " + objectMapper.writeValueAsString(mappingNode));
         // The below query to figure the type name dynamically for ES 6.x
@@ -483,7 +481,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         logger.trace("rootNode: " + objectMapper.writeValueAsString(rootNode));
         if (indexAggregationResult.getAggregations()!=null) {
           String aggStr = objectMapper.writeValueAsString(indexAggregationResult.getAggregations());
-          String sanitizedAggStr = JsonSanitizer.sanitize(aggStr);
+          String sanitizedAggStr = SipCommonUtils.sanitizeJson(aggStr);
           JsonNode aggregationNode  = objectMapper.readTree(sanitizedAggStr);
           logger.trace("aggregationNodeIndex: " + objectMapper.writeValueAsString(aggregationNode));
           indexbucketNode = (ArrayNode) aggregationNode.get(INDEX_AGGREGATION_NAME).get(BUCKETS);;
@@ -635,14 +633,14 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   String result ="{\"took\":7,\"timed_out\":false,\"_shards\":{\"total\":5,\"successful\":5,\"skipped\":0,\"failed\":0},\"hits\":{\"total\":538335,\"max_score\":0,\"hits\":[]},\"aggregations\":{\"typeAgg\":{\"doc_count_error_upper_bound\":0,\"sum_other_doc_count\":0,\"buckets\":[{\"key\":\"session\",\"doc_count\":538335}]}}}";
 
 
-  String sanitizedMappingStr = JsonSanitizer.sanitize(mappingString);
+  String sanitizedMappingStr = SipCommonUtils.sanitizeJson(mappingString);
   JsonNode mappingNode  = objectMapper.readTree(sanitizedMappingStr);
   ObjectNode rootNode = (ObjectNode) mappingNode;
   ObjectNode mappingDataNode = (ObjectNode)rootNode.get("mct_tmo_session").get("mappings");
 
   System.out.println(mappingDataNode);
 
-  String sanitizedResult = JsonSanitizer.sanitize(result);
+  String sanitizedResult = SipCommonUtils.sanitizeJson(result);
   JsonNode aggregationNode  = objectMapper.readTree(sanitizedResult);
   ArrayNode bucketNode = (ArrayNode) aggregationNode.get("aggregations").get("typeAgg").get("buckets");
   List<String> typesOfIndex = new ArrayList<String>();

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
@@ -20,6 +19,7 @@ import com.synchronoss.saw.semantic.model.request.BinarySemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -125,7 +125,7 @@ public class MigrationService {
     JsonNode json = objectMapper.readTree(resource.getFile());
 
     String mdService = json.toString();
-    String sanitizedMdService = JsonSanitizer.sanitize(mdService);
+    String sanitizedMdService = SipCommonUtils.sanitizeJson(mdService);
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSemanticObjects contentDataLocation =
@@ -136,7 +136,7 @@ public class MigrationService {
     String analyzeStr =
         objectMapper.writeValueAsString(metaDataObjects.getContents().get(0).getAnalyze());
 
-    String sanitizedAnalyzeStr = JsonSanitizer.sanitize(analyzeStr);
+    String sanitizedAnalyzeStr = SipCommonUtils.sanitizeJson(analyzeStr);
     List<BinarySemanticNode> binaryNodes =
         objectMapper.readValue(sanitizedAnalyzeStr,
             new TypeReference<List<BinarySemanticNode>>() {});
@@ -162,7 +162,7 @@ public class MigrationService {
         semanticNode.setEsRepository(binarySemanticNode.getEsRepository());
       } else {
         String repositoryStr = objectMapper.writeValueAsString(binarySemanticNode.getRepository());
-        String sanitizedRepositoryStr = JsonSanitizer.sanitize(repositoryStr);
+        String sanitizedRepositoryStr = SipCommonUtils.sanitizeJson(repositoryStr);
         JsonNode repository =
             objectMapper.readTree(sanitizedRepositoryStr);
         ArrayNode repositories = (ArrayNode) repository.get("objects");
@@ -257,7 +257,7 @@ public class MigrationService {
 
       String analyzeStr = objectMapper.writeValueAsString(
           binarySemanticStoreData.getBody().getContents().get(0).getAnalyze());
-      String sanitizedAnalyseStr = JsonSanitizer.sanitize(analyzeStr);
+      String sanitizedAnalyseStr = SipCommonUtils.sanitizeJson(analyzeStr);
       List<BinarySemanticNode> binaryNodes =
           objectMapper.readValue(sanitizedAnalyseStr,
               new TypeReference<List<BinarySemanticNode>>() {});
@@ -284,7 +284,7 @@ public class MigrationService {
           if (binarySemanticNode.getEsRepository() != null) {
             String repositoryStr = objectMapper
                 .writeValueAsString(binarySemanticNode.getEsRepository());
-            String sanitizedRepositoryStr = JsonSanitizer.sanitize(repositoryStr);
+            String sanitizedRepositoryStr = SipCommonUtils.sanitizeJson(repositoryStr);
             JsonNode esRepository =
                 objectMapper.readTree(sanitizedRepositoryStr);
             String indexName = esRepository.get("indexName").asText();
@@ -363,7 +363,7 @@ public class MigrationService {
     List<String> listOfDataObjectNames = new ArrayList<>();
     ObjectMapper objectMapper = new ObjectMapper();
     String repositoryStr = objectMapper.writeValueAsString(binarySemanticNode.getRepository());
-    String sanitizedRepositoryStr = JsonSanitizer.sanitize(repositoryStr);
+    String sanitizedRepositoryStr = SipCommonUtils.sanitizeJson(repositoryStr);
     JsonNode repository =
         objectMapper.readTree(sanitizedRepositoryStr);
     ArrayNode repositories = (ArrayNode) repository.get("objects");
@@ -392,7 +392,7 @@ public class MigrationService {
 
       String dataObjectStr = objectMapper
           .writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0));
-      String sanitizedDataObjectStr = JsonSanitizer.sanitize(dataObjectStr);
+      String sanitizedDataObjectStr = SipCommonUtils.sanitizeJson(dataObjectStr);
       dataObjectData =
           objectMapper.readTree(sanitizedDataObjectStr);
       logger.trace("dataObjectData : " + objectMapper.writeValueAsString(dataObjectData));

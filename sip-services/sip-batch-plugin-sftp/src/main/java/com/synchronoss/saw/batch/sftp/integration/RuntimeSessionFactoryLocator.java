@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.json.JsonSanitizer;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
       ObjectNode rootNode = null;
       try {
         String channelMetadata = bisChannelEntity.getChannelMetadata();
-        String sanitizedChannelMetadata = JsonSanitizer.sanitize(channelMetadata);
+        String sanitizedChannelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
         nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
         rootNode = (ObjectNode) nodeEntity;
         String hostname = rootNode.get("hostName").asText();
@@ -123,7 +123,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
      
       try {
         String channelMetadataStr = bisChannelEntity.getChannelMetadata();
-        String sanitizedChannelMetadataStr = JsonSanitizer.sanitize(channelMetadataStr);
+        String sanitizedChannelMetadataStr = SipCommonUtils.sanitizeJson(channelMetadataStr);
         nodeEntity = objectMapper.readTree(sanitizedChannelMetadataStr);
         rootNode = (ObjectNode) nodeEntity;
         hostname = rootNode.get("hostName").asText();

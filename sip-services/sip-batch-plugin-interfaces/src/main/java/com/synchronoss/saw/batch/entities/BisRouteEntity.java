@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch.entities;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
 import java.util.Date;
@@ -107,7 +108,7 @@ public class BisRouteEntity implements Serializable {
   }
 
   public void setRouteMetadata(String routeMetadata) {
-    this.routeMetadata = routeMetadata;
+    this.routeMetadata = SipCommonUtils.sanitizeJson(routeMetadata);
   }
 
   public Long getBisChannelSysId() {

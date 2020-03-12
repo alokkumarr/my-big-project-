@@ -89,9 +89,10 @@
       <version>2.4.16</version>
     </dependency>
     <dependency>
-      <groupId>com.mikesamuel</groupId>
-      <artifactId>json-sanitizer</artifactId>
-      <version>1.2.0</version>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>

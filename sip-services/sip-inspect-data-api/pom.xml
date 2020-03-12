@@ -41,11 +41,11 @@
 			<version>${revision}</version>
 		</dependency>
     <dependency>
-      <groupId>com.mikesamuel</groupId>
-      <artifactId>json-sanitizer</artifactId>
-      <version>1.2.0</version>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
     </dependency>
-	</dependencies>
+  </dependencies>
 	<repositories>
 		<repository>
 			<id>synchronoss</id>

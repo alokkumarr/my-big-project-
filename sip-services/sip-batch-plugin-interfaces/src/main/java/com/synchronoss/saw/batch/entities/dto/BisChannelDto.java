@@ -1,6 +1,7 @@
 package com.synchronoss.saw.batch.entities.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;

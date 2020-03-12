@@ -2,13 +2,13 @@ package com.synchronoss.saw.batch.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -218,7 +218,7 @@ public class BisRouteService {
           Long lastFired = null;
           Long nextFired = null;
           try {
-            String sanitizedResponse = JsonSanitizer.sanitize(response);
+            String sanitizedResponse = SipCommonUtils.sanitizeJson(response);
             rootNode = objectMapper.readTree(sanitizedResponse);
             dataNode = rootNode.get("data");
             logger.info("data node from response " + dataNode);

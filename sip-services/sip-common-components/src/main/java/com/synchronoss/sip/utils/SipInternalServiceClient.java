@@ -55,7 +55,7 @@ public class SipInternalServiceClient {
     while ((line = rd.readLine()) != null) {
       result.append(line);
     }
-    String sanitizedResultString = JsonSanitizer.sanitize(result.toString());
+    String sanitizedResultString = SipCommonUtils.sanitizeJson(result.toString());
     node = mapper.readValue(sanitizedResultString, object.getClass());
     ObjectNode rootNode = (ObjectNode) node;
     if (rootNode.get("repository") != null) {

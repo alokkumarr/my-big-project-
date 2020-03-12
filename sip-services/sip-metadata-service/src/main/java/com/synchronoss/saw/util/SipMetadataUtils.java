@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
@@ -21,6 +20,7 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -274,7 +274,7 @@ public class SipMetadataUtils {
     com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
     JsonElement jsonElement;
     try {
-      String sanitizedJsonString = JsonSanitizer.sanitize(jsonString);
+      String sanitizedJsonString = SipCommonUtils.sanitizeJson(jsonString);
       jsonElement = jsonParser.parse(sanitizedJsonString);
       logger.info("json element parsed successfully");
       logger.trace("Parsed String = ", jsonElement);

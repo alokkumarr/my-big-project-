@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisChannelDto;
@@ -20,6 +19,7 @@ import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -110,7 +110,7 @@ public class SawBisChannelController {
     JsonNode nodeEntity = null;
     ObjectNode rootNode = null;
     String channelMetadata = requestBody.getChannelMetadata();
-    String sanitizedChannelMetadata = JsonSanitizer.sanitize(channelMetadata);
+    String sanitizedChannelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
 
     nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
     rootNode = (ObjectNode) nodeEntity;
@@ -312,7 +312,7 @@ public class SawBisChannelController {
 
     String channelMetadata = requestBody.getChannelMetadata();
 
-    String sanitizedChannelMetadata = JsonSanitizer.sanitize(channelMetadata);
+    String sanitizedChannelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
 
     nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
     rootNode = (ObjectNode) nodeEntity;

@@ -1,7 +1,6 @@
 package com.synchronoss.saw.es;
 
 import com.google.gson.Gson;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.constants.CommonQueryConstants;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Expression;
@@ -15,6 +14,7 @@ import com.synchronoss.saw.model.Sort.Order;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.util.BuilderUtil;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -175,7 +175,7 @@ public class SIPAggregationBuilder {
              * provided field.
              */
             String expressionStr = field.getExpression();
-            String sanitizedExpressionStr = JsonSanitizer.sanitize(expressionStr);
+            String sanitizedExpressionStr = SipCommonUtils.sanitizeJson(expressionStr);
             Gson gson = new Gson();
             if (sanitizedExpressionStr != null && sanitizedExpressionStr.length() != 0) {
               Expression expression = gson.fromJson(sanitizedExpressionStr, Expression.class);

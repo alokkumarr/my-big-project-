@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.json.JsonSanitizer;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
-import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
@@ -28,6 +26,7 @@ import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -194,7 +193,7 @@ public class SftpServiceImpl extends SipPluginContract {
           delegatingSessionFactory.getSessionFactory(entity.getBisChannelSysId());
       try (Session<?> session = sessionFactory.getSession()) {
         String routeMetadataStr = entity.getRouteMetadata();
-        String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+        String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
         nodeEntity = objectMapper.readTree(sanitizedRouteMetadataStr);
         rootNode = (ObjectNode) nodeEntity;
         String destinationLoc = this.constructDestinationPath(
@@ -707,7 +706,7 @@ public class SftpServiceImpl extends SipPluginContract {
             JsonNode nodeEntity = null;
             ObjectNode rootNode = null;
             String routeMetadataStr = bisRouteEntity.getRouteMetadata();
-            String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+            String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
             nodeEntity = objectMapper.readTree(sanitizedRouteMetadataStr);
             rootNode = (ObjectNode) nodeEntity;
             String sourceLocation = rootNode.get("sourceLocation").asText();
@@ -1246,7 +1245,7 @@ public class SftpServiceImpl extends SipPluginContract {
         JsonNode rootNode;
         try {
           String routeMetadataStr = route.getRouteMetadata();
-          String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+          String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
           rootNode = objectMapper.readTree(sanitizedRouteMetadataStr);
           filePattern = rootNode.get("filePattern").asText();
           logger.trace("File pattern::" + filePattern);
@@ -1286,7 +1285,7 @@ public class SftpServiceImpl extends SipPluginContract {
           BisRouteEntity bisRouteEntity = routeEntity.get();
 
           String routeMetadataStr = bisRouteEntity.getRouteMetadata();
-          String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+          String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
           JsonNode nodeEntity = objectMapper
               .readTree(sanitizedRouteMetadataStr);
           JsonNode rootNode = (ObjectNode) nodeEntity;

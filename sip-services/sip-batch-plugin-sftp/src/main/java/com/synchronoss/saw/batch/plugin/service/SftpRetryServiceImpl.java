@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.json.JsonSanitizer;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
@@ -18,6 +17,7 @@ import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +82,7 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                 JsonNode nodeEntity = null;
                 ObjectNode rootNode = null;
                 String routeMetadataStr = bisRouteEntity.getRouteMetadata();
-                String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetadataStr);
+                String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
                 nodeEntity = objectMapper.readTree(sanitizedRouteMetadataStr);
                 rootNode = (ObjectNode) nodeEntity;
                 // The below change has been made for the task SIP-6292

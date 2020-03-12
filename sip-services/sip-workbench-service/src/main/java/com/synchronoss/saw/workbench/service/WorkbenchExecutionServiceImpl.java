@@ -1,6 +1,6 @@
 package com.synchronoss.saw.workbench.service;
 
-import com.google.json.JsonSanitizer;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -139,7 +139,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     log.info("execute component = " + component);
 
 
-    String sanitizedCfg = JsonSanitizer.sanitize(cfg);
+    String sanitizedCfg = SipCommonUtils.sanitizeJson(cfg);
     ComponentConfiguration config = new Gson().fromJson(sanitizedCfg, ComponentConfiguration.class);
 
     log.info("Component Config = " + config);

@@ -1,5 +1,6 @@
 package com.synchronoss.saw.inspect;
 import com.google.json.JsonSanitizer;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,7 +62,7 @@ public class SAWDelimitedInspector {
   public SAWDelimitedInspector(String jsonSettings, String root, boolean localFileSystem, String relativePath) throws Exception {
     this.localFileSystem = localFileSystem;
     this.relativePath = relativePath;
-    String sanitizedJsonSettings = JsonSanitizer.sanitize(jsonSettings);
+    String sanitizedJsonSettings = SipCommonUtils.sanitizeJson(jsonSettings);
     JsonObject conf = new JsonParser().parse(sanitizedJsonSettings).getAsJsonObject();
     JsonObject inspectorSettings = conf.getAsJsonObject("inspect");
     if (inspectorSettings != null) {

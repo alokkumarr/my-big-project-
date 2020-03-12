@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -22,6 +21,7 @@ import com.synchronoss.saw.batch.service.BisRouteService;
 import com.synchronoss.saw.batch.service.ChannelTypeService;
 import com.synchronoss.sip.utils.RestUtil;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -57,10 +57,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-
-
-
 
 
 @RestController
@@ -141,7 +137,6 @@ public class SawBisRouteController {
       BisRouteEntity routeEntity = new BisRouteEntity();
       logger.trace("Channel retrieved :" + channel);
       String routeMetaData = requestBody.getRouteMetadata();
-      String sanitizedRouteMetadata = JsonSanitizer.sanitize(routeMetaData);
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -151,7 +146,7 @@ public class SawBisRouteController {
         BeanUtils.copyProperties(requestBody, routeEntity);
         routeEntity.setCreatedDate(new Date());
         routeEntity.setStatus(STATUS_ACTIVE);
-        routeData = (ObjectNode) objectMapper.readTree(sanitizedRouteMetadata);
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
 
         /**
          * Check duplicate route.
@@ -329,20 +324,19 @@ public class SawBisRouteController {
       BisRouteEntity routeEntity = new BisRouteEntity();
       routeEntity = bisRouteDataRestRepository.getOne(routeId);
       String routeMetaData = requestBody.getRouteMetadata();
-      String sanitizedRouteMetadata = JsonSanitizer.sanitize(routeMetaData);
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       ObjectNode routeData = null;
       try {
-        routeData = (ObjectNode) objectMapper.readTree(sanitizedRouteMetadata);
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
         requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
         logger.error("Exception occurred while updating routeMetaData ", e);
         throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
       }
       String schedulerDetails = routeData.get("schedulerExpression").toString();
-      String sanitizedSchedulerDetails = JsonSanitizer.sanitize(schedulerDetails);
+      String sanitizedSchedulerDetails = SipCommonUtils.sanitizeJson(schedulerDetails);
       JsonNode schedulerExpn = routeData.get("schedulerExpression");
       if (schedulerExpn != null) {
         logger.trace("schedulerExpression  is not null ", schedulerExpn);
@@ -420,9 +414,7 @@ public class SawBisRouteController {
       }
       BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
       try {
-        String routeMetadataStr = requestBody.getRouteMetadata();
-        String sanitizedRouteMetadataStr = JsonSanitizer.sanitize(routeMetaData);
-        routeData = (ObjectNode) objectMapper.readTree(sanitizedRouteMetadataStr);
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
         // routeData.put("destinationLocation", destinationLocation);
         requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
