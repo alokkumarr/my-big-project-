@@ -17,7 +17,6 @@ import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,8 +81,7 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                 JsonNode nodeEntity = null;
                 ObjectNode rootNode = null;
                 String routeMetadataStr = bisRouteEntity.getRouteMetadata();
-                String sanitizedRouteMetadataStr = SipCommonUtils.sanitizeJson(routeMetadataStr);
-                nodeEntity = objectMapper.readTree(sanitizedRouteMetadataStr);
+                nodeEntity = objectMapper.readTree(routeMetadataStr);
                 rootNode = (ObjectNode) nodeEntity;
                 // The below change has been made for the task SIP-6292
                 
