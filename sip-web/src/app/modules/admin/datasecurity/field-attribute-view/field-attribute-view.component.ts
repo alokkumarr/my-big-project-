@@ -22,7 +22,7 @@ export class FieldAttributeViewComponent implements OnInit, OnChanges {
     this.emptyState = isEmpty(this.dskFilterGroup);
     this.previewString = this.emptyState
       ? ''
-      : this.DskFiltersService.generatePreview(this.dskFilterGroup);
+      : this.DskFiltersService.generatePreview(this.dskFilterGroup, 'DSK');
   }
 
   constructor(private DskFiltersService: DskFiltersService) {}

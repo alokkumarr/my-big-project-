@@ -7,6 +7,7 @@ import * as debounce from 'lodash/debounce';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as forEach from 'lodash/forEach';
 import * as isArray from 'lodash/isArray';
+import * as isEmpty from 'lodash/isEmpty';
 
 import { DSKFilterGroup } from '../dsk-filter.model';
 import { defaultFilters } from '../dsk-filter-group/dsk-filter-group.component';
@@ -33,14 +34,40 @@ export class DskFilterDialogComponent implements OnInit {
       groupSelected;
       filterGroup: DSKFilterGroup;
       mode;
+      filters;
     }
   ) {
+    console.log(this.data);
     this.datasecurityService.clearDSKEligibleFields();
     this.operation = this.data.filterGroup ? 'Update' : 'Add';
-    this.dskFilterObject = this.data.filterGroup || cloneDeep(defaultFilters);
+    this.dskFilterObject = this.data.mode === 'ANALYZE'
+      ? this.getFilterArray(this.data.filters) : this.data.filterGroup || cloneDeep(defaultFilters);
   }
 
   ngOnInit() {}
+
+  getFilterArray(filters) {
+    if (isEmpty(filters)) {
+      return cloneDeep(defaultFilters);
+    }
+
+    const filter = filters[0];
+    if (filter.filters) {
+      filter.booleanQuery = filter.filters;
+      delete filter.filters;
+    }
+    forEach(filter.booleanQuery, obj => {
+      if (obj.filters) {
+        obj.booleanQuery = obj.filters;
+        delete obj.filters;
+      }
+      if (isArray(obj)) {
+        this.changeIndexToFilters(obj);
+      }
+    })
+    console.log(filter);
+    return filter;
+  }
 
   validateFilterGroup() {
     this.errorState = !this.datasecurityService.isDSKFilterValid(
@@ -56,7 +83,7 @@ export class DskFilterDialogComponent implements OnInit {
       this.previewString = '';
     } else {
       this.previewString = this.datasecurityService.generatePreview(
-        this.dskFilterObject
+        this.dskFilterObject, this.data.mode
       );
     }
   }
@@ -75,7 +102,7 @@ export class DskFilterDialogComponent implements OnInit {
       dskObject.filters = dskObject.booleanQuery;
       delete dskObject.booleanQuery;
     }
-    forEach(dskObject, obj => {
+    forEach(dskObject.booleanQuery, obj => {
       if (obj.booleanQuery) {
         obj.filters = obj.booleanQuery;
         delete obj.booleanQuery;

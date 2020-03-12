@@ -121,7 +121,7 @@
         <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
             <mat-label>Artifacts</mat-label>
             <mat-select (selectionChange)="artifactSelect($event.value, childId)"
-                        [value]="">
+                        [value]="filterGroup.booleanQuery[childId].artifactsName">
               <mat-option *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn"
                           [value]="artifact.artifactName">
                 {{ artifact.artifactName }}
@@ -132,7 +132,7 @@
           <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
             <mat-label>Columns</mat-label>
             <mat-select (selectionChange)="columnsSelect($event.value, childId)"
-                        [value]="">
+                        [value]="filterGroup.booleanQuery[childId].columnName">
               <mat-option *ngFor="let column of fetchColumns(childId);"
                           [value]="column.columnName">
                 {{ column.displayName }}
@@ -144,23 +144,23 @@
             <designer-string-filter
               *ngSwitchCase="'string'"
               (filterModelChange)="onFilterModelChange($event, childId)"
+              [filterModel]="filterGroup.booleanQuery[childId].model || {}"
             >
             </designer-string-filter>
             <designer-date-filter
               *ngSwitchCase="'date'"
               (filterModelChange)="onFilterModelChange($event, childId)"
+              [filterModel]="filterGroup.booleanQuery[childId].model"
             >
             </designer-date-filter>
             <designer-number-filter
               *ngSwitchCase="'number'"
               (filterModelChange)="onFilterModelChange($event, childId)"
+              [filterModel]="filterGroup.booleanQuery[childId].model"
             >
             </designer-number-filter>
           </div>
       </div>
-
-
-
       <div
         fxLayout="row"
         class="filter__action__space"
@@ -169,6 +169,7 @@
       >
         <mat-checkbox
           *ngIf="!data.isInRuntimeMode && data.supportsGlobalFilters"
+          [checked]="filterGroup.booleanQuery[childId].isGlobalFilter"
           (change)="onGlobalCheckboxToggle($event.checked, childId)"
           i18n
           e2e="filter-dialog-global-checkbox"
@@ -180,11 +181,13 @@
           (change)="onRuntimeCheckboxToggle($event.checked, childId)"
           i18n
           e2e="filter-dialog-prompt-checkbox"
+          [checked]="filterGroup.booleanQuery[childId].isRuntimeFilter"
         >
           Prompt
         </mat-checkbox>
         <mat-checkbox
           *ngIf="!data.isInRuntimeMode"
+          [checked]="filterGroup.booleanQuery[childId].isOptional"
           (change)="onOptionalCheckboxToggle($event.checked, childId)"
           i18n
           e2e="filter-dialog-optional-checkbox"
@@ -192,20 +195,6 @@
           Optional
         </mat-checkbox>
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <button
         mat-icon-button
         aria-label="Remove dsk field attribute"

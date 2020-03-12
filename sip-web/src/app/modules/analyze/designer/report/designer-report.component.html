@@ -1,12 +1,12 @@
 <div [ngSwitch]="designerState" style="height: 100%; width: 100%;">
-  <filter-chips-u
+  <!-- <filter-chips-u
     *ngIf="filters.length > 0 && !isInQueryMode"
     (remove)="onRemoveFilter($event)"
     (removeAll)="onRemoveFilterAll()"
     [filters]="filters"
     [artifacts]="artifacts"
   >
-  </filter-chips-u>
+  </filter-chips-u> -->
 
   <div
     *ngSwitchCase="DesignerStates.NO_SELECTION"

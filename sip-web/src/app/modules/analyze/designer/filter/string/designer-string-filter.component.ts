@@ -8,8 +8,11 @@ import {
 } from '@angular/core';
 import { MatChipInputEvent } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
+
 import * as filter from 'lodash/filter';
+import * as isUndefined from 'lodash/isUndefined';
 import * as compact from 'lodash/compact';
+
 import { FilterModel } from '../../types';
 import { STRING_FILTER_OPERATORS } from '../../../consts';
 
@@ -43,7 +46,7 @@ export class DesignerStringFilterComponent implements OnInit, OnChanges {
         operator: ''
       };
       this.tempValue = '';
-    } else {
+    } else if (!isUndefined(this.filterModel.modelValues)) {
       this.tempValue = this.filterModel.modelValues[0] || '';
     }
   }
