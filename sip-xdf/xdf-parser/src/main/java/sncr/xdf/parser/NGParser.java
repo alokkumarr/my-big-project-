@@ -962,7 +962,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if(index >= 0){
             return index;
         }else{
-            throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Field sourceFieldName not exist in File Header.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Field sourceFieldName - "+fieldName+" - not exist in File Header.");
         }
     }
 
@@ -994,7 +994,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     return new java.sql.Timestamp(df.parse(defaultValue).getTime());
                 }
             } catch (Exception e) {
-                throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Invalid default value for the field - " + field.getName() +" - is : " + defaultValue);
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Invalid default value for the field - " + field.getName() +", for the Type - "+field.getType()+" - is : " + defaultValue);
             }
         }
         return null;
