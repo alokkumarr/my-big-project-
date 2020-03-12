@@ -120,18 +120,6 @@ export const CHART_COLORS = [
 
 const NEW_DATE_FORMATS = [
   {
-    label: '09/15/2017',
-    value: 'MM/dd/yyyy',
-    groupInterval: 'day',
-    momentValue: 'MM/DD/YYYY'
-  },
-  {
-    label: '15/09/2017',
-    value: 'dd/MM/yyyy',
-    groupInterval: 'day',
-    momentValue: 'DD/MM/YYYY'
-  },
-  {
     label: '09/15/17',
     value: 'MM/dd/yy',
     groupInterval: 'day',
