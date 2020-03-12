@@ -472,9 +472,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       {
         format: payload.format || payload.dateFormat,
         type,
-        ...(this.analysis.type === 'esReport'
-          ? { availableFormats: ES_REPORTS_DATE_FORMATS }
-          : {})
+        availableFormats: ES_REPORTS_DATE_FORMATS
       },
       format => {
         changeColumnProp('format', format);
