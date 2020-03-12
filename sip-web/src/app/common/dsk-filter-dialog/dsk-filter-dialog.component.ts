@@ -33,6 +33,7 @@ export class DskFilterDialogComponent implements OnInit {
       filterGroup: DSKFilterGroup;
       mode;
       filters;
+      booleanCriteria;
     }
   ) {
     this.datasecurityService.clearDSKEligibleFields();
@@ -48,7 +49,18 @@ export class DskFilterDialogComponent implements OnInit {
         if (isEmpty(data.filters)) {
           return cloneDeep(defaultFilters);
         } else {
-          return this.changeIndexToNames2(this.data.filters, 'fiters', 'booleanQuery');
+          console.log(this.data);
+          if (this.data.filters[0].filters) {
+            return this.changeIndexToNames2(this.data.filters, 'fiters', 'booleanQuery');
+          } else {
+            const oldFormatFilters = cloneDeep(this.data.filters);
+            this.data.filters = [];
+            this.data.filters.push({
+              booleanCriteria: this.data.booleanCriteria,
+              filters: oldFormatFilters
+            })
+            return this.changeIndexToNames2(this.data.filters, 'fiters', 'booleanQuery');
+          }
         }
       case 'DSK':
         return data.filterGroup || cloneDeep(defaultFilters);
