@@ -906,7 +906,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 fieldNames = Arrays.asList(header.toUpperCase().split("\\s*"+delimiter+"\\s*",-1));
             }
         }
-        Set<Integer> indices = new HashSet<>();
+        boolean isIndexConfigNotExists = true;
         boolean isSchemaIndexBased = true;
         int i = 0;
         for(Field field : fields){
@@ -917,14 +917,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 isSchemaIndexBased = false;
                 fieldIndex=i;
             }else{
-                indices.add(fieldIndex);
+                isIndexConfigNotExists = false;
             }
             NGStructField structField = new NGStructField(field.getName(), dataType, true, Metadata.empty(), fieldIndex, defaultValObj);
             structFields[i] = structField;
             i++;
         }
 
-        if(fields.size() == indices.size()){
+        if(isSchemaIndexBased || isIndexConfigNotExists){
             schema = new NGStructType(structFields, isSchemaIndexBased);
             internalSchema = schema;
             internalSchema = internalSchema.add(new NGStructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty(), schema.length(), null));
