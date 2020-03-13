@@ -25,6 +25,7 @@ import * as get from 'lodash/get';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
+import { v4 as uuid } from 'uuid';
 
 import { Artifact, Filter } from './../../modules/analyze/designer/types';
 import { ArtifactDSL } from '../../models';
@@ -125,6 +126,7 @@ export class DskFilterGroupComponent implements OnInit {
         isGlobalFilter: false,
         isRuntimeFilter: false,
         isOptional: false,
+        uuid: uuid(),
         model: {
           operator: '',
           values: ''
@@ -244,7 +246,11 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   onFilterModelChange(filter, childId) {
-    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
+    if ((<DSKFilterField>this.filterGroup.booleanQuery[childId]).isRuntimeFilter) {
+      delete (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model;
+    } else {
+      (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
+    }
     this.onChange.emit(this.filterGroup);
   }
 
@@ -278,6 +284,9 @@ export class DskFilterGroupComponent implements OnInit {
 
   onRuntimeCheckboxToggle(value, childId) {
     (<DSKFilterField>this.filterGroup.booleanQuery[childId]).isRuntimeFilter = value;
+    if (value) {
+      delete (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model;
+    }
     this.onChange.emit(this.filterGroup);
   }
 

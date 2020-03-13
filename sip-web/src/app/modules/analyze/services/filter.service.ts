@@ -9,9 +9,11 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
-import * as fpConcat from 'lodash/fp/concat';
+import * as forEach from 'lodash/forEach';
+import * as isArray from 'lodash/isArray';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
+import { AnalyzeService } from './analyze.service';
 import { AnalysisDSL } from '../types';
 
 @Injectable()
@@ -19,7 +21,8 @@ export class FilterService {
   constructor(
     public _dialog: AnalyzeDialogService,
     private router: Router,
-    private locationService: Location
+    private locationService: Location,
+    private _analyzeService: AnalyzeService
   ) {}
 
   getRuntimeFiltersFrom(filters = []) {
@@ -78,21 +81,29 @@ export class FilterService {
     });
   }
 
+
+  sampleFilters(filters, flattenedFilters, filterObj) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.sampleFilters(filter, flattenedFilters, filterObj);
+      }
+      if (filter.columnName &&
+        (filter.uuid === filterObj.uuid
+          && filter.columnName === filterObj.columnName)) {
+        filter.model = cloneDeep(filterObj.model);
+      }
+    });
+    return flattenedFilters;
+  }
+
   mergeValuedRuntimeFiltersIntoFilters(
     runtimeFilters,
     allFiltersWithEmptyRuntimeFilters
   ) {
-    const nonRuntimeFilters = filter(
-      allFiltersWithEmptyRuntimeFilters,
-      f => !(f.isRuntimeFilter || f.isGlobalFilter)
-    );
-    return fpPipe(
-      fpFilter(
-        ({ isRuntimeFilter, isOptional, model }) =>
-          !(isRuntimeFilter && isOptional && !model)
-      ),
-      fpConcat(nonRuntimeFilters)
-    )(runtimeFilters);
+    forEach(runtimeFilters, filter => {
+      this.sampleFilters(allFiltersWithEmptyRuntimeFilters, [], filter);
+    });
+    return allFiltersWithEmptyRuntimeFilters;
   }
 
   private navigateTo(navigateTo, analysisCategory) {
@@ -108,6 +119,7 @@ export class FilterService {
 
   getCleanedRuntimeFilterValues(analysis) {
     const filters = get(analysis, 'sipQuery.filters');
+    const flattenedFilters = this._analyzeService.flattenAndFetchFilters(filters, []);
     const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
     if (analysis.type === 'report' && reportType === 'query') {
       return filters;
@@ -117,7 +129,7 @@ export class FilterService {
     return fpPipe(
       fpFilter(f => f.isRuntimeFilter),
       fpMap(fpOmit('model'))
-    )(filters);
+    )(flattenedFilters);
   }
 
   public getRuntimeFilterValuesIfAvailable(
