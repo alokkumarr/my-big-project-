@@ -1,24 +1,18 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Filter, Artifact } from '../../types';
 import { getFilterDisplayName } from './../../../../analyze/consts';
 import { AnalyzeService } from '../../../services/analyze.service';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
-import * as forEach from 'lodash/forEach';
-import * as isArray from 'lodash/isArray';
 @Component({
   selector: 'filter-chips-u',
   templateUrl: './filter-chips.component.html',
   styleUrls: ['./filter-chips.component.scss']
 })
-export class FilterChipsComponent {
+export class FilterChipsComponent implements OnInit {
   @Output() remove: EventEmitter<number> = new EventEmitter();
   @Output() removeAll: EventEmitter<null> = new EventEmitter();
-  @Input('filters')
-  set _filters(val) {
-    this.filters = [];
-    this.fetchFilters(val);
-  }
+  @Input() filters;
   @Input('artifacts')
   set artifacts(artifacts: Artifact[] | ArtifactDSL[]) {
     if (!artifacts) {
@@ -29,9 +23,15 @@ export class FilterChipsComponent {
   @Input() readonly: boolean;
 
   public nameMap;
-  public filters= [];
+  public flattenedFilters = [];
 
-  constructor(private analyzeService: AnalyzeService) {}
+  constructor(
+    private analyzeService: AnalyzeService
+  ) {}
+
+  ngOnInit() {
+    this.flattenedFilters = this.analyzeService.flattenAndFetchFilters(this.filters, []);
+  }
 
   getDisplayName(filter: Filter) {
     return getFilterDisplayName(this.nameMap, filter);
@@ -43,16 +43,5 @@ export class FilterChipsComponent {
 
   onRemoveAll() {
     this.removeAll.emit();
-  }
-
-  fetchFilters(filters) {
-    forEach(filters, filter => {
-      if (filter.filters || isArray(filter)) {
-        this.fetchFilters(filter);
-      }
-      if (filter.columnName) {
-        this.filters.push(filter);
-      }
-    })
   }
 }

@@ -140,7 +140,7 @@
             </mat-select>
           </mat-form-field>
 
-          <div [ngSwitch]="TYPE_MAP[fetchType(childId)]">
+          <div [ngSwitch]="TYPE_MAP[fetchType(childId)]" *ngIf="!filterGroup.booleanQuery[childId].isRuntimeFilter">
             <designer-string-filter
               *ngSwitchCase="'string'"
               (filterModelChange)="onFilterModelChange($event, childId)"

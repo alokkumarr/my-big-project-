@@ -15,6 +15,7 @@ export interface DSKFilterField {
   isGlobalFilter?: boolean;
   isRuntimeFilter?: boolean;
   isOptional?: boolean;
+  uuid?;
   model: {
     operator;
     values;
