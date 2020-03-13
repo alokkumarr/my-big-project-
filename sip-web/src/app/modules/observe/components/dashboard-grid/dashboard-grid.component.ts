@@ -25,7 +25,6 @@ import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
-import * as unionWith from 'lodash/unionWith';
 import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
@@ -45,6 +44,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
 import { ObserveService } from '../../services/observe.service';
 import { AnalyzeService } from 'src/app/modules/analyze/services/analyze.service';
+import { FilterService } from 'src/app/modules/analyze/services/filter.service'
 import { isDSLAnalysis } from 'src/app/common/types';
 
 const MARGIN_BETWEEN_TILES = 10;
@@ -102,7 +102,8 @@ export class DashboardGridComponent
     private sidenav: SideNavService,
     private _dialog: MatDialog,
     private _analyzeService: AnalyzeService,
-    private store: Store
+    private store: Store,
+    private _filterService: FilterService
   ) {}
 
   ngOnInit() {
@@ -275,12 +276,13 @@ export class DashboardGridComponent
       table => table.columns || table.fields
     );
 
-    const filters = get(
+    const unflatennedFilters = get(
       analysis,
       'sqlBuilder.filters',
       get(analysis, 'sipQuery.filters', [])
     );
 
+    const filters = cloneDeep(this._analyzeService.flattenAndFetchFilters(unflatennedFilters, []));
     this.filters.addFilter(
       filter(
         map(filters, flt => {
@@ -350,30 +352,21 @@ export class DashboardGridComponent
         return;
       }
 
-      const gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
-
-      let filters = unionWith(
-        gFilters,
-        tile.origAnalysis.sipQuery.filters,
-        (gFilt, filt) =>
-          (gFilt.tableName || gFilt.artifactsName) ===
-            (filt.tableName || filt.artifactsName) &&
-          gFilt.columnName === filt.columnName &&
-          gFilt.isAggregationFilter === filt.isAggregationFilter &&
-          gFilt.isGlobalFilter === filt.isGlobalFilter &&
-          gFilt.isGlobalFilter
-      );
+      let gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
 
       // Global filters are being ignored by backend. Set that property
       // false to make them execute properly.
-      filters = map(filters, f => {
+      gFilters = map(gFilters, f => {
         if (f.model) {
           f.isGlobalFilter = false;
         }
         return f;
       });
 
-      const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters } };
+      const combinedFilters = this._filterService
+        .mergeValuedRuntimeFiltersIntoFilters(gFilters, tile.origAnalysis.sipQuery.filters);
+
+      const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters: combinedFilters } };
       tile.analysis = {
         ...tile.origAnalysis,
         ...{ sipQuery },
