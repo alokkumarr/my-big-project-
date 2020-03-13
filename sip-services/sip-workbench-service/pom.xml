@@ -190,7 +190,11 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.elasticsearch</groupId>
-					<artifactId>elasticsearch-spark-${scala.version.exclude}</artifactId>
+					<artifactId>elasticsearch-spark-20_${scala.version}</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.synchronoss.bda</groupId>
+					<artifactId>xdf-rtps</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
