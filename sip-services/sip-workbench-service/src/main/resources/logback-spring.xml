@@ -20,3 +20,5 @@
   <root level="INFO" additivity="false">
     <appender-ref ref="STDOUT" />
   </root>
+  
+  </configuration>
