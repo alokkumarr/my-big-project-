@@ -348,7 +348,7 @@ public class SIPDSLTest {
     String assertQuerytFilter = dlSparkQueryBuilder
         .buildDataQuery(sipdsl.getSipQuery());
     String queryWithFilter =
-        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0 AND (SALES.double >= 1.0 OR SALES.string IN ('string 123') )))";
+        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0 AND (SALES.double >= 1.0 OR upper(SALES.string) IN (upper('string 123') ))))";
     Assert.assertEquals(queryWithFilter, assertQuerytFilter.trim());
   }
 
@@ -409,7 +409,7 @@ public class SIPDSLTest {
         + " FROM SALES"
         + " INNER JOIN PRODUCT"
         + " ON SALES.string = PRODUCT.string_2"
-        + " WHERE (((SALES.long = 1000.0) AND SALES.Double = 2000.0))"
+        + " WHERE ((SALES.long = 1000.0 AND SALES.Double = 2000.0))"
         + "  AND  (upper(SALES.string) IN (upper('String 1'), upper('str') )"
         + " AND upper(SALES.string) IN (upper('String 123'), upper('string 456') ))"
         + " GROUP BY SALES.string, SALES.date"
