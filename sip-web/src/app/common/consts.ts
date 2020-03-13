@@ -118,7 +118,7 @@ export const CHART_COLORS = [
   '#DFB2B2'
 ];
 
-const DATE_FORMATS = [
+export const DATE_FORMATS = [
   {
     value: 'YYYY',
     momentValue: 'YYYY',
@@ -253,29 +253,16 @@ const DATE_FORMATS = [
   }
 ];
 
-export const PIVOT_DATE_FORMATS = DATE_FORMATS;
-
-export const DEFAULT_PIVOT_DATE_FORMAT = PIVOT_DATE_FORMATS[0];
-
-export const PIVOT_DATE_FORMATS_OBJ = fpPipe(
+export const DATE_FORMATS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
-)(PIVOT_DATE_FORMATS);
+)(DATE_FORMATS);
 
-export const ES_REPORTS_DATE_FORMATS = [...PIVOT_DATE_FORMATS];
+export const DEFAULT_DATE_FORMAT = DATE_FORMATS[11];
 
 export const CUSTOM_HEADERS = {
   SKIP_TOAST: 'SIP-Skip-Error-Toast'
 };
-
-export const CHART_DATE_FORMATS = DATE_FORMATS;
-
-export const CHART_DEFAULT_DATE_FORMAT = CHART_DATE_FORMATS[1];
-
-export const CHART_DATE_FORMATS_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(CHART_DATE_FORMATS);
 
 export const AGGREGATE_TYPES = [
   {

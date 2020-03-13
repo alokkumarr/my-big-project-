@@ -8,23 +8,7 @@ import {
   Format,
   DesignerChangeEvent
 } from '../../../types';
-import {
-  CHART_DATE_FORMATS,
-  CHART_DATE_FORMATS_OBJ,
-  PIVOT_DATE_FORMATS,
-  PIVOT_DATE_FORMATS_OBJ
-} from '../../../../consts';
-
-const dateFormatsMap = {
-  pivot: {
-    array: PIVOT_DATE_FORMATS,
-    obj: PIVOT_DATE_FORMATS_OBJ
-  },
-  chart: {
-    array: CHART_DATE_FORMATS,
-    obj: CHART_DATE_FORMATS_OBJ
-  }
-};
+import { DATE_FORMATS, DATE_FORMATS_OBJ } from '../../../../consts';
 
 @Component({
   selector: 'designer-date-format-selector',
@@ -49,7 +33,7 @@ export class DesignerDateFormatSelectorComponent {
       switch (this.analysisType) {
         case 'chart':
           this.artifactColumn.dateFormat = <string>format;
-          const groupInterval = dateFormatsMap.chart.obj[format].groupInterval;
+          const groupInterval = DATE_FORMATS_OBJ[format].groupInterval;
 
           this.store.dispatch(
             new DesignerUpdateArtifactColumn({
@@ -90,9 +74,8 @@ export class DesignerDateFormatSelectorComponent {
   }
 
   getDateLabel(artifactColumn) {
-    const dateFormatsObj = get(dateFormatsMap, `${this.analysisType}.obj`);
     return get(
-      dateFormatsObj,
+      DATE_FORMATS_OBJ,
       `[${artifactColumn.dateFormat || artifactColumn.format}].label`,
       ''
     );
@@ -100,9 +83,8 @@ export class DesignerDateFormatSelectorComponent {
 
   openDateFormatDialog() {
     const columnFormat = this.artifactColumn.dateFormat;
-    const availableFormats = get(dateFormatsMap, `${this.analysisType}.array`);
     this._analyzeDialogService
-      .openDateFormatDialog(<string>columnFormat, availableFormats)
+      .openDateFormatDialog(<string>columnFormat, DATE_FORMATS)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }

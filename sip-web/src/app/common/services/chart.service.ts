@@ -44,7 +44,7 @@ import {
   DATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   CHART_COLORS,
-  CHART_DATE_FORMATS_OBJ
+  DATE_FORMATS_OBJ
 } from '../consts';
 
 const removeKeyword = (input: string) => {
@@ -532,7 +532,7 @@ export class ChartService {
   getMomentDateFormat(dateFormat) {
     // the backend and moment.js require different date formats for days of month
     // the backend represents it with "d", and momentjs with "Do"
-    return CHART_DATE_FORMATS_OBJ[dateFormat].momentValue;
+    return DATE_FORMATS_OBJ[dateFormat].momentValue;
   }
 
   getZIndex(type) {

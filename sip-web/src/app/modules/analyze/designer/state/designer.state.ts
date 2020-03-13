@@ -65,9 +65,9 @@ import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
 import {
   DATE_TYPES,
-  DEFAULT_PIVOT_DATE_FORMAT,
+  DEFAULT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
-  CHART_DATE_FORMATS_OBJ
+  DATE_FORMATS_OBJ
 } from '../../consts';
 import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
@@ -774,7 +774,7 @@ export class DesignerState {
       switch (analysis.type) {
         case 'chart':
           groupInterval.groupInterval =
-            CHART_DATE_FORMATS_OBJ[
+            DATE_FORMATS_OBJ[
               artifactColumn.dateFormat || <string>artifactColumn.format
             ].groupInterval;
           break;
@@ -820,7 +820,7 @@ export class DesignerState {
       ...(isDateType
         ? {
             dateFormat:
-              <string>artifactColumn.format || DEFAULT_PIVOT_DATE_FORMAT.value
+              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
           }
         : { format: artifactColumn.format })
     };

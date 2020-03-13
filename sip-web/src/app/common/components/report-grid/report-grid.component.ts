@@ -34,7 +34,7 @@ import * as isEqual from 'lodash/isEqual';
 import {
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
-  ES_REPORTS_DATE_FORMATS
+  DATE_FORMATS
 } from '../../consts';
 
 import {
@@ -472,7 +472,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       {
         format: payload.format || payload.dateFormat,
         type,
-        availableFormats: ES_REPORTS_DATE_FORMATS
+        availableFormats: DATE_FORMATS
       },
       format => {
         changeColumnProp('format', format);
