@@ -1,11 +1,11 @@
 package com.synchronoss.saw;
 
+import static com.synchronoss.saw.util.BuilderUtil.buildNestedFilter;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
@@ -98,7 +98,7 @@ public class SIPDSLTest {
 
       boolQueryBuilder1 =
           elasticSearchQueryBuilder.buildFilterQuery(
-              elasticSearchQueryBuilder.buildNestedFilter(
+              buildNestedFilter(
                   filters, sipdsl.getSipQuery().getBooleanCriteria()));
       searchSourceBuilder.query(boolQueryBuilder1);
     }
