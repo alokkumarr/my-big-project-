@@ -106,12 +106,23 @@
     <mat-accordion>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title>Description</mat-panel-title>
+          <mat-panel-title>Details</mat-panel-title>
         </mat-expansion-panel-header>
 
-        <p>
-          {{ data.analysis.description || 'No description provided.' }}
-        </p>
+        <div fxLayout="column" fxLayoutGap="10px">
+          <div fxLayout="row" fxLayoutGap="10px">
+            <strong>Description:</strong>
+            <div style="margin: 0px">
+              {{ data.analysis.description || 'No description provided.' }}
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <strong>Data Pod:</strong>
+            <div style="margin: 0px">
+              {{ data.analysis.metricName || 'Not Available' }}
+            </div>
+          </div>
+        </div>
       </mat-expansion-panel>
     </mat-accordion>
   </div>

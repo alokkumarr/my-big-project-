@@ -34,37 +34,6 @@
           (click)="zoomAnalysis(item)"
           matTooltip="View Full Screen"
         ></mat-icon>
-
-        <mat-icon
-          fontIcon="icon-description"
-          matTooltip="Show Description"
-          (click)="showDescription = true"
-        ></mat-icon>
-      </div>
-
-      <div
-        class="analysis-description"
-        fxLayout="column"
-        fxLayoutAlign="start stretch"
-        fxLayoutGap="10px"
-        *ngIf="showDescription"
-        [@inOutAnimation]
-        #analysisDescription
-      >
-        <div fxLayout="row" fxLayout="start center">
-          <h3 style="margin: auto 0" fxFlex>{{ item.analysis.name }}</h3>
-          <button
-            mat-icon-button
-            matTooltip="Close Description"
-            [attr.e2e]="'dashboard-close-description-button-' + idx"
-            (click)="showDescription = false"
-          >
-            <mat-icon fontIcon="icon-close"></mat-icon>
-          </button>
-        </div>
-        <div>
-          {{ item.analysis.description || 'No description available.' }}
-        </div>
       </div>
 
       <observe-map
