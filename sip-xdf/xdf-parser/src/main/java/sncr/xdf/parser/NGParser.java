@@ -1,6 +1,7 @@
 package sncr.xdf.parser;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -926,9 +927,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         if(isSchemaIndexBased || isIndexConfigNotExists){
             schema = new NGStructType(structFields, isSchemaIndexBased);
-            internalSchema = schema;
-            internalSchema = internalSchema.add(new NGStructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty(), schema.length(), null));
-            internalSchema = internalSchema.add(new NGStructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty(), schema.length()+1, null));
+            NGStructField rejFlagField = new NGStructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty(), i, null);
+            NGStructField rejRsnField = new NGStructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty(), i+1, null);
+            NGStructField[] structFields1 = ArrayUtils.addAll(structFields, rejFlagField, rejRsnField);
+            internalSchema = new NGStructType(structFields1, isSchemaIndexBased);
         }else{
             throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Fields sourceIndex or sourceFieldName config is incorrect.");
         }
