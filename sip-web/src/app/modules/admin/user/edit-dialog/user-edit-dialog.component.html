@@ -12,7 +12,7 @@
   <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="start center">
     <mat-form-field class="select-form-field" appearance="outline">
       <mat-label>Role</mat-label>
-      <mat-select [attr.e2e]="role-types" required formControlName="roleId">
+      <mat-select e2e="role-types" required formControlName="roleId">
         <mat-option
           *ngFor="let role of data.formDeps.roles$ | async"
           [value]="role.roleId"
@@ -28,7 +28,7 @@
         required
         type="text"
         autocomplete="off"
-        [attr.e2e]="first-name"
+        e2e="first-name"
         formControlName="firstName"
         placeholder="First name"
       />
@@ -37,7 +37,7 @@
       <input
         matInput
         type="text"
-        [attr.e2e]="middle-name"
+        e2e="middle-name"
         autocomplete="off"
         formControlName="middleName"
         placeholder="Middle name"
@@ -49,7 +49,7 @@
         required
         type="text"
         autocomplete="off"
-        [attr.e2e]="last-name"
+        e2e="last-name"
         formControlName="lastName"
         placeholder="Last name"
       />
@@ -59,7 +59,7 @@
         matInput
         required
         type="text"
-        [attr.e2e]="master-login-id"
+        e2e="master-login-id"
         autocomplete="off"
         formControlName="masterLoginId"
         placeholder="Login Id"
@@ -69,7 +69,7 @@
     <password-toggle
       [placeholder]="'Password'"
       [isUserEditMode]="data.mode === 'edit'"
-      [attr.e2e]="user-passowrd"
+      e2e="user-passowrd"
       (change)="createUserPasswordChange($event)"
     ></password-toggle>
     <mat-error e2e="error-msg" *ngIf="passwordError" style="width: 100%" i18n>
@@ -84,8 +84,8 @@
       <input
         matInput
         required
+        e2e="user-email"
         type="email"
-        [attr.e2e]="user-email"
         type="text"
         formControlName="email"
         placeholder="Email"
@@ -94,7 +94,7 @@
 
     <mat-form-field class="select-form-field" appearance="outline">
       <mat-label>Status</mat-label>
-      <mat-select [attr.e2e]="user-status" required formControlName="activeStatusInd">
+      <mat-select e2e="user-status" required formControlName="activeStatusInd">
         <mat-option *ngFor="let status of statuses" [value]="status.id">
           {{ status.name }}
         </mat-option>

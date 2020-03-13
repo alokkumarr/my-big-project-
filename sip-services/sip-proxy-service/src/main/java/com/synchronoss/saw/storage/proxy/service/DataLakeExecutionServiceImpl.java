@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +93,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
         sipQuery.getFilters().forEach(filter -> {
           String filterValue = getRunTimeFilters(filter);
-          if (filterValue != null) {
+          if (!StringUtils.isEmpty(filterValue)) {
             runTimeFilters.add(filterValue);
           }
         });
@@ -330,11 +331,21 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
    */
   public String getRunTimeFilters(Filter filter) {
     String runTimeFilter = null;
-    if (filter != null && Boolean.valueOf(filter.getIsRuntimeFilter())) {
+    if (filter != null) {
       List<String> filList = new ArrayList<>();
-      filter.getModel().getModelValues().forEach(val -> {
-        filList.add(String.format("'%s'", val));
-      });
+      if (filter.getBooleanCriteria() != null && !CollectionUtils.isEmpty(filter.getFilters())) {
+        filter.getFilters().forEach(filter1 -> {
+          if (BooleanUtils.isTrue(filter1.getIsRuntimeFilter())) {
+            filter1.getModel().getModelValues().forEach(val -> {
+              filList.add(String.format("'%s'", val));
+            });
+          }
+        });
+      } else if (BooleanUtils.isTrue(filter.getIsRuntimeFilter()))  {
+        filter.getModel().getModelValues().forEach(val -> {
+          filList.add(String.format("'%s'", val));
+        });
+      }
       runTimeFilter = String.join(", ", filList);
     }
     return runTimeFilter;

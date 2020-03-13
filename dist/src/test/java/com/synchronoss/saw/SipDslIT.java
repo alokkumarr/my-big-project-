@@ -1861,4 +1861,21 @@ public class SipDslIT extends BaseIT {
         .assertThat()
         .statusCode(HttpStatus.BAD_REQUEST.value());
   }
+
+  @Test
+  public void testNestedFilterDl() {
+    ObjectNode analysis = getJsonObject("json/dsl/dataLake/sample-query-mode.json");
+    analysis.put("designerEdit",false);
+    logger.debug("Analysis body for execution : {}", analysis);
+    Response response = execute(token, analysis);
+    Assert.assertNotNull(response);
+    ObjectNode a = response.getBody().as(ObjectNode.class);
+    List<Map<String, String>> dataNode = response.getBody().path("data");
+    ArrayNode data = a.withArray("data");
+    logger.debug("Result : {}", data);
+    Long countOfRows = a.get("totalRows").asLong();
+    Assert.assertTrue(countOfRows == 2);
+    Assert.assertEquals(dataNode.get(0).get("integer"), 343);
+    Assert.assertEquals(dataNode.get(1).get("integer"), 344);
+  }
 }

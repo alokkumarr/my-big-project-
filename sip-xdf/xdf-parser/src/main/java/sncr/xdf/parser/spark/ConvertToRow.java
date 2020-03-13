@@ -16,7 +16,11 @@ import java.text.SimpleDateFormat;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
+ */
 public class ConvertToRow implements Function<String, Row> {
 
     private static final Logger logger = Logger.getLogger(ConvertToRow.class);
@@ -32,11 +36,12 @@ public class ConvertToRow implements Function<String, Row> {
     private LongAccumulator recCounter;
     private LongAccumulator errCounter;
 
-    private static String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
+    private static final String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
     private SimpleDateFormat df;
 
     private CsvParser parser = null;
+    private boolean allowInconsistentCol;
 
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
@@ -46,7 +51,8 @@ public class ConvertToRow implements Function<String, Row> {
                         char quoteEscapeChar,
                         char charToEscapeQuoteEscaping,
                         LongAccumulator recordCounter,
-                        LongAccumulator errorCounter) {
+                        LongAccumulator errorCounter,
+                        boolean allowInconsistentCol) {
         this.schema = schema;
         this.tsFormats = tsFormats;
         this.lineSeparator = lineSeparator ;
@@ -56,6 +62,7 @@ public class ConvertToRow implements Function<String, Row> {
         this.charToEscapeQuoteEscaping = charToEscapeQuoteEscaping;
         this.errCounter = errorCounter;
         this.recCounter = recordCounter;
+        this.allowInconsistentCol = allowInconsistentCol;
 
         df = new SimpleDateFormat();
         /*
@@ -98,16 +105,22 @@ public class ConvertToRow implements Function<String, Row> {
             logger.info("Unable to parse the record");
             errCounter.add(1);
             record = createRejectedRecord(line, "Unable to parse the record");
-        }
-        else if(parsed.length != schema.fields().length){
+        } else if(parsed.length > schema.fields().length || (!allowInconsistentCol && parsed.length != schema.fields().length)) {
             // Create record with rejected flag
             errCounter.add(1);
             record = createRejectedRecord(line, "Invalid number of columns");
-
         } else {
-            // TODO: Faster implementation will require automatic Janino code generation
             try {
-                if (Arrays.stream(parsed).filter(val -> val != null).count() == 0) {
+                int parsedLength = parsed.length;
+                int validSchemaLength = schema.fields().length;
+
+                // Don't reject the record if columns are inconsistent (less than the schema length)
+                // Copy the input row array and create a valid schema length array with default values
+                if(allowInconsistentCol && parsedLength < validSchemaLength){
+                    parsed = Arrays.copyOf(parsed, validSchemaLength);
+                    logger.debug("Column with default values : " + Arrays.toString(parsed));
+                }
+                if (Arrays.stream(parsed).filter(Objects::nonNull).count() == 0) {
                     record = createRejectedRecord(line, "All fields are null");
                 }
                 int i = 0;
@@ -124,17 +137,13 @@ public class ConvertToRow implements Function<String, Row> {
                             } else {
                                 throw new Exception("Invalid string value " + parsed[i]);
                             }
-                        }
-                        else if (sf.dataType().equals(DataTypes.LongType)) {
+                        } else if (sf.dataType().equals(DataTypes.LongType)) {
                             record[i] = Long.parseLong(parsed[i]);
-                        }
-                        else if (sf.dataType().equals(DataTypes.DoubleType)) {
+                        } else if (sf.dataType().equals(DataTypes.DoubleType)) {
                             record[i] = Double.parseDouble(parsed[i]);
-                        }
-                        else if (sf.dataType().equals(DataTypes.IntegerType)) {
+                        } else if (sf.dataType().equals(DataTypes.IntegerType)) {
                             record[i] = Integer.parseInt(parsed[i]);
-                        }
-                        else if (sf.dataType().equals(DataTypes.TimestampType)) {
+                        } else if (sf.dataType().equals(DataTypes.TimestampType)) {
                             if (!tsFormats.get(i).isEmpty()) {
                                 df.applyPattern(tsFormats.get(i));
                             } else {
@@ -145,87 +154,71 @@ public class ConvertToRow implements Function<String, Row> {
                     }
                     i++;
                 }
+            } catch (NumberFormatException ex){
+              errCounter.add(1);
+              record = createRejectedRecord(line, "Invalid number format " + ex.getMessage());
             } catch(Exception e){
-                errCounter.add(1);
-
-                //TODO; Not working - Sunil
-//                record = new Object[]{line, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()};
-                if (e instanceof NumberFormatException){
-                    record = createRejectedRecord(line, "Invalid number format " + e.getMessage());
-                } else {
-                    record = createRejectedRecord(line, e.getMessage());
-                }
+               errCounter.add(1);
+               record = createRejectedRecord(line, e.getMessage());
             }
         }
         recCounter.add(1);
         return  RowFactory.create(record);
     }
 
+  /**
+   * Create the rejected records row with the reason of rejection
+   *
+   * @param line
+   * @param rejectReason
+   * @return object array with value and reason of rejection
+   */
     private Object[] createRejectedRecord (String line, String rejectReason) {
         Object []record = new Object[this.schema.length() + 2];
-
         record[0] = line;
         record[this.schema.length()] = 1;
         record[this.schema.length() + 1] = rejectReason;
-
         return record;
     }
 
+  /**
+   * Validate the column string with the quote char
+   *
+   * @param inputString
+   * @return true if valid else false
+   */
     private boolean validateString(String inputString) {
-        boolean status = true;
-
-        status = validateQuoteBalance(inputString, this.quoteChar);
-
+        boolean status = validateQuoteBalance(inputString, this.quoteChar);
+        logger.debug("Have valid quote balanced string : " + status);
         return status;
     }
 
+  /**
+   * Validate string column with balance quote
+   *
+   * @param inputString
+   * @param quoteCharacter
+   * @return true if the column value valid else false
+   */
     private boolean validateQuoteBalance(String inputString, char quoteCharacter) {
-        boolean status = true;
-
         int charCount = countChar(inputString, quoteCharacter);
-
-        status = (charCount % 2) == 0 ? true : false;
-
-        return status;
+        return  (charCount % 2) == 0;
     }
 
+  /**
+   * Count the number of char for balance character
+   *
+   * @param inputString
+   * @param character
+   * @return no of balance char
+   */
     private int countChar(String inputString, char character) {
         int count = 0;
-
         for(char c: inputString.toCharArray()) {
             if (c == character) {
                 count += 1;
             }
         }
-
         return count;
-    }
-
-    private String codeGen(){
-
-        StringBuffer sb = new StringBuffer();
-        Integer i = 0;
-        for(StructField sf : schema.fields()) {
-            if (sf.dataType().equals(DataTypes.StringType)) {
-                sb.append("record[").append(i).append("] = parsed[").append(i).append("];\n");
-            }
-            if (sf.dataType().equals(DataTypes.LongType)) {
-                sb.append("record[").append(i).append("] = Long.parseLong(parsed[").append(i).append("]);\n");
-            }
-            if (sf.dataType().equals(DataTypes.DoubleType)) {
-                sb.append("record[").append(i).append("] = Double.parseDouble(parsed[").append(i).append("]);\n");
-            }
-            if (sf.dataType().equals(DataTypes.TimestampType)) {
-                if(!tsFormats.get(i).isEmpty()){
-                    sb.append("SimpleDateFormat df").append(i).append("= new SimpleDateFormat(\"").append(tsFormats.get(i)).append("\");\n");
-                } else {
-                    // TODO: pass default timestamp format as a parameter
-                    sb.append("SimpleDateFormat df").append(i).append("= new SimpleDateFormat(\"dd/MM/yy HH:mm:ss\");\n");
-                }
-                sb.append("record[").append(i).append("] = new java.sql.Timestamp(df").append(i).append(".parse(parsed[").append(i).append("]).getTime());\n");
-            }
-            i++;
-        }
-        return sb.toString();
     }
 }

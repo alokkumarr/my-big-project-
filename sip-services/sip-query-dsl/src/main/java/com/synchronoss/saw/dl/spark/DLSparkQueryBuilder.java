@@ -1,13 +1,10 @@
 package com.synchronoss.saw.dl.spark;
 
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Join;
@@ -20,7 +17,6 @@ import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +29,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 public class DLSparkQueryBuilder {
 
@@ -43,7 +40,6 @@ public class DLSparkQueryBuilder {
   private static final String ONLY_YEAR_FORMAT = "YYYY";
   private static final String EPOCH_SECOND = "epoch_second";
   private static final String EPOCH_MILLIS = "epoch_millis";
-  public static final String CUSTOMER_CODE = "customerCode";
   private BooleanCriteria booleanCriteria;
   public static final String UPPER = "upper";
   public static final String IN = "IN";
@@ -54,27 +50,52 @@ public class DLSparkQueryBuilder {
   public static final String JOIN = "JOIN";
   public static final String SPACE = " ";
   public static final String ORDER_BY = "ORDER BY";
+  private StringBuilder filterQuery = new StringBuilder();
 
   List<String> groupByColumns = new ArrayList<>();
 
   public String buildDataQuery(SipQuery sipQuery) {
+    filterQuery = new StringBuilder();
     groupByColumns.clear();
     booleanCriteria = sipQuery.getBooleanCriteria();
-    String select = "SELECT ";
+    StringBuilder select = new StringBuilder(SELECT).append(SPACE);
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
-    String finalSelect = String.join(", ", selectList);
-    select = select.concat(finalSelect);
-    select = select.concat(" FROM " + buildFrom(sipQuery));
-    String filter = buildFilter(sipQuery.getFilters());
-    if (filter != null && !StringUtils.isEmpty(filter)) {
-      select = select.concat(" WHERE (").concat(filter).concat(")");
-    }
-    select = select.concat(buildGroupBy());
+    String selectWithJoin = String.join(", ", selectList);
+    select
+        .append(selectWithJoin)
+        .append(SPACE)
+        .append(FROM)
+        .append(SPACE)
+        .append(buildFrom(sipQuery));
+    List<Filter> filters = sipQuery.getFilters();
 
-    return select.concat(
-        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
-            ? ""
-            : " ORDER BY " + buildSort(sipQuery.getSorts()));
+    if (!CollectionUtils.isEmpty(filters)) {
+      sipQuery.getFilters().forEach(fil -> {
+        if (booleanCriteria == null) {
+          throw new SipDslProcessingException("Bad Request. BooleanCriteria Can't be null!!");
+        }
+        if (filterQuery != null && filterQuery.length() != 0) {
+          filterQuery.append(SPACE).append(booleanCriteria).append(SPACE);
+        }
+        buildSipFilters(fil);
+      });
+    }
+
+    String filter = filterQuery.toString();
+    if (filter != null && !StringUtils.isEmpty(filter)) {
+      select
+          .append(SPACE)
+          .append(WHERE)
+          .append(SPACE)
+          .append(filter)
+          .append(SPACE);
+    }
+    select = select.append(buildGroupBy());
+    String sort = buildSort(sipQuery.getSorts());
+    if (sort != null && !StringUtils.isEmpty(sort)) {
+      select.append(SPACE).append(ORDER_BY).append(SPACE).append(sort);
+    }
+    return select.toString();
   }
 
   /**
@@ -199,105 +220,41 @@ public class DLSparkQueryBuilder {
   /**
    * Build sql query for Filters.
    *
-   * @param filterList {@link List} of {@link Filter}
+   * @param  {@link List} of {@link Filter}
    * @return String where clause
    */
-  private String buildFilter(List<Filter> filterList) {
-    List<String> whereFilters = new ArrayList<>();
-    for (Filter filter : filterList) {
-      Model model = filter.getModel();
-      boolean inValidFilter = model == null ? true : model.isEmpty();
-      if (filter.getType() == null) {
-        throw new SipDslProcessingException("Filter Type is missing");
-      } else if (!inValidFilter) {
-        switch (filter.getType()) {
-          case DATE:
-            whereFilters.add(buildDateTimestampFilter(filter));
-            break;
-          case TIMESTAMP:
-            whereFilters.add(buildDateTimestampFilter(filter));
-            break;
-          case DOUBLE:
-            whereFilters.add(buildNumericFilter(filter));
-            break;
-          case FLOAT:
-            whereFilters.add(buildNumericFilter(filter));
-            break;
-          case LONG:
-            whereFilters.add(buildNumericFilter(filter));
-            break;
-          case INTEGER:
-            whereFilters.add(buildNumericFilter(filter));
-            break;
-          case STRING:
-            whereFilters.add(buildStringFilter(filter));
-            break;
-        }
+  private StringBuilder buildFilterUtil(Filter sipFilter) {
+    Filter filter = sipFilter;
+    Model model = filter.getModel();
+    boolean inValidFilter = model == null ? true : model.isEmpty();
+    if (filter.getType() == null) {
+      throw new SipDslProcessingException("Filter Type is missing");
+    } else if (!inValidFilter) {
+      switch (filter.getType()) {
+        case DATE:
+          filterQuery.append(buildDateTimestampFilter(filter));
+          break;
+        case TIMESTAMP:
+          filterQuery.append(buildDateTimestampFilter(filter));
+          break;
+        case DOUBLE:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case FLOAT:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case LONG:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case INTEGER:
+          filterQuery.append(buildNumericFilter(filter));
+          break;
+        case STRING:
+          filterQuery.append(buildStringFilter(filter));
+          break;
       }
     }
-    return StringUtils.join(whereFilters, " " + booleanCriteria.value() + " ");
-  }
-
-  /**
-   * Build Actual query to be ran over background (DSK Included).
-   *
-   * @param sipQuery SipQuery Object
-   * @param dataSecurityKey DataSecurityKey Object
-   * @return String dsk included query
-   */
-  public String buildDskDataQuery(SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
-    booleanCriteria = sipQuery.getBooleanCriteria();
-    String select = "SELECT ";
-    List<String> selectList = buildSelect(sipQuery.getArtifacts());
-    String selectWithJoin = String.join(", ", selectList);
-    select = select.concat(selectWithJoin);
-    select = select.concat(" FROM " + buildFrom(sipQuery));
-    String filter = buildFilter(sipQuery.getFilters());
-    if (filter != null && !StringUtils.isEmpty(filter)) {
-      select = select.concat(" WHERE (").concat(filter).concat(")");
-    }
-    select = select.concat(queryDskBuilder(dataSecurityKey, sipQuery) + buildGroupBy());
-
-    return select.concat(
-        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
-            ? ""
-            : " ORDER BY " + buildSort(sipQuery.getSorts()));
-  }
-
-  /**
-   * @param dataSecurityKeyObj
-   * @param sipQuery
-   * @return
-   */
-  private String queryDskBuilder(DataSecurityKey dataSecurityKeyObj, SipQuery sipQuery) {
-    String dskFilter = "";
-    if (dataSecurityKeyObj.getDataSecuritykey() != null
-        && dataSecurityKeyObj.getDataSecuritykey().size() != 0) {
-      if (buildFilter(sipQuery.getFilters()).trim().isEmpty()) {
-        dskFilter = " WHERE ";
-      } else {
-        dskFilter = " AND ";
-      }
-      int dskFlag = 0;
-
-      if (dataSecurityKeyObj.getDataSecuritykey() != null
-          && dataSecurityKeyObj.getDataSecuritykey().size() > 0) {
-        for (DataSecurityKeyDef dsk : dataSecurityKeyObj.getDataSecuritykey()) {
-          dskFilter = dskFlag != 0 ? dskFilter.concat(" AND ") : dskFilter;
-          dskFilter = dskFilter.concat(dsk.getName() + " in (");
-          List<String> values = dsk.getValues();
-          int initFlag = 0;
-          for (String value : values) {
-            dskFilter = initFlag != 0 ? dskFilter.concat(", ") : dskFilter;
-            dskFilter = dskFilter.concat("'" + value + "'");
-            initFlag++;
-          }
-          dskFilter = dskFilter.concat(")");
-          dskFlag++;
-        }
-      }
-    }
-    return dskFilter;
+    return filterQuery;
   }
 
   /**
@@ -552,7 +509,6 @@ public class DLSparkQueryBuilder {
   }
 
   private String buildDistinctCount(String artifactName, Field field) {
-    String columnName = field.getColumnName().replace(".keyword", "");
     String column = null;
 
     String aliasName = field.getAlias();
@@ -748,6 +704,51 @@ public class DLSparkQueryBuilder {
     return dskquery.toString();
   }
 
+  /**
+   *
+   * @param sipFilter
+   * @return
+   */
+  public StringBuilder buildSipFilters(Filter sipFilter) {
+    boolean flag = true;
+    String booleanCriteria = null;
+    if (sipFilter == null) {
+      return filterQuery;
+    }
+    if (sipFilter.getBooleanCriteria() != null) {
+      booleanCriteria = " " + sipFilter.getBooleanCriteria() + " ";
+    }
+
+    if (sipFilter.getBooleanCriteria() == null || CollectionUtils.isEmpty(sipFilter.getFilters())) {
+      buildFilterUtil(sipFilter);
+    } else {
+      for (Filter filterAttribute : sipFilter.getFilters()) {
+        if (filterAttribute.getFilters() != null) {
+          StringBuilder childQuery = buildSipFilters(filterAttribute);
+          if (childQuery != null && !StringUtils.isEmpty(childQuery.toString())) {
+            if (filterQuery != null && filterQuery.length() > 0) {
+              filterQuery.append(booleanCriteria);
+            }
+            filterQuery.append(childQuery);
+            flag = false;
+          }
+        } else {
+          if (!flag) {
+            filterQuery.append(booleanCriteria);
+          }
+          buildFilterUtil(filterAttribute);
+          flag = false;
+
+        }
+      }
+    }
+
+    if (filterQuery.length() != 0) {
+      filterQuery.insert(0, "(").append(")");
+    }
+    return filterQuery;
+  }
+
   private static StringBuilder prepareQueryWithCondition(
       String columnName, com.synchronoss.bda.sip.dsk.Model model, StringBuilder dskquery) {
     dskquery.append(UPPER).append("(" + columnName.trim() + ")");
@@ -783,6 +784,7 @@ public class DLSparkQueryBuilder {
    * @return sipQuery semantic sipQuery
    */
   public String buildDskQuery(SipQuery sipQuery, SipDskAttribute sipDskAttribute) {
+    filterQuery = new StringBuilder();
     booleanCriteria = sipQuery.getBooleanCriteria();
     StringBuilder select = new StringBuilder(SELECT).append(SPACE);
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
@@ -793,7 +795,20 @@ public class DLSparkQueryBuilder {
         .append(FROM)
         .append(SPACE)
         .append(buildFrom(sipQuery));
-    String filter = buildFilter(sipQuery.getFilters());
+
+    if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
+      sipQuery.getFilters().forEach(fil -> {
+        if (booleanCriteria == null) {
+          throw new SipDslProcessingException("Bad Request. BooleanCriteria Can't be null!!");
+        }
+        if (filterQuery != null && filterQuery.length() != 0) {
+          filterQuery.append(SPACE).append(booleanCriteria).append(SPACE);
+        }
+        buildSipFilters(fil);
+      });
+    }
+
+    String filter = filterQuery.toString();
     if (filter != null && !StringUtils.isEmpty(filter)) {
       select
           .append(SPACE)
