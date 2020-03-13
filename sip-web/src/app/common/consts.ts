@@ -118,42 +118,36 @@ export const CHART_COLORS = [
   '#DFB2B2'
 ];
 
-const NEW_DATE_FORMATS = [
+const DATE_FORMATS = [
   {
-    label: '09/15/17',
-    value: 'MM/dd/yy',
-    groupInterval: 'day',
-    momentValue: 'MM/DD/YY'
+    value: 'YYYY',
+    momentValue: 'YYYY',
+    groupInterval: 'year',
+    label: '2017'
   },
   {
-    label: '15/09/17',
-    value: 'dd/MM/yy',
-    groupInterval: 'day',
-    momentValue: 'DD/MM/YY'
-  },
-  {
-    label: '09/15/17 11:20',
-    value: 'MM/dd/yyyy hh:mm',
-    groupInterval: 'minute',
-    momentValue: 'MM/DD/YYYY HH:mm'
-  },
-  {
-    label: '09/15/17 11:20:36',
-    value: 'MM/dd/yyyy hh:mm:ss',
-    groupInterval: 'second',
-    momentValue: 'MM/DD/YYYY HH:mm:ss'
-  },
-  {
-    label: '09/15 11:20',
-    value: 'MM/dd HH:mm',
-    groupInterval: 'minute',
-    momentValue: 'MM/DD HH:mm'
-  },
-  {
-    label: 'September-2017',
-    value: 'MMMM-yyyy',
+    value: 'MMM YYYY',
+    momentValue: 'MMM YYYY',
     groupInterval: 'month',
-    momentValue: 'MMMM-YYYY'
+    label: 'September 2017'
+  },
+  {
+    value: 'MM YYYY',
+    momentValue: 'MM YYYY',
+    groupInterval: 'month',
+    label: '09 2017'
+  },
+  {
+    label: '2017-11',
+    value: 'yyyy-MM',
+    momentValue: 'YYYY-MM',
+    groupInterval: 'month'
+  },
+  {
+    label: 'September 1',
+    value: 'MMMM d',
+    momentValue: 'MMMM D',
+    groupInterval: 'month'
   },
   {
     label: '09-2017',
@@ -174,6 +168,30 @@ const NEW_DATE_FORMATS = [
     momentValue: 'MMM-YY'
   },
   {
+    value: 'MMM d YYYY',
+    momentValue: 'MMM Do YYYY',
+    groupInterval: 'day',
+    label: ' Sep 1st 2017'
+  },
+  {
+    label: '09/15/17',
+    value: 'MM/dd/yy',
+    groupInterval: 'day',
+    momentValue: 'MM/DD/YY'
+  },
+  {
+    label: '15/09/17',
+    value: 'dd/MM/yy',
+    groupInterval: 'day',
+    momentValue: 'DD/MM/YY'
+  },
+  {
+    label: '2017-11-23',
+    value: 'yyyy-MM-dd',
+    momentValue: 'YYYY-MM-DD',
+    groupInterval: 'day'
+  },
+  {
     label: 'September-15',
     value: 'MMMM-dd',
     groupInterval: 'day',
@@ -184,47 +202,58 @@ const NEW_DATE_FORMATS = [
     value: 'MMM-dd',
     groupInterval: 'day',
     momentValue: 'MMM-DD'
-  }
-];
-
-export const PIVOT_DATE_FORMATS = [
-  {
-    label: 'Default',
-    value: 'yyyy-MM-dd',
-    momentValue: 'YYYY-MM-DD'
   },
   {
     label: 'September 1, 2017',
     value: 'MMMM d, yyyy',
-    momentValue: 'MMMM D, YYYY'
+    momentValue: 'MMMM D, YYYY',
+    groupInterval: 'day'
   },
   {
     label: '09/01/2017 (MM/DD/YYYY)',
     value: 'MM/dd/yyyy',
-    momentValue: 'MM/DD/YYYY'
+    momentValue: 'MM/DD/YYYY',
+    groupInterval: 'day'
   },
   {
     label: '01/09/2017 (DD/MM/YYYY)',
     value: 'dd/MM/yyyy',
-    momentValue: 'DD/MM/YYYY'
+    momentValue: 'DD/MM/YYYY',
+    groupInterval: 'day'
   },
   {
-    label: 'September 2017',
-    value: 'MMMM yyyy',
-    momentValue: 'MMMM YYYY'
+    value: 'MMMM d YYYY, h:mm:ss a',
+    momentValue: 'MMMM Do YYYY, h:mm:ss a',
+    groupInterval: 'hour',
+    label: 'September 1st 2017, 1:28:31 pm'
   },
   {
-    label: 'September 1',
-    value: 'MMMM d',
-    momentValue: 'MMMM D'
+    label: '09/15/17 11:20',
+    value: 'MM/dd/yyyy hh:mm',
+    groupInterval: 'minute',
+    momentValue: 'MM/DD/YYYY HH:mm'
+  },
+  {
+    label: '09/15 11:20',
+    value: 'MM/dd HH:mm',
+    groupInterval: 'minute',
+    momentValue: 'MM/DD HH:mm'
   },
   {
     label: '09/01/2017 11:20:36',
     value: 'MM/dd/yyyy HH:mm:ss',
-    momentValue: 'MM/DD/YYYY HH:mm:ss'
+    momentValue: 'MM/DD/YYYY HH:mm:ss',
+    groupInterval: 'second'
   },
-  ...NEW_DATE_FORMATS
+  {
+    label: '09/15/17 11:20:36',
+    value: 'MM/dd/yyyy hh:mm:ss',
+    groupInterval: 'second',
+    momentValue: 'MM/DD/YYYY HH:mm:ss'
+  }
 ];
+
+export const PIVOT_DATE_FORMATS = DATE_FORMATS;
 
 export const DEFAULT_PIVOT_DATE_FORMAT = PIVOT_DATE_FORMATS[0];
 
@@ -239,39 +268,7 @@ export const CUSTOM_HEADERS = {
   SKIP_TOAST: 'SIP-Skip-Error-Toast'
 };
 
-export const CHART_DATE_FORMATS = [
-  {
-    value: 'MMMM d YYYY, h:mm:ss a',
-    momentValue: 'MMMM Do YYYY, h:mm:ss a',
-    groupInterval: 'hour',
-    label: 'September 1st 2017, 1:28:31 pm'
-  },
-  {
-    value: 'MMM d YYYY',
-    momentValue: 'MMM Do YYYY',
-    groupInterval: 'day',
-    label: ' Sep 1st 2017'
-  },
-  {
-    value: 'MMM YYYY',
-    momentValue: 'MMM YYYY',
-    groupInterval: 'month',
-    label: 'September 2017'
-  },
-  {
-    value: 'MM YYYY',
-    momentValue: 'MM YYYY',
-    groupInterval: 'month',
-    label: '09 2017'
-  },
-  {
-    value: 'YYYY',
-    momentValue: 'YYYY',
-    groupInterval: 'year',
-    label: '2017'
-  },
-  ...NEW_DATE_FORMATS
-];
+export const CHART_DATE_FORMATS = DATE_FORMATS;
 
 export const CHART_DEFAULT_DATE_FORMAT = CHART_DATE_FORMATS[1];
 
