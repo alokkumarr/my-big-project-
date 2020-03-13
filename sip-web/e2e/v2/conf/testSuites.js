@@ -37,6 +37,7 @@ const CRITICAL = [
   'prompt-filter/reportPromptFilters.test.js',
   'reports/createAndDeleteReport.test.js',
   'charts/topNForCharts.test.js',
+  'charts/topNForCharts.test.js',
   'charts/bottomNForCharts.test.js',
   'charts/SortingWithCharts.test.js',
   'bis/APIPullRouteSchedule.test.js',
@@ -63,6 +64,9 @@ const CRITICAL = [
   'schedule/createDeleteSchedule.test.js',
   'alert/addAlert.test.js',
   'alert/editDeleteAlerts.test.js',
+  'publish/publishPivot.test.js',
+  'publish/publishReports.test.js',
+  'publish/publishCharts.test.js',
   'admin/create-user.test.js'
 ];
 // All tests which were executed in critical with larger data set
