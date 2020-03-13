@@ -6,7 +6,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.sql.types.StructType;
 
-public class NGStructType{
+import java.io.Serializable;
+
+public class NGStructType implements Serializable {
 
     StructType structType = null;
     NGStructField[] ngFields = null;
