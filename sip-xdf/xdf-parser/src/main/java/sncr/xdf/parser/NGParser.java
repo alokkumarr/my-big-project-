@@ -990,7 +990,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     return new java.sql.Timestamp(df.parse(defaultValue).getTime());
                 }
             } catch (Exception e) {
-                throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Invalid default value for the Type - "+dataType+" - is : " + defaultValue);
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Invalid default value for the Type ("+dataType+") is : " + defaultValue);
             }
         }
         return null;
