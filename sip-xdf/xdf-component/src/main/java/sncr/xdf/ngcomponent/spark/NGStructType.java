@@ -59,7 +59,7 @@ public class NGStructType{
             }else{
                 List<NGStructField> list = new ArrayList<>(Arrays.asList(ngFields));
                 list.add(field);
-                ngFields = (NGStructField[]) list.toArray();
+                ngFields = list.toArray(new NGStructField[0]);
             }
         }
         return this;
