@@ -4,6 +4,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.spark.sql.types.StructType;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,7 +57,7 @@ public class NGStructType{
                 ngFields = new NGStructField[1];
                 ngFields[0] = field;
             }else{
-                List<NGStructField> list = Arrays.asList(ngFields);
+                List<NGStructField> list = new ArrayList<>(Arrays.asList(ngFields));
                 list.add(field);
                 ngFields = (NGStructField[]) list.toArray();
             }
