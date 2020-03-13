@@ -72,7 +72,7 @@ RUN systemctl disable mapr-warden mapr-zookeeper
 #COPY mapr-spark-worker.service /etc/systemd/system/
 #RUN systemctl enable mapr-spark-worker
 #
-#ENV spark_home=/opt/mapr/spark/spark-2.3.2
+#ENV spark_home=/opt/mapr/spark/spark-2.4.4
 #RUN echo "export SPARK_MASTER_HOST=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo "export SPARK_MASTER_IP=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo 'export SPARK_DIST_CLASSPATH=$MAPR_SPARK_CLASSPATH:$(hadoop classpath)' >> $spark_home/conf/spark-env.sh
@@ -88,7 +88,7 @@ RUN systemctl disable mapr-warden mapr-zookeeper
  # file size of Livy, so increase it.
  RUN echo "livy.file.upload.max.size = 500000000" >> $livy_conf
 
- RUN echo 'export CLASSPATH=$(mapr classpath):$(hadoop classpath):$(yarn classpath)' \
+ RUN echo 'export CLASSPATH=$(mapr classpath):$(hadoop classpath):$(yarn classpath):${SPARK_HOME}/jars/*' \
    >> $livy_home/conf/livy-env.sh.template
 # Workaround: The MapR "yarn classpath" command gives an error about
 # the "which" not being found, so install it here
