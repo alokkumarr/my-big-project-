@@ -78,11 +78,20 @@ export const DATE_INTERVALS = [
 ];
 
 export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
-
 export const DATE_INTERVALS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(DATE_INTERVALS);
+
+export const COMPARISON_CHART_DATE_INTERVALS = [
+  DATE_INTERVALS[2],
+  DATE_INTERVALS[3]
+];
+
+export const COMPARISON_CHART_DATE_INTERVALS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(COMPARISON_CHART_DATE_INTERVALS);
 
 export const CHART_COLORS = [
   '#00c9e8',

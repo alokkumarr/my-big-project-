@@ -315,9 +315,9 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
       }
     };
 
@@ -438,9 +438,9 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
         artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
       }
     };
 
@@ -509,6 +509,7 @@ export class DesignerService {
     chartType
   ): IDEsignerSettingGroupAdapter[] {
     const isStockChart = chartType.substring(0, 2) === 'ts';
+    const isComparisonChart = chartType === 'comparison';
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn['checked'] = false;
       artifactColumn.alias = '';
@@ -602,11 +603,12 @@ export class DesignerService {
       groupByRejectFn
     );
 
-    const canAcceptDimensionType = isStockChart
-      ? canAcceptDateType
-      : chartType === 'packedbubble'
-      ? canAcceptStringType
-      : canAcceptAnyType;
+    const canAcceptDimensionType =
+      isStockChart || isComparisonChart
+        ? canAcceptDateType
+        : chartType === 'packedbubble'
+        ? canAcceptStringType
+        : canAcceptAnyType;
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
     const applyDataFieldDefaults = (
@@ -625,15 +627,15 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
 
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
       } else if (['tsspline', 'tsPane'].includes(chartType)) {
         artifactColumn.comboType = 'line';
-      } else if (['combo', 'bar'].includes(chartType)) {
+      } else if (['combo', 'bar', 'comparison'].includes(chartType)) {
         artifactColumn.comboType = 'column';
       }
     };
@@ -649,7 +651,9 @@ export class DesignerService {
       type: 'chart',
       marker: 'y',
       maxAllowed: () =>
-        ['pie', 'bubble', 'stack', 'packedbubble'].includes(chartType)
+        ['pie', 'bubble', 'stack', 'packedbubble', 'comparison'].includes(
+          chartType
+        )
           ? 1
           : Infinity,
       artifactColumns: [],
@@ -732,10 +736,8 @@ export class DesignerService {
     const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = compact([
       metricAdapter,
       dimensionAdapter,
-      /* prettier-ignore */
-      chartType === 'bubble' ?
-        sizeAdapter : null,
-      groupByAdapter
+      chartType === 'bubble' ? sizeAdapter : null,
+      isComparisonChart ? null : groupByAdapter
     ]);
 
     this._distributeArtifactColumnsIntoGroups(
@@ -801,7 +803,7 @@ export class DesignerService {
             aggregate: isDataArea ? artifactColumn.aggregate : null,
             // the name propertie is needed for the elastic search
             name: isDataArea ? artifactColumn.columnName : null,
-            dateInterval: isDateType ? artifactColumn.dateInterval : null,
+            dateInterval: isDateType ? artifactColumn.groupInterval : null,
             // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {

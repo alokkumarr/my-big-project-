@@ -209,6 +209,9 @@
         },
         "numberOfFiles": {
           "$ref": "#/numberOfFiles"
+        },
+        "allowInconsistentCol": {
+          "type" : "boolean"
         }
       }
     },

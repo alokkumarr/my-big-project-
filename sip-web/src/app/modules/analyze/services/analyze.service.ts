@@ -483,7 +483,6 @@ export class AnalyzeService {
     const paginationParams = ['report', 'esReport'].includes(model.type)
       ? `&page=${page}&pageSize=${options.take}`
       : '';
-
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${model.id ||
