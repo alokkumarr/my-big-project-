@@ -12,18 +12,16 @@ public class NGStructType{
 
     StructType structType = null;
     NGStructField[] ngFields = null;
+    boolean isSchemaIndexBased = false;
 
     public NGStructType(){
         structType = new StructType();
     }
 
-    public NGStructType(NGStructField[] fields){
+    public NGStructType(NGStructField[] fields, boolean isSchemaIndexBased){
         structType = new StructType(fields);
-        if(fields != null && fields.length != 0){
-            for(NGStructField field : fields){
-                add(field);
-            }
-        }
+        ngFields = fields;
+        this.isSchemaIndexBased = isSchemaIndexBased;
     }
 
     public StructType getStructType() {
@@ -40,6 +38,14 @@ public class NGStructType{
 
     public void setNgFields(NGStructField[] ngFields) {
         this.ngFields = ngFields;
+    }
+
+    public boolean isSchemaIndexBased() {
+        return isSchemaIndexBased;
+    }
+
+    public void setSchemaIndexBased(boolean isSchemaIndexBased) {
+        this.isSchemaIndexBased = isSchemaIndexBased;
     }
 
     public NGStructType add(NGStructField field){

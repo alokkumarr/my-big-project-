@@ -129,10 +129,10 @@ public class ConvertToRow implements Function<String, Row> {
     }
 
     private Object[] constructRecord(String line, Object[] record, String[] parsed) {
-        if(ngSchema == null){
-            record = constructRecordFromLine(line, record, parsed);
-        }else{
+        if(ngSchema != null && ngSchema.isSchemaIndexBased()){
             record = constructRecordWithIndices(line, record, parsed);
+        }else{
+            record = constructRecordFromLine(line, record, parsed);
         }
         return record;
     }
@@ -141,17 +141,17 @@ public class ConvertToRow implements Function<String, Row> {
         try {
             int parsedLength = parsed.length;
             NGStructField[] ngStructFields = ngSchema.getNgFields();
-            int index = 0;
+            int i = 0;
             for (NGStructField ngStructField : ngStructFields) {
                 Object fieldValue = null;
                 if(ngStructField.getSourceColumnIndex() < parsedLength){
-                    fieldValue = getFieldValue(parsed[ngStructField.getSourceColumnIndex()], ngStructField, index);
+                    fieldValue = getFieldValue(parsed[ngStructField.getSourceColumnIndex()], ngStructField, i);
                 }
                 if(fieldValue == null){
                     fieldValue = ngStructField.getDefaultValue();
                 }
-                record[index] = fieldValue;
-                index++;
+                record[i] = fieldValue;
+                i++;
             }
         } catch(Exception ex){
             errCounter.add(1);
@@ -183,11 +183,21 @@ public class ConvertToRow implements Function<String, Row> {
                 if (Arrays.stream(parsed).filter(Objects::nonNull).count() == 0) {
                     record = createRejectedRecord(line, "All fields are null");
                 }
+
+                int ngFiledsLength = 0;
+                if(ngSchema != null && ngSchema.getNgFields() != null){
+                    ngFiledsLength = ngSchema.getNgFields().length;
+                }
+
                 int i = 0;
                 for (StructField sf : schema.fields()) {
                     //Should accept null values unless mentioned as mandatory
                     //Reject rows with all null fields
-                    record[i] = getFieldValue(parsed[i], sf, i);
+                    Object fieldValue = getFieldValue(parsed[i], sf, i);
+                    if(fieldValue == null && ngFiledsLength > i){
+                        fieldValue = ngSchema.getNgFields()[i].getDefaultValue();
+                    }
+                    record[i] = fieldValue;
                     i++;
                 }
             } catch(Exception ex){

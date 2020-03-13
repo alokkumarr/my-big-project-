@@ -906,28 +906,26 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 fieldNames = Arrays.asList(header.toUpperCase().split("\\s*"+delimiter+"\\s*",-1));
             }
         }
-        boolean areAllIndexesPositive = true;
-        boolean areAllIndexesMinusOne = true;
+        Set<Integer> indices = new HashSet<>();
+        boolean isSchemaIndexBased = true;
         int i = 0;
         for(Field field : fields){
             DataType dataType = convertXdfToSparkType(field.getType());
             int fieldIndex = getFieldIndex(field, Optional.ofNullable(fieldNames));
             Object defaultValObj =  getFieldDefaultValue(dataType, field.getDefaultValue(), Optional.ofNullable(tsFormats.get(i)));
             if(fieldIndex == -1){
-                areAllIndexesPositive = false;
+                isSchemaIndexBased = false;
+                fieldIndex=i;
             }else{
-                areAllIndexesMinusOne = false;
-            }
-            if(areAllIndexesMinusOne){
-                fieldIndex = i;
+                indices.add(fieldIndex);
             }
             NGStructField structField = new NGStructField(field.getName(), dataType, true, Metadata.empty(), fieldIndex, defaultValObj);
             structFields[i] = structField;
             i++;
         }
 
-        if(areAllIndexesPositive || areAllIndexesMinusOne){
-            schema = new NGStructType(structFields);
+        if(fields.size() == indices.size()){
+            schema = new NGStructType(structFields, isSchemaIndexBased);
             internalSchema = schema;
             internalSchema = internalSchema.add(new NGStructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty(), schema.length(), null));
             internalSchema = internalSchema.add(new NGStructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty(), schema.length()+1, null));
@@ -937,19 +935,30 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     }
 
     private int getFieldIndex(Field field, Optional<List<String>> optFieldNames) {
+        int index = -1;
         if(field.getSourceIndex() != null){
-            return field.getSourceIndex();
-        }else if(field.getSourceFieldName() != null && !field.getSourceFieldName().trim().isEmpty()){
-            if(optFieldNames.isPresent()) {
-                int index = optFieldNames.get().indexOf(field.getName().trim().toUpperCase());
-                if(index >= 0){
-                    return index;
-                }
+            if(field.getSourceIndex() >= 0){
+                index = field.getSourceIndex();
             }else{
-                throw new XDFException(XDFReturnCode.CONFIG_ERROR,"File Header not exist. So sourceFieldName should not add to Field Config.");
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR,"sourceIndex ("+field.getSourceIndex()+") should not be negative value.");
             }
+        }else if(field.getSourceFieldName() != null){
+           if(field.getSourceFieldName().trim().isEmpty()){
+               throw new XDFException(XDFReturnCode.CONFIG_ERROR,"sourceFieldName should not be empty in Fields Config.");
+           }else{
+               if(optFieldNames.isPresent()) {
+                   int fieldIndex = optFieldNames.get().indexOf(field.getSourceFieldName().trim().toUpperCase());
+                   if(fieldIndex >= 0){
+                       index = fieldIndex;
+                   }else{
+                       throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Field sourceFieldName ("+field.getSourceFieldName()+") not exist in File Header.");
+                   }
+               }else{
+                   throw new XDFException(XDFReturnCode.CONFIG_ERROR,"File Header not exist. So sourceFieldName should not add to Field Config.");
+               }
+           }
         }
-        return -1;
+        return index;
     }
 
     private Object getFieldDefaultValue(DataType dataType, String defaultValue, Optional<String> optTsFormat) {
