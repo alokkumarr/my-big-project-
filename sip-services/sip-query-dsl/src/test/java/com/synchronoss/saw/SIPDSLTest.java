@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
@@ -343,9 +345,10 @@ public class SIPDSLTest {
 
     sipdsl.getSipQuery().setFilters(filterList);
 
-    String assertQuerytFilter = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+    String assertQuerytFilter = dlSparkQueryBuilder
+        .buildDataQuery(sipdsl.getSipQuery());
     String queryWithFilter =
-        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0) AND SALES.double >= 1.0 OR SALES.string IN ('string 123') )";
+        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0 AND (SALES.double >= 1.0 OR SALES.string IN ('string 123') )))";
     Assert.assertEquals(queryWithFilter, assertQuerytFilter.trim());
   }
 
@@ -356,7 +359,7 @@ public class SIPDSLTest {
 
     String query = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertion =
-        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE ((SALES.long = 1000.0) AND SALES.Double = 2000.0)  GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE ((SALES.long = 1000.0 AND SALES.Double = 2000.0))  GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(assertion, query);
 
     sipdsl.getSipQuery().setFilters(new ArrayList<Filter>());

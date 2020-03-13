@@ -1,5 +1,7 @@
 package com.synchronoss.saw.dl.spark;
 
+import static com.synchronoss.saw.util.BuilderUtil.buildNestedFilter;
+
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Aggregate;
@@ -29,7 +31,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 public class DLSparkQueryBuilder {
 
@@ -50,12 +51,11 @@ public class DLSparkQueryBuilder {
   public static final String JOIN = "JOIN";
   public static final String SPACE = " ";
   public static final String ORDER_BY = "ORDER BY";
-  private StringBuilder filterQuery = new StringBuilder();
 
   List<String> groupByColumns = new ArrayList<>();
 
   public String buildDataQuery(SipQuery sipQuery) {
-    filterQuery = new StringBuilder();
+    StringBuilder filterQuery = new StringBuilder();
     groupByColumns.clear();
     booleanCriteria = sipQuery.getBooleanCriteria();
     StringBuilder select = new StringBuilder(SELECT).append(SPACE);
@@ -69,17 +69,8 @@ public class DLSparkQueryBuilder {
         .append(buildFrom(sipQuery));
     List<Filter> filters = sipQuery.getFilters();
 
-    if (!CollectionUtils.isEmpty(filters)) {
-      sipQuery.getFilters().forEach(fil -> {
-        if (booleanCriteria == null) {
-          throw new SipDslProcessingException("Bad Request. BooleanCriteria Can't be null!!");
-        }
-        if (filterQuery != null && filterQuery.length() != 0) {
-          filterQuery.append(SPACE).append(booleanCriteria).append(SPACE);
-        }
-        buildSipFilters(fil);
-      });
-    }
+    Filter fil = buildNestedFilter(filters,booleanCriteria);
+    filterQuery = buildSipFilters(fil);
 
     String filter = filterQuery.toString();
     if (filter != null && !StringUtils.isEmpty(filter)) {
@@ -87,7 +78,9 @@ public class DLSparkQueryBuilder {
           .append(SPACE)
           .append(WHERE)
           .append(SPACE)
+          .append("(")
           .append(filter)
+          .append(")")
           .append(SPACE);
     }
     select = select.append(buildGroupBy());
@@ -223,7 +216,7 @@ public class DLSparkQueryBuilder {
    * @param  {@link List} of {@link Filter}
    * @return String where clause
    */
-  private StringBuilder buildFilterUtil(Filter sipFilter) {
+  private StringBuilder buildFilterUtil(Filter sipFilter, StringBuilder filterQuery) {
     Filter filter = sipFilter;
     Model model = filter.getModel();
     boolean inValidFilter = model == null ? true : model.isEmpty();
@@ -232,25 +225,25 @@ public class DLSparkQueryBuilder {
     } else if (!inValidFilter) {
       switch (filter.getType()) {
         case DATE:
-          filterQuery.append(buildDateTimestampFilter(filter));
+          filterQuery = buildDateTimestampFilter(filter, filterQuery);
           break;
         case TIMESTAMP:
-          filterQuery.append(buildDateTimestampFilter(filter));
+          filterQuery = buildDateTimestampFilter(filter, filterQuery);
           break;
         case DOUBLE:
-          filterQuery.append(buildNumericFilter(filter));
+          filterQuery = buildNumericFilter(filter, filterQuery);
           break;
         case FLOAT:
-          filterQuery.append(buildNumericFilter(filter));
+          filterQuery = buildNumericFilter(filter,filterQuery);
           break;
         case LONG:
-          filterQuery.append(buildNumericFilter(filter));
+          filterQuery = buildNumericFilter(filter,filterQuery);
           break;
         case INTEGER:
-          filterQuery.append(buildNumericFilter(filter));
+          filterQuery = buildNumericFilter(filter, filterQuery);
           break;
         case STRING:
-          filterQuery.append(buildStringFilter(filter));
+          filterQuery = buildStringFilter(filter, filterQuery);
           break;
       }
     }
@@ -263,8 +256,8 @@ public class DLSparkQueryBuilder {
    * @param filter Filter Object
    * @return String filter query
    */
-  private String buildDateTimestampFilter(Filter filter) {
-    String whereClause = filter.getArtifactsName() + "." + filter.getColumnName();
+  private StringBuilder buildDateTimestampFilter(Filter filter, StringBuilder filterQuery) {
+    filterQuery.append(filter.getArtifactsName()).append(".").append(filter.getColumnName());
 
     String dateFormat = null;
     if ((filter.getModel() != null)
@@ -279,27 +272,27 @@ public class DLSparkQueryBuilder {
     if (dateFormat != null) {
       switch (dateFormat) {
         case DATE_ONLY_FORMAT:
-          whereClause = whereClause.concat(dateFilterUtil(filter));
+          filterQuery = dateFilterUtil(filter, filterQuery);
           break;
         case DATE_WITH_HOUR_MINUTES:
-          whereClause = whereClause.concat(dateFilterUtil(filter));
+          filterQuery = dateFilterUtil(filter,filterQuery);
           break;
         case EPOCH_MILLIS:
-          whereClause =
-              "from_unixtime(" + filter.getArtifactsName() + "." + filter.getColumnName() + ")";
-          whereClause = whereClause.concat(epochDateFilterUtil(filter, true));
+          filterQuery.append("from_unixtime(").append(filter.getArtifactsName()).append(".")
+              .append(filter.getColumnName()).append(")");
+          filterQuery = epochDateFilterUtil(filter, true,filterQuery);
           break;
         case EPOCH_SECOND:
-          whereClause =
-              "from_unixtime(" + filter.getArtifactsName() + "." + filter.getColumnName() + ")";
-          whereClause = whereClause.concat(epochDateFilterUtil(filter, false));
+          filterQuery.append("from_unixtime(").append(filter.getArtifactsName()).append(".")
+              .append(filter.getColumnName()).append(")");
+          filterQuery = epochDateFilterUtil(filter, false, filterQuery);
           break;
         case ONLY_YEAR_FORMAT:
-          whereClause = whereClause.concat(onlyYearFilter(filter));
+          filterQuery = onlyYearFilter(filter, filterQuery);
           break;
       }
     }
-    return whereClause;
+    return filterQuery;
   }
 
   /**
@@ -307,8 +300,7 @@ public class DLSparkQueryBuilder {
    * @param isMilli
    * @return
    */
-  private String epochDateFilterUtil(Filter filter, boolean isMilli) {
-    String whereCond = null;
+  private StringBuilder epochDateFilterUtil(Filter filter, boolean isMilli, StringBuilder filterQuery) {
     Preset preset = filter.getModel().getPreset();
     Operator operator = filter.getModel().getOperator();
     String gte = filter.getModel().getGte();
@@ -319,13 +311,13 @@ public class DLSparkQueryBuilder {
       DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(preset.value());
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
-      whereCond = setGteLteForDate(gte, lte, filter);
+      filterQuery = setGteLteForDate(gte, lte, filter, filterQuery);
     } else if (filter.getModel().getPresetCal() != null) {
       DynamicConvertor dynamicConvertor =
           BuilderUtil.getDynamicConvertForPresetCal(filter.getModel().getPresetCal());
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
-      whereCond = setGteLteForDate(gte, lte, filter);
+      filterQuery = setGteLteForDate(gte, lte, filter, filterQuery);
     } else if ((preset.value().equals(Model.Preset.NA.toString())
             || (operator.equals(Operator.BTW)))
         && (gte != null || value != null)
@@ -351,9 +343,9 @@ public class DLSparkQueryBuilder {
       gte = dateFormat.format(date);
       date = new Date(lteInEpoch);
       lte = dateFormat.format(date);
-      whereCond = setGteLteForDate(gte, lte, filter);
+      filterQuery = setGteLteForDate(gte, lte, filter, filterQuery);
     }
-    return whereCond;
+    return filterQuery;
   }
 
   /**
@@ -362,8 +354,7 @@ public class DLSparkQueryBuilder {
    * @param filter Filter object
    * @return Where clause for date
    */
-  private String dateFilterUtil(Filter filter) {
-    String whereCond = null;
+  private StringBuilder dateFilterUtil(Filter filter, StringBuilder filterQuery) {
     Preset preset = filter.getModel().getPreset();
     Operator operator = filter.getModel().getOperator();
     String gte = filter.getModel().getGte();
@@ -372,110 +363,98 @@ public class DLSparkQueryBuilder {
       DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(preset.value());
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
-      whereCond = setGteLteForDate(gte, lte, filter);
+      filterQuery = setGteLteForDate(gte, lte, filter, filterQuery);
     } else if (filter.getModel().getPresetCal() != null) {
       DynamicConvertor dynamicConvertor =
           BuilderUtil.getDynamicConvertForPresetCal(filter.getModel().getPresetCal());
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
-      whereCond = setGteLteForDate(gte, lte, filter);
+      filterQuery = setGteLteForDate(gte, lte, filter, filterQuery);
     } else if ((preset.value().equals(Model.Preset.NA.toString())
             || (operator.equals(Operator.BTW)))
         && gte != null
         && lte != null) {
-      whereCond = setGteLteForDate(filter.getModel().getGte(), filter.getModel().getLte(), filter);
+      filterQuery = setGteLteForDate(filter.getModel().getGte(), filter.getModel().getLte(), filter,
+          filterQuery);
     }
-    return whereCond;
+    return filterQuery;
   }
 
-  private String setGteLteForDate(String gte, String lte, Filter filter) {
-    String whereCond =
-        " >= TO_DATE('"
-            + gte
-            + "') AND "
-            + filter.getArtifactsName()
-            + "."
-            + filter.getColumnName()
-            + " <= TO_DATE(date_add('"
-            + lte
-            + "',1))";
-    return whereCond;
+  private StringBuilder setGteLteForDate(String gte, String lte, Filter filter,
+      StringBuilder filterQuery) {
+    return filterQuery.append(" >= TO_DATE('").append(gte).append("') AND ")
+        .append(filter.getArtifactsName()).append(".").append(filter.getColumnName())
+        .append(" <= TO_DATE(date_add('").append(lte).append("',1))");
   }
 
-  private String buildNumericFilter(Filter filter) {
-    String whereClause = filter.getArtifactsName() + "." + filter.getColumnName();
+  private StringBuilder buildNumericFilter(Filter filter,StringBuilder filterQuery) {
+    filterQuery.append(filter.getArtifactsName()).append(".").append(filter.getColumnName());
 
     Operator op = filter.getModel().getOperator();
 
     switch (op) {
       case GTE:
-        whereClause = whereClause.concat(" >= " + filter.getModel().getValue());
+        filterQuery.append(" >= ").append(filter.getModel().getValue());
         break;
       case LTE:
-        whereClause = whereClause.concat(" <= " + filter.getModel().getValue());
+        filterQuery.append(" <= ").append( filter.getModel().getValue());
         break;
       case GT:
-        whereClause = whereClause.concat(" > " + filter.getModel().getValue());
+        filterQuery.append(" > ").append(filter.getModel().getValue());
         break;
       case LT:
-        whereClause = whereClause.concat(" < " + filter.getModel().getValue());
+        filterQuery.append(" < ").append(filter.getModel().getValue());
         break;
       case EQ:
-        whereClause = whereClause.concat(" = " + filter.getModel().getValue());
+        filterQuery.append(" = ").append(filter.getModel().getValue());
         break;
       case NEQ:
-        whereClause = whereClause.concat(" <> " + filter.getModel().getValue());
+        filterQuery.append(" <> ").append(filter.getModel().getValue());
         break;
       case BTW:
-        whereClause =
-            whereClause.concat(" >= " + filter.getModel().getOtherValue())
-                + " AND "
-                + filter.getArtifactsName()
-                + "."
-                + filter.getColumnName()
-                + " <= "
-                + filter.getModel().getValue();
+        filterQuery.append(" >= ").append(filter.getModel().getOtherValue()).append(" AND ")
+            .append(filter.getArtifactsName()).append(".").append(filter.getColumnName())
+            .append(" <= ").append(filter.getModel().getValue());
         break;
     }
 
-    return whereClause;
+    return filterQuery;
   }
 
-  private String buildStringFilter(Filter filter) {
-    String whereClause = filter.getArtifactsName() + "." + filter.getColumnName();
+  private StringBuilder buildStringFilter(Filter filter, StringBuilder filterQuery) {
+    filterQuery.append(filter.getArtifactsName()).append(".").append(filter.getColumnName());
 
     Operator op = filter.getModel().getOperator();
 
     switch (op) {
       case SW:
-        whereClause =
-            whereClause.concat(" like '" + filter.getModel().getModelValues().get(0) + "%' ");
+        filterQuery.append(" like '").append(filter.getModel().getModelValues().get(0))
+            .append("%' ");
         break;
       case EW:
-        whereClause =
-            whereClause.concat(" like '%" + filter.getModel().getModelValues().get(0) + "' ");
+        filterQuery.append(" like '%").append(filter.getModel().getModelValues().get(0))
+            .append("' ");
         break;
       case ISIN:
-        whereClause =
-            whereClause.concat(" IN (" + joinString(filter.getModel().getModelValues()) + ") ");
+        filterQuery.append(" IN (").append(joinString(filter.getModel().getModelValues()))
+            .append(") ");
         break;
       case ISNOTIN:
-        whereClause =
-            whereClause.concat(" NOT IN (" + joinString(filter.getModel().getModelValues()) + ") ");
+        filterQuery.append(" NOT IN (").append(joinString(filter.getModel().getModelValues()))
+            .append(") ");
         break;
       case CONTAINS:
-        whereClause =
-            whereClause.concat(" like '%" + filter.getModel().getModelValues().get(0) + "%' ");
+        filterQuery.append(" like '%").append(filter.getModel().getModelValues().get(0))
+            .append("%' ");
         break;
       case EQ:
-        whereClause = whereClause.concat(" = '" + filter.getModel().getModelValues().get(0) + "' ");
+        filterQuery.append(" = '").append(filter.getModel().getModelValues().get(0)).append("' ");
         break;
       case NEQ:
-        whereClause =
-            whereClause.concat(" <> '" + filter.getModel().getModelValues().get(0) + "' ");
+        filterQuery.append(" <> '").append(filter.getModel().getModelValues().get(0)).append("' ");
         break;
     }
-    return whereClause;
+    return filterQuery;
   }
 
   private String buildSort(List<Sort> sorts) {
@@ -534,34 +513,32 @@ public class DLSparkQueryBuilder {
     return column;
   }
 
-  private String onlyYearFilter(Filter filter) {
+  private StringBuilder onlyYearFilter(Filter filter, StringBuilder filterQuery) {
     GregorianCalendar startDate;
-    String whereClause = null;
     String gte = filter.getModel().getGte();
     String lte = filter.getModel().getLte();
     String gt = filter.getModel().getGt();
     String lt = filter.getModel().getLt();
     Double value = filter.getModel().getValue();
-    Double otherValue = filter.getModel().getOtherValue();
 
     if (gte != null) {
       int year = value == null ? Integer.parseInt(gte) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
-      whereClause = " >= TO_DATE('" + startDate + "')";
+      filterQuery.append(" >= TO_DATE('").append( startDate).append( "')");
     } else if (gt != null) {
       int year = value == null ? Integer.parseInt(gt) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
-      whereClause = " > TO_DATE('" + startDate + "')";
+      filterQuery.append(" > TO_DATE('").append( startDate).append("')");
     } else if (lte != null) {
       int year = value == null ? Integer.parseInt(lte) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
-      whereClause = " <= TO_DATE('" + startDate + "')";
+      filterQuery.append(" <= TO_DATE('").append(startDate).append("')");
     } else if (lt != null) {
       int year = value == null ? Integer.parseInt(lt) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
-      whereClause = " < TO_DATE('" + startDate + "')";
+      filterQuery.append(" < TO_DATE('").append(startDate).append("')");
     }
-    return whereClause;
+    return filterQuery;
   }
 
   private String buildForPercentage(String artifactName, Field field) {
@@ -705,6 +682,7 @@ public class DLSparkQueryBuilder {
   }
 
   /**
+   * Recursive function call to build Filters.
    *
    * @param sipFilter
    * @return
@@ -712,16 +690,20 @@ public class DLSparkQueryBuilder {
   public StringBuilder buildSipFilters(Filter sipFilter) {
     boolean flag = true;
     String booleanCriteria = null;
+    StringBuilder filterQuery = new StringBuilder();
     if (sipFilter == null) {
       return filterQuery;
     }
+
+    if (sipFilter.getBooleanCriteria() == null && sipFilter.getFilters() == null) {
+      logger.error("Invalid dsk object");
+      return filterQuery;
+    }
+
     if (sipFilter.getBooleanCriteria() != null) {
       booleanCriteria = " " + sipFilter.getBooleanCriteria() + " ";
     }
 
-    if (sipFilter.getBooleanCriteria() == null || CollectionUtils.isEmpty(sipFilter.getFilters())) {
-      buildFilterUtil(sipFilter);
-    } else {
       for (Filter filterAttribute : sipFilter.getFilters()) {
         if (filterAttribute.getFilters() != null) {
           StringBuilder childQuery = buildSipFilters(filterAttribute);
@@ -736,12 +718,12 @@ public class DLSparkQueryBuilder {
           if (!flag) {
             filterQuery.append(booleanCriteria);
           }
-          buildFilterUtil(filterAttribute);
+          filterQuery = buildFilterUtil(filterAttribute, filterQuery);
           flag = false;
 
         }
       }
-    }
+
 
     if (filterQuery.length() != 0) {
       filterQuery.insert(0, "(").append(")");
@@ -784,7 +766,7 @@ public class DLSparkQueryBuilder {
    * @return sipQuery semantic sipQuery
    */
   public String buildDskQuery(SipQuery sipQuery, SipDskAttribute sipDskAttribute) {
-    filterQuery = new StringBuilder();
+    StringBuilder filterQuery = new StringBuilder();
     booleanCriteria = sipQuery.getBooleanCriteria();
     StringBuilder select = new StringBuilder(SELECT).append(SPACE);
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
@@ -796,17 +778,8 @@ public class DLSparkQueryBuilder {
         .append(SPACE)
         .append(buildFrom(sipQuery));
 
-    if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
-      sipQuery.getFilters().forEach(fil -> {
-        if (booleanCriteria == null) {
-          throw new SipDslProcessingException("Bad Request. BooleanCriteria Can't be null!!");
-        }
-        if (filterQuery != null && filterQuery.length() != 0) {
-          filterQuery.append(SPACE).append(booleanCriteria).append(SPACE);
-        }
-        buildSipFilters(fil);
-      });
-    }
+    Filter fil = buildNestedFilter(sipQuery.getFilters(),booleanCriteria);
+    filterQuery = buildSipFilters(fil);
 
     String filter = filterQuery.toString();
     if (filter != null && !StringUtils.isEmpty(filter)) {
