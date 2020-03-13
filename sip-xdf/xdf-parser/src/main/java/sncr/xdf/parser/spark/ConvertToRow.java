@@ -1,5 +1,8 @@
 package sncr.xdf.parser.spark;
 
+import sncr.xdf.ngcomponent.spark.NGStructType;
+import sncr.xdf.ngcomponent.spark.NGStructField;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 import com.univocity.parsers.common.processor.NoopRowProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -15,7 +18,6 @@ import org.apache.spark.util.LongAccumulator;
 import java.text.SimpleDateFormat;
 
 import java.util.*;
-import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 /**
  * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
@@ -23,6 +25,7 @@ import sncr.xdf.ngcomponent.util.NGComponentUtil;
 public class ConvertToRow implements Function<String, Row> {
 
     private static final Logger logger = Logger.getLogger(ConvertToRow.class);
+    private NGStructType ngSchema;
     private StructType schema;
     private List<String> tsFormats;
 
@@ -41,7 +44,23 @@ public class ConvertToRow implements Function<String, Row> {
 
     private CsvParser parser = null;
     private boolean allowInconsistentCol;
-    LinkedHashMap<Integer, Object> fieldsAddlConfigMap = null;
+
+    public ConvertToRow(NGStructType ngSchema,
+                        List<String> tsFormats,
+                        String lineSeparator,
+                        char delimiter,
+                        char quoteChar,
+                        char quoteEscapeChar,
+                        char charToEscapeQuoteEscaping,
+                        LongAccumulator recordCounter,
+                        LongAccumulator errorCounter,
+                        boolean allowInconsistentCol) {
+        this(ngSchema.getStructType(),tsFormats,
+            lineSeparator,delimiter,quoteChar,
+            quoteEscapeChar,charToEscapeQuoteEscaping,
+            recordCounter,errorCounter,allowInconsistentCol);
+        this.ngSchema = ngSchema;
+    }
 
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
@@ -52,8 +71,7 @@ public class ConvertToRow implements Function<String, Row> {
                         char charToEscapeQuoteEscaping,
                         LongAccumulator recordCounter,
                         LongAccumulator errorCounter,
-                        boolean allowInconsistentCol,
-                        Optional<LinkedHashMap<Integer, Object>> optFieldsAddlConfigMap) {
+                        boolean allowInconsistentCol) {
         this.schema = schema;
         this.tsFormats = tsFormats;
         this.lineSeparator = lineSeparator ;
@@ -64,7 +82,6 @@ public class ConvertToRow implements Function<String, Row> {
         this.errCounter = errorCounter;
         this.recCounter = recordCounter;
         this.allowInconsistentCol = allowInconsistentCol;
-        if(optFieldsAddlConfigMap.isPresent()) this.fieldsAddlConfigMap = optFieldsAddlConfigMap.get();
 
         df = new SimpleDateFormat();
         /*
@@ -112,7 +129,7 @@ public class ConvertToRow implements Function<String, Row> {
     }
 
     private Object[] constructRecord(String line, Object[] record, String[] parsed) {
-        if(fieldsAddlConfigMap == null || fieldsAddlConfigMap.isEmpty()){
+        if(ngSchema == null){
             record = constructRecordFromLine(line, record, parsed);
         }else{
             record = constructRecordWithIndices(line, record, parsed);
@@ -123,15 +140,15 @@ public class ConvertToRow implements Function<String, Row> {
     private Object[] constructRecordWithIndices(String line, Object[] record, String[] parsed) {
         try {
             int parsedLength = parsed.length;
-            StructField[] structFields = schema.fields();
+            NGStructField[] ngStructFields = ngSchema.getNgFields();
             int index = 0;
-            for (Map.Entry<Integer, Object> entry : fieldsAddlConfigMap.entrySet()) {
+            for (NGStructField ngStructField : ngStructFields) {
                 Object fieldValue = null;
-                if(entry.getKey() < parsedLength){
-                    fieldValue = getFieldValue(parsed[entry.getKey()], structFields[index], index);
+                if(ngStructField.getSourceColumnIndex() < parsedLength){
+                    fieldValue = getFieldValue(parsed[ngStructField.getSourceColumnIndex()], ngStructField, index);
                 }
                 if(fieldValue == null){
-                    fieldValue = entry.getValue();
+                    fieldValue = ngStructField.getDefaultValue();
                 }
                 record[index] = fieldValue;
                 index++;

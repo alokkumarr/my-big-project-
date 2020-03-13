@@ -362,7 +362,7 @@ public class Parser {
      *
      * @return value of inconsistentCol
      */
-    public boolean isAllowInconsistentColumn() {
+    public boolean getAllowInconsistentColumn() {
         return allowInconsistentCol;
     }
 

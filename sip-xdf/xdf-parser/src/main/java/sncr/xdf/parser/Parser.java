@@ -37,7 +37,6 @@ import sncr.xdf.parser.parsers.ParquetFileParser;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
-import java.util.Optional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -127,7 +126,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         outputDsPartitionKeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
-        allowInconsistentCol = ctx.componentConfiguration.getParser().isAllowInconsistentColumn();
+        allowInconsistentCol = ctx.componentConfiguration.getParser().getAllowInconsistentColumn();
 
         logger.debug("Input file format = " + this.parserInputFileFormat);
         logger.debug("outputDsPartitionKeys size is = " + outputDsPartitionKeys.size());
@@ -367,8 +366,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter, allowInconsistentCol
-                ,Optional.empty()));
+                '\'', recCounter, errCounter, allowInconsistentCol));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
@@ -432,8 +430,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             // Get rid of file numbers
             .keys()
             .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol
-                ,Optional.empty()));
+                quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol));
 
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =

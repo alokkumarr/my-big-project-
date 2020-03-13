@@ -2,6 +2,7 @@ package sncr.xdf.ngcomponent.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import sncr.xdf.ngcomponent.AbstractComponent;
@@ -80,15 +81,15 @@ public class NGComponentUtil {
         return false;
     }
 
-    public static String getLineFromRdd(JavaRDD<String> rdd, int headerSize, int lineNumber){
+    public static String getLineFromRdd(JavaPairRDD<String, Long> zipIndexRdd, int headerSize, int lineNumber){
         String line  = null;
         if(headerSize == 1){
             lineNumber = 1;
         }
         final int index = lineNumber-1;
-        if(rdd != null && index >= 0){
+        if(zipIndexRdd != null && index >= 0){
             try{
-                line = rdd.zipWithIndex().filter(row->row._2==index).map(row->row._1).first();
+                line = zipIndexRdd.filter(row->row._2==index).map(row->row._1).first();
             } catch (Exception e) {
                 logger.error("Exception occurred while getting line from rdd :" + e);
             }
