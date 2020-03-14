@@ -6,7 +6,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import javax.servlet.ServletException;
 import javax.validation.constraints.NotNull;
-import org.codehaus.jettison.json.JSONException;
+
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
