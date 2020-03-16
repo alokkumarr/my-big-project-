@@ -1065,7 +1065,7 @@ public class ExternalSecurityService {
         valid = userRepository.updateUserDetails(userDetails, masterLoginId);
         if (valid.getValid()) {
           userDetailsResponse.setUser(
-              userRepository.getUser(userDetails.getMasterLoginId(), userDetails.getCustomerId()));
+              userRepository.getUserbyId(userDetails.getUserId(), userDetails.getCustomerId()));
           if (userDetailsResponse.getUser()!=null) {
               userDetailsResponse.setValid(true);
               userDetailsResponse.setValidityMessage("User Details updated successfully");

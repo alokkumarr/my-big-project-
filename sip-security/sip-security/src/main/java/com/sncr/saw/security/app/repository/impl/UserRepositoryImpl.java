@@ -31,6 +31,7 @@ import com.sncr.saw.security.common.bean.repo.admin.privilege.SubCategoriesPrivi
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
+import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
@@ -3176,12 +3177,13 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Valid updateUserDetails(UserDetails userDetails, String modifiedBy) {
         Valid valid = new Valid();
+        int numberOfRowsUpdated=0;
         String sql =
             " UPDATE USERS SET EMAIL=? , ROLE_SYS_ID=?,SEC_GROUP_SYS_ID= ? , ENCRYPTED_PASSWORD =? , "
                 + "FIRST_NAME =? , MIDDLE_NAME =? , LAST_NAME=? , ACTIVE_STATUS_IND=? , ID3_ENABLED=? , MODIFIED_DATE= SYSDATE() , MODIFIED_BY=? "
                 + " where USER_SYS_ID=? and CUSTOMER_SYS_ID=? ; ";
         try {
-            jdbcTemplate.update(
+            numberOfRowsUpdated = jdbcTemplate.update(
                 sql,
                 preparedStatement -> {
                     preparedStatement.setString(1, userDetails.getEmail());
@@ -3212,7 +3214,13 @@ public class UserRepositoryImpl implements UserRepository {
             valid.setError(e.getMessage());
             return valid;
         }
-        valid.setValid(true);
+        if (numberOfRowsUpdated>0) {
+            valid.setValid(true);
+        }else {
+            valid.setValid(false);
+            valid.setError(ErrorMessages.unableToUpdateUser+userDetails.getUserId());
+        }
+
         return valid;
     }
 
