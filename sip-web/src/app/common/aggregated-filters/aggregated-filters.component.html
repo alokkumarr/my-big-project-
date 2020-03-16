@@ -1,45 +1,46 @@
 <div *ngIf="data.supportsAggregationFilters" fxLayout="row">
-    <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
-        <mat-label>Columns</mat-label>
-        <mat-select (selectionChange)="columnsSelect($event.value)"
-                    [value]="filter.columnName">
-          <mat-option *ngFor="let column of cols;"
-                      [value]="column.columnName">
-            {{ column.displayName }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+  <div class="input-fields" fxLayout="row">
+      <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+          <mat-label>Columns</mat-label>
+          <mat-select (selectionChange)="columnsSelect($event.value)"
+                      [value]="filter.columnName">
+            <mat-option *ngFor="let column of cols;"
+                        [value]="column.columnName">
+              {{ column.displayName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field
-      class="select-form-field"
-      style="max-width: 145px; margin-left: 10px"
-      appearance="outline"
-      *ngIf="!filter.isRuntimeFilter"
-      >
-        <mat-label>Aggregate</mat-label>
-        <mat-select
-          e2e="filter-aggregate-select"
-          [value]="filter.aggregate"
-          (selectionChange)="aggregateSelect($event.value)"
-        >
-          <mat-option
-            *ngFor="let aggregate of supportedAggregates"
-            [value]="aggregate.value"
-            [attr.e2e]="'filter-aggregate-option-' + aggregate.label"
-          >
-            {{ aggregate.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <designer-number-filter
+        <mat-form-field
+        class="select-form-field"
+        style="max-width: 145px; margin-left: 10px"
+        appearance="outline"
         *ngIf="!filter.isRuntimeFilter"
-        (filterModelChange)="onFilterModelChange($event)"
-        [filterModel]="filter.model"
-      >
-      </designer-number-filter>
+        >
+          <mat-label>Aggregate</mat-label>
+          <mat-select
+            e2e="filter-aggregate-select"
+            [value]="filter.aggregate"
+            (selectionChange)="aggregateSelect($event.value)"
+          >
+            <mat-option
+              *ngFor="let aggregate of supportedAggregates"
+              [value]="aggregate.value"
+              [attr.e2e]="'filter-aggregate-option-' + aggregate.label"
+            >
+              {{ aggregate.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <div
+        <designer-number-filter
+          *ngIf="!filter.isRuntimeFilter"
+          (filterModelChange)="onFilterModelChange($event)"
+          [filterModel]="filter.model"
+        >
+        </designer-number-filter>
+    </div>
+    <div
       fxLayout="row"
       class="filter__action__space"
       fxLayoutAlign="space-between center"

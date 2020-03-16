@@ -38,27 +38,28 @@
     ></dsk-filter-group>
   </div>
 
-  <h3 *ngIf="data.supportsAggregationFilters">Aggregated Filters</h3>
-  <div *ngIf="data.supportsAggregationFilters" class="filter__table-name">
-    {{ data.artifacts[0].artifactName }}
+  <div class="analyze-aggregate-filters" *ngIf="data.mode === 'ANALYZE' && data.supportsAggregationFilters">
+    <h3> Aggregated Filters </h3>
+    <div class="filter__table-name">
+      {{ data.artifacts[0].artifactName }}
+    </div>
+    <mat-divider></mat-divider>
+    <aggregated-filters
+      [data]="data"
+      *ngFor="let agfilter of aggregatedFilters; let i = index;trackBy: filterRowTrackBy"
+      (removeRequest)="removeAggrFilter(i)"
+      (filterChange)="onFilterChange($event)"
+      [filter]='agfilter'
+    >
+    </aggregated-filters>
+    <button
+      mat-icon-button
+      [attr.e2e]="'aggregate-filter-add-btn-'"
+      (click)="addaggregateFilter()"
+    >
+      <mat-icon fontIcon="icon-plus"></mat-icon>
+    </button>
   </div>
-  <mat-divider></mat-divider>
-  <aggregated-filters
-    [data]="data"
-    *ngFor="let agfilter of aggregatedFilters; let i = index;trackBy: filterRowTrackBy"
-    (removeRequest)="removeAggrFilter(i)"
-    (filterChange)="onFilterChange($event)"
-    [filter]='agfilter'
-  >
-  </aggregated-filters>
-  <button
-    mat-icon-button
-    *ngIf="data.supportsAggregationFilters"
-    [attr.e2e]="'aggregate-filter-add-btn-'"
-    (click)="addaggregateFilter()"
-  >
-    <mat-icon fontIcon="icon-plus"></mat-icon>
-  </button>
 </div>
 
 <div

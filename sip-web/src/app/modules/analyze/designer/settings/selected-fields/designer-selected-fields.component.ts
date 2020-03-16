@@ -52,7 +52,15 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   @Output() removeFilter = new EventEmitter();
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
-  @Input() filters: Filter[];
+  filters;
+  // @Input() filters: Filter[];
+  @Input('filters') set setFilters(filters: Filter[]) {
+    if (!filters) {
+      return;
+    }
+    this.filters = this.analyzeService.flattenAndFetchFilters(filters, []);
+  }
+
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   private subscriptions: Subscription[] = [];
 
@@ -88,6 +96,8 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
     const dndSub = this._dndPubsub.subscribe(this.onDndEvent.bind(this));
     this.subscriptions.push(dndSub);
+
+    this.filters
 
     const adapterSub = this.groupAdapters$.subscribe(adapters => {
       this.canAcceptMap = reduce(

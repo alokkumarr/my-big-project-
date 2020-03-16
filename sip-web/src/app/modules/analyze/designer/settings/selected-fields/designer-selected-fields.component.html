@@ -83,7 +83,7 @@
     fxFlex="90"
   >
     <mat-chip-list e2e="designer-applied-filters" class="selected-fields__list">
-      <!-- <mat-chip
+      <mat-chip
         *ngFor="let filter of filters; let i = index"
         class="selected-fields__item"
         [attr.e2e]="'applied-filter-' + getDisplayNameForFilter(filter)"
@@ -92,7 +92,7 @@
       >
         {{ getDisplayNameForFilter(filter) }}
         <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
-      </mat-chip> -->
+      </mat-chip>
     </mat-chip-list>
   </perfect-scrollbar>
 </div>
