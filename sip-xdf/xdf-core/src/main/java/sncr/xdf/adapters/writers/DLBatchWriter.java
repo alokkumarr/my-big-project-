@@ -26,6 +26,7 @@ public class DLBatchWriter {
      */
     public DLBatchWriter(NGContext ngctx){
         this.ngctx = ngctx;
+        logger.debug("##### Inside DLBatchWriter format #########"+ format);
     }
 
     /**
@@ -35,7 +36,7 @@ public class DLBatchWriter {
         this.format = format;
         this.numberOfFiles = numberOfFiles;
         this.keys = keys;
-
+        logger.debug("##### Inside DLBatchWriter format #########"+ format);
         if (keys != null) {
             String m = "Format: " + format + ": ";
             for (String s : keys) m += s + " ";
@@ -132,6 +133,9 @@ public class DLBatchWriter {
         }
         else {
             logger.debug("Partition keys not provided");
+            
+            logger.debug("########### Partiton logic invoking format #########"+ format);
+            
             // Create flat structure/compact files - no key file definitions provided
             switch (format){
                 case "parquet":
@@ -141,6 +145,7 @@ public class DLBatchWriter {
                     DS.repartition(numberOfFiles).write().json(dataLocation);
                     break;
                 case "csv" :
+                	logger.debug("##### Invoking CSV ######");
                     DS.repartition(numberOfFiles).write().csv(dataLocation);
                     break;
                 default:
@@ -165,6 +170,9 @@ public class DLBatchWriter {
                     break;
             }
         }
+        
+        
+        logger.debug("##### END of Partitioning ######");
 
     }
 
