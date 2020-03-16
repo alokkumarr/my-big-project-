@@ -100,6 +100,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private PivotFields pivotFields;
     private boolean isFlatteningEnabled;
     private boolean isPivotApplied;
+    private boolean allowInconsistentCol;
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
@@ -135,15 +136,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 	@Override
     protected int execute(){
 
-		
-		logger.debug(":::: parser execute   :::"+ ngctx.componentConfiguration.getParser());
+		    logger.debug(":::: parser execute   :::"+ ngctx.componentConfiguration.getParser());
         int retval = 0;
 
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
         sourcePath = ngctx.componentConfiguration.getParser().getFile();
         tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
                                       null, null);
-
         archiveDir = generateArchiveLocation(new DataSetHelper(ngctx, services.md));
 
         Map<String, Object> outputDataset = getOutputDatasetDetails();
@@ -159,6 +158,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         pkeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
+      allowInconsistentCol = ngctx.componentConfiguration.getParser().getAllowInconsistentColumn();
 
         logger.info("Input file format = " + this.parserInputFileFormat);
 
@@ -518,6 +518,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Dataset later on to insure output number of files.
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(sourcePath, outputNOF);
+        
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
         inputDSCount = rdd.count();
         if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
@@ -526,7 +527,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-                '\'', recCounter, errCounter));
+                '\'', recCounter, errCounter, allowInconsistentCol));
 
         logger.debug("Output rdd length = " + recCounter.value());
         logger.debug("Rejected rdd length = " + errCounter.value());
@@ -621,8 +622,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.trace("Parsing " + file + " to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
 
-        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-                .textFile(file.toString(), 1);
+        JavaRDD<String> rdd = null;
+        
+        if(this.ctx.extSparkCtx) {
+
+        	logger.debug("##### Using existing JavaSparkContext ...");
+        	rdd = this.ctx.javaSparkContext
+                    .textFile(file.toString(), 1);
+        } else {
+        	logger.debug("##### Crating new JavaSparkContext ...");
+        	JavaSparkContext context  = new JavaSparkContext(ctx.sparkSession.sparkContext());
+        	rdd = context
+                    .textFile(file.toString(), 1);
+        }
 
         JavaRDD<String> rddWithoutHeader = rdd
                 // Add line numbers
@@ -637,7 +649,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if(!ngctx.componentConfiguration.isErrorHandlingEnabled() || rddCount > 0) {
             inputDSCount += rddCount;
             JavaRDD<Row> parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter));
+                quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol));
             // Create output dataset
             JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
             logger.debug("####### Rejected RDD COUNT:: " + rejectedRdd.count());
@@ -725,7 +737,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
         JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
-            '\'', recCounter, errCounter));
+            '\'', recCounter, errCounter, allowInconsistentCol));
 	    // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(
@@ -767,7 +779,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
         inputDSCount = combinedRdd.count();
         JavaRDD<Row> parseRdd = combinedRdd.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-            quoteEscapeChar, '\'', recCounter, errCounter));
+            quoteEscapeChar, '\'', recCounter, errCounter, allowInconsistentCol));
         // Create output dataset
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> outputDS = convertRddToDS(outputRdd);

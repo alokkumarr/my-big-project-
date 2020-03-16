@@ -3,13 +3,16 @@ package sncr.bda.conf;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Generated;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** Parser specific properties */
+/**
+ * Parser specific properties
+ */
 @Generated("org.jsonschema2pojo")
 public class Parser {
 
@@ -56,29 +59,37 @@ public class Parser {
   @SerializedName("headerSize")
   @Expose
   private Integer headerSize;
-  /** Number of files for all output objects */
+  /**
+   * Number of files for all output objects
+   */
   @SerializedName("numberOfFiles")
   @Expose
   private Integer numberOfFiles = 1;
 
-    @SerializedName("isFlatteningEnabled")
-    @Expose
-    private boolean isFlatteningEnabled = false;
+  @SerializedName("isFlatteningEnabled")
+  @Expose
+  private boolean isFlatteningEnabled = false;
 
-    @SerializedName("pivotFields")
-    @Expose
-    private PivotFields pivotFields = null;
+  @SerializedName("pivotFields")
+  @Expose
+  private PivotFields pivotFields = null;
 
-    /**
-     * Alert configuration for the component.
-     *
-     */
-    @SerializedName("alert")
-    @Expose
-    private Alert alerts;
+  /**
+   * Alert configuration for the component.
+   */
+  @SerializedName("alert")
+  @Expose
+  private Alert alerts;
 
-  /** No args constructor for use in serialization */
-  public Parser() {}
+  @SerializedName("allowInconsistentCol")
+  @Expose
+  private boolean allowInconsistentCol;
+
+  /**
+   * No args constructor for use in serialization
+   */
+  public Parser() {
+  }
 
   /**
    * @param headerSize
@@ -102,7 +113,7 @@ public class Parser {
       String quoteEscape,
       Integer headerSize,
       Integer numberOfFiles,
-      boolean multiLine ) {
+      boolean multiLine) {
     this.file = file;
     this.fields = fields;
     this.outputFieldsList = outputFieldsList;
@@ -115,12 +126,16 @@ public class Parser {
     this.multiLine = multiLine;
   }
 
-  /** @return The file */
+  /**
+   * @return The file
+   */
   public String getFile() {
     return file;
   }
 
-  /** @param file The file */
+  /**
+   * @param file The file
+   */
   public void setFile(String file) {
     this.file = file;
   }
@@ -153,17 +168,21 @@ public class Parser {
   }
 
   public Parser withSchemaValidationRequired(Boolean schemaValidationRequired) {
-      this.schemaValidationRequired = schemaValidationRequired;
+    this.schemaValidationRequired = schemaValidationRequired;
 
-      return this;
+    return this;
   }
 
-  /** @return The fields */
+  /**
+   * @return The fields
+   */
   public List<Field> getFields() {
     return fields;
   }
 
-  /** @param fields The fields */
+  /**
+   * @param fields The fields
+   */
   public void setFields(List<Field> fields) {
     this.fields = fields;
   }
@@ -173,28 +192,36 @@ public class Parser {
     return this;
   }
 
-    /** @return The outputFieldsList */
-    public List<OutputFieldsList> getOutputFieldsList() {
-        return outputFieldsList;
-    }
+  /**
+   * @return The outputFieldsList
+   */
+  public List<OutputFieldsList> getOutputFieldsList() {
+    return outputFieldsList;
+  }
 
-    /** @param fields The outputFieldsList */
-    public void setOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
-        this.outputFieldsList = outputFieldsList;
-    }
+  /**
+   * @param fields The outputFieldsList
+   */
+  public void setOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
+    this.outputFieldsList = outputFieldsList;
+  }
 
-    public Parser withOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
-        this.outputFieldsList = outputFieldsList;
-        return this;
-    }
+  public Parser withOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
+    this.outputFieldsList = outputFieldsList;
+    return this;
+  }
 
 
-  /** @return The lineSeparator */
+  /**
+   * @return The lineSeparator
+   */
   public String getLineSeparator() {
     return lineSeparator;
   }
 
-  /** @param lineSeparator The lineSeparator */
+  /**
+   * @param lineSeparator The lineSeparator
+   */
   public void setLineSeparator(String lineSeparator) {
     this.lineSeparator = lineSeparator;
   }
@@ -204,12 +231,16 @@ public class Parser {
     return this;
   }
 
-  /** @return The delimiter */
+  /**
+   * @return The delimiter
+   */
   public String getDelimiter() {
     return delimiter;
   }
 
-  /** @param delimiter The delimiter */
+  /**
+   * @param delimiter The delimiter
+   */
   public void setDelimiter(String delimiter) {
     this.delimiter = delimiter;
   }
@@ -219,12 +250,16 @@ public class Parser {
     return this;
   }
 
-  /** @return The quoteChar */
+  /**
+   * @return The quoteChar
+   */
   public String getQuoteChar() {
     return quoteChar;
   }
 
-  /** @param quoteChar The quoteChar */
+  /**
+   * @param quoteChar The quoteChar
+   */
   public void setQuoteChar(String quoteChar) {
     this.quoteChar = quoteChar;
   }
@@ -234,12 +269,16 @@ public class Parser {
     return this;
   }
 
-  /** @return The quoteEscape */
+  /**
+   * @return The quoteEscape
+   */
   public String getQuoteEscape() {
     return quoteEscape;
   }
 
-  /** @param quoteEscape The quoteEscape */
+  /**
+   * @param quoteEscape The quoteEscape
+   */
   public void setQuoteEscape(String quoteEscape) {
     this.quoteEscape = quoteEscape;
   }
@@ -249,12 +288,16 @@ public class Parser {
     return this;
   }
 
-  /** @return The headerSize */
+  /**
+   * @return The headerSize
+   */
   public Integer getHeaderSize() {
     return headerSize;
   }
 
-  /** @param headerSize The headerSize */
+  /**
+   * @param headerSize The headerSize
+   */
   public void setHeaderSize(Integer headerSize) {
     this.headerSize = headerSize;
   }
@@ -287,70 +330,86 @@ public class Parser {
     return this;
   }
 
-    /**
-     * Number of files for all output objects
-     *
-     * @return The multiLine
-     */
-    public boolean getMultiLine() {
-        return multiLine;
-    }
+  /**
+   * Number of files for all output objects
+   *
+   * @return The multiLine
+   */
+  public boolean getMultiLine() {
+    return multiLine;
+  }
 
-    /**
-     * Json data multiline indicator
-     *
-     * @param multiLine The multiLine
-     */
-    public void setMultiLines(boolean multiLine) {
-        this.multiLine = multiLine;
-    }
+  /**
+   * Json data multiline indicator
+   *
+   * @param multiLine The multiLine
+   */
+  public void setMultiLines(boolean multiLine) {
+    this.multiLine = multiLine;
+  }
 
-    public Parser withMultiLine(boolean multiLine) {
-        this.multiLine = multiLine;
-        return this;
-    }
+  public Parser withMultiLine(boolean multiLine) {
+    this.multiLine = multiLine;
+    return this;
+  }
 
-    /**
-     * Gets alerts
-     *
-     * @return value of alerts
-     */
-    public Alert getAlerts() {
-        return alerts;
-    }
+  /**
+   * Gets alerts
+   *
+   * @return value of alerts
+   */
+  public Alert getAlerts() {
+    return alerts;
+  }
 
-    /**
-     * Sets alerts
-     */
-    public void setAlerts(Alert alerts) {
-        this.alerts = alerts;
-    }
+  /**
+   * Sets alerts
+   */
+  public void setAlerts(Alert alerts) {
+    this.alerts = alerts;
+  }
 
-    public PivotFields getPivotFields() {
-        return pivotFields;
-    }
+  /**
+   * Gets inconsistentCol
+   *
+   * @return value of inconsistentCol
+   */
+  public boolean getAllowInconsistentColumn() {
+    return allowInconsistentCol;
+  }
 
-    public void setPivotFields(PivotFields pivotFields) {
-        this.pivotFields = pivotFields;
-    }
+  /**
+   * Sets inconsistentCol
+   */
+  public void setAllowInconsistentColumn(boolean inconsistentColumn) {
+    this.allowInconsistentCol = allowInconsistentCol;
+  }
 
-    public boolean isMultiLine() {
-        return multiLine;
-    }
+  public PivotFields getPivotFields() {
+    return pivotFields;
+  }
 
-    public void setMultiLine(boolean multiLine) {
-        this.multiLine = multiLine;
-    }
+  public void setPivotFields(PivotFields pivotFields) {
+    this.pivotFields = pivotFields;
+  }
 
-    public boolean isFlatteningEnabled() {
-        return isFlatteningEnabled;
-    }
+  public boolean isMultiLine() {
+    return multiLine;
+  }
 
-    public void setFlatteningEnabled(boolean flatteningEnabled) {
-        isFlatteningEnabled = flatteningEnabled;
-    }
+  public void setMultiLine(boolean multiLine) {
+    this.multiLine = multiLine;
+  }
 
-    @Override
+  public boolean isFlatteningEnabled() {
+    return isFlatteningEnabled;
+  }
+
+  public void setFlatteningEnabled(boolean flatteningEnabled) {
+    isFlatteningEnabled = flatteningEnabled;
+  }
+
+  @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
   }
@@ -372,6 +431,7 @@ public class Parser {
         .append(multiLine)
         .append(isFlatteningEnabled)
         .append(pivotFields)
+        .append(allowInconsistentCol)
         .toHashCode();
   }
 
@@ -389,16 +449,17 @@ public class Parser {
         .append(parserInputFileFormat, rhs.parserInputFileFormat)
         .append(schemaValidationRequired, rhs.schemaValidationRequired)
         .append(fields, rhs.fields)
-        .append(outputFieldsList,rhs.outputFieldsList)
+        .append(outputFieldsList, rhs.outputFieldsList)
         .append(lineSeparator, rhs.lineSeparator)
         .append(delimiter, rhs.delimiter)
         .append(quoteChar, rhs.quoteChar)
         .append(quoteEscape, rhs.quoteEscape)
         .append(headerSize, rhs.headerSize)
         .append(numberOfFiles, rhs.numberOfFiles)
-        .append(multiLine,rhs.multiLine)
-        .append(isFlatteningEnabled,rhs.isFlatteningEnabled)
-        .append(pivotFields,rhs.pivotFields)
+        .append(multiLine, rhs.multiLine)
+        .append(isFlatteningEnabled, rhs.isFlatteningEnabled)
+        .append(pivotFields, rhs.pivotFields)
+        .append(allowInconsistentCol, this.allowInconsistentCol)
         .isEquals();
   }
 }

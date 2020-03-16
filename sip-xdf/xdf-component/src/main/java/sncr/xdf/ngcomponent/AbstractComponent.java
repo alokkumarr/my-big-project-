@@ -133,12 +133,15 @@ public abstract class AbstractComponent implements WithContext{
             throw new IllegalArgumentException("NGContext must not be null");
         ngctx.setStartTs();
         this.ngctx = ngctx;
-        logger.warn(this.ngctx.toString());
+        logger.debug(this.ngctx.toString());
         if (this.ngctx.serviceStatus.isEmpty())
             throw new IllegalArgumentException("NGContext is not initialized correctly");
     }
 
-    public AbstractComponent() {}
+    public AbstractComponent() {
+    	
+    	logger.debug("#########Hello Workbench from XDFNG!!");
+    }
 
     public String getError(){
         return error;
@@ -441,7 +444,7 @@ public abstract class AbstractComponent implements WithContext{
     private int initSpark(JavaSparkContext jsc){
         if (this instanceof WithSpark && ngctx.serviceStatus.containsKey(ComponentServices.Spark)) {
             if (ctx.extSparkCtx) {
-                SparkSession ss = new SparkSession(jsc.sc());
+                SparkSession ss = new SparkSession(jsc.sc().getOrCreate());
                 ((WithSpark) this).initSpark(ss, ctx, ngctx);
             }
             else{
@@ -510,6 +513,7 @@ public abstract class AbstractComponent implements WithContext{
         try {
             ctx = new InternalContext();
             ctx.extSparkCtx = (jsc != null);
+            ctx.javaSparkContext = jsc;
             ctx.fs = HFileOperations.getFileSystem();
             ctx.fc = HFileOperations.getFileContext();
         } catch (Exception e) {
