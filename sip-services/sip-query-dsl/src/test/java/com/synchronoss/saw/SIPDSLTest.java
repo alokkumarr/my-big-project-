@@ -8,6 +8,7 @@ import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
+import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -36,6 +38,7 @@ import org.junit.Test;
 public class SIPDSLTest {
   private static final String esFileName = "sample.json";
   private static final String dlFileName = "sample_dl.json";
+  private static final String ES_NESTED_FILTER_ANALYSIS = "sample_nested_filter_Dsl.json";
 
   /** Query Builder Tests with aggregation. */
   @Test
@@ -109,6 +112,7 @@ public class SIPDSLTest {
     File file = new File(classLoader.getResource(fileName).getPath());
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
     return sipdsl;
   }
@@ -412,5 +416,65 @@ public class SIPDSLTest {
         + " GROUP BY SALES.string, SALES.date"
         + " ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(query,assertQuery);
+  }
+
+  @Test
+  public void testBuildNestedFilter() throws IOException {
+    SIPDSL sipDsl = getSipDsl(ES_NESTED_FILTER_ANALYSIS);
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    BoolQueryBuilder queryBuilder =
+        elasticSearchQueryBuilder.buildFilterQuery(sipDsl.getSipQuery().getFilters().get(0));
+    Assert.assertNotNull(queryBuilder);
+  }
+
+  @Test
+  public void testBuildingFilterQuery() {
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    Filter filter = new Filter();
+    filter.setArtifactsName("sample");
+    filter.setColumnName("integer");
+    filter.setIsGlobalFilter(false);
+    filter.setType(Filter.Type.INTEGER);
+    Model model = new Model();
+    model.setOperator(Operator.GTE);
+    model.setValue((double) 1);
+    filter.setModel(model);
+    Optional<QueryBuilder> queryBuilder = elasticSearchQueryBuilder.buildFilter(filter);
+    Assert.assertNotNull(queryBuilder);
+    Assert.assertTrue(queryBuilder.isPresent());
+    Assert.assertNotNull(queryBuilder.get());
+  }
+
+  @Test
+  public void testRuntimeFilterInPreviewMode() {
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    Filter filter = new Filter();
+    filter.setArtifactsName("sample");
+    filter.setColumnName("integer");
+    filter.setIsGlobalFilter(false);
+    filter.setIsRuntimeFilter(Boolean.TRUE);
+    filter.setType(Filter.Type.INTEGER);
+    Optional<QueryBuilder> queryBuilder = elasticSearchQueryBuilder.buildFilter(filter);
+    Assert.assertNotNull(queryBuilder);
+    Assert.assertFalse(queryBuilder.isPresent());
+  }
+
+  @Test
+  public void testBuildingStringFilter() {
+    Filter filter = new Filter();
+    filter.setArtifactsName("sample");
+    filter.setColumnName("string");
+    filter.setIsGlobalFilter(false);
+    filter.setIsRuntimeFilter(Boolean.TRUE);
+    filter.setType(Filter.Type.STRING);
+    Model model = new Model();
+    List<String> modelValues = new ArrayList<>();
+    modelValues.add("String 1");
+    modelValues.add("str");
+    model.setModelValues(Collections.singletonList(modelValues));
+    model.setOperator(Operator.EQ);
+    filter.setModel(model);
+    QueryBuilder queryBuilder = QueryBuilderUtil.stringFilter(filter);
+    Assert.assertNotNull(queryBuilder);
   }
 }

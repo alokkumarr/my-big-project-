@@ -353,7 +353,11 @@ public class SIPAggregationBuilder {
    */
   public static List<Filter> getAggregationFilter(List<Filter> filters) {
     return filters.stream()
-        .filter(filter -> filter.getAggregationFilter() != null && filter.getAggregationFilter())
+        .filter(
+            filter ->
+                filter.getFilters() != null
+                    ? false
+                    : filter.getAggregationFilter() != null && filter.getAggregationFilter())
         .collect(Collectors.toList());
   }
 
