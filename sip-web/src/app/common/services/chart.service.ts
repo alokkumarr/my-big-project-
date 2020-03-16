@@ -326,7 +326,11 @@ export class ChartService {
           chartType
         ),
         data: map(parsedData, dataPoint =>
-          mapValues(axesFieldNameMap, val => dataPoint[val])
+          mapValues(axesFieldNameMap, val => {
+            return axesFieldNameMap.y === val && dataPoint[val] === ''
+              ? null
+              : dataPoint[val];
+          })
         )
       }
     ];
@@ -339,9 +343,14 @@ export class ChartService {
     const dateFields = filter(fieldsArray, ({ type }) =>
       DATE_TYPES.includes(type)
     );
+    const aggregateYFields = fields.y.filter(field => Boolean(field.aggregate));
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
-      this.formatDatesIfNeeded(parsedData, dateFields);
+      this.formatDatesIfNeeded(
+        parsedData,
+        dateFields,
+        aggregateYFields.length > 0
+      );
     } else {
       this.dateStringToTimestamp(parsedData, dateFields);
     }
@@ -472,7 +481,7 @@ export class ChartService {
     }
   }
 
-  formatDatesIfNeeded(parsedData, dateFields) {
+  formatDatesIfNeeded(parsedData, dateFields, aggregatesExist) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat, groupInterval }) => {
@@ -480,8 +489,11 @@ export class ChartService {
             dateFormat,
             groupInterval
           );
+          const parseFormat = aggregatesExist
+            ? dateFormats.dateFormat
+            : 'YYYY-MM-DD hh:mm:ss';
           dataPoint[removeKeyword(columnName)] = moment
-            .utc(dataPoint[removeKeyword(columnName)], dateFormats.dateFormat)
+            .utc(dataPoint[removeKeyword(columnName)], parseFormat)
             .format(dateFormats.momentFormat || dateFormats.dateFormat);
         });
       });

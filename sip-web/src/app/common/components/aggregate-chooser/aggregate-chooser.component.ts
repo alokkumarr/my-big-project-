@@ -149,7 +149,8 @@ export class AggregateChooserComponent implements OnInit {
   canClearAggregate() {
     return (
       this.analysisSubtype === 'scatter' &&
-      NUMBER_TYPES.includes(this.artifactColumn.type)
+      NUMBER_TYPES.includes(this.artifactColumn.type) &&
+      this.aggregate
     );
   }
 
