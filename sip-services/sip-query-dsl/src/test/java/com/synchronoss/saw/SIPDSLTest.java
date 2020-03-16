@@ -1,5 +1,7 @@
 package com.synchronoss.saw;
 
+import static com.synchronoss.saw.util.BuilderUtil.buildNestedFilter;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,7 +101,7 @@ public class SIPDSLTest {
 
       boolQueryBuilder1 =
           elasticSearchQueryBuilder.buildFilterQuery(
-              elasticSearchQueryBuilder.buildNestedFilter(
+              buildNestedFilter(
                   filters, sipdsl.getSipQuery().getBooleanCriteria()));
       searchSourceBuilder.query(boolQueryBuilder1);
     }
@@ -347,9 +349,10 @@ public class SIPDSLTest {
 
     sipdsl.getSipQuery().setFilters(filterList);
 
-    String assertQuerytFilter = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+    String assertQuerytFilter = dlSparkQueryBuilder
+        .buildDataQuery(sipdsl.getSipQuery());
     String queryWithFilter =
-        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0) AND SALES.double >= 1.0 OR SALES.string IN ('string 123') )";
+        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0 AND (SALES.double >= 1.0 OR upper(SALES.string) IN (upper('string 123') ))))";
     Assert.assertEquals(queryWithFilter, assertQuerytFilter.trim());
   }
 
@@ -360,7 +363,7 @@ public class SIPDSLTest {
 
     String query = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertion =
-        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE ((SALES.long = 1000.0) AND SALES.Double = 2000.0)  GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE ((SALES.long = 1000.0 AND SALES.Double = 2000.0))  GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(assertion, query);
 
     sipdsl.getSipQuery().setFilters(new ArrayList<Filter>());
@@ -410,7 +413,7 @@ public class SIPDSLTest {
         + " FROM SALES"
         + " INNER JOIN PRODUCT"
         + " ON SALES.string = PRODUCT.string_2"
-        + " WHERE (((SALES.long = 1000.0) AND SALES.Double = 2000.0))"
+        + " WHERE ((SALES.long = 1000.0 AND SALES.Double = 2000.0))"
         + "  AND  (upper(SALES.string) IN (upper('String 1'), upper('str') )"
         + " AND upper(SALES.string) IN (upper('String 123'), upper('string 456') ))"
         + " GROUP BY SALES.string, SALES.date"

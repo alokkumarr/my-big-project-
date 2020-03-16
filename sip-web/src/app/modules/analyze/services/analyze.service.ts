@@ -817,4 +817,16 @@ export class AnalyzeService {
       {}
     );
   }
+
+  flattenAndFetchFilters(filters, flattenedFilters) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.flattenAndFetchFilters(filter, flattenedFilters);
+      }
+      if (filter.columnName) {
+        flattenedFilters.push(filter);
+      }
+    });
+    return flattenedFilters;
+  }
 }

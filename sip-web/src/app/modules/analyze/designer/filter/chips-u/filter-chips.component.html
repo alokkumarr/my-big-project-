@@ -1,12 +1,12 @@
 <div
   fxLayout="row"
   fxLayoutAlign="start center"
-  *ngIf="filters.length > 0"
+  *ngIf="flattenedFilters.length > 0"
   class="filter-chips"
 >
   <div fxLayout="column">
     <span class="filter-counter" i18n
-      >{filters.length, plural, =1 {1 Filter} other {{{filters.length}} Filters}
+      >{flattenedFilters.length, plural, =1 {1 Filter} other {{{flattenedFilters.length}} Filters}
       } Applied</span
     >
     <button
@@ -22,7 +22,7 @@
   </div>
   <mat-chip-list #chipList>
     <mat-chip
-      *ngFor="let filter of filters; let i = index"
+      *ngFor="let filter of flattenedFilters; let i = index"
       [removable]="!readonly"
       (removed)="onRemove(i)"
       [attr.e2e]="'filters-execute-' + getDisplayName(filter)"

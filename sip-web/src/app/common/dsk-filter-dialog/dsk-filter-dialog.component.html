@@ -1,7 +1,12 @@
 <header class="base-dialog__header">
-  <strong>
-    {{ operation }} Attributes - {{ data?.groupSelected?.securityGroupName }}
-  </strong>
+  <span [ngSwitch]="data.mode">
+    <strong *ngSwitchCase="'ANALYZE'">
+      Filter
+    </strong>
+    <strong *ngSwitchCase="'DSK'">
+      {{ operation }} Attributes - {{ data?.groupSelected?.securityGroupName }}
+    </strong>
+  </span>
 </header>
 <div class="base-dialog__content">
   <div fxLayout="column" fxLayoutAlign="center stretch">
@@ -46,7 +51,7 @@
     [disabled]="errorState"
     mat-raised-button
   >
-    Save
+    {{ data.mode === 'ANALYZE' ? 'Apply Filters' : 'Save'}}
   </button>
   <button mat-button mat-dialog-close i18n>Cancel</button>
 </div>

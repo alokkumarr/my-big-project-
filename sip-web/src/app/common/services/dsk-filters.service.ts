@@ -3,8 +3,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../appConfig';
 import { first, map, tap } from 'rxjs/operators';
 import * as fpGet from 'lodash/fp/get';
+import * as get from 'lodash/get';
 import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
+import * as isUndefined from 'lodash/isUndefined';
 import { Observable, of } from 'rxjs';
 import {
   DSKFilterGroup,
@@ -76,8 +78,9 @@ export class DskFiltersService {
 
   isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false) {
     let condition;
-    condition = filter.booleanQuery.length > 0;
     return true;
+    condition = filter.booleanQuery.length > 0;
+
     return (
       filter.booleanCriteria &&
       condition &&
@@ -132,22 +135,27 @@ export class DskFiltersService {
       .toPromise();
   }
 
-  generatePreview(filterGroup: DSKFilterGroup): string {
+  generatePreview(filterGroup: DSKFilterGroup, mode: string): string {
     const pStart = '<strong class="parens">(</strong>';
     const pEnd = '<strong class="parens">)</strong>';
     return filterGroup.booleanQuery
       .map(query => {
-        if (query['booleanCriteria']) {
+        const statement = mode === 'ANALYZE' ? get(query, 'booleanCriteria') : query['booleanCriteria'];
+        if (statement) {
           return `${pStart}${this.generatePreview(
-            query as DSKFilterGroup
+            query as DSKFilterGroup,
+            mode
           )}${pEnd}`;
         }
 
         const field = <DSKFilterField>query;
-
+        const values = field.model.values || get(field, 'model.modelValues');
+        if (isUndefined(values)) {
+          return '';
+        }
         return `${field.columnName} <span class="operator">${
           field.model.operator
-        }</span> [${field.model.values.join(', ')}]`;
+        }</span> [${values.join(', ')}]`;
       })
       .join(
         ` <strong class="bool-op">${filterGroup.booleanCriteria}</strong> `
