@@ -1,39 +1,61 @@
 package com.synchronoss.saw.workbench.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
-import com.google.gson.Gson;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.parquet.example.data.Group;
+import org.apache.parquet.hadoop.ParquetReader;
+import org.apache.parquet.hadoop.example.GroupReadSupport;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.joda.time.DateTime;
-import org.ojai.Document;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
-import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
+import com.synchronoss.saw.workbench.SparkConfig;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutor;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorImpl;
+
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.NGContextServices;
-import sncr.xdf.context.ComponentServices;
-import static sncr.xdf.context.ComponentServices.*;
+
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
   private final ObjectMapper mapper = new ObjectMapper();
+  
+  
 
   @Value("${workbench.project-key}")
   @NotNull
@@ -43,10 +65,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private String root;
 
-  @Value("${workbench.livy-uri}")
-  @NotNull
-  private String livyUri;
-
   @Value("${workbench.preview-limit}")
   @NotNull
   private Integer previewLimit;
@@ -54,14 +72,18 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Value("${workbench.project-root}/services/metadata/previews")
   @NotNull
   private String previewsTablePath;
+  
+  @Autowired
+  WorkbenchExecutor executor;
+  
+  @Autowired
+  SparkConf sparkConf;
 
-  /**
-   * Cached Workbench Livy client to be kept around for next operation to reduce startup time.
-   */
-  private WorkbenchClient cachedClient;
+ 
 
   @PostConstruct
   private void init() throws Exception {
+	  log.info("#### Inside Post Construct ####");
       /* Workaround: If the "/apps/spark" directory does not exist in
        * the data lake, Apache Livy will fail with a file not found
        * error.  So create the "/apps/spark" directory here.  */
@@ -80,67 +102,23 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
         admin.createTable(table).close();
       }
     }
-    /*
-     * Cache a Workbench Livy client to reduce startup time for first operation
-     */
-    try {
-      cacheWorkbenchClient();
-    } catch (Exception e) {
-      /* If Apache Livy is not installed in the environment, fail
-       * gracefully by letting the Workbench Service still start up.
-       * If Apache Livy is later installed, the Workbench Service will
-       * be able to recover by reattempting to create the client.  */
-      log.error("Unable to create Workbench client upon startup", e);
-    }
+    
   }
 
-  /**
-   * Get Workbench Livy client to be used for Livy jobs.
-   */
-  private WorkbenchClient getWorkbenchClient() throws Exception {
-    /*
-     * Synchronize access to the cached client to ensure that the current client is handed out only
-     * to a single caller and that a new client is put into place before the next caller
-     */
-    synchronized (cachedClient) {
-      try {
-        if (cachedClient == null) {
-          log.debug("Create Workbench Livy client on demand");
-          cacheWorkbenchClient();
-        }
-        return cachedClient;
-      } finally {
-        /*
-         * Create a new Workbench Livy client for the next operation
-         */
-        cacheWorkbenchClient();
-      }
-    }
-  }
+  
 
-  private void cacheWorkbenchClient() throws Exception {
-    log.debug("Caching Workbench Livy client");
-    cachedClient = new WorkbenchClient(livyUri);
-  }
-
+  
   /**
    * Execute a transformation component on a dataset to create a new dataset.
    */
   @Override
   public ObjectNode execute(
     String project, String name, String component, String cfg) throws Exception {
-    log.info("Executing dataset transformation starts here ");
-    log.info("XDF Configuration = " + cfg);
-    WorkbenchClient client = getWorkbenchClient();
-    createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
-    log.info("execute name = " + name);
-    log.info("execute root = " + root);
-    log.info("execute component = " + component);
-
+	  
+    log.debug("Executing dataset transformation starts here ");
+    log.debug("XDF Configuration = " + cfg);
     ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
-
     log.info("Component Config = " + config);
-
     String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 
     NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
@@ -151,7 +129,8 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     NGContext workBenchcontext = contextServices.getNgctx();
 
     workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-    client.submit(new WorkbenchExecuteJob(workBenchcontext));
+    executor.executeJob(project, name, component, cfg);
+    
     ObjectNode root = mapper.createObjectNode();
     ArrayNode ids = root.putArray("outputDatasetIds");
     for (String id: workBenchcontext.registeredOutputDSIds) {
@@ -179,62 +158,76 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     return path;
   }
 
-  @Value("${metastore.base}")
-  @NotNull
-  private String metastoreBase;
 
-  /**
-   * Preview the output of a executing a transformation component on a dataset.
-   * Also used for simply viewing the contents of an existing dataset.
-   */
+
   @Override
-  public ObjectNode preview(String project, String name) throws Exception {
-    log.info("Creating dataset transformation preview");
-    /* Get physical location of dataset */
-    DataSetStore dss = new DataSetStore(metastoreBase);
-    String json = dss.readDataSet(project, name);
-    log.debug("Dataset metadata: {}", json);
-    if (json == null) {
-      throw new RuntimeException("Dataset not found: " + name);
-    }
-    JsonNode dataset = mapper.readTree(json);
-    String status = dataset.path("asOfNow").path("status").asText();
-    if (status == null || !status.equals("SUCCESS")) {
-      throw new RuntimeException("Unhandled dataset status: " + status);
-    }
+  public ObjectNode getPreview(String project, String name) throws Exception {
+    log.info("Getting dataset transformation preview");
+    log.info("Project ::"+project);
+    log.info("Name ::"+name);
     String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
-    /* Submit job to Livy for reading out preview data */
-    WorkbenchClient client = getWorkbenchClient();
-    String id = UUID.randomUUID().toString();
-    client.submit(new WorkbenchPreviewJob(id, location, previewLimit, previewsTablePath),
-        () -> handlePreviewFailure(id));
-    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "queued");
-    preview.insert();
-    /*
-     * Return generated preview ID to client to be used for retrieving preview data
-     */
+    log.info("location ::"+ location);
+    String jsonData = getDataset(location);
+    log.info("#### Extracted DATA ######"+ jsonData);
     ObjectNode root = mapper.createObjectNode();
-    root.put("id", id);
+    root.put("status", "success");
+    root.put("rows", jsonData);
     return root;
   }
+  
+  
+	public String getDataset(String location) {
+		log.info("Inside getDataset ####");
+		SparkConfig sparkConfig = new SparkConfig();
+		SparkSession session = SparkSession.builder().config(sparkConf).getOrCreate();
 
-  private void handlePreviewFailure(String previewId) {
-    log.error("Creating preview failed");
-    PreviewBuilder preview = new PreviewBuilder(previewsTablePath, previewId, "failed");
-    preview.insert();
-  }
+		log.info("Spark config completed ####" + session);
 
-  @Override
-  public ObjectNode getPreview(String previewId) throws Exception {
-    log.debug("Getting dataset transformation preview");
-    /* Locate the preview data in MapR-DB */
-    Table table = MapRDB.getTable(previewsTablePath);
-    Document doc = table.findById(previewId);
-    /* Return the preview data */
-    if (doc == null) {
-      return null;
-    }
-    JsonNode json = mapper.readTree(doc.toString());
-    return (ObjectNode) json;
-  }
+		log.info("Inside try ####");
+		FileStatus[] files = null;
+		try {
+			files = HFileOperations.getFilesStatus(location);
+		} catch (Exception exception) {
+			log.error("Error while reading hadoop file status"+ exception.getMessage());
+		}
+		log.info("Retrived hadoop files.... ####");
+		String contents = null;
+		for (FileStatus file : files) {
+			log.info("######### File Path ::" + file.getPath());
+			log.info("######### File Name ::" + file.getPath().getName());
+			String fileName = file.getPath().getName();
+
+			if (fileName.endsWith(".parquet")) {
+				log.info("##### reading file ::" + file.getPath().toString());
+				try {
+
+					Dataset<Row> parquetFileDF = session.read().
+							parquet(file.getPath().toString());
+
+					List<String> list = parquetFileDF.
+							limit(previewLimit).toJSON().collectAsList();
+					log.info("############After applying limit dataset count ::"+ list.size());
+					List<Map<String, Object>> result = new ArrayList<>();
+					Map<String, Object> map = new HashMap<>();
+					for (String s : list) {
+
+						map = mapper.readValue(s, 
+								new TypeReference<Map<String, String>>() {
+						});
+						result.add(map);
+					}
+					contents = mapper.writeValueAsString(result);
+					
+				} catch (Exception exception) {
+					log.error("#######ERROR reading file " 
+				        + file.getPath() + exception.getMessage());
+				}
+				// As we expect only one parquet file break from iteration
+				break;
+			}
+
+		}
+		log.info("#### outside of payload inside try ::");
+		return contents;
+	}
 }
