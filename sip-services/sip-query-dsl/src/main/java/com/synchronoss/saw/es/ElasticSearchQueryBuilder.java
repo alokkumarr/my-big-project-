@@ -394,7 +394,7 @@ public class ElasticSearchQueryBuilder {
    * @param filter filter
    * @return optional querybuilder
    */
-  private Optional<QueryBuilder> buildFilter(Filter filter) {
+  public Optional<QueryBuilder> buildFilter(Filter filter) {
     if ((filter.getIsRuntimeFilter() == null || !filter.getIsRuntimeFilter())
         && (filter.getIsGlobalFilter() == null || !filter.getIsGlobalFilter())
         // skip the Aggregated filter since it will added based on aggregated data.
