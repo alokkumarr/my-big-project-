@@ -132,5 +132,11 @@ class Header extends SideNav {
   visibilityOfAdminLink() {
     commonFunctions.waitFor.elementToBeVisible(this._adminLink);
   }
+
+  goToSubCategory(categoryName,subCategoryName) {
+    this.openCategoryMenu();
+    this.selectCategory(categoryName);
+    this.selectSubCategory(subCategoryName);
+  }
 }
 module.exports = Header;
