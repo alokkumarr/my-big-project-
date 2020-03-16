@@ -75,13 +75,13 @@ class ExecutePage extends ConfirmationModel {
             )
         );
     this._publishLink = element(by.css(`[e2e="actions-menu-selector-publish"]`));
-    this._listBox = element(by.xpath(`(//span[text()=' Publish ']/preceding::mat-select[@role='listbox'])[last()]`));
+    this._listBox = element(by.css(`[e2e="publish-select-box"]`));
     this._selectCategory = subCategory =>
         element(
             by.xpath(
                 `//*[@class='mat-option-text' and contains(text(),'${subCategory}')]`
             ));
-    this._publishAnalysis = element(by.xpath(`//span[text()=' Publish ']`));
+    this._publishAnalysis = element(by.css(`[e2e="publish-submit-button"]`));
     this._editAnalysis = element(by.css(`[e2e="actions-menu-selector-edit"]`));
     this._toastMessageInfo = element(by.css(`[class="toast toast-info"]`));
     this._selectReport = selectReport => element(
@@ -150,7 +150,14 @@ class ExecutePage extends ConfirmationModel {
   }
 
   clickOnEditLink() {
-    commonFunctions.clickOnElement(this._editLink);
+    //commonFunctions.clickOnElement(this._editLink);
+    this._editLink.isDisplayed().then(()=>{
+      commonFunctions.clickOnElement(this._editLink);
+    },()=>{
+      this._editAnalysis.isDisplayed().then(()=>{
+        commonFunctions.clickOnElement(this._editAnalysis);
+      });
+    });
     commonFunctions.waitFor.pageToBeReady(/edit/);
   }
 

@@ -37,7 +37,6 @@ const CRITICAL = [
   'prompt-filter/reportPromptFilters.test.js',
   'reports/createAndDeleteReport.test.js',
   'charts/topNForCharts.test.js',
-  'charts/topNForCharts.test.js',
   'charts/bottomNForCharts.test.js',
   'charts/SortingWithCharts.test.js',
   'bis/APIPullRouteSchedule.test.js',

@@ -18,7 +18,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ExecutePage = require('../../pages/ExecutePage');
 const users = require('../../helpers/data-generation/users');
 
-describe('Executing Publish Funtionality from list View', () => {
+describe('Executing Publish Functionality from list/Card/Details View for CHARTS', () => {
 
   //updated fields
   const metrics = 'Integer';
@@ -104,40 +104,43 @@ describe('Executing Publish Funtionality from list View', () => {
 
           const header = new Header();
           const loginPage = new LoginPage();
-          loginPage.loginAs(data.user, /analyze/);
           const analyzePage = new AnalyzePage();
-          header.openCategoryMenu();
-          header.selectCategory(categoryName);
-          header.selectSubCategory(subCategoryName);
           const executePage = new ExecutePage();
           const chartDesignerPage = new ChartDesignerPage();
+          loginPage.loginAs(data.loginUser, /analyze/);
+          header.goToSubCategory(categoryName,subCategoryName);
 
-          //Publish Analysis
-          analyzePage.clickOnActionLinkByAnalysisName(chartName);
+          //Publish Analysis from List/Card/Details View
+          analyzePage.goToViewAndSelectAnalysis(data.publishFrom,chartName);
+          if(data.publishFrom ==="details") {
+            analyzePage.clickOnActionMenu();
+          }
           executePage.publishAnalysis(editSubCategoryName);
+          analyzePage.verifyToastMessagePresent(data.loadMessage);
           analyzePage.verifyToastMessagePresent(data.editMessage);
           header.doLogout();
 
           //Login as different User
-          loginPage.loginAs(data.user, /analyze/);
-          header.openCategoryMenu();
-          header.selectCategory(editCategoryName);
-          header.selectSubCategory(editSubCategoryName);
-          analyzePage.clickOnAnalysisLink(chartName);
+          loginPage.loginAs(data.modifyUser, /analyze/);
+          header.goToSubCategory(editCategoryName,editSubCategoryName);
+          analyzePage.goToViewAndSelectAnalysis(data.publishFrom,chartName);
           executePage.clickOnEditLink();
           chartDesignerPage.searchInputPresent();
           chartDesignerPage.clearAttributeSelection();
-
-          if (data.chartType === 'chart:pie') {
-            chartDesignerPage.clickOnAttribute(dimension, 'Color By');
-            chartDesignerPage.clickOnAttribute(metrics, 'Angle');
-          } else {
-            chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
-            chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
-          }
-          if (data.chartType === 'chart:bubble') {
-            chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
-            chartDesignerPage.clickOnAttribute(groupName, 'Color By');
+          switch (data.chartType) {
+            case "chart:pie" :
+              chartDesignerPage.clickOnAttribute(dimension, 'Color By');
+              chartDesignerPage.clickOnAttribute(metrics, 'Angle');
+              break;
+            case "chart:bubble" :
+              chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+              chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+              chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+              chartDesignerPage.clickOnAttribute(groupName, 'Color By');
+              break;
+            default:
+              chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+              chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
           }
           // If Combo then add one more metric field
           if (data.chartType === 'chart:combo') {
@@ -154,26 +157,19 @@ describe('Executing Publish Funtionality from list View', () => {
           chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
           analyzePage.clickOnActionLinkByAnalysisName(updatedName);
           executePage.publishAnalysis(subCategoryName);
+          analyzePage.verifyToastMessagePresent(data.loadMessage);
           analyzePage.verifyToastMessagePresent(data.editMessage);
           header.doLogout();
 
           //login as original user
-          loginPage.loginAs(data.user, /analyze/);
-          header.openCategoryMenu();
-          header.selectCategory(categoryName);
-          header.selectSubCategory(subCategoryName);
+          loginPage.loginAs(data.loginUser, /analyze/);
+          header.goToSubCategory(categoryName,subCategoryName);
           analyzePage.clickOnAnalysisLink(updatedName);
           chartDesignerPage.verifyFields(metrics);
           chartDesignerPage.verifyFields(dimension);
-          executePage.verifyTitle(updatedName);
           executePage.getAnalysisId().then(id => {
             analysesDetails.push({ analysisId: id });
           });
-          executePage.clickOnActionLink();
-          executePage.clickOnDetails();
-          executePage.verifyDescription(updatedDescription);
-          executePage.closeActionMenu();
-
           // Delete the report
           executePage.deleteAnalysis();
           analyzePage.verifyToastMessagePresent('Analysis deleted.');

@@ -18,7 +18,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ExecutePage = require('../../pages/ExecutePage');
 const users = require('../../helpers/data-generation/users');
 
-describe('Executing Publish Funtionality from list View', () => {
+describe('Executing Publish Functionality from list/Card/Details View for PIVOT Reports', () => {
   //updated fields
   let analysesDetails = [];
   let host;
@@ -90,26 +90,26 @@ describe('Executing Publish Funtionality from list View', () => {
 
           const header = new Header();
           const loginPage = new LoginPage();
-          loginPage.loginAs(data.user, /analyze/);
           const analyzePage = new AnalyzePage();
-          header.openCategoryMenu();
-          header.selectCategory(categoryName);
-          header.selectSubCategory(subCategoryName);
           const executePage = new ExecutePage();
           const chartDesignerPage = new ChartDesignerPage();
+          loginPage.loginAs(data.loginUser, /analyze/);
+          header.goToSubCategory(categoryName,subCategoryName);
 
-          //Publish Analysis
-          analyzePage.clickOnActionLinkByAnalysisName(pivotName);
+          //Publish Analysis from List/Card/Details View
+          analyzePage.goToViewAndSelectAnalysis(data.publishFrom,pivotName);
+          if(data.publishFrom ==="details") {
+            analyzePage.clickOnActionMenu();
+          }
           executePage.publishAnalysis(editSubCategoryName);
+          analyzePage.verifyToastMessagePresent(data.loadMessage);
           analyzePage.verifyToastMessagePresent(data.editMessage);
           header.doLogout();
 
           //Login as different User
-          loginPage.loginAs(data.user, /analyze/);
-          header.openCategoryMenu();
-          header.selectCategory(editCategoryName);
-          header.selectSubCategory(editSubCategoryName);
-          analyzePage.clickOnAnalysisLink(pivotName);
+          loginPage.loginAs(data.modifyUser, /analyze/);
+          header.goToSubCategory(editCategoryName,editSubCategoryName);
+          analyzePage.goToViewAndSelectAnalysis(data.publishFrom,pivotName);
           executePage.clickOnEditLink();
           chartDesignerPage.searchInputPresent();
           chartDesignerPage.clearAttributeSelection();
@@ -129,22 +129,14 @@ describe('Executing Publish Funtionality from list View', () => {
           header.doLogout();
 
           //login as original user
-          loginPage.loginAs(data.user, /analyze/);
-          header.openCategoryMenu();
-          header.selectCategory(categoryName);
-          header.selectSubCategory(subCategoryName);
+          loginPage.loginAs(data.loginUser, /analyze/);
+          header.goToSubCategory(categoryName,subCategoryName);
           analyzePage.clickOnAnalysisLink(updatedName);
           chartDesignerPage.verifyPivotFields(data.fieldValue1,data.fieldName1);
           chartDesignerPage.verifyPivotFields(data.fieldValue2,data.fieldName2);
-          executePage.verifyTitle(updatedName);
           executePage.getAnalysisId().then(id => {
             analysesDetails.push({ analysisId: id });
           });
-          executePage.clickOnActionLink();
-          executePage.clickOnDetails();
-          executePage.verifyDescription(updatedDescription);
-          executePage.closeActionMenu();
-
           // Delete the report
           executePage.deleteAnalysis();
           analyzePage.verifyToastMessagePresent('Analysis deleted.');

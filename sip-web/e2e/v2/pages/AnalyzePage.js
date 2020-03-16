@@ -5,6 +5,7 @@ const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const CreateAnalysisModel = require('./components/CreateAnalysisModel');
 const Utils = require('./utils/Utils');
+const log = require('../conf/logger')(__filename);
 
 class AnalyzePage extends CreateAnalysisModel {
   constructor() {
@@ -79,7 +80,7 @@ class AnalyzePage extends CreateAnalysisModel {
       by.xpath(`//a[text()='${reportName}']/following::td[2]`));
     this._scheduledTimingsInCardView = reportName =>
       element(
-      by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
+      by.xpath(`//a[text()='${reportName}']/followiclickOnActionLinkByAnalysisNameng::mat-card-subtitle/span[2]`));
   }
 
   goToView(viewName) {
@@ -162,8 +163,9 @@ class AnalyzePage extends CreateAnalysisModel {
           commonFunctions.clickOnElement(this._toastMessage(message));
           browser.sleep(2000); // Need to wait else logout button will not be visible
         }
-      })
-    }).catch(()=>{
+      });
+    },()=>{
+      log.debug("Toast Message did not display");
     });
   }
 
@@ -196,7 +198,6 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
     clickOnActionLinkByAnalysisName(name) {
-    commonFunctions.waitFor.elementToBeVisible(this._actionLinkByAnalysisName(name));
     commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
   }
 
@@ -245,6 +246,15 @@ class AnalyzePage extends CreateAnalysisModel {
     this.clickOnNextButton();
     this.clickOnDataPods(dataPods);
     this.clickOnCreateButton();
+  }
+
+  goToViewAndSelectAnalysis(viewName,analysisName) {
+    if(viewName === "details") {
+      this.clickOnAnalysisLink(analysisName);
+    }else {
+      this.goToView(viewName);
+      this.clickOnActionLinkByAnalysisName(analysisName);
+    }
   }
 
 }

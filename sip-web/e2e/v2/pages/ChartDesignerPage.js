@@ -76,7 +76,12 @@ class ChartsDesignerPage extends Designer {
           `//legend[contains(text(),'${dataType} Fields')]/following::mat-chip[contains(text(),"${value}")]`
         )
       );
-    this._validateFields = value => element(by.xpath(`//*[@text-anchor="middle"]/*[contains(text(),'${value}')]`));
+    this._validateFields = value =>
+      element(
+        by.xpath(
+          `//*[@text-anchor="middle"]/*[contains(text(),'${value}')]`
+        )
+      );
   }
 
   searchAttribute(attribute) {

@@ -18,7 +18,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ExecutePage = require('../../pages/ExecutePage');
 const users = require('../../helpers/data-generation/users');
 
-describe('Executing Publish Functionality for Reports from list View', () => {
+describe('Executing Publish Functionality for Reports from list/Card/Details View for DL/ES Reports', () => {
   let analysesDetails = [];
   let host;
   let token;
@@ -48,15 +48,15 @@ describe('Executing Publish Functionality for Reports from list View', () => {
     setTimeout(function() {
       //Delete analysis
       analysesDetails.forEach(currentAnalysis => {
-          if (currentAnalysis.analysisId) {
-            new AnalysisHelper().deleteAnalysis(
-              host,
-              token,
-              protractorConf.config.customerCode,
-              currentAnalysis.analysisId,
-              Constants.ES_REPORT ||Constants.REPORT
-            );
-          }
+        if (currentAnalysis.analysisId) {
+          new AnalysisHelper().deleteAnalysis(
+            host,
+            token,
+            protractorConf.config.customerCode,
+            currentAnalysis.analysisId,
+            Constants.ES_REPORT ||Constants.REPORT
+          );
+        }
       });
       commonFunctions.clearLocalStorage();
       done();
@@ -69,85 +69,74 @@ describe('Executing Publish Functionality for Reports from list View', () => {
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, async () => {
-          logger.info(`Executing test case with id: ${id}`);
-          const reportType = data.analysisType;
-          const now = new Date().getTime();
-          const analysisName = `e2e ${now}`;
-          const analysisType = data.analysisType;
-          const analysisDescription = `e2e DL/ES Report description ${new Date().toString()}`;
-          let analysis = await new AnalysisHelper().createNewAnalysis(
-            host,
-            token,
-            analysisName,
-            analysisDescription,
-            analysisType,
-            null, // No subtype of Pivot.
-            null
-          );
-          expect(analysis).toBeTruthy();
-          assert.isNotNull(analysis, 'analysis cannot be null');
-          analysesDetails.push(analysis);
+        logger.info(`Executing test case with id: ${id}`);
+        const reportType = data.analysisType;
+        const now = new Date().getTime();
+        const analysisName = `e2e ${now}`;
+        const analysisType = data.analysisType;
+        const analysisDescription = `e2e DL/ES Report description ${new Date().toString()}`;
+        let analysis = await new AnalysisHelper().createNewAnalysis(
+          host,
+          token,
+          analysisName,
+          analysisDescription,
+          analysisType,
+          null, // No subtype of Pivot.
+          null
+        );
+        expect(analysis).toBeTruthy();
+        assert.isNotNull(analysis, 'analysis cannot be null');
+        analysesDetails.push(analysis);
 
-          const header = new Header();
-          const loginPage = new LoginPage();
-          const analyzePage = new AnalyzePage();
-          const executePage = new ExecutePage();
-          const reportDesignerPage = new ReportDesignerPage();
-          loginPage.loginAs(data.user, /analyze/);
-          header.openCategoryMenu();
-          header.selectCategory(categoryName);
-          header.selectSubCategory(subCategoryName);
+        const header = new Header();
+        const loginPage = new LoginPage();
+        const analyzePage = new AnalyzePage();
+        const executePage = new ExecutePage();
+        const reportDesignerPage = new ReportDesignerPage();
+        loginPage.loginAs(data.loginUser, /analyze/);
+        header.goToSubCategory(categoryName,subCategoryName);
 
-          //Publish Analysis
-          analyzePage.clickOnActionLinkByAnalysisName(analysisName);
-          executePage.publishAnalysis(editSubCategoryName);
-          analyzePage.verifyToastMessagePresent(data.editMessage);
-          header.doLogout();
+        //Publish Analysis from List/Card/Details View
+        analyzePage.goToViewAndSelectAnalysis(data.publishFrom,analysisName);
+        if(data.publishFrom ==="details") {
+          analyzePage.clickOnActionMenu();
+        }
+        executePage.publishAnalysis(editSubCategoryName);
+        analyzePage.verifyToastMessagePresent(data.loadMessage);
+        analyzePage.verifyToastMessagePresent(data.editMessage);
+        header.doLogout();
 
-          //Edit and publish from different folder
-          loginPage.loginAs(data.user, /analyze/);
-          header.openCategoryMenu();
-          header.selectCategory(editCategoryName);
-          header.selectSubCategory(editSubCategoryName);
-          analyzePage.clickOnActionLinkByAnalysisName(analysisName);
-          executePage.editAnalysis();
+        //Login as different User
+        loginPage.loginAs(data.modifyUser, /analyze/);
+        header.goToSubCategory(editCategoryName,editSubCategoryName);
+        analyzePage.goToViewAndSelectAnalysis(data.publishFrom,analysisName);
+        executePage.clickOnEditLink();
+        const updatedName = analysisName + 'uptd';
+        const updatedDescription = analysisDescription + 'updated';
+        reportDesignerPage.clickOnReportFields(data.tables);
+        reportDesignerPage.clickOnSave();
+        reportDesignerPage.enterAnalysisName(updatedName);
+        reportDesignerPage.enterAnalysisDescription(updatedDescription);
+        reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+        analyzePage.clickOnActionLinkByAnalysisName(updatedName);
+        executePage.publishAnalysis(subCategoryName);
+        analyzePage.verifyToastMessagePresent(data.loadMessage);
+        analyzePage.verifyToastMessagePresent(data.editMessage);
+        header.doLogout();
 
-          //Save Analysis
-          const updatedName = analysisName + 'uptd';
-          const updatedDescription = analysisDescription + 'updated';
-          reportDesignerPage.clickOnReportFields(data.tables);
-          reportDesignerPage.clickOnSave();
-          reportDesignerPage.enterAnalysisName(updatedName);
-          reportDesignerPage.enterAnalysisDescription(updatedDescription);
-          reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
-
-          //Publish Analysis
-          analyzePage.clickOnActionLinkByAnalysisName(updatedName);
-          executePage.publishAnalysis(subCategoryName);
-          analyzePage.verifyToastMessagePresent(data.loadMessage)
-          analyzePage.verifyToastMessagePresent(data.editMessage);
-          header.doLogout();
-
-          //validate edited/published analysis
-          loginPage.loginAs(data.user, /analyze/);
-          header.openCategoryMenu();
-          header.selectCategory(categoryName);
-          header.selectSubCategory(subCategoryName);
-          analyzePage.clickOnAnalysisLink(updatedName);
-          reportDesignerPage.verifySelectedFieldsCount(data.totalColumns);
-          executePage.verifyTitle(updatedName);
-          executePage.getAnalysisId().then(id => {
+        //login as original user
+        loginPage.loginAs(data.loginUser, /analyze/);
+        header.goToSubCategory(categoryName,subCategoryName);
+        analyzePage.clickOnAnalysisLink(updatedName);
+        reportDesignerPage.verifySelectedFieldsCount(data.totalColumns);
+        executePage.getAnalysisId().then(id => {
           analysesDetails.push({ analysisId: id });
-          });
-          executePage.clickOnActionLink();
-          executePage.clickOnDetails();
-          executePage.verifyDescription(updatedDescription);
-          executePage.closeActionMenu();
+        });
 
-          // Delete the report
-          executePage.deleteAnalysis();
-          analyzePage.verifyToastMessagePresent('Analysis deleted.');
-          analyzePage .verifyAnalysisDeleted();
+        // Delete the report
+        executePage.deleteAnalysis();
+        analyzePage.verifyToastMessagePresent('Analysis deleted.');
+        analyzePage .verifyAnalysisDeleted();
       }).result.testInfo = {
         testId: id,
         data: data,

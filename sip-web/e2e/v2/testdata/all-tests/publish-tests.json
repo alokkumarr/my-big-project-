@@ -5,72 +5,189 @@
         "suites": [
           "critical","regression","sanity"
         ],
-        "user": "admin",
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "fieldName1": "Date",
         "fieldValue1": "Row",
         "fieldName2": "Integer",
         "fieldValue2": "Data",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "admin should be able edit and publish Pivot Analysis(Integer,Date)"
+        "description": "admin should be able edit and publish Pivot Analysis(Date,Integer)"
       },
       "PBLH02": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
-        "fieldName1": "State",
+        "publishFrom": "card",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Date",
         "fieldValue1": "Row",
-        "fieldName2": "Long",
+        "fieldName2": "Double",
         "fieldValue2": "Data",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "admin should be able edit and publish Pivot Analysis(Long,State)"
+        "description": "admin should be able edit and publish Pivot Analysis(Date,Double)"
       },
       "PBLH03": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
-        "fieldName1": "String",
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Date",
         "fieldValue1": "Row",
-        "fieldName2": "Double",
+        "fieldName2": "Float",
         "fieldValue2": "Data",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "admin should be able edit and publish Pivot Analysis(Double,String)"
+        "description": "admin should be able edit and publish Pivot Analysis(Date,Float)"
       },
       "PBLH04": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
-        "fieldName1": "Integer",
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Date",
         "fieldValue1": "Row",
-        "fieldName2": "Double",
+        "fieldName2": "Long",
         "fieldValue2": "Data",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "admin should be able edit and publish Pivot Analysis(Integer,Double)"
+        "description": "admin should be able edit and publish Pivot Analysis(Date,Long)"
       },
       "PBLH05": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
-        "fieldName1": "State",
+        "publishFrom": "card",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Date",
         "fieldValue1": "Row",
-        "fieldName2": "Integer",
+        "fieldName2": "State",
         "fieldValue2": "Data",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "admin should be able edit and publish Pivot Analysis(State,Integer)"
+        "description": "admin should be able edit and publish Pivot Analysis(Date,State)"
       },
       "PBLH06": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Date",
+        "fieldValue1": "Row",
+        "fieldName2": "String",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Date,String)"
+      },
+        "PBLH07": {
+          "suites": [
+            "critical","regression","sanity"
+          ],
+          "publishFrom": "list",
+          "loginUser": "admin",
+          "modifyUser": "userOne",
+          "fieldName1": "Double",
+          "fieldValue1": "Row",
+          "fieldName2": "Integer",
+          "fieldValue2": "Data",
+          "loadMessage": "Tap this message to reload data.",
+          "editMessage": "Analysis has been updated.",
+          "description": "admin should be able edit and publish Pivot Analysis(Double,Integer)"
+        },
+        "PBLH08": {
+          "suites": [
+            "regression"
+          ],
+          "publishFrom": "card",
+          "loginUser": "admin",
+          "modifyUser": "userOne",
+          "fieldName1": "Double",
+          "fieldValue1": "Row",
+          "fieldName2": "Long",
+          "fieldValue2": "Data",
+          "loadMessage": "Tap this message to reload data.",
+          "editMessage": "Analysis has been updated.",
+          "description": "admin should be able edit and publish Pivot Analysis(Double,Long)"
+        },
+        "PBLH09": {
+          "suites": [
+            "regression"
+          ],
+          "publishFrom": "details",
+          "loginUser": "admin",
+          "modifyUser": "userOne",
+          "fieldName1": "Double",
+          "fieldValue1": "Row",
+          "fieldName2": "String",
+          "fieldValue2": "Data",
+          "loadMessage": "Tap this message to reload data.",
+          "editMessage": "Analysis has been updated.",
+          "description": "admin should be able edit and publish Pivot Analysis(Double,String)"
+        },
+        "PBLH10": {
+          "suites": [
+            "regression"
+          ],
+          "publishFrom": "list",
+          "loginUser": "admin",
+          "modifyUser": "userOne",
+          "fieldName1": "Double",
+          "fieldValue1": "Row",
+          "fieldName2": "State",
+          "fieldValue2": "Data",
+          "loadMessage": "Tap this message to reload data.",
+          "editMessage": "Analysis has been updated.",
+          "description": "admin should be able edit and publish Pivot Analysis(Double,State)"
+        },
+        "PBLH11": {
+          "suites": [
+            "regression"
+          ],
+          "publishFrom": "card",
+          "loginUser": "admin",
+          "modifyUser": "userOne",
+          "fieldName1": "Double",
+          "fieldValue1": "Row",
+          "fieldName2": "Float",
+          "fieldValue2": "Data",
+          "loadMessage": "Tap this message to reload data.",
+          "editMessage": "Analysis has been updated.",
+          "description": "admin should be able edit and publish Pivot Analysis(Double,Float)"
+        },
+      "PBLH12": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Float",
+        "fieldValue1": "Row",
+        "fieldName2": "Integer",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Float,Integer)"
+      },
+      "PBLH13": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "fieldName1": "Float",
         "fieldValue1": "Row",
         "fieldName2": "Long",
@@ -78,72 +195,221 @@
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "admin should be able edit and publish Pivot Analysis(Float,Long)"
+      },
+      "PBLH14": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "card",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Float",
+        "fieldValue1": "Row",
+        "fieldName2": "State",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Float,State)"
+      },
+      "PBLH15": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Float",
+        "fieldValue1": "Row",
+        "fieldName2": "String",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Float,String)"
+      },
+      "PBLH16": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Integer",
+        "fieldValue1": "Row",
+        "fieldName2": "Long",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Integer,Long)"
+      },
+      "PBLH17": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "card",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Integer",
+        "fieldValue1": "Row",
+        "fieldName2": "State",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Integer,State)"
+      },
+      "PBLH18": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Integer",
+        "fieldValue1": "Row",
+        "fieldName2": "String",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Integer,String)"
+      },
+      "PBLH19": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Long",
+        "fieldValue1": "Row",
+        "fieldName2": "String",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Long,String)"
+      },
+      "PBLH20": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "card",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "Long",
+        "fieldValue1": "Row",
+        "fieldName2": "State",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(Long,State)"
+      },
+      "PBLH21": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "State",
+        "fieldValue1": "Row",
+        "fieldName2": "String",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(State,String)"
+      },
+      "PBLH22": {
+        "suites": [
+          "regression"
+        ],
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
+        "fieldName1": "String",
+        "fieldValue1": "Row",
+        "fieldName2": "State",
+        "fieldValue2": "Data",
+        "loadMessage": "Tap this message to reload data.",
+        "editMessage": "Analysis has been updated.",
+        "description": "admin should be able edit and publish Pivot Analysis(String,State)"
       }
     },
     "chart": {
-      "PBLH07": {
+      "PBLH23": {
         "suites": [
-          "sanity","critical","regression"
+          "critical","regression","sanity"
         ],
-        "user": "admin",
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "chartType": "chart:bubble",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish bubble charts"
       },
-      "PBLH08": {
+      "PBLH24": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "publishFrom": "list",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "chartType": "chart:column",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish column charts"
       },
-      "PBLH09": {
+      "PBLH25": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "publishFrom": "card",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "chartType": "chart:line",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish line charts"
       },
-      "PBLH10": {
+      "PBLH26": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "publishFrom": "card",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "chartType": "chart:combo",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish combo charts"
       },
-      "PBLH11": {
+      "PBLH27": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "chartType": "chart:bar",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish bar charts"
       },
-      "PBLH12": {
+      "PBLH28": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "chartType": "chart:stack",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish stack charts"
       },
-      "PBLH13": {
+      "PBLH29": {
         "suites": ["regression"],
-        "user": "admin",
+        "publishFrom": "details",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "chartType": "chart:scatter",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
@@ -151,16 +417,17 @@
       }
     },
     "report": {
-      "PBLH16": {
+      "PBLH30": {
         "suites": [
-          "sanity","critical","regression"
+          "critical","regression","sanity"
         ],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "report",
-        "publishFromView": "details",
+        "publishFrom": "list",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "Admin should be able to edit and publish DL Report without Integer Field",
+        "description": "Admin should be able to edit and publish DL Report without Integer Field from List View",
         "totalColumns": 5,
         "tables": [
           {
@@ -171,16 +438,17 @@
           }
         ]
       },
-      "PBLH17": {
+      "PBLH31": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "report",
-        "publishFromView": "list",
+        "publishFrom": "card",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "Admin should be able to edit and publish DL Report without Double & Date Fields",
+        "description": "Admin should be able to edit and publish DL Report without Double & Date Fields from Card View",
         "totalColumns": 4,
         "tables": [
           {
@@ -192,16 +460,17 @@
           }
         ]
       },
-      "PBLH18": {
+      "PBLH32": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "report",
-        "publishFromView": "details",
+        "publishFrom": "details",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
-        "description": "Admin should be able to edit and publish DL Report without Float,Integer & Long Fields",
+        "description": "Admin should be able to edit and publish DL Report without Float,Integer Fields from Details View",
         "totalColumns": 3,
         "tables": [
           {
@@ -214,12 +483,14 @@
           }
         ]
       },
-      "PBLH19": {
+      "PBLH33": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "report",
+        "publishFrom": "list",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish DL Report without Date,Integer & String Fields",
@@ -235,12 +506,14 @@
           }
         ]
       },
-      "PBLH20": {
+      "PBLH34": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "report",
+        "publishFrom": "card",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish DL Report without Date,Integer,Float & Long Fields",
@@ -257,12 +530,14 @@
           }
         ]
       },
-      "PBLH21": {
+      "PBLH35": {
         "suites": [
           "regression"
         ],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "report",
+        "publishFrom": "details",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish DL Report without Date,Integer,Float,String,Long Fields",
@@ -280,10 +555,14 @@
           }
         ]
       },
-      "PBLH22": {
-        "suites": ["sanity","critical","regression"],
-        "user": "admin",
+      "PBLH36": {
+        "suites": [
+          "critical","regression","sanity"
+        ],
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "esReport",
+        "publishFrom": "list",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish ES Report without Double Field",
@@ -295,10 +574,12 @@
           }
         ]
       },
-      "PBLH23": {
+      "PBLH37": {
         "suites": ["regression"],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "esReport",
+        "publishFrom": "card",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish ES Report without Double & Date Fields",
@@ -310,10 +591,12 @@
           }
         ]
       },
-      "PBLH24": {
+      "PBLH38": {
         "suites": ["regression"],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "esReport",
+        "publishFrom": "details",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish ES Report without Float,Integer & Long Fields",
@@ -325,10 +608,12 @@
           }
         ]
       },
-      "PBLH25": {
+      "PBLH39": {
         "suites": ["regression"],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "esReport",
+        "publishFrom": "list",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish ES Report without Date,Integer & String Fields",
@@ -340,10 +625,12 @@
           }
         ]
       },
-      "PBLH26": {
+      "PBLH40": {
         "suites": ["regression"],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "esReport",
+        "publishFrom": "card",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish ES Report without Date,Integer,Float & Long Fields",
@@ -355,10 +642,12 @@
           }
         ]
       },
-      "PBLH27": {
+      "PBLH41": {
         "suites": ["regression"],
-        "user": "admin",
+        "loginUser": "admin",
+        "modifyUser": "userOne",
         "analysisType": "esReport",
+        "publishFrom": "details",
         "loadMessage": "Tap this message to reload data.",
         "editMessage": "Analysis has been updated.",
         "description": "Admin should be able to edit and publish ES Report without Date,Integer,Float,String,Long Fields",
