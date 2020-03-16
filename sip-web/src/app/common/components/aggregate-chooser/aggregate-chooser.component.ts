@@ -138,6 +138,21 @@ export class AggregateChooserComponent implements OnInit {
     return AGGREGATE_TYPES_OBJ[toLower(this.aggregate)] || {};
   }
 
+  /**
+   * Only allow clearing of aggregate on numeric fields. If we
+   * clear aggregates on string fields, we won't get numeric data
+   * for charts.
+   *
+   * @returns
+   * @memberof AggregateChooserComponent
+   */
+  canClearAggregate() {
+    return (
+      this.analysisSubtype === 'scatter' &&
+      NUMBER_TYPES.includes(this.artifactColumn.type)
+    );
+  }
+
   checkColumn(value, sipQuery: QueryDSL) {
     const fields = fpFlatMap(a => a.fields, sipQuery.artifacts);
     const isGroupBy = AggregateChooserComponent.getGroupByPresent(fields);

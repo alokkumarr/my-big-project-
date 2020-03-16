@@ -142,6 +142,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     );
   }
 
+  /**
+   * Even if no aggregate is selected, show the aggregate chooser for numeric types
+   * if it's a scatter chart.
+   *
+   * @returns {boolean}
+   * @memberof DesignerDataOptionFieldComponent
+   */
   shouldShowAggregate(): boolean {
     return (
       (this.analysisSubtype === 'scatter' &&

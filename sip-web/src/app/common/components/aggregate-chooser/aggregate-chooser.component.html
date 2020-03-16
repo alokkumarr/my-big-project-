@@ -25,6 +25,11 @@
     </button>
   </div>
 </mat-menu>
-<button mat-button *ngIf="aggregate" type="button" (click)="clearAggregate()">
+<button
+  mat-button
+  *ngIf="canClearAggregate()"
+  type="button"
+  (click)="clearAggregate()"
+>
   Clear
 </button>
