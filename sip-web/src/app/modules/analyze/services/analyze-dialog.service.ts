@@ -130,6 +130,7 @@ export class AnalyzeDialogService {
     supportsAggregationFilters = false,
     designerPage
   ) {
+    console.log(filters);
     const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
     const data: DesignerFilterDialogData = {
       filters,
