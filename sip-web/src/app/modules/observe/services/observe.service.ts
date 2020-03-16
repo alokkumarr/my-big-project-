@@ -60,7 +60,6 @@ export class ObserveService {
       [CUSTOM_HEADERS.SKIP_TOAST]: '1'
     };
     const analysis = await this.analyze.readAnalysis(id, true, skipToastHeader);
-
     return analysis;
   }
 
