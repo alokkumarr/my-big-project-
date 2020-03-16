@@ -6,6 +6,10 @@ import * as get from 'lodash/get';
 import * as debounce from 'lodash/debounce';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isEmpty from 'lodash/isEmpty';
+import * as filter from 'lodash/filter';
+import * as concat from 'lodash/concat';
+
+import { v4 as uuid } from 'uuid';
 
 import { DSKFilterGroup } from '../dsk-filter.model';
 import { defaultFilters } from '../dsk-filter-group/dsk-filter-group.component';
@@ -23,6 +27,7 @@ export class DskFilterDialogComponent implements OnInit {
   previewString = '';
   errorMessage;
   filterQuery;
+  aggregatedFilters = [];
   debouncedValidator = debounce(this.validateFilterGroup.bind(this), 200);
   constructor(
     private _dialogRef: MatDialogRef<DskFilterDialogComponent>,
@@ -34,6 +39,7 @@ export class DskFilterDialogComponent implements OnInit {
       mode;
       filters;
       booleanCriteria;
+      artifacts;
     }
   ) {
     this.datasecurityService.clearDSKEligibleFields();
@@ -41,7 +47,9 @@ export class DskFilterDialogComponent implements OnInit {
     this.dskFilterObject = this.fetch(this.data, this.data.mode);
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+
+  }
 
   fetch(data, mode) {
     switch (mode) {
@@ -50,6 +58,15 @@ export class DskFilterDialogComponent implements OnInit {
           return cloneDeep(defaultFilters);
         } else {
           console.log(this.data);
+
+          this.aggregatedFilters = [];
+          this.aggregatedFilters = this.data.filters.filter(option => {
+            return option.isAggregationFilter === true;
+          });
+
+          console.log(this.aggregatedFilters);
+
+
           if (this.data.filters[0].filters) {
             return this.changeIndexToNames2(this.data.filters, 'fiters', 'booleanQuery');
           } else {
@@ -111,11 +128,39 @@ export class DskFilterDialogComponent implements OnInit {
     return convertToJson[0];
   }
 
+  addaggregateFilter() {
+    this.aggregatedFilters.push({
+      columnName: '',
+      type:'',
+      artifactsName: this.data.artifacts[0].artifactName,
+      aggregate: null,
+      isAggregationFilter: true,
+      uuid: uuid(),
+      isRuntimeFilter: false,
+      isOptional: false,
+      model: {}
+    });
+  }
+
+  removeAggrFilter(targetIndex) {
+    this.aggregatedFilters = filter(
+      this.aggregatedFilters,
+      (_, index) => targetIndex !== index
+    );
+  }
+
+  onFilterChange(e) {
+  }
+
+  filterRowTrackBy(index, filterRow) {
+    return `${index}:${filterRow.columnName}`;
+  }
+
   submit() {
     if (this.data.mode === 'ANALYZE') {
       this.filterQuery = cloneDeep(this.dskFilterObject);
       const result = this.changeIndexToNames(this.filterQuery, 'booleanQuery', 'filters' );
-      this._dialogRef.close([result]);
+      this._dialogRef.close(concat([result], this.aggregatedFilters));
     } else {
         this.datasecurityService
         .updateDskFiltersForGroup(

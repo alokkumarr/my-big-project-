@@ -11,6 +11,7 @@ export interface DSKFilterField {
   attributeId?: string;
   columnName: string;
   type?: string;
+  isAggregationFilter?: boolean;
   artifactsName?: string;
   isGlobalFilter?: boolean;
   isRuntimeFilter?: boolean;

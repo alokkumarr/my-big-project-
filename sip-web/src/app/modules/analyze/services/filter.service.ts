@@ -91,6 +91,9 @@ export class FilterService {
         (filter.uuid === filterObj.uuid
           && filter.columnName === filterObj.columnName)) {
         filter.model = cloneDeep(filterObj.model);
+        if (filter.isAggregationFilter) {
+          filter.aggregate = cloneDeep(filterObj.aggregate);
+        }
       }
     });
     return flattenedFilters;

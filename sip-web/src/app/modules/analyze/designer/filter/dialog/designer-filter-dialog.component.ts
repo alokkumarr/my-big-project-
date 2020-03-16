@@ -61,6 +61,7 @@ export class DesignerFilterDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log(this.data);
     this.queryWithClass = this.data.analysisType === 'report'
       && this.data.analysisReportType === 'query'
         ? this.loadQueryWithClasses()

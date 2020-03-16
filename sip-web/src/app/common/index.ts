@@ -100,6 +100,7 @@ import { DesignerStringFilterComponent } from './../modules/analyze/designer/fil
 import { DesignerDateFilterComponent } from './../modules/analyze/designer/filter/date';
 import { DesignerNumberFilterComponent } from './../modules/analyze/designer/filter/number';
 import { FilterChipsComponent } from './../modules/analyze/designer/filter/chips-u';
+import { AggregatedFiltersComponent } from './aggregated-filters/aggregated-filters.component';
 
 import {
   RemoteFolderSelectorComponent,
@@ -195,7 +196,8 @@ const COMPONENTS = [
   DesignerStringFilterComponent,
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent,
-  FilterChipsComponent
+  FilterChipsComponent,
+  AggregatedFiltersComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];

@@ -126,6 +126,7 @@ export class DskFilterGroupComponent implements OnInit {
         isGlobalFilter: false,
         isRuntimeFilter: false,
         isOptional: false,
+        isAggregationFilter: false,
         uuid: uuid(),
         model: {
           operator: '',
