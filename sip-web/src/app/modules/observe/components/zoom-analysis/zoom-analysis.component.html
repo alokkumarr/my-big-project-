@@ -6,7 +6,11 @@
     fxLayoutGap="10px"
   >
     <div fxLayout="row" fxLayoutAlign="end center">
-      <button mat-icon-button (click)="close()">
+      <button
+        style="position: fixed; background: white; z-index: 1;"
+        mat-icon-button
+        (click)="close()"
+      >
         <mat-icon class="close-icon" fontIcon="icon-close"></mat-icon>
       </button>
     </div>
