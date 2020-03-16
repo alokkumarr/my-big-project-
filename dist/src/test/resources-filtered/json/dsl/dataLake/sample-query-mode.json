@@ -9,25 +9,7 @@
   "projectCode": "workbench",
   "module": "ANALYZE",
   "sipQuery": {
-    "artifacts": [
-      {
-        "artifactsName":"SALES",
-        "fields":[
-          {
-            "columnName":"string.keyword",
-            "type":"STRING"
-          },
-          {
-            "columnName":"integer",
-            "type":"INTEGER"
-          },
-          {
-            "columnName":"double",
-            "type":"DOUBLE"
-          }
-        ]
-      }
-    ],
+    "artifacts": [],
     "booleanCriteria": "AND",
     "filters": [
       {
@@ -61,34 +43,6 @@
           ],
           "operator": "EQ"
         }
-      },
-      {
-        "booleanCriteria":"OR",
-        "filters":[
-          {
-            "type":"DOUBLE",
-            "artifactsName":"SALES",
-            "columnName":"double",
-            "isGlobalFilter":false,
-            "model":{
-              "operator":"LTE",
-              "value":99995.246
-            }
-          },
-          {
-            "type":"STRING",
-            "artifactsName":"SALES",
-            "columnName":"string",
-            "isGlobalFilter":false,
-            "model":{
-              "operator":"ISIN",
-              "modelValues":[
-                "string 244",
-                "string 245"
-              ]
-            }
-          }
-        ]
       }
     ],
     "joins": [

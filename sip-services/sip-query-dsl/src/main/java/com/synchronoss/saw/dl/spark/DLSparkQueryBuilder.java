@@ -722,12 +722,12 @@ public class DLSparkQueryBuilder {
           if (!flag) {
             filterQuery.append(booleanCriteria);
           }
-          filterQuery = buildFilterUtil(filterAttribute, filterQuery);
-          flag = false;
-
+          if (filterAttribute.getIsRuntimeFilter() && filterAttribute.getModel() != null) {
+            filterQuery = buildFilterUtil(filterAttribute, filterQuery);
+            flag = false;
+          }
         }
       }
-
 
     if (filterQuery.length() != 0) {
       filterQuery.insert(0, "(").append(")");

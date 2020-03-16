@@ -1864,7 +1864,7 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testNestedFilterDl() {
-    ObjectNode analysis = getJsonObject("json/dsl/dataLake/sample-query-mode.json");
+    ObjectNode analysis = getJsonObject("json/dsl/dataLake/sample-dl-nested-filter.json");
     analysis.put("designerEdit",false);
     logger.debug("Analysis body for execution : {}", analysis);
     Response response = execute(token, analysis);
