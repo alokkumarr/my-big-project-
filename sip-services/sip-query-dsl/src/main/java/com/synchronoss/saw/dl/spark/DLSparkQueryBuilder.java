@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -722,7 +723,7 @@ public class DLSparkQueryBuilder {
           if (!flag) {
             filterQuery.append(booleanCriteria);
           }
-          if (filterAttribute.getIsRuntimeFilter() && filterAttribute.getModel() != null) {
+          if (filterAttribute.getModel() != null) {
             filterQuery = buildFilterUtil(filterAttribute, filterQuery);
             flag = false;
           }

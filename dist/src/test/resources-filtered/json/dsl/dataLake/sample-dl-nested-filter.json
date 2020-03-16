@@ -37,6 +37,7 @@
             "type":"DOUBLE",
             "artifactsName":"SALES",
             "columnName":"double",
+            "isRuntimeFilter": false,
             "isGlobalFilter":false,
             "model":{
               "operator":"LTE",
