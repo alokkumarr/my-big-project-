@@ -174,7 +174,9 @@ export class ChartGridComponent {
     }
 
     const aggregateYFields = this.analysis.sipQuery.artifacts[0].fields.filter(
-      field => Boolean(field.aggregate) && field.area === 'y'
+      field =>
+        (Boolean(field.aggregate) || Boolean(field.expression)) &&
+        field.area === 'y'
     );
     return aggregateYFields.length > 0;
   }

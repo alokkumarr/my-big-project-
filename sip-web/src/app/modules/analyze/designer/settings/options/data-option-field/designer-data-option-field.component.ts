@@ -150,6 +150,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
    * @memberof DesignerDataOptionFieldComponent
    */
   shouldShowAggregate(): boolean {
+    if (this.artifactColumn.expression) {
+      return false;
+    }
+
     return (
       (this.analysisSubtype === 'scatter' &&
         NUMBER_TYPES.includes(this.artifactColumn.type)) ||

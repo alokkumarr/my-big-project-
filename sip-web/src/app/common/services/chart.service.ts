@@ -343,7 +343,9 @@ export class ChartService {
     const dateFields = filter(fieldsArray, ({ type }) =>
       DATE_TYPES.includes(type)
     );
-    const aggregateYFields = fields.y.filter(field => Boolean(field.aggregate));
+    const aggregateYFields = fields.y.filter(
+      field => Boolean(field.aggregate) || Boolean(field.expression)
+    );
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
       this.formatDatesIfNeeded(
