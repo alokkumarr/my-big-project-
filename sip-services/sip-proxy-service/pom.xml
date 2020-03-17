@@ -287,7 +287,6 @@
       <artifactId>kafka-clients</artifactId>
       <version>${kafka.driver.version}</version>
     </dependency>
-
   </dependencies>
 	<build>
 		<pluginManagement>

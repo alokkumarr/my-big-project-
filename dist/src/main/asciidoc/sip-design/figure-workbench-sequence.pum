@@ -11,9 +11,7 @@ Client -> "SIP Gateway Service": Execution request
 "SIP Workbench Service" -> "Metadata Service": Register dataset
 "Metadata Service" --> "SIP Workbench Service": Return dataset ID
 
-"SIP Workbench Service" -> "Apache Spark": Execute Spark SQL
+"SIP Workbench Service" -> "XDF-NG": Invokes XDF component 
+"XDF-NG" -> "Apache Spark": Write results
 "Apache Spark" -> "MapR-FS": Write results
-"MapR-FS" --> "SIP Execution Service": Read results
-
-"SIP Workbench Service" --> "SIP Gateway Service": Execution response
 "SIP Gateway Service" --> Client: Execution response

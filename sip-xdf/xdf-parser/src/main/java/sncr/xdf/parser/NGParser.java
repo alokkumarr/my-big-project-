@@ -494,6 +494,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Dataset later on to insure output number of files.
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(sourcePath, outputNOF);
+        
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
         inputDSCount = rdd.count();
         if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
@@ -569,8 +570,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.trace("Parsing " + file + " to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
 
-        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-                .textFile(file.toString(), 1);
+        JavaRDD<String> rdd = null;
+        
+        if(this.ctx.extSparkCtx) {
+
+        	logger.debug("##### Using existing JavaSparkContext ...");
+        	rdd = this.ctx.javaSparkContext
+                    .textFile(file.toString(), 1);
+        } else {
+        	logger.debug("##### Crating new JavaSparkContext ...");
+        	JavaSparkContext context  = new JavaSparkContext(ctx.sparkSession.sparkContext());
+        	rdd = context
+                    .textFile(file.toString(), 1);
+        }
 
         // Add line numbers
         JavaPairRDD<String, Long> zipIndexRdd = rdd.zipWithIndex();

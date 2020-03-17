@@ -1,10 +1,12 @@
 package com.sncr.saw.security.app.id3.model;
 
+import java.io.Serializable;
+
 /**
  * This class contains authorization code details issued using ID3 Identity token to provide the SSO
  * login in SIP.
  */
-public class AuthorizationCodeDetails {
+public class AuthorizationCodeDetails implements Serializable {
 
   /** unique Id for ticket Details; */
   private long ticketDetailsId;
@@ -26,7 +28,7 @@ public class AuthorizationCodeDetails {
   /**
    * get the ticket details id.
    *
-   * @return
+   * @return long
    */
   public long getTicketDetailsId() {
     return ticketDetailsId;
@@ -35,7 +37,7 @@ public class AuthorizationCodeDetails {
   /**
    * get the ticket details id.
    *
-   * @param ticketDetailsId
+   * @param ticketDetailsId Ticket details ID.
    */
   public void setTicketDetailsId(long ticketDetailsId) {
     this.ticketDetailsId = ticketDetailsId;
@@ -53,7 +55,7 @@ public class AuthorizationCodeDetails {
   /**
    * * Set the Sip Ticket ID (Unique identifier for authorization code) .
    *
-   * @param sipTicketId
+   * @param sipTicketId SIP Ticket ID .
    */
   public void setSipTicketId(String sipTicketId) {
     this.sipTicketId = sipTicketId;
@@ -71,7 +73,7 @@ public class AuthorizationCodeDetails {
   /**
    * Set SIP Customer code associated with authorization code.
    *
-   * @param customerCode
+   * @param customerCode Customer Code.
    */
   public void setCustomerCode(String customerCode) {
     this.customerCode = customerCode;
@@ -80,7 +82,7 @@ public class AuthorizationCodeDetails {
   /**
    * Get SIP Master login id associated with authorization code.
    *
-   * @return
+   * @return String
    */
   public String getMasterLoginId() {
     return masterLoginId;
@@ -89,7 +91,7 @@ public class AuthorizationCodeDetails {
   /**
    * Set SIP Master login id associated with authorization code.
    *
-   * @param masterLoginId
+   * @param masterLoginId Master Login ID.
    */
   public void setMasterLoginId(String masterLoginId) {
     this.masterLoginId = masterLoginId;
@@ -107,7 +109,7 @@ public class AuthorizationCodeDetails {
   /**
    * set Id3 client id associated with authorization code.
    *
-   * @param id3ClientId
+   * @param id3ClientId Id3 Client Id.
    */
   public void setId3ClientId(String id3ClientId) {
     this.id3ClientId = id3ClientId;
@@ -116,7 +118,7 @@ public class AuthorizationCodeDetails {
   /**
    * Get the Domain Name for Id3 client .
    *
-   * @return
+   * @return String
    */
   public String getId3DomainName() {
     return id3DomainName;
@@ -125,7 +127,7 @@ public class AuthorizationCodeDetails {
   /**
    * set the Domain Name for Id3 client .
    *
-   * @param id3DomainName
+   * @param id3DomainName Id3 Domain Name.
    */
   public void setId3DomainName(String id3DomainName) {
     this.id3DomainName = id3DomainName;
@@ -134,7 +136,7 @@ public class AuthorizationCodeDetails {
   /**
    * Get the authorization code validity time.
    *
-   * @return
+   * @return Long.
    */
   public long getValidUpto() {
     return validUpto;
@@ -143,7 +145,7 @@ public class AuthorizationCodeDetails {
   /**
    * set the authorization code validity time.
    *
-   * @param validUpto
+   * @param validUpto Token Valid till the time .
    */
   public void setValidUpto(long validUpto) {
     this.validUpto = validUpto;
@@ -152,15 +154,13 @@ public class AuthorizationCodeDetails {
   /**
    * check authorization code is valid.
    *
-   * @return
+   * @return Boolean is token valid.
    */
   public boolean isValid() {
     return valid;
   }
   /**
    * set authorization code validity.
-   *
-   * @return
    */
   public void setValid(boolean valid) {
     this.valid = valid;

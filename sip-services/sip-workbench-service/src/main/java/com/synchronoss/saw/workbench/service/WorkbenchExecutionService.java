@@ -1,5 +1,7 @@
 package com.synchronoss.saw.workbench.service;
 
+import org.json.JSONObject;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface WorkbenchExecutionService {
@@ -8,15 +10,11 @@ public interface WorkbenchExecutionService {
    */
   ObjectNode execute(String project, String name, String component, String config) throws Exception;
 
-  /**
-   * Start creating preview of given dataset asynchronously.
-   */
-  ObjectNode preview(String project, String name) throws Exception;
 
   /**
-   * Get dataset preview data by preview ID.
+   * Get dataset preview data by dataset name.
    */
-  ObjectNode getPreview(String previewId) throws Exception;
+  ObjectNode getPreview(String project, String name) throws Exception;
   /**
    * Get dataset preview data by preview ID.
    */

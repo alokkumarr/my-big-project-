@@ -439,10 +439,70 @@ public class ExternalSecurityController {
             return userDetailsResponse;
         }
         Long customerId = Long.valueOf(ticket.getCustID());
-        userDetailsResponse.setUser(userRepository.getUserbyId(userSysId,customerId));
-        userDetailsResponse.setValid(true);
-        userDetailsResponse.setValidityMessage("User details fetched successfully");
-        userDetailsResponse.setError("");
+        UserDetails userDetails = userRepository.getUserbyId(userSysId,customerId);
+        if (userDetails!=null) {
+            userDetailsResponse.setUser(userDetails);
+            userDetailsResponse.setValid(true);
+            userDetailsResponse.setValidityMessage("User details fetched successfully");
+            userDetailsResponse.setError("");
+        }
+        else {
+            userDetailsResponse.setValid(false);
+            userDetailsResponse.setValidityMessage("Unable to fetch the user Details");
+            userDetailsResponse.setError("Error occurred while fetching user details ");
+        }
+        return userDetailsResponse;
+    }
+
+
+    /**
+     * delete user with dsk.
+     *
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @return Returns UserDetailsResponse
+     */
+    @ApiOperation(
+        value = " delete User API ",
+        nickname = "deleteUserWithDsk",
+        notes = "Admin can only use this API to delete the user",
+        response = UserDetailsResponse.class)
+    @DeleteMapping(value = "/users/{id}")
+    public UserDetailsResponse deleteUser(
+        HttpServletRequest request,
+        HttpServletResponse response, @PathVariable(name = "id") Long userSysId) {
+        Ticket ticket = SipCommonUtils.getTicket(request);
+        RoleType roleType = ticket.getRoleType();
+        UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+        if (roleType != RoleType.ADMIN) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            userDetailsResponse.setValid(false);
+            logger.error("user is not admin");
+            userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+            return userDetailsResponse;
+        }
+        Long customerId = Long.valueOf(ticket.getCustID());
+        UserDetails userDetails = userRepository.getUserbyId(userSysId,customerId);
+        if (userDetails!=null) {
+            boolean flag = userRepository.deleteUser(userSysId,
+                userDetails.getMasterLoginId(),customerId);
+            if (flag) {
+                userDetailsResponse.setUser(userDetails);
+                userDetailsResponse.setValid(true);
+                userDetailsResponse.setValidityMessage("User details deleted successfully");
+                userDetailsResponse.setError("");
+            }
+            else {
+                userDetailsResponse.setValid(false);
+                userDetailsResponse.setValidityMessage("Unable to delete the user Details");
+                userDetailsResponse.setError("Error occurred while deleting user details ");
+            }
+        }
+        else {
+            userDetailsResponse.setValid(false);
+            userDetailsResponse.setValidityMessage("Unable to delete the user Details");
+            userDetailsResponse.setError("Error occurred while deleting user details ");
+        }
         return userDetailsResponse;
     }
 

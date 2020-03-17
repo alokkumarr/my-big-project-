@@ -65,10 +65,6 @@ public class ServerCookies {
       buf.append("; Secure");
     }
 
-    // HttpOnly
-    if (httpOnly) {
-      buf.append("; HttpOnly");
-    }
     // Path=path
     buf.append("; Path=");
     buf.append("/");
