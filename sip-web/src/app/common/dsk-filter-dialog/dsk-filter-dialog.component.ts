@@ -40,6 +40,7 @@ export class DskFilterDialogComponent implements OnInit {
       filters;
       booleanCriteria;
       artifacts;
+      supportsAggregationFilters: boolean;
     }
   ) {
     this.datasecurityService.clearDSKEligibleFields();
@@ -57,18 +58,13 @@ export class DskFilterDialogComponent implements OnInit {
         if (isEmpty(data.filters)) {
           return cloneDeep(defaultFilters);
         } else {
-          console.log(this.data);
-
           this.aggregatedFilters = [];
           this.aggregatedFilters = this.data.filters.filter(option => {
             return option.isAggregationFilter === true;
           });
 
-          console.log(this.aggregatedFilters);
-
-
           if (this.data.filters[0].filters) {
-            return this.changeIndexToNames2(this.data.filters, 'fiters', 'booleanQuery');
+            return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
           } else {
             const oldFormatFilters = cloneDeep(this.data.filters);
             this.data.filters = [];
@@ -76,7 +72,7 @@ export class DskFilterDialogComponent implements OnInit {
               booleanCriteria: this.data.booleanCriteria,
               filters: oldFormatFilters
             })
-            return this.changeIndexToNames2(this.data.filters, 'fiters', 'booleanQuery');
+            return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
           }
         }
       case 'DSK':
@@ -85,14 +81,13 @@ export class DskFilterDialogComponent implements OnInit {
   }
 
   validateFilterGroup() {
+    const analyzeResult = this.datasecurityService.changeIndexToNames(this.dskFilterObject, 'booleanQuery', 'filters' );
     this.errorState = !this.datasecurityService.isDSKFilterValid(
-      this.dskFilterObject,
-      true
+      this.data.mode === 'DSK' ? this.dskFilterObject : concat([analyzeResult], this.aggregatedFilters),
+      true,
+      this.data.mode
     );
 
-    if (this.data.mode === 'ANALYZE') {
-      return;
-    }
 
     if (this.errorState) {
       this.previewString = '';
@@ -115,13 +110,6 @@ export class DskFilterDialogComponent implements OnInit {
   //Need to para'se the replace funtion;
 
   changeIndexToNames(dskObject, source, target) {
-    const convertToString = JSON.stringify(dskObject);
-    const replaceIndex = convertToString.replace(/"booleanQuery":/g, '"filters":');
-    const convertToJson = JSON.parse(replaceIndex);
-    return convertToJson;
-  }
-
-  changeIndexToNames2(dskObject, source, target) {
     const convertToString = JSON.stringify(dskObject);
     const replaceIndex = convertToString.replace(/"filters":/g, '"booleanQuery":');
     const convertToJson = JSON.parse(replaceIndex);
@@ -150,6 +138,7 @@ export class DskFilterDialogComponent implements OnInit {
   }
 
   onFilterChange(e) {
+    this.debouncedValidator();
   }
 
   filterRowTrackBy(index, filterRow) {
@@ -159,7 +148,7 @@ export class DskFilterDialogComponent implements OnInit {
   submit() {
     if (this.data.mode === 'ANALYZE') {
       this.filterQuery = cloneDeep(this.dskFilterObject);
-      const result = this.changeIndexToNames(this.filterQuery, 'booleanQuery', 'filters' );
+      const result = this.datasecurityService.changeIndexToNames(this.filterQuery, 'booleanQuery', 'filters' );
       this._dialogRef.close(concat([result], this.aggregatedFilters));
     } else {
         this.datasecurityService

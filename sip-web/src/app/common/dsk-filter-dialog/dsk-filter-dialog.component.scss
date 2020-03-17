@@ -65,3 +65,15 @@
     color: #e53935;
   }
 }
+
+.analyze-aggregate-filters {
+  padding: 5px;
+
+  div {
+    color: var(--theme-primary-600);
+  }
+
+  mat-divider {
+    height: 10px;
+  }
+}

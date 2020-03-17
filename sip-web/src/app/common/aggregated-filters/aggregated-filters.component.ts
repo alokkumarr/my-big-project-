@@ -48,16 +48,12 @@ export class AggregatedFiltersComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    console.log(this.data, get(this.data, 'artifacts[0].artifactName') || get(this.data, 'artifacts[0].artifactsName'));
     this.filter.artifactsName = get(this.data, 'artifacts[0].artifactName') || get(this.data, 'artifacts[0].artifactsName');
     this.cols = this.data.artifacts[0].columns;
-    console.log(this.cols);
   }
 
   columnsSelect(column) {
-    console.log(column);
     this.filter.columnName = column;
-    console.log(this.filter);
 
     this.filter.type = fpPipe(
       fpFilter(({ columnName }) => {
@@ -69,17 +65,13 @@ export class AggregatedFiltersComponent implements OnInit {
   }
 
   aggregateSelect(aggregate) {
-    console.log(aggregate);
     this.filter.aggregate = aggregate;
     this.filter.isAggregationFilter = true;
-    console.log(this.filter);
     this.filterChange.emit(this.filter);
   }
 
   onFilterModelChange(model) {
-    console.log(model);
     this.filter.model = model
-    console.log(this.filter);
     this.filterChange.emit(this.filter);
   }
 
@@ -89,10 +81,12 @@ export class AggregatedFiltersComponent implements OnInit {
       delete this.filter.model;
     }
     this.filter.isRuntimeFilter = checked;
+    this.filterChange.emit(this.filter);
   }
 
   onOptionalCheckboxToggle(checked) {
     this.filter.isOptional = checked;
+    this.filterChange.emit(this.filter);
   }
 
   remove() {

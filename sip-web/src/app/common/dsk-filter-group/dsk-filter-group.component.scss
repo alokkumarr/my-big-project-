@@ -21,6 +21,11 @@ $icon-font-size: 12px;
   }
 }
 
+.analyze-criteria-header {
+  width: 900px;
+  padding: 10px 0 10px 10px;
+}
+
 .boolean-criteria-header {
   padding: 10px 0 10px 10px;
 }
@@ -84,4 +89,12 @@ mat-select {
   position: absolute;
   top: 3px;
   left: -4px;
+}
+
+.input-fields {
+  width: 680px;
+
+  .mat-form-field {
+    margin-left: 10px;
+  }
 }
