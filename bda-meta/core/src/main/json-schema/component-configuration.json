@@ -246,6 +246,10 @@
         "headerSize": {
           "type": "integer"
         },
+        "fieldDefRowNumber": {
+          "description": "Field Names Row Number in CSV File when Header Size is Greater than 1",
+          "type": "integer"
+        },
         "numberOfFiles": {
           "$ref": "#/numberOfFiles"
         },
