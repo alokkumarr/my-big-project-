@@ -625,7 +625,13 @@ export class ChartService {
     }
 
     return fpPipe(
-      fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
+      fpMap(dataPoint =>
+        mapValues(axesFieldNameMap, val => {
+          return axesFieldNameMap.y === val && dataPoint[val] === ''
+            ? null
+            : dataPoint[val];
+        })
+      ),
       fpGroupBy('g'),
       fpToPairs,
       fpMap(([name, data]) => ({
