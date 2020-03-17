@@ -26,7 +26,10 @@ import {
   DEFAULT_DATE_INTERVAL,
   BETWEEN_NUMBER_FILTER_OPERATOR,
   NUMBER_FILTER_OPERATORS,
-  NUMBER_FILTER_OPERATORS_OBJ
+  NUMBER_FILTER_OPERATORS_OBJ,
+  CUSTOM_DATE_PRESET_VALUE,
+  DATE_PRESETS,
+  LESS_THAN_A_WEEK_DATE_PRESETS
 } from '../../common/consts';
 
 export { DATAPOD_CATEGORIES_OBJ } from '../../common/consts';
@@ -52,7 +55,10 @@ export {
   DEFAULT_DATE_INTERVAL,
   BETWEEN_NUMBER_FILTER_OPERATOR,
   NUMBER_FILTER_OPERATORS,
-  NUMBER_FILTER_OPERATORS_OBJ
+  NUMBER_FILTER_OPERATORS_OBJ,
+  CUSTOM_DATE_PRESET_VALUE,
+  DATE_PRESETS,
+  LESS_THAN_A_WEEK_DATE_PRESETS
 };
 
 export const DSL_ANALYSIS_TYPES = [
@@ -369,75 +375,6 @@ export const AREA_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(AREA_TYPES);
-
-export const CUSTOM_DATE_PRESET_VALUE = 'NA';
-export const DATE_PRESETS = [
-  {
-    value: 'Yesterday',
-    keyword: 'YESTERDAY',
-    label: 'Yesterday'
-  },
-  {
-    value: 'Today',
-    keyword: 'TODAY',
-    label: 'Today'
-  },
-  {
-    value: 'TW',
-    keyword: 'THIS_WEEK',
-    label: 'This Week'
-  },
-  {
-    value: 'MTD',
-    keyword: 'MONTH_TO_DATE',
-    label: 'MTD (Month to Date)'
-  },
-  {
-    value: 'YTD',
-    keyword: 'YEAR_TO_DATE',
-    label: 'YTD (Year to Date)'
-  },
-  {
-    value: 'LW',
-    keyword: 'LAST_WEEK',
-    label: 'Last Week'
-  },
-  {
-    value: 'LTW',
-    keyword: 'LAST_2_WEEKS',
-    label: 'Last 2 Weeks'
-  },
-  {
-    value: 'LM',
-    keyword: 'LAST_MONTH',
-    label: 'Last Month'
-  },
-  {
-    value: 'LQ',
-    keyword: 'LAST_QUARTER',
-    label: 'Last Quarter'
-  },
-  {
-    value: 'LTM',
-    keyword: 'LAST_3_MONTHS',
-    label: 'Last 3 Months'
-  },
-  {
-    value: 'LSM',
-    keyword: 'LAST_6_MONTHS',
-    label: 'Last 6 Months'
-  },
-  {
-    value: 'LY',
-    keyword: 'LAST_YEAR',
-    label: 'Last Year'
-  },
-  {
-    value: CUSTOM_DATE_PRESET_VALUE,
-    keyword: 'CUSTOM',
-    label: 'Custom'
-  }
-];
 
 export const PLURAL_STRING_FILTERS = [
   {

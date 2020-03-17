@@ -222,6 +222,16 @@ export class AnalyzeDialogService {
     return this.openConfirmationDialog(queryConfirmation);
   }
 
+  openWarningDialog(title: string, msg: string) {
+    const queryConfirmation = {
+      title,
+      content: msg,
+      positiveActionLabel: 'Ok',
+      negativeActionLabel: 'Cancel'
+    };
+    return this.openConfirmationDialog(queryConfirmation);
+  }
+
   openConfirmationDialog(data: ConfirmDialogData) {
     return this.dialog.open(ConfirmDialogComponent, {
       width: 'auto',

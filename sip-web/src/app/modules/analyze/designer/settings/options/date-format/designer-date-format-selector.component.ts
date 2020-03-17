@@ -44,6 +44,7 @@ export class DesignerDateFormatSelectorComponent {
               groupInterval
             })
           );
+          this.onGroupIntervalChangedForChart(groupInterval);
           break;
 
         case 'pivot':
@@ -70,6 +71,12 @@ export class DesignerDateFormatSelectorComponent {
           );
       }
       this.change.emit({ subject: 'format' });
+    }
+  }
+
+  onGroupIntervalChangedForChart(groupInterval) {
+    if (groupInterval === 'minute') {
+      console.log('minute interval selected');
     }
   }
 
