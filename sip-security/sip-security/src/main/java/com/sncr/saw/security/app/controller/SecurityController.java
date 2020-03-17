@@ -1242,7 +1242,8 @@ public class SecurityController {
 			Ticket ticket = SipCommonUtils.getTicket(request);
       if (deleteUser.getUserId() != null && deleteUser.getCustomerId() != null && deleteUser.getMasterLoginId() != null
           && securityService.haveValidCustomerId(ticket, deleteUser.getCustomerId())) {
-				if (userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId())) {
+				if (userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId()
+                    ,Long.valueOf(ticket.getCustID()))) {
 					userList.setUsers(userRepository.getUsers(deleteUser.getCustomerId()));
 					userList.setValid(true);
 				} else {
