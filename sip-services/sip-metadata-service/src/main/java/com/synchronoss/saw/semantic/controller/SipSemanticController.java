@@ -12,6 +12,7 @@ import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import com.synchronoss.saw.semantic.service.SemanticService;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -191,8 +192,10 @@ public class SipSemanticController {
     SemanticNodes responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
+      String queryMapStr = objectMapper.writeValueAsString(queryMap);
+      String sanitizedQueryMapStr = SipCommonUtils.sanitizeJson(queryMapStr);
       SemanticNode requestBody =
-          objectMapper.readValue(objectMapper.writeValueAsString(queryMap), SemanticNode.class);
+          objectMapper.readValue(sanitizedQueryMapStr, SemanticNode.class);
       logger.trace("Search Request Body : {} ", objectMapper.writeValueAsString(requestBody));
       responseObjectFuture = semanticService.search(requestBody, headers);
       logger.trace(
@@ -220,8 +223,10 @@ public class SipSemanticController {
     BackCompatibleStructure responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     try {
+      String queryMapStr = objectMapper.writeValueAsString(queryMap);
+      String sanitizedQueryMapStr = SipCommonUtils.sanitizeJson(queryMapStr);
       SemanticNode requestBody =
-          objectMapper.readValue(objectMapper.writeValueAsString(queryMap), SemanticNode.class);
+          objectMapper.readValue(sanitizedQueryMapStr, SemanticNode.class);
       logger.trace("Search Request Body : {} ", requestBody);
       responseObjectFuture = semanticService.list(requestBody, headers);
       logger.trace(

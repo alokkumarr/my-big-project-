@@ -806,6 +806,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this._store.selectSnapshot(DesignerState.analysisFilters),
           this.artifacts,
           get(analysis, 'sipQuery.booleanCriteria'),
+          get(analysis, 'type'),
           supportsGlobalFilters,
           this.filterService.supportsAggregatedFilters(analysis)
         )

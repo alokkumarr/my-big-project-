@@ -342,6 +342,11 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           }
         });
       } else if (BooleanUtils.isTrue(filter.getIsRuntimeFilter()))  {
+        if (filter.getModel() == null && CollectionUtils
+            .isEmpty(filter.getModel().getModelValues())) {
+          throw new RuntimeException(
+              "Run time filter for queryMode : {ModelValues} can't be null or empty!! ");
+        }
         filter.getModel().getModelValues().forEach(val -> {
           filList.add(String.format("'%s'", val));
         });

@@ -1,0 +1,72 @@
+<div *ngIf="data.supportsAggregationFilters" fxLayout="row">
+  <div class="input-fields" fxLayout="row">
+      <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+          <mat-label>Columns</mat-label>
+          <mat-select (selectionChange)="columnsSelect($event.value)"
+                      [value]="filter.columnName">
+            <mat-option *ngFor="let column of cols;"
+                        [value]="column.columnName">
+              {{ column.displayName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field
+        class="select-form-field"
+        style="max-width: 145px; margin-left: 10px"
+        appearance="outline"
+        *ngIf="!filter.isRuntimeFilter"
+        >
+          <mat-label>Aggregate</mat-label>
+          <mat-select
+            e2e="filter-aggregate-select"
+            [value]="filter.aggregate"
+            (selectionChange)="aggregateSelect($event.value)"
+          >
+            <mat-option
+              *ngFor="let aggregate of supportedAggregates"
+              [value]="aggregate.value"
+              [attr.e2e]="'filter-aggregate-option-' + aggregate.label"
+            >
+              {{ aggregate.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <designer-number-filter
+          *ngIf="!filter.isRuntimeFilter"
+          (filterModelChange)="onFilterModelChange($event)"
+          [filterModel]="filter.model"
+        >
+        </designer-number-filter>
+    </div>
+    <div
+      fxLayout="row"
+      class="filter__action__space"
+      fxLayoutAlign="space-between center"
+      *ngIf="data.showFilterOptions"
+    >
+      <mat-checkbox
+        [checked]="filter.isRuntimeFilter"
+        (change)="onRuntimeCheckboxToggle($event.checked)"
+        i18n
+        e2e="filter-dialog-prompt-checkbox"
+      >
+        Prompt
+      </mat-checkbox>
+      <mat-checkbox
+        *ngIf="filter.isRuntimeFilter"
+        [checked]="filter.isOptional"
+        (change)="onOptionalCheckboxToggle($event.checked)"
+        i18n
+        e2e="filter-dialog-optional-checkbox"
+      >
+        Optional
+      </mat-checkbox>
+    </div>
+
+    <button mat-icon-button (click)="remove()">
+      <mat-icon fontIcon="icon-close" class="filter__remove-button__icon">
+      </mat-icon>
+    </button>
+</div>

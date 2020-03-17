@@ -166,6 +166,7 @@ export class DesignerFilterRowComponent implements OnInit {
 
   onAggregateSelected(aggregate: string) {
     this.filter.aggregate = aggregate;
+    console.log(this.filter, aggregate)
     this.filterModelChange.emit();
   }
 

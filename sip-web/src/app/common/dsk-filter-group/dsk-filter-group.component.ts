@@ -126,6 +126,7 @@ export class DskFilterGroupComponent implements OnInit {
         isGlobalFilter: false,
         isRuntimeFilter: false,
         isOptional: false,
+        isAggregationFilter: false,
         uuid: uuid(),
         model: {
           operator: '',
@@ -246,7 +247,8 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   onFilterModelChange(filter, childId) {
-    if ((<DSKFilterField>this.filterGroup.booleanQuery[childId]).isRuntimeFilter) {
+    if ((<DSKFilterField>this.filterGroup.booleanQuery[childId]).isRuntimeFilter
+      || (<DSKFilterField>this.filterGroup.booleanQuery[childId]).isGlobalFilter) {
       delete (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model;
     } else {
       (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
@@ -277,6 +279,9 @@ export class DskFilterGroupComponent implements OnInit {
   onGlobalCheckboxToggle(value, childId) {
     if (!this.data.supportsGlobalFilters) {
       return;
+    }
+    if (value) {
+      delete (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model;
     }
     (<DSKFilterField>this.filterGroup.booleanQuery[childId]).isGlobalFilter = value;
     this.onChange.emit(this.filterGroup);

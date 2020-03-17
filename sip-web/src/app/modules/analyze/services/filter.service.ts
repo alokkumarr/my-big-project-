@@ -82,15 +82,18 @@ export class FilterService {
   }
 
 
-  sampleFilters(filters, flattenedFilters, filterObj) {
+  mergeFilters(filters, flattenedFilters, filterObj) {
     forEach(filters, filter => {
       if (filter.filters || isArray(filter)) {
-        this.sampleFilters(filter, flattenedFilters, filterObj);
+        this.mergeFilters(filter, flattenedFilters, filterObj);
       }
       if (filter.columnName &&
         (filter.uuid === filterObj.uuid
           && filter.columnName === filterObj.columnName)) {
         filter.model = cloneDeep(filterObj.model);
+        if (filter.isAggregationFilter) {
+          filter.aggregate = cloneDeep(filterObj.aggregate);
+        }
       }
     });
     return flattenedFilters;
@@ -101,7 +104,7 @@ export class FilterService {
     allFiltersWithEmptyRuntimeFilters
   ) {
     forEach(runtimeFilters, filter => {
-      this.sampleFilters(allFiltersWithEmptyRuntimeFilters, [], filter);
+      this.mergeFilters(allFiltersWithEmptyRuntimeFilters, [], filter);
     });
     return allFiltersWithEmptyRuntimeFilters;
   }

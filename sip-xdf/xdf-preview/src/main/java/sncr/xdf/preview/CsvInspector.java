@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.json.JsonSanitizer;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import org.apache.hadoop.fs.FileStatus;
@@ -62,7 +63,9 @@ public class CsvInspector {
 
     //c/projects/tools
     public CsvInspector(String jsonSettings, String root) throws Exception {
-        JsonObject conf = new JsonParser().parse(jsonSettings).getAsJsonObject();
+        String sanitizedJson = JsonSanitizer.sanitize(jsonSettings);
+        JsonObject conf = new JsonParser().parse(sanitizedJson).getAsJsonObject();
+
         JsonObject inspectorSettings = conf.getAsJsonObject("csvInspector");
         if(inspectorSettings != null) {
             String tmp = "";

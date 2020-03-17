@@ -21,6 +21,7 @@ import com.synchronoss.saw.batch.service.BisRouteService;
 import com.synchronoss.saw.batch.service.ChannelTypeService;
 import com.synchronoss.sip.utils.RestUtil;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -56,10 +57,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-
-
-
 
 
 @RestController
@@ -339,6 +336,7 @@ public class SawBisRouteController {
         throw new SftpProcessorException("Exception occurred while updating routeMetaData ", e);
       }
       String schedulerDetails = routeData.get("schedulerExpression").toString();
+      String sanitizedSchedulerDetails = SipCommonUtils.sanitizeJson(schedulerDetails);
       JsonNode schedulerExpn = routeData.get("schedulerExpression");
       if (schedulerExpn != null) {
         logger.trace("schedulerExpression  is not null ", schedulerExpn);
@@ -352,7 +350,7 @@ public class SawBisRouteController {
         schedulerRequest.setJobGroup(String.valueOf(routeId));
         JsonNode schedulerData = null;
         try {
-          schedulerData = objectMapper.readTree(schedulerDetails);
+          schedulerData = objectMapper.readTree(sanitizedSchedulerDetails);
           logger.trace("schedulerData  is not null ", schedulerData);
         } catch (IOException e) {
           logger.error("Exception occurred while updating schedulerExpression ", e);
@@ -416,7 +414,7 @@ public class SawBisRouteController {
       }
       BeanUtils.copyProperties(routeEntity, requestBody, "routeMetadata");
       try {
-        routeData = (ObjectNode) objectMapper.readTree(requestBody.getRouteMetadata());
+        routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
         // routeData.put("destinationLocation", destinationLocation);
         requestBody.setRouteMetadata(objectMapper.writeValueAsString(routeData));
       } catch (IOException e) {
