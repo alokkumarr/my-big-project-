@@ -21,7 +21,6 @@ import { ChartService } from '../../services';
 import {
   ArtifactColumnReport,
   AnalysisDSL,
-  SqlBuilderChart,
   AnalysisChartDSL,
   isDSLAnalysis,
   ChartOptions
@@ -121,42 +120,6 @@ export class ChartGridComponent {
     });
   }
 
-  /**
-   * Converts sipQuery to sqlBuilder like object for use in chart service.
-   * This is a non-ideal work-around made until we can locate all the places
-   * we need to change.
-   *
-   * @param {*} queryOrBuilder
-   * @returns {SqlBuilderChart}
-   * @memberof DesignerChartComponent
-   */
-  sipQueryToSQLBuilderFields(queryOrBuilder): SqlBuilderChart {
-    if (queryOrBuilder.nodeFields || queryOrBuilder.dataFields) {
-      return queryOrBuilder;
-    }
-
-    const builderLike: SqlBuilderChart = {
-      dataFields: [],
-      nodeFields: [],
-      filters: queryOrBuilder.filters,
-      sorts: queryOrBuilder.sorts,
-      orderByColumns: queryOrBuilder.orderByColumns,
-      booleanCriteria: queryOrBuilder.booleanCriteria
-    };
-
-    (queryOrBuilder.artifacts || []).forEach(table => {
-      (table.fields || []).forEach(column => {
-        if (['y', 'z'].includes(column.area)) {
-          builderLike.dataFields.push(column);
-        } else {
-          builderLike.nodeFields.push(column);
-        }
-      });
-    });
-
-    return builderLike;
-  }
-
   initChartOptions(analysis) {
     this.toggleToGrid = false;
     const { LEGEND_POSITIONING, LAYOUT_POSITIONS } = this._chartService;
@@ -214,19 +177,28 @@ export class ChartGridComponent {
           (isDataField
             ? dataFieldToHuman(column.dataField)
             : column.displayName);
+
+        const {
+          dateFormat,
+          momentFormat
+        } = this._chartService.getMomentDateFormat(
+          columnFormat,
+          get(<AnalysisChartDSL>this.analysis, 'chartOptions.chartType') ===
+            'comparison'
+            ? column.groupInterval
+            : null
+        );
         value =
           column.type === 'date'
             ? moment
-                .utc(
-                  value,
-                  this._chartService.getMomentDateFormat(columnFormat)
-                )
+                .utc(value, dateFormat)
                 .format(
-                  columnFormat === 'MMM d YYYY'
-                    ? 'MMM DD YYYY'
-                    : columnFormat === 'MMMM d YYYY, h:mm:ss a'
-                    ? 'MMMM DD YYYY, h:mm:ss a'
-                    : columnFormat
+                  momentFormat ||
+                    (columnFormat === 'MMM d YYYY'
+                      ? 'MMM DD YYYY'
+                      : columnFormat === 'MMMM d YYYY, h:mm:ss a'
+                      ? 'MMMM DD YYYY, h:mm:ss a'
+                      : columnFormat)
                 )
             : value;
         if (
@@ -287,7 +259,7 @@ export class ChartGridComponent {
       }
       res[field.columnName] = this._chartService.getMomentDateFormat(
         field.dateFormat
-      );
+      ).dateFormat;
       return res;
     }, {});
   }
@@ -371,6 +343,7 @@ export class ChartGridComponent {
         }
       });
     }
+
     return chartHeight;
   }
 

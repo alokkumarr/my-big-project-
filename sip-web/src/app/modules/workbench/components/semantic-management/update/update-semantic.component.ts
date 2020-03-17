@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
+import CheckBox from 'devextreme/ui/check_box';
 
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 import { CommonLoadUpdatedMetrics } from '../../../../../common/actions/common.actions';
+import { NUMBER_TYPES, DATE_TYPES } from '../../../../../common/consts';
 
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -20,6 +22,8 @@ import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as has from 'lodash/has';
 
+const NUMBER_AND_DATE = [...NUMBER_TYPES, ...DATE_TYPES];
+const ELIGIBLE_COLS = ['kpiEligible', 'filterEligible', 'dskEligible'];
 @Component({
   selector: 'update-semantic',
   templateUrl: './update-semantic.component.html',
@@ -34,6 +38,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   public isJoinEligible = false;
   public selectedDPDetails: any = [];
   public dpID = '';
+  public isDateTypeMatched = true;
 
   constructor(
     public router: Router,
@@ -112,12 +117,18 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
             set(col, 'include', false);
           }
         });
+        this.isDateTypeMatched = some(this.selectedDPData[0].columns, obj => {
+          return DATE_TYPES.includes(obj.type);
+        });
       });
     });
   }
 
   /**
    * Construct semantic layer field object structure.
+   * When user does not include a column and update datapod, later point of time, same datapod
+   * is updated then filterEligible is selected automatically for not included column.
+   * So changing default value of filterEligible to false. Added as part of SIP-9565.
    *
    * @param {*} dsData
    * @returns
@@ -131,7 +142,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         alias: value.name,
         columnName: colName,
         displayName: value.name,
-        filterEligible: true,
+        filterEligible: false,
         joinEligible: false,
         kpiEligible: false,
         dskEligible: false,
@@ -168,5 +179,49 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         this.store.dispatch(new CommonLoadUpdatedMetrics());
         this.router.navigate(['workbench', 'dataobjects']);
       });
+  }
+
+  /**
+   *
+   * @param e
+   * Disable checkbox of non numeric and date type fields in KPI Eligible column. Added as part of SIP-9373.
+   *
+   * When Include checkbox is not selected for a column then
+   * uncheck and disable filterEligible, kpiEligible and dskEligible for same column.
+   * Also when Include column is checked then enable all the checkboxes
+   * for all the eligible columns based on requirement of SIP-9373.
+   * Added as part of SIP-9566
+   */
+  cellPrepared(e) {
+    if (e.rowType === 'data' && ELIGIBLE_COLS.includes(e.column.dataField)) {
+      const check =
+        !e.row.cells[0].value ||
+        ((['kpiEligible'].includes(e.column.dataField) &&
+          !NUMBER_AND_DATE.includes(e.data.type)) ||
+          !this.isDateTypeMatched);
+      CheckBox.getInstance(e.cellElement.querySelector('.dx-checkbox')).option(
+        'disabled',
+        check
+      );
+    }
+    return;
+  }
+
+  cellClicked(e) {
+    if (e.rowType === 'data' && e.column.dataField === 'include') {
+      const matchedCol = find(this.selectedDPData[0].columns, col => {
+        // For new datapod aliasName is changed to alias hence checking for both conditions.
+        return col.aliasName
+          ? col.aliasName === e.data.aliasName
+          : col.alias === e.data.alias;
+      });
+      const check = matchedCol && !matchedCol.include;
+      set(matchedCol, 'filterEligible', !check);
+      if (check) {
+        set(matchedCol, 'kpiEligible', !check);
+        set(matchedCol, 'dskEligible', !check);
+      }
+    }
+    return;
   }
 }

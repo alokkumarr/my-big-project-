@@ -45,14 +45,15 @@ export class FilterService {
     );
   }
 
-  openRuntimeModal(analysis: AnalysisDSL, filters = [], navigateTo: string) {
+  openRuntimeModal(analysis: AnalysisDSL, filters = [], navigateTo: string, designerPage) {
     return new Promise(resolve => {
       this._dialog
         .openFilterPromptDialog(
           filters,
           analysis,
           this.supportsAggregatedFilters(analysis) &&
-            this.hasRuntimeAggregatedFilters(analysis)
+            this.hasRuntimeAggregatedFilters(analysis),
+          designerPage
         )
         .afterClosed()
         .subscribe(result => {
@@ -65,7 +66,12 @@ export class FilterService {
             runtimeFiltersWithValues,
             allFiltersWithEmptyRuntimeFilters
           );
-          analysis.sipQuery.filters = allFiltersWithValues;
+          if (analysis.designerEdit && analysis.type === 'report') {
+            analysis.sipQuery.filters = result.filters;
+          } else {
+            analysis.sipQuery.filters = allFiltersWithValues;
+          }
+
           resolve(analysis);
           this.navigateTo(navigateTo, analysis.category);
         });
@@ -102,6 +108,10 @@ export class FilterService {
 
   getCleanedRuntimeFilterValues(analysis) {
     const filters = get(analysis, 'sipQuery.filters');
+    const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
+    if (analysis.type === 'report' && reportType === 'query') {
+      return filters;
+    }
     // due to a bug, the backend sends runtimeFilters, with the values that were last used
     // so we have to delete model from runtime filters
     return fpPipe(
@@ -112,7 +122,8 @@ export class FilterService {
 
   public getRuntimeFilterValuesIfAvailable(
     analysis,
-    navigateBack: string = null
+    navigateBack: string = null,
+    designerPage
   ) {
     const clone = cloneDeep(analysis);
     const cleanedRuntimeFilters = this.getCleanedRuntimeFilterValues(clone);
@@ -120,6 +131,6 @@ export class FilterService {
     if (!cleanedRuntimeFilters.length) {
       return Promise.resolve(clone);
     }
-    return this.openRuntimeModal(clone, cleanedRuntimeFilters, navigateBack);
+    return this.openRuntimeModal(clone, cleanedRuntimeFilters, navigateBack, designerPage);
   }
 }

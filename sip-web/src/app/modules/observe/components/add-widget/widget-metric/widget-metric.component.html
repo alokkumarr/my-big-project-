@@ -18,13 +18,13 @@
       class="choose-metric"
       *ngFor="let column of metric.kpiColumns"
       (click)="onSelectMetricColumn(column, metric)"
+      [disabled]="metric.dateColumns.length === 0"
     >
       {{ column.displayName || column.columnName }}
     </button>
 
     <h4 class="metric-ineligible-message" *ngIf="metric.kpiEligible === false">
-      This Dataset either is not configured with any KPI eligible metrics or it
-      does not contain at least one eligible Date type field.
+      {{ metric.errorMessage }}
     </h4>
   </mat-expansion-panel>
 </mat-accordion>

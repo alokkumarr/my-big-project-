@@ -8,6 +8,7 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -217,7 +218,8 @@ public class BisRouteService {
           Long lastFired = null;
           Long nextFired = null;
           try {
-            rootNode = objectMapper.readTree(response);
+            String sanitizedResponse = SipCommonUtils.sanitizeJson(response);
+            rootNode = objectMapper.readTree(sanitizedResponse);
             dataNode = rootNode.get("data");
             logger.info("data node from response " + dataNode);
             if (dataNode.isArray() && dataNode.size() > 0) {

@@ -105,7 +105,13 @@
 			<artifactId>commons-compress</artifactId>
 			<version>${compress}</version>
 		</dependency>
-    </dependencies>
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
     	<build>
 		<plugins>
 			<plugin>

@@ -1,5 +1,6 @@
 package com.synchronoss.sip.utils;
 
+import com.google.json.JsonSanitizer;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
@@ -324,5 +325,17 @@ public class SipCommonUtils {
       }
     }
     return false;
+  }
+
+  /**
+   * Sanitize a given string to eliminate JSONInjection vulnerabilities.
+   *
+   * @param inputJsonString Json string to be sanitized
+   * @return Sanitized Json string
+   */
+  public static String sanitizeJson(String inputJsonString) {
+    String sanitizedString = JsonSanitizer.sanitize(inputJsonString);
+
+    return sanitizedString;
   }
 }

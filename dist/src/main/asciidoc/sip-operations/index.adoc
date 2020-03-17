@@ -15,12 +15,11 @@ provided in the environment:
 
 . Install and configure a MapR version 6.1.0 cluster in the environment
 
-. Install and configure Apache Spark version 2.3.2 from the MapR
+. Install and configure a MapR Ecosystem MEP version 6.3.0 in the environment
+
+. Install and configure Apache Spark version 2.4.4 from the MapR
   Ecosystem Pack on the MapR cluster
 
-. Install and configure Apache Livy from the MapR Ecosystem Pack on
-  the MapR cluster, and set `livy.file.upload.max.size = 500000000`
-  and `livy.spark.master` in `livy.conf`
 
 . Provision a MapR user in the MapR cluster (with user ID 500 and
   group ID 5000)
@@ -40,7 +39,7 @@ provided in the environment:
   host is typically common to the entire environment.
 
 . Provision hosts for running SIP (the target host), with 32 GB of
-  memory and CentOS 7.4 as the operating system.  The hosts should be
+  memory and CentOS 7.7 as the operating system.  The hosts should be
   dedicated to SIP and not run other applications.  The hosts should
   have time synchronization enabled.
 
@@ -157,6 +156,7 @@ to the below SIP environment configuration (`sip-config`).
     # saw_spark_yarn_resource_manager is optional parameter if we want to explicitly
     # define the resource manager for saw-executor if not configured in yarn-site.xml.
     saw_spark_yarn_resource_manager=sip-mapr
+    saw_workbench_lib_path=/opt/bda/saw-workbench-service/lib/
 
 Additional parameter added to control large file export from FTP/email dispatch.
 In case of any higher memory/CPU load on (saw-transport service/export service) server,

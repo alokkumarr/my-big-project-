@@ -601,9 +601,9 @@ public class UserRepositoryImplTest {
 	@Test
 	public void testDeleteUser() {
 
-		when(userRepositoryDAO.deleteUser(user2.getUserId(), user2.getMasterLoginId())).thenReturn(true); // Stubbing the methods of mocked userRepo with mocked data.
+		when(userRepositoryDAO.deleteUser(user2.getUserId(), user2.getMasterLoginId(),1L)).thenReturn(true); // Stubbing the methods of mocked userRepo with mocked data.
 
-		boolean flag = userRepositoryDAO.deleteUser(2l, "2");
+		boolean flag = userRepositoryDAO.deleteUser(2l, "2",1L);
 		assertEquals(true, flag);
 		if (flag) {
 			when(userRepositoryDAO.getUsers(1l)).thenReturn(Arrays.asList(user1)); // Stubbing the methods of mocked userRepo with mocked data.

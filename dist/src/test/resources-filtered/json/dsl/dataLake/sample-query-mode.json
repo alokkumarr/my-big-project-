@@ -1,0 +1,64 @@
+{
+  "type": "report",
+  "semanticId": "workbench::sample-spark",
+  "name": "Untitled Analysis",
+  "description": "",
+  "createdBy": "sawadmin@synchronoss.com",
+  "userId": 1,
+  "customerCode": "SYNCHRONOSS",
+  "projectCode": "workbench",
+  "module": "ANALYZE",
+  "sipQuery": {
+    "artifacts": [
+    ],
+    "booleanCriteria": "AND",
+    "filters": [
+      {
+        "type": "string",
+        "tableName": "SALES",
+        "isOptional": false,
+        "columnName": "string",
+        "isRuntimeFilter": true,
+        "isAggregationFilter": false,
+        "isGlobalFilter": false,
+        "artifactsName": "SALES",
+        "model": {
+          "modelValues": [
+            "string 1"
+          ],
+          "operator": "EQ"
+        }
+      },
+      {
+        "type": "integer",
+        "tableName": "SALES",
+        "isOptional": false,
+        "columnName": "integer",
+        "isRuntimeFilter": true,
+        "isAggregationFilter": false,
+        "isGlobalFilter": false,
+        "artifactsName": "SALES",
+        "model": {
+          "modelValues": [
+            "100"
+          ],
+          "operator": "EQ"
+        }
+      }
+    ],
+    "joins": [
+    ],
+    "sorts": [
+    ],
+    "store": {
+      "dataStore": null,
+      "storageType": null
+    },
+    "semanticId": "workbench::sample-spark",
+    "query": "select integer, string from SALES where string = ? and SALES.integer = ?"
+  },
+  "categoryId": "4",
+  "metricName": "sample-spark",
+  "scheduled": null,
+  "designerEdit": true
+}

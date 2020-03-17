@@ -12,13 +12,21 @@ const LoginPage = require('../../pages/LoginPage');
 const logger = require('../../conf/logger')(__filename);
 const Header = require('../../pages/components/Header');
 const RouteActions = require('../../pages/workbench/RouteActions');
+let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
 describe('BIS API PULL tests: APIPullRouteSchedule.test.js', () => {
+  let token;
   beforeAll(function() {
     logger.info(
       `started executing BIS API PULL tests APIPullRouteSchedule.test.js`
     );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
+    const host = APICommonHelpers.getApiUrl(browser.baseUrl);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.masterAdmin.loginId,
+      users.masterAdmin.password
+    );
   });
 
   beforeEach(function(done) {
@@ -83,7 +91,7 @@ describe('BIS API PULL tests: APIPullRouteSchedule.test.js', () => {
         channelActions.clickOnChannelType(data.channelInfo.sourceType);
         channelActions.clickOnChannelNextButton();
 
-        channelActions.fillApiChannleInfo(data.channelInfo);
+        channelActions.fillApiChannleInfo(data.channelInfo, false, token);
         channelActions.testAndVerifyTestConnectivity(
           data.channelInfo.testConnectivityMessage
         );
@@ -92,7 +100,7 @@ describe('BIS API PULL tests: APIPullRouteSchedule.test.js', () => {
         dataSourcesPage.clickOnAddRoute();
         // create route
         const routeActions = new RouteActions();
-        routeActions.fillRouteInfo(data.routeInfo);
+        routeActions.fillRouteInfo(data.routeInfo, false, token);
         // test connectivity
         routeActions.clickOnTestConnectivity();
         routeActions.verifyTestConnectivityLogs(
