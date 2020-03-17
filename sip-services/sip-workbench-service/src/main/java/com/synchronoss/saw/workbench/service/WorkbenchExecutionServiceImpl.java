@@ -1,34 +1,7 @@
 package com.synchronoss.saw.workbench.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.parquet.example.data.Group;
-import org.apache.parquet.hadoop.ParquetReader;
-import org.apache.parquet.hadoop.example.GroupReadSupport;
-import org.apache.spark.SparkConf;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -39,12 +12,28 @@ import com.mapr.db.MapRDB;
 import com.mapr.db.TableDescriptor;
 import com.synchronoss.saw.workbench.SparkConfig;
 import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutor;
-import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorImpl;
-
+import com.synchronoss.sip.utils.SipCommonUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
-import sncr.bda.metastore.DataSetStore;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.NGContextServices;
@@ -114,10 +103,16 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Override
   public ObjectNode execute(
     String project, String name, String component, String cfg) throws Exception {
-	  
-    log.debug("Executing dataset transformation starts here ");
-    log.debug("XDF Configuration = " + cfg);
-    ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
+    log.info("Executing dataset transformation starts here ");
+    log.info("XDF Configuration = " + cfg);
+    createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+    log.info("execute name = " + name);
+    log.info("execute root = " + root);
+    log.info("execute component = " + component);
+
+    String sanitizedCfg = SipCommonUtils.sanitizeJson(cfg);
+    ComponentConfiguration config = new Gson().fromJson(sanitizedCfg, ComponentConfiguration.class);
+
     log.info("Component Config = " + config);
     String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 

@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch.entities;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
 import java.util.Date;
@@ -145,11 +146,11 @@ public class BisChannelEntity implements Serializable {
   }
 
   public String getChannelMetadata() {
-    return channelMetadata;
+    return SipCommonUtils.sanitizeJson(channelMetadata);
   }
 
   public void setChannelMetadata(String channelMetadata) {
-    this.channelMetadata = channelMetadata;
+    this.channelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
   }
 
   /*

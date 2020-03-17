@@ -62,8 +62,9 @@ public class ApiPullRetryServiceImpl implements SipRetryContract {
         BisRouteEntity bisRouteEntity = routeEntity.get();
 
         if (bisRouteEntity.getStatus() > 0) {
+          String routeMetadata = bisRouteEntity.getRouteMetadata();
           ObjectNode rootNode =
-              (ObjectNode) objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+              (ObjectNode) objectMapper.readTree(routeMetadata);
 
           BisJobEntity job = sipLogService.retriveJobById(jobId);
           job.setJobStatus("INPROGRESS");

@@ -80,7 +80,8 @@ public class SftpRetryServiceImpl implements SipRetryContract {
               if (bisRouteEntity.getStatus() > 0) {
                 JsonNode nodeEntity = null;
                 ObjectNode rootNode = null;
-                nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+                String routeMetadataStr = bisRouteEntity.getRouteMetadata();
+                nodeEntity = objectMapper.readTree(routeMetadataStr);
                 rootNode = (ObjectNode) nodeEntity;
                 // The below change has been made for the task SIP-6292
                 

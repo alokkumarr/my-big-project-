@@ -1,6 +1,7 @@
 package com.synchronoss.saw.batch.entities.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -141,12 +142,12 @@ public class BisChannelDto implements Serializable {
 
   @JsonProperty("channelMetadata")
   public String getChannelMetadata() {
-    return channelMetadata;
+    return SipCommonUtils.sanitizeJson(channelMetadata);
   }
 
   @JsonProperty("channelMetadata")
   public void setChannelMetadata(String channelMetadata) {
-    this.channelMetadata = channelMetadata;
+    this.channelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
   }
 
   @JsonProperty("channelType")

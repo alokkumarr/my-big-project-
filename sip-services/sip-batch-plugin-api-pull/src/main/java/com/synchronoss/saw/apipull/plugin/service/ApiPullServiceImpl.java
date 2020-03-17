@@ -698,7 +698,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
         logger.debug("Port = " + port);
 
         String routeMetadataStr = routeEntity.getRouteMetadata();
-        ApiRouteMetadata apiRouteMetadata = gson.fromJson(routeMetadataStr, ApiRouteMetadata.class);
+        ApiRouteMetadata apiRouteMetadata =
+            gson.fromJson(routeMetadataStr, ApiRouteMetadata.class);
 
         logger.debug("Route metadata = " + apiRouteMetadata);
 
