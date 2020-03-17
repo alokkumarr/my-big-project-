@@ -34,6 +34,7 @@ export interface DesignerFilterDialogData {
   analysisReportType?: string;
   designerPage?: boolean;
   query?: string;
+  mode?: string;
 }
 export interface DesignerFilterDialogResult {
   filters: Filter[];
@@ -60,6 +61,7 @@ export class DesignerFilterDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log(this.data);
     this.queryWithClass = this.data.analysisType === 'report'
       && this.data.analysisReportType === 'query'
         ? this.loadQueryWithClasses()

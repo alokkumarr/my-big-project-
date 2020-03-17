@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import AppConfig from '../../../../../appConfig';
+import AppConfig from '../../../../appConfig';
 import { first, map, tap } from 'rxjs/operators';
-import * as isUndefined from 'lodash/isUndefined';
 import * as fpGet from 'lodash/fp/get';
+import * as get from 'lodash/get';
 import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
+import * as isUndefined from 'lodash/isUndefined';
 import { Observable, of } from 'rxjs';
-import * as uniqWith from 'lodash/uniqWith';
-
 import {
   DSKFilterGroup,
-  DSKSecurityGroup
-} from './../../../common/dsk-filter.model';
+  DSKSecurityGroup,
+  DSKFilterField,
+  DSKFilterBooleanCriteria
+} from './../dsk-filter.model';
+import * as uniqWith from 'lodash/uniqWith';
 
 const loginUrl = AppConfig.login.url;
 
@@ -22,14 +24,10 @@ export interface DskEligibleField {
 }
 
 @Injectable()
-export class DataSecurityService {
+export class DskFiltersService {
   private dskEligibleFields: Array<DskEligibleField>;
 
   constructor(private _http: HttpClient) {}
-
-  getList() {
-    return this.getRequest('auth/admin/user-assignments').toPromise();
-  }
 
   getFiltersFor(group: string): Observable<DSKFilterGroup> {
     return (<Observable<DSKSecurityGroup>>(
@@ -37,21 +35,8 @@ export class DataSecurityService {
     )).pipe(map(data => data.dskAttributes));
   }
 
-  addSecurityGroup(data) {
-    let path;
-    switch (data.mode) {
-      case 'create':
-        const requestCreateBody = {
-          description: isUndefined(data.description) ? '' : data.description,
-          securityGroupName: data.securityGroupName
-        };
-        path = 'auth/admin/security-groups';
-        return this.postRequest(path, requestCreateBody);
-      case 'edit':
-        path = `auth/admin/security-groups/${data.secGroupSysId}/name`;
-        const requestEditBody = [data.securityGroupName, data.description];
-        return this.putrequest(path, requestEditBody);
-    }
+  clearDSKEligibleFields() {
+    this.dskEligibleFields = null;
   }
 
   getEligibleDSKFieldsFor(
@@ -91,37 +76,40 @@ export class DataSecurityService {
     );
   }
 
-  attributetoGroup(data) {
-    const requestBody = {
-      attributeName: data.attributeName.trim(),
-      value: data.value
-    };
-    const path = `auth/admin/security-groups/${data.groupSelected.secGroupSysId}/dsk-attribute-values`;
-    switch (data.mode) {
-      case 'create':
-        return this.postRequest(path, requestBody);
-      case 'edit':
-        return this.putrequest(path, requestBody);
-    }
+  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false) {
+    let condition;
+    return true;
+    condition = filter.booleanQuery.length > 0;
+
+    return (
+      filter.booleanCriteria &&
+      condition &&
+      filter.booleanQuery.every(child => {
+        if ((<DSKFilterGroup>child).booleanCriteria) {
+          return this.isDSKFilterValid(<DSKFilterGroup>child, false);
+        }
+
+        const field = <DSKFilterField>child;
+        return (
+          field.columnName &&
+          field.model &&
+          field.model.values &&
+          field.model.values.length > 0
+        );
+      })
+    );
   }
 
-  getSecurityAttributes(request) {
-    return this.getRequest(
-      `auth/admin/security-groups/${request.secGroupSysId}/dsk-attribute-values`
-    ).toPromise();
+  updateDskFiltersForGroup(groupId: string, filters: DSKFilterGroup) {
+    const path = `auth/admin/v1/dsk-security-groups/${groupId}`;
+    return this.putrequest(path, filters);
   }
 
-  getSecurityGroups() {
-    return this.getRequest('auth/admin/security-groups').toPromise();
-  }
-
-  deleteGroupOrAttribute(path) {
-    return this._http.delete(`${loginUrl}/${path}`).toPromise();
-  }
-
-  assignGroupToUser(requestBody) {
-    const path = `auth/admin/users/${requestBody.userId}/security-group`;
-    return this.putrequest(path, requestBody.securityGroupName);
+  deleteDskFiltersForGroup(groupId: string): Promise<any> {
+    return this.updateDskFiltersForGroup(groupId, {
+      booleanCriteria: DSKFilterBooleanCriteria.AND,
+      booleanQuery: []
+    });
   }
 
   getRequest(path) {
@@ -145,5 +133,32 @@ export class DataSecurityService {
     return this._http
       .post(`${loginUrl}/${path}`, params, httpOptions)
       .toPromise();
+  }
+
+  generatePreview(filterGroup: DSKFilterGroup, mode: string): string {
+    const pStart = '<strong class="parens">(</strong>';
+    const pEnd = '<strong class="parens">)</strong>';
+    return filterGroup.booleanQuery
+      .map(query => {
+        const statement = mode === 'ANALYZE' ? get(query, 'booleanCriteria') : query['booleanCriteria'];
+        if (statement) {
+          return `${pStart}${this.generatePreview(
+            query as DSKFilterGroup,
+            mode
+          )}${pEnd}`;
+        }
+
+        const field = <DSKFilterField>query;
+        const values = field.model.values || get(field, 'model.modelValues');
+        if (isUndefined(values)) {
+          return '';
+        }
+        return `${field.columnName} <span class="operator">${
+          field.model.operator
+        }</span> [${values.join(', ')}]`;
+      })
+      .join(
+        ` <strong class="bool-op">${filterGroup.booleanCriteria}</strong> `
+      );
   }
 }
