@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.synchronoss.saw.exceptions.SipDslRuntimeException;
 import com.synchronoss.saw.model.Aggregate;
 
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Filter;
-import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.Model.Operation;
 import com.synchronoss.saw.model.Model.Operator;
 
@@ -35,22 +36,26 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.util.CollectionUtils;
 
 public class QueryBuilderUtil {
 
   public static final String DATE_FORMAT = "yyyy-MM-dd";
   public static final String SPACE_REGX = "\\s+";
   public static final String EMPTY_STRING = "";
-  private static String HITS = "hits";
-  private static String _SOURCE = "_source";
+  private static final String HITS = "hits";
+  private static final String SOURCE = "_source";
+  private static final String MONTH = "month";
+  private static final String KEYWORD = ".keyword";
+
   public static Map<String, String> dateFormats = new HashMap<String, String>();
 
-  static {
+  private QueryBuilderUtil() {}
+
+    static {
     Map<String, String> formats = new HashMap<String, String>();
     formats.put("YYYY", "year");
-    formats.put("MMMYYYY", "month");
-    formats.put("MMYYYY", "month");
+    formats.put("MMMYYYY", MONTH);
+    formats.put("MMYYYY", MONTH);
     formats.put("MMMdYYYY", "day");
     formats.put("MMMMdYYYY,h:mm:ssa", "hour");
     dateFormats = Collections.unmodifiableMap(formats);
@@ -74,7 +79,7 @@ public class QueryBuilderUtil {
             AggregationBuilders.dateHistogram(aggregationName)
                 .field(field.getColumnName())
                 .format(field.getDateFormat())
-                .dateHistogramInterval(groupInterval(field.getGroupInterval().value()))
+                .dateHistogramInterval(groupInterval(field.getGroupInterval()))
                 .order(BucketOrder.key(false));
       } else {
         aggregationBuilder =
@@ -100,28 +105,31 @@ public class QueryBuilderUtil {
    * @param groupInterval
    * @return
    */
-  public static DateHistogramInterval groupInterval(String groupInterval) {
+  public static DateHistogramInterval groupInterval(GroupInterval groupInterval) {
     DateHistogramInterval histogramInterval = null;
     switch (groupInterval) {
-      case "month":
+      case MONTH:
         histogramInterval = DateHistogramInterval.MONTH;
         break;
-      case "day":
-      case "all":
+      case DAY:
+      case ALL:
         histogramInterval = DateHistogramInterval.DAY;
         break;
-      case "year":
+      case YEAR:
         histogramInterval = DateHistogramInterval.YEAR;
         break;
-      case "quarter":
+      case QUARTER:
         histogramInterval = DateHistogramInterval.QUARTER;
         break;
-      case "hour":
+      case HOUR:
         histogramInterval = DateHistogramInterval.HOUR;
         break;
-      case "week":
+      case WEEK:
         histogramInterval = DateHistogramInterval.WEEK;
         break;
+      default:
+        throw new SipDslRuntimeException(
+            String.format("groupInterval %s is not yet supported", groupInterval));
     }
     return histogramInterval;
   }
@@ -254,7 +262,7 @@ public class QueryBuilderUtil {
           return boolQueryBuilderIn;
         }
       default:
-        throw new RuntimeException(
+        throw new SipDslRuntimeException(
             String.format("Operator %s is not yet supported for numeric filter", operator));
     }
   }
@@ -321,6 +329,9 @@ public class QueryBuilderUtil {
                 aggregatedColumnName, Operation.NEQ, item.getModel().getValue());
 
         break;
+      default:
+        throw new SipDslRuntimeException(
+            String.format("Operator %s is not  supported for Aggregated filter", operator));
     }
     return scriptQuery;
   }
@@ -416,7 +427,7 @@ public class QueryBuilderUtil {
           return boolQueryBuilder;
         }
       default:
-        throw new RuntimeException(
+        throw new SipDslRuntimeException(
             String.format("Operator %s is not yet supported for string filter", operator));
     }
   }
@@ -443,8 +454,8 @@ public class QueryBuilderUtil {
    * @param columnName
    */
   private static String buildFilterColumn(String columnName) {
-    if (columnName.contains(".keyword")) {
-      return columnName.replace(".keyword", ".filter");
+    if (columnName.contains(KEYWORD)) {
+      return columnName.replace(KEYWORD, ".filter");
     } else {
       return columnName + ".filter";
     }
@@ -549,12 +560,12 @@ public class QueryBuilderUtil {
     List<Object> data = new ArrayList<>();
     while (recordIterator.hasNext()) {
       JsonNode source = recordIterator.next();
-      ObjectNode row = source.get(_SOURCE).deepCopy();
+      ObjectNode row = source.get(SOURCE).deepCopy();
       // Add the missing columns in response for reports.
       dataFields.forEach(
           field -> {
             // Remove the .keyword if its string fields.
-            String fieldName = field.getColumnName().replace(".keyword", "");
+            String fieldName = field.getColumnName().replace(KEYWORD, "");
             if (!row.has(fieldName)) row.put(fieldName, "");
           });
       data.add(row);
