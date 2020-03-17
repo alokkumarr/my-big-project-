@@ -34,12 +34,14 @@ application:
 
 connector: http
 workbench:
+        app-name: workbench-executor
         project-key: "workbench"
         project-path: "/Desktop" 
         project-root: "/var/sip"
         preview-limit: 10000
         livy-uri: http://localhost:8998
         storage-url: ${connector}://localhost:9800
+        stream.base-path: "/var/sip/workbench/services/workbench/executor"
 
 metastore:
     base:  hdfs:///var/sip
@@ -53,4 +55,24 @@ sip:
    key:
       store: /Users/spau0004/Desktop/keystore/keystore.jks
       password: sip@123
-         
+spark:
+  master: local[2]
+  executor.memory: "2G"
+  cores.max: "2"
+  executor.cores: "2"
+  driver.memory: "2G"
+  hadoop.yarn.resourcemanager.hostname: "mapr-rd612.eng-sip.dev01.us-west.sncrcloud.net"
+  yarn.jars: "/opt/mapr/spark/spark-2.4.4/jars"
+  yarn.archive: "/opt/bda/sip-executor/spark.zip"
+  executor.instances: "1"
+  driver.port: 
+  driver.host: 
+  driver.bindAddress: 
+  driver.blockManager.port: 
+  sql.inMemoryColumnarStorage.compressed: true
+  sql.inMemoryColumnarStorage.batchSize: 20 
+  sql.caseSensitive: false
+  ui.enabled: false
+  
+workbench-executor: 
+  jar-location: /opt/bda/saw-workbench-service/lib

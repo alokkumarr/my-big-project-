@@ -14,6 +14,7 @@ import com.synchronoss.saw.model.Sort.Order;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.util.BuilderUtil;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -174,9 +175,10 @@ public class SIPAggregationBuilder {
              * provided field.
              */
             String expressionStr = field.getExpression();
+            String sanitizedExpressionStr = SipCommonUtils.sanitizeJson(expressionStr);
             Gson gson = new Gson();
-            if (expressionStr != null && expressionStr.length() != 0) {
-              Expression expression = gson.fromJson(expressionStr, Expression.class);
+            if (sanitizedExpressionStr != null && sanitizedExpressionStr.length() != 0) {
+              Expression expression = gson.fromJson(sanitizedExpressionStr, Expression.class);
               String dataFieldName = field.getDataField();
               expressionEvaluator(dataFieldName, expression, aggregationBuilder);
             }

@@ -16,6 +16,7 @@
             class="publish-select"
             (selectionChange)="onCategorySelected($event.value)"
             [value]="categoryId"
+            [attr.e2e]="'publish-select-box'"
           >
             <mat-optgroup
               *ngFor="let category of categories"
@@ -42,6 +43,7 @@
       (click)="publish()"
       [disabled]="!hasPublishableCategories"
       mat-raised-button
+      [attr.e2e]="'publish-submit-button'"
       color="primary"
       i18n
     >

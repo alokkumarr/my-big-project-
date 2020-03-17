@@ -223,6 +223,16 @@ export class WorkbenchService {
       })
     );
   }
+  
+  
+  retrievePreview(name: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews/${name}`;
+    return this.http.get(endpoint).pipe(
+      catchError((e: any) => {
+        return of(e);
+      })
+    );
+  }
 
   createSemantic(payload) {
     const endpoint = `${this.api}/internal/semantic/${userProject}/create`;

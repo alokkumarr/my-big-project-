@@ -12,6 +12,7 @@ import com.sncr.saw.security.app.id3.model.Id3Claims;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.Id3Repository;
 import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,8 @@ public class ValidateId3IdentityToken {
       ObjectMapper objectMapper = new ObjectMapper();
       if (jwtParts.length == 3) {
         String payload = new String(Base64.getDecoder().decode(jwtParts[1]));
-        JsonNode decodedToken = objectMapper.readTree(payload);
+        String sanitizedPayload = SipCommonUtils.sanitizeJson(payload);
+        JsonNode decodedToken = objectMapper.readTree(sanitizedPayload);
         String iss = decodedToken.get("iss").asText();
         masterLoginId = decodedToken.get("sub").asText();
         clientId = decodedToken.get("aud").asText();

@@ -40,7 +40,12 @@
 			<artifactId>sip-date-extract-api</artifactId>
 			<version>${revision}</version>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>com.synchronoss.bda.sip</groupId>
+      <artifactId>sip-common-components</artifactId>
+      <version>${revision}</version>
+    </dependency>
+  </dependencies>
 	<repositories>
 		<repository>
 			<id>synchronoss</id>

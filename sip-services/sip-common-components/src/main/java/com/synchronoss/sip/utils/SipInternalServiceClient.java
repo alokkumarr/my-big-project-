@@ -54,7 +54,8 @@ public class SipInternalServiceClient {
     while ((line = rd.readLine()) != null) {
       result.append(line);
     }
-    node = mapper.readValue(result.toString(), object.getClass());
+    String sanitizedResultString = SipCommonUtils.sanitizeJson(result.toString());
+    node = mapper.readValue(sanitizedResultString, object.getClass());
     ObjectNode rootNode = (ObjectNode) node;
     if (rootNode.get("repository") != null) {
       setDataLocation(rootNode.get("repository").get("physicalLocation").asText());
