@@ -619,8 +619,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.trace("Parsing " + sourcePath + " files to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
 
-        JavaPairRDD<String, String> javaPairRDD = new JavaSparkContext(ctx.sparkSession.sparkContext())
+        JavaPairRDD<String, String> javaPairRDD;
+        if(this.ctx.extSparkCtx) {
+            logger.debug("##### Using existing JavaSparkContext ...");
+            javaPairRDD = this.ctx.javaSparkContext.wholeTextFiles(new Path(sourcePath).toString(), outputNOF);
+        } else {
+            logger.debug("##### Crating new JavaSparkContext ...");
+            javaPairRDD = new JavaSparkContext(ctx.sparkSession.sparkContext())
                 .wholeTextFiles(new Path(sourcePath).toString(), outputNOF);
+        }
 
         JavaRDD<String> rddWithoutHeader = javaPairRDD
                 // Filter out header based on line number from all values
