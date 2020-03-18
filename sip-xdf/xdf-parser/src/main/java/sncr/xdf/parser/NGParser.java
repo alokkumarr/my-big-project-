@@ -917,32 +917,32 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             String header = optHeader.get().trim();
             if(!header.isEmpty()){
                 fieldNames = Arrays.asList(header.toUpperCase().split("\\s*"+delimiter+"\\s*",-1));
-            }
+            }isSkipFieldsEnabled
         }
-        boolean isIndexConfigNotExists = true;
-        boolean isSchemaIndexBased = true;
+        boolean isIndexConfigNotExists = true;isSkipFieldsEnabled
+        boolean isSkipFieldsEnabled = true;
         int i = 0;
         for(Field field : fields){
             DataType dataType = convertXdfToSparkType(field.getType());
             int fieldIndex = getFieldIndex(field, Optional.ofNullable(fieldNames));
             Object defaultValObj =  getFieldDefaultValue(dataType, field.getDefaultValue(), Optional.ofNullable(tsFormats.get(i)));
             if(fieldIndex == -1){
-                isSchemaIndexBased = false;
+                isSkipFieldsEnabled = false;
                 fieldIndex=i;
             }else{
                 isIndexConfigNotExists = false;
             }
-            NGStructField structField = new NGStructField(field.getName(), dataType, true, Metadata.empty(), fieldIndex, defaultValObj);
+            NGStructField structField = new NGStructField(field.getName(), dataType, true, Metadata.empty(), fieldIndex, null, defaultValObj);
             structFields[i] = structField;
             i++;
         }
 
-        if(isSchemaIndexBased || isIndexConfigNotExists){
-            schema = new NGStructType(structFields, isSchemaIndexBased);
-            NGStructField rejFlagField = new NGStructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty(), i, null);
-            NGStructField rejRsnField = new NGStructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty(), i+1, null);
+        if(isSkipFieldsEnabled || isIndexConfigNotExists){
+            schema = new NGStructType(structFields, isSkipFieldsEnabled);
+            NGStructField rejFlagField = new NGStructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty(), i, null, null);
+            NGStructField rejRsnField = new NGStructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty(), i+1, null, null);
             NGStructField[] structFields1 = ArrayUtils.addAll(structFields, rejFlagField, rejRsnField);
-            internalSchema = new NGStructType(structFields1, isSchemaIndexBased);
+            internalSchema = new NGStructType(structFields1, isSkipFieldsEnabled);
         }else{
             throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Fields sourceIndex or sourceFieldName config is incorrect.");
         }

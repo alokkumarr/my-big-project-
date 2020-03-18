@@ -12,7 +12,7 @@ public class NGStructType implements Serializable {
 
     StructType structType = null;
     NGStructField[] ngFields = null;
-    boolean isSchemaIndexBased = false;
+    boolean isSkipFieldsEnabled = false;
 
     public NGStructType(){
         structType = new StructType();
@@ -21,7 +21,7 @@ public class NGStructType implements Serializable {
     public NGStructType(NGStructField[] fields, boolean isSchemaIndexBased){
         structType = new StructType(fields);
         ngFields = fields;
-        this.isSchemaIndexBased = isSchemaIndexBased;
+        this.isSkipFieldsEnabled = isSkipFieldsEnabled;
     }
 
     public StructType getStructType() {
@@ -40,12 +40,12 @@ public class NGStructType implements Serializable {
         this.ngFields = ngFields;
     }
 
-    public boolean isSchemaIndexBased() {
-        return isSchemaIndexBased;
+    public boolean isSkipFieldsEnabled() {
+        return isSkipFieldsEnabled;
     }
 
-    public void setSchemaIndexBased(boolean isSchemaIndexBased) {
-        this.isSchemaIndexBased = isSchemaIndexBased;
+    public void setSkipFieldsEnabled(boolean isSkipFieldsEnabled) {
+        this.isSkipFieldsEnabled = isSkipFieldsEnabled;
     }
 
     public NGStructType add(NGStructField field){
@@ -72,7 +72,7 @@ public class NGStructType implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(structType).append(ngFields).toHashCode();
+        return new HashCodeBuilder().append(structType).append(ngFields).append(isSkipFieldsEnabled).toHashCode();
     }
 
     @Override
@@ -87,6 +87,7 @@ public class NGStructType implements Serializable {
         return new EqualsBuilder()
             .append(structType, rhs.structType)
             .append(ngFields, rhs.ngFields)
+            .append(isSkipFieldsEnabled, rhs.isSkipFieldsEnabled)
             .isEquals();
     }
 }

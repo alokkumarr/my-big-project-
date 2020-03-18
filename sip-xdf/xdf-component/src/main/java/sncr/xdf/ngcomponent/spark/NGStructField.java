@@ -10,11 +10,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class NGStructField extends StructField{
 
     protected int sourceColumnIndex = -1;
+    protected String sourceFieldName = null;
     protected Object defaultValue = null;
 
-    public NGStructField(String name, DataType dataType, boolean nullable, Metadata metadata, int sourceColumnIndex, Object defaultValue){
+    public NGStructField(String name, DataType dataType, boolean nullable, Metadata metadata, int sourceColumnIndex, String sourceFieldName, Object defaultValue){
         super(name, dataType, nullable, metadata);
         this.sourceColumnIndex = sourceColumnIndex;
+        this.sourceFieldName = sourceFieldName;
         this.defaultValue = defaultValue;
     }
 
@@ -24,6 +26,13 @@ public class NGStructField extends StructField{
 
     public void setSourceColumnIndex(int sourceColumnIndex) {
         this.sourceColumnIndex = sourceColumnIndex;
+    }
+    public String getSourceFieldName() {
+        return sourceFieldName;
+    }
+
+    public void setSourceFieldName(String sourceFieldName) {
+        this.sourceFieldName = sourceFieldName;
     }
 
     public Object getDefaultValue() {
@@ -48,6 +57,7 @@ public class NGStructField extends StructField{
             .append(nullable())
             .append(metadata())
             .append(sourceColumnIndex)
+            .append(sourceFieldName)
             .append(defaultValue)
             .toHashCode();
     }
@@ -67,6 +77,7 @@ public class NGStructField extends StructField{
             .append(nullable(), rhs.nullable())
             .append(metadata(), rhs.metadata())
             .append(sourceColumnIndex, rhs.sourceColumnIndex)
+            .append(sourceFieldName, rhs.sourceFieldName)
             .append(defaultValue, rhs.defaultValue)
             .isEquals();
     }

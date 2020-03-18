@@ -129,7 +129,7 @@ public class ConvertToRow implements Function<String, Row> {
     }
 
     private Object[] constructRecord(String line, Object[] record, String[] parsed) {
-        if(ngSchema != null && ngSchema.isSchemaIndexBased()){
+        if(ngSchema != null && ngSchema.isSkipFieldsEnabled()){
             record = constructRecordWithIndices(line, record, parsed);
         }else{
             record = constructRecordFromLine(line, record, parsed);
