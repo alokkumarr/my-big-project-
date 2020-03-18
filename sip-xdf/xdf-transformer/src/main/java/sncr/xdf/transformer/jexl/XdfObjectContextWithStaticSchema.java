@@ -21,11 +21,18 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
     //TODO:: Output schema???
     public XdfObjectContextWithStaticSchema(JexlEngine engine, StructType inSchema, Row record) throws Exception {
         super(engine, inSchema, record);
-        String[] fieldNames = schema.fieldNames();
         String[] recordFieldNames = record.schema().fieldNames();
-        for (int i = 0; i < fieldNames.length; i++) {
-            targetRowTypes.put(fieldNames[i], schema.fields()[i]);
-            int fInx = findField(recordFieldNames, fieldNames[i]);
+        int i = 0;
+        for (String fieldName : recordFieldNames) {
+            Object value = getValue(fieldName, i);
+            fullRow.put(fieldName, value);
+            i++;
+        }
+        String[] fieldNames = schema.fieldNames();
+        i = 0;
+        for (String fieldName : fieldNames) {
+            targetRowTypes.put(fieldName, schema.fields()[i]);
+            int fInx = findField(recordFieldNames, fieldName);
             if(fInx >= 0) {
                 if (!schema.fields()[i].dataType().sameType(record.schema().fields()[fInx].dataType())) {
                     throw new Exception("Explicit data type conversion is required " +
@@ -37,15 +44,13 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
                     + "\nRecord Field Type = " + record.schema().fields()[fInx].dataType());
                 }
                 if (this.record.get(fInx) != null) {
-                    Object value = getValue(fieldNames[i], fInx);
-                    if (value != null)
-                        targetRow.put(fieldNames[i], value);
-
+                    targetRow.put(fieldName, fullRow.get(fieldName));
                 }
             }
             else{
                 // Field not found
             }
+            i++;
         }
     }
 
