@@ -917,9 +917,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             String header = optHeader.get().trim();
             if(!header.isEmpty()){
                 fieldNames = Arrays.asList(header.toUpperCase().split("\\s*"+delimiter+"\\s*",-1));
-            }isSkipFieldsEnabled
+            }
         }
-        boolean isIndexConfigNotExists = true;isSkipFieldsEnabled
+        boolean isIndexConfigNotExists = true;
         boolean isSkipFieldsEnabled = true;
         int i = 0;
         for(Field field : fields){
