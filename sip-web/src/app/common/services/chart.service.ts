@@ -563,9 +563,12 @@ export class ChartService {
     );
     // the backend and moment.js require different date formats for days of month
     // the backend represents it with "d", and momentjs with "Do"
+    let format = replace(dateFormat, 'dd', 'DD');
+    format = replace(format, 'd', 'Do');
+    format = replace(format, /y/g, 'Y');
     return {
       /* Date format saved with column will cater to backend. Make adjustments for FE */
-      dateFormat: replace(replace(dateFormat, 'd', 'Do'), /y/g, 'Y'),
+      dateFormat: format,
 
       /* If an explicit moment format is defined for this date format, return that too */
       momentFormat:

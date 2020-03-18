@@ -214,6 +214,7 @@ export class ChartGridComponent {
         const parseFormat = this.hasAggregatesInScatter()
           ? dateFormat
           : 'YYYY-MM-DD hh:mm:ss';
+
         value =
           column.type === 'date'
             ? moment
@@ -224,7 +225,7 @@ export class ChartGridComponent {
                       ? 'MMM DD YYYY'
                       : columnFormat === 'MMMM d YYYY, h:mm:ss a'
                       ? 'MMMM DD YYYY, h:mm:ss a'
-                      : columnFormat)
+                      : dateFormat)
                 )
             : value;
         if (
