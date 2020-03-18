@@ -350,10 +350,6 @@
               },
               "type": {
                 "type": "string"
-              },
-              "sourceFieldName":{
-                "description": "Input Dataset Source Column Name. This require if we want to select only required columns from Input Dataset.",
-                "type": "string"
               }
             }
           }
