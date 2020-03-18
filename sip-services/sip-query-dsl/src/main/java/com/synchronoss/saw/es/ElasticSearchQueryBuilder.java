@@ -4,11 +4,10 @@ import static com.synchronoss.saw.es.QueryBuilderUtil.queryDSKBuilder;
 import static com.synchronoss.saw.util.BuilderUtil.buildNestedFilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.synchronoss.saw.exceptions.SipDslRuntimeException;
 import com.synchronoss.saw.model.Aggregate;
-import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Filter.Type;
@@ -19,10 +18,8 @@ import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -77,7 +74,6 @@ public class ElasticSearchQueryBuilder {
     }
     // The below call is to build sort
     searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
-      List<QueryBuilder> dskBuilder = new ArrayList<>();
     BoolQueryBuilder boolQueryBuilderDsk;
     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
     if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
@@ -154,38 +150,42 @@ public class ElasticSearchQueryBuilder {
     DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
 
     if (item.getType().value().equals(Filter.Type.DATE.value())) {
-      logger.info("rangeQueryBuilder.format(dateFormat.format(date)) : " + dateFormat.format(date));
+      logger.trace("date format is  :{} ", EPOCH_TO_DATE_FORMAT);
       rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
     }
 
     switch (item.getModel().getOperator()) {
       case GT:
-        logger.info(
-            "Filter for values - Operator: 'GT', Timestamp(asLong) : "
-                + item.getModel().getValue().longValue());
+        logger.trace(
+            "Filter for values - Operator: 'GT', Timestamp(asLong) : {}",
+            item.getModel().getValue().longValue());
         rangeQueryBuilder.gt(dateFormat.format(date));
         break;
 
       case LT:
-        logger.info(
-            "Filter for values - Operator: 'LT', Timestamp(asLong) : "
-                + item.getModel().getValue().longValue());
+        logger.trace(
+            "Filter for values - Operator: 'LT', Timestamp(asLong) :{} ",
+            item.getModel().getValue().longValue());
         rangeQueryBuilder.lt(dateFormat.format(date));
         break;
 
       case GTE:
-        logger.info(
-            "Filter for values - Operator: 'GTE', Timestamp(asLong) : "
-                + item.getModel().getValue().longValue());
+        logger.trace(
+            "Filter for values - Operator: 'GTE', Timestamp(asLong) : {}",
+            item.getModel().getValue().longValue());
         rangeQueryBuilder.gte(dateFormat.format(date));
         break;
 
       case LTE:
-        logger.info(
-            "Filter for values - Operator: 'LTE', Timestamp(asLong) : "
-                + item.getModel().getValue().longValue());
+        logger.trace(
+            "Filter for values - Operator: 'LTE', Timestamp(asLong) :{} ",
+            item.getModel().getValue().longValue());
         rangeQueryBuilder.lte(dateFormat.format(date));
         break;
+      default:
+        throw new SipDslRuntimeException(
+            String.format(
+                "Operator %s is not  supported for date filter", item.getModel().getOperator()));
     }
     return rangeQueryBuilder;
   }
@@ -207,39 +207,6 @@ public class ElasticSearchQueryBuilder {
     return searchSourceBuilder;
   }
 
-  /**
-   * @param dataSecurityString
-   * @return
-   * @throws IOException
-   */
-  public DataSecurityKey buildDsk(String dataSecurityString) throws IOException {
-    DataSecurityKey dataSecurityKeyNode;
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode objectNode = objectMapper.readTree(dataSecurityString);
-    dataSecurityKeyNode = objectMapper.treeToValue(objectNode, DataSecurityKey.class);
-    return dataSecurityKeyNode;
-  }
-
-  /**
-   * @param sipQuery
-   * @param builder
-   * @return
-   */
-  public BoolQueryBuilder buildBooleanQuery(SipQuery sipQuery, List<QueryBuilder> builder) {
-    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-    if (sipQuery.getBooleanCriteria().value().equals(SipQuery.BooleanCriteria.AND.value())) {
-      builder.forEach(
-          item -> {
-            boolQueryBuilder.must(item);
-          });
-    } else {
-      builder.forEach(
-          item -> {
-            boolQueryBuilder.should(item);
-          });
-    }
-    return boolQueryBuilder;
-  }
 
   /**
    * @param dataFields
@@ -259,7 +226,7 @@ public class ElasticSearchQueryBuilder {
       BooleanCriteria booleanCriteria) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
     AggregationBuilder finalAggregationBuilder = null;
-    if (aggregationFields.size() == 0) {
+    if (!aggregationFields.isEmpty()) {
       String[] excludes = null;
       String[] includes = getFieldsInclude(dataFields);
       searchSourceBuilder.fetchSource(includes, excludes);
@@ -269,7 +236,7 @@ public class ElasticSearchQueryBuilder {
         reportAggregationBuilder.aggregationBuilder(
             dataFields, aggregationFields, searchSourceBuilder, aggregationFilter,booleanCriteria);
       } else {
-        this.groupByFields = new String[dataFields.size() - aggregationFields.size()];;
+        this.groupByFields = new String[dataFields.size() - aggregationFields.size()];
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
                 dataFields,
@@ -441,7 +408,7 @@ public class ElasticSearchQueryBuilder {
   private QueryBuilder buildDateFilter(Filter filter) {
     Optional<String> formatForDate = Optional.empty();
     if (filter.getModel().getPreset() != null
-        && !(filter.getModel().getPreset() == Model.Preset.NA)) {
+        && (filter.getModel().getPreset() != Model.Preset.NA)) {
       DynamicConvertor dynamicConvertor =
           BuilderUtil.dynamicDecipher(filter.getModel().getPreset().value());
       if (filter.getType() == Type.DATE) {
@@ -467,24 +434,24 @@ public class ElasticSearchQueryBuilder {
         && ((filter.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
             || (filter.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)))) {
       if (filter.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)) {
-        logger.debug("TimeStamp in Epoch(in seconds),Value " + filter.getModel().getValue());
+        logger.debug("TimeStamp in Epoch(in seconds),Value :{}" ,filter.getModel().getValue());
         filter.getModel().setValue(filter.getModel().getValue() * 1000);
         if (filter.getModel().getOtherValue() != null) {
           filter.getModel().setOtherValue(filter.getModel().getOtherValue() * 1000);
           logger.trace(
-              "Convert TimeStamp to milliseconds, OtherValue  :"
-                  + filter.getModel().getOtherValue());
+              "Convert TimeStamp to milliseconds, OtherValue  :{}",
+              filter.getModel().getOtherValue());
         }
       }
       Date date = new Date(filter.getModel().getValue().longValue());
-      logger.trace("Date object created :" + date);
+      logger.trace("Date object created :{}", date);
       DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
-      if ((filter.getType() == Filter.Type.DATE) || ((filter.getType() == Type.TIMESTAMP))) {
+      if ((filter.getType() == Filter.Type.DATE) || (filter.getType() == Type.TIMESTAMP)) {
         formatForDate = Optional.of(EPOCH_TO_DATE_FORMAT);
       }
 
       if (filter.getModel().getOperator() == Model.Operator.EQ) {
-        logger.info("dateFormat (SimpleDateFormat) :" + dateFormat);
+        logger.info("dateFormat (SimpleDateFormat) :{}", dateFormat);
         return buildRangeQueryBuilder(
             filter.getColumnName(),
             formatForDate,
@@ -510,7 +477,7 @@ public class ElasticSearchQueryBuilder {
     } else {
       RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(filter.getColumnName());
       if ((filter.getType().value().equals(Filter.Type.DATE.value()))
-          || ((filter.getType().value().equals(Type.TIMESTAMP.value())))) {
+          || (filter.getType().value().equals(Type.TIMESTAMP.value()))) {
         if (filter.getModel().getFormat() == null) {
           rangeQueryBuilder.format(DATE_FORMAT);
         } else {
@@ -568,14 +535,14 @@ public class ElasticSearchQueryBuilder {
         new GregorianCalendar(filter.getModel().getValue().intValue(), 0, 1, 0, 0, 0);
     GregorianCalendar endDate;
 
-    if ((filter.getType() == Filter.Type.DATE) || ((filter.getType() == Type.TIMESTAMP))) {
+    if ((filter.getType() == Filter.Type.DATE) || (filter.getType() == Type.TIMESTAMP)) {
       formatForDate = Optional.of(EPOCH_TO_DATE_FORMAT);
     }
 
     if (filter.getModel().getOperator() == Model.Operator.EQ) {
       endDate = new GregorianCalendar(filter.getModel().getValue().intValue(), 11, 31, 23, 59, 59);
-      logger.debug("Start Date :" + startDate.getTime());
-      logger.debug("End Date :" + endDate.getTime());
+      logger.debug("Start Date :{}" , startDate.getTime());
+      logger.debug("End Date :{}", endDate.getTime());
       return buildRangeQueryBuilder(
           filter.getColumnName(),
           formatForDate,
@@ -584,8 +551,8 @@ public class ElasticSearchQueryBuilder {
     } else if (filter.getModel().getOperator() == Model.Operator.BTW) {
       endDate =
           new GregorianCalendar(filter.getModel().getOtherValue().intValue(), 11, 31, 23, 59, 59);
-      logger.debug("Start Date :" + startDate.getTime());
-      logger.debug("End Date :" + endDate.getTime());
+      logger.debug("Start Date :{}", startDate.getTime());
+      logger.debug("End Date :{}", endDate.getTime());
       return buildRangeQueryBuilder(
           filter.getColumnName(),
           formatForDate,

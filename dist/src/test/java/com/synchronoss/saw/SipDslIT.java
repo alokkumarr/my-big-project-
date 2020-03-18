@@ -177,9 +177,9 @@ public class SipDslIT extends BaseIT {
     filter2.addProperty("isGlobalFilter", false);
     model = new JsonObject();
     model.addProperty("format", "epoch_second");
-    model.addProperty("operator", "NEQ");
-    model.addProperty("value", 1483228800000L);
-    model.addProperty("otherValue", 1483228800000L);
+    model.addProperty("operator", "BTW");
+    model.addProperty("value", 1483228800L);
+    model.addProperty("otherValue", 1584513173L);
     filter2.add("model", model);
     filters.add(filter2);
 
