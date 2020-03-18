@@ -21,7 +21,8 @@
   <mat-form-field *ngIf="filterModel.operator === 'ISIN' || filterModel.operator === 'ISNOTIN'" style="margin-left: 10px;">
     <mat-chip-list #chipList>
       <mat-chip *ngFor="let value of filterModel.modelValues; let i = index; trackBy: index"
-               [removable]="true" (removed)="remove(i)">
+               [removable]="true" (removed)="remove(i)" style="word-break: break-word;
+               overflow: scroll;">
         {{value}}
         <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
       </mat-chip>

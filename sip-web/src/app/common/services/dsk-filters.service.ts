@@ -114,7 +114,7 @@ export class DskFiltersService {
 
       case 'ANALYZE':
         let areValid = true;
-        const flattenedFilters = this.analyzeService.flattenAndFetchFilters(filter, []);
+        const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
         forEach(
           flattenedFilters,
           ({
@@ -123,8 +123,13 @@ export class DskFiltersService {
             isAggregationFilter,
             isRuntimeFilter,
             isGlobalFilter,
-            isOptional
+            isOptional,
+            columnName
           }) => {
+            if (isEmpty(columnName)) {
+              areValid = false;
+              return false;
+            }
             if (!isRuntimeFilter && isGlobalFilter) {
               areValid = true;
             } else if (!model) {
