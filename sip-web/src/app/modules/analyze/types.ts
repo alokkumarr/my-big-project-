@@ -97,6 +97,7 @@ export interface IToolbarActionResult {
   booleanCriteria?: string;
   analysis?: AnalysisDSL;
   action?: string;
+  publishOnSave?: string;
 }
 
 export interface IAnalysisMethod {

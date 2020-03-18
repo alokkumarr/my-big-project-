@@ -1,6 +1,8 @@
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as isNil from 'lodash/isNil';
+import * as toString from 'lodash/toString';
 
 import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
@@ -13,6 +15,7 @@ import { validateEntityName } from './../../../../common/validators/field-name-r
   styleUrls: ['./toolbar-action-dialog.component.scss']
 })
 export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
+  overrideCategoryIdForSave: null;
   showProgress = false;
   progressSub;
   filterValid = true;
@@ -68,8 +71,8 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     this.data.analysis.name = name;
   }
 
-  onCategoryChange(categoryId) {
-    this.data.analysis.category = categoryId;
+  setParentPublishOnSave(categoryId) {
+    this.overrideCategoryIdForSave = categoryId;
   }
 
   onOk() {
@@ -100,7 +103,10 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
         }
         const result: IToolbarActionResult = {
           analysis: this.data.analysis,
-          action
+          action,
+          ...(isNil(this.overrideCategoryIdForSave)
+            ? {}
+            : { publishOnSave: toString(this.overrideCategoryIdForSave) })
         };
         this.dialogRef.close(result);
       });

@@ -4,7 +4,6 @@ import {
   USER_ANALYSIS_CATEGORY_NAME,
   USER_ANALYSIS_SUBCATEGORY_NAME
 } from '../../../../common/consts';
-import { JwtService } from '../../../../common/services';
 import {
   validateEntityName,
   entityNameErrorMessage
@@ -22,23 +21,22 @@ import * as find from 'lodash/find';
 export class DesignerSaveComponent implements OnInit {
   @Output() public nameChange: EventEmitter<string> = new EventEmitter();
   @Output() public descriptionChange: EventEmitter<string> = new EventEmitter();
-  @Output() public categoryChange: EventEmitter<number> = new EventEmitter();
+  @Output() public parentPublishChange: EventEmitter<
+    number
+  > = new EventEmitter();
   @Input() public analysis: Analysis;
   @Input() public designerMode: string;
 
-  publishingToOtherCategory = false;
+  publishingToParentCategory = false;
   categories = [];
 
   userCategoryName = USER_ANALYSIS_CATEGORY_NAME;
   userSubCategoryName = USER_ANALYSIS_SUBCATEGORY_NAME;
+  parentCategory = null;
 
   public saveForm: FormGroup;
 
-  constructor(
-    private jwtService: JwtService,
-    public fb: FormBuilder,
-    private analyzeService: AnalyzeService
-  ) {}
+  constructor(public fb: FormBuilder, private analyzeService: AnalyzeService) {}
 
   ngOnInit() {
     this.saveForm = this.fb.group({
@@ -49,9 +47,44 @@ export class DesignerSaveComponent implements OnInit {
       ]
     });
 
-    this.analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {
-      this.categories = response;
-    });
+    this.checkForParentAnalysis();
+  }
+
+  async checkForParentAnalysis() {
+    if (!this.analysis.parentAnalysisId) {
+      return;
+    }
+
+    try {
+      this.categories = await this.analyzeService.getCategories(
+        PRIVILEGES.PUBLISH
+      );
+      const parentAnalysis = await this.analyzeService.readAnalysis(
+        this.analysis.parentAnalysisId,
+        true
+      );
+
+      this.parentCategory = this.categories.reduce((result, cat) => {
+        if (result) {
+          return result;
+        }
+
+        const subCategory = find(
+          cat.children,
+          subCat => subCat.id.toString() === parentAnalysis.category.toString()
+        );
+        if (subCategory) {
+          return {
+            id: cat.id,
+            name: cat.name,
+            subCategoryId: subCategory.id,
+            subCategoryName: subCategory.name
+          };
+        }
+      }, null);
+    } catch (error) {
+      throw error;
+    }
   }
 
   displayErrorMessage(state) {
@@ -84,23 +117,23 @@ export class DesignerSaveComponent implements OnInit {
     this.descriptionChange.emit(description);
   }
 
-  onCategoryChange($event) {}
+  getDestinationCategoryName() {
+    return this.publishingToParentCategory && this.parentCategory
+      ? this.parentCategory.name
+      : this.userCategoryName;
+  }
+
+  getDestinationSubCategoryName() {
+    return this.publishingToParentCategory && this.parentCategory
+      ? this.parentCategory.subCategoryName
+      : this.userSubCategoryName;
+  }
 
   onPublishToggle({ checked }: MatCheckboxChange) {
-    this.publishingToOtherCategory = checked;
+    this.publishingToParentCategory = checked;
 
-    if (!checked) {
-      this.categoryChange.emit(this.jwtService.userAnalysisCategoryId);
-    } else {
-      const category = find(
-        this.categories,
-        cat => cat.children && cat.children.length > 0
-      );
-      if (category) {
-        this.categoryChange.emit(category.children[0].id);
-      } else {
-        this.categoryChange.emit(this.jwtService.userAnalysisCategoryId);
-      }
-    }
+    this.parentPublishChange.emit(
+      checked && this.parentCategory ? this.parentCategory.subCategoryId : null
+    );
   }
 }

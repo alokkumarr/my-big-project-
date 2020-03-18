@@ -37,15 +37,20 @@
       </textarea>
     </mat-form-field>
 
+    <mat-checkbox
+      style="margin-bottom: 10px;"
+      *ngIf="parentCategory"
+      [checked]="publishingToParentCategory"
+      (change)="onPublishToggle($event)"
+      >Publish to {{ parentCategory.subCategoryName }}</mat-checkbox
+    >
+
     <span>
       This analysis will be saved to
-      <strong>{{ userCategoryName }} > {{ userSubCategoryName }}.</strong>
+      <strong
+        >{{ getDestinationCategoryName() }} >
+        {{ getDestinationSubCategoryName() }}.</strong
+      >
     </span>
-
-    <mat-checkbox
-      [checked]="publishingToOtherCategory"
-      (change)="onPublishToggle($event)"
-      >Publish to Category</mat-checkbox
-    >
   </div>
 </form>

@@ -25,10 +25,10 @@
     *ngSwitchCase="'save'"
     [designerMode]="data.designerMode"
     [analysis]="data.analysis"
-  >
     (descriptionChange)="onSaveDescriptionChange($event)"
     (nameChange)="onNameChange($event)"
-    (categoryChange)="onCategoryChange($event)"
+    (parentPublishChange)="setParentPublishOnSave($event)"
+  >
   </designer-save>
 </div>
 <div class="dialog__actions" fxLayout="column" fxLayoutAlign="start start">
@@ -62,15 +62,17 @@
       >
         Save & Close
       </button>
-      <button
-        *ngSwitchCase="'save'"
-        (click)="save('save')"
-        e2e="dialog-save-analysis"
-        mat-button
-        i18n
-      >
-        Save
-      </button>
+      <ng-container *ngIf="overrideCategoryIdForSave === null">
+        <button
+          *ngSwitchCase="'save'"
+          (click)="save('save')"
+          e2e="dialog-save-analysis"
+          mat-button
+          i18n
+        >
+          Save
+        </button>
+      </ng-container>
     </div>
     <button mat-button i18n (click)="onBack()" e2e="designer-dialog-cancel">
       Cancel

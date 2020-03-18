@@ -18,6 +18,8 @@ import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { DesignerLoadMetric } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
+import { PublishService } from '../../services/publish.service';
+import { AnalyzeActionsService } from '../../actions';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -57,6 +59,7 @@ export class DesignerPageComponent implements OnInit {
   constructor(
     private locationService: Location,
     private analyzeService: AnalyzeService,
+    private analyzeActionsService: AnalyzeActionsService,
     private dialogService: MatDialog,
     private route: ActivatedRoute,
     private router: Router,
@@ -93,7 +96,7 @@ export class DesignerPageComponent implements OnInit {
     }
   }
 
-  onSave({ analysis, requestExecution }: DesignerSaveEvent) {
+  onSave({ analysis, requestExecution, publishTo }: DesignerSaveEvent) {
     const navigateBackTo =
       this.designerMode === 'fork' || this.designerMode === 'new'
         ? 'home'
@@ -133,6 +136,15 @@ export class DesignerPageComponent implements OnInit {
               }
             }
           }
+        });
+    } else if (publishTo) {
+      this.analyzeActionsService
+        .publishAnalysis(
+          <AnalysisDSL>{ ...analysis, category: publishTo },
+          (<AnalysisDSL>analysis).category
+        )
+        .then(() => {
+          this.router.navigate(['analyze', publishTo]);
         });
     }
   }
