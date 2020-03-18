@@ -226,7 +226,7 @@ public class ElasticSearchQueryBuilder {
       BooleanCriteria booleanCriteria) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
     AggregationBuilder finalAggregationBuilder = null;
-    if (!aggregationFields.isEmpty()) {
+    if (aggregationFields.isEmpty()) {
       String[] excludes = null;
       String[] includes = getFieldsInclude(dataFields);
       searchSourceBuilder.fetchSource(includes, excludes);
