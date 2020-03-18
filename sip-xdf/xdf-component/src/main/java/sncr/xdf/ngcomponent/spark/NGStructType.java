@@ -18,6 +18,11 @@ public class NGStructType implements Serializable {
         structType = new StructType();
     }
 
+    public NGStructType(NGStructField[] fields){
+        structType = new StructType(fields);
+        ngFields = fields;
+    }
+
     public NGStructType(NGStructField[] fields, boolean isSkipFieldsEnabled){
         structType = new StructType(fields);
         ngFields = fields;
