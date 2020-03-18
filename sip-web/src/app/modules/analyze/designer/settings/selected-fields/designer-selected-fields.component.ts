@@ -58,6 +58,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     if (!filters) {
       return;
     }
+
     this.filters = this.analyzeService.flattenAndFetchFilters(filters, []);
   }
 

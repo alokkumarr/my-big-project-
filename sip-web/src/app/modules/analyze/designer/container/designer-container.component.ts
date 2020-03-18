@@ -813,6 +813,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         .afterClosed()
         .subscribe((result: IToolbarActionResult) => {
           if (result) {
+            this.filters = cloneDeep(result);
             this._store.dispatch(new DesignerUpdateFilters(result));
             this.onSettingsChange({ subject: 'filter' });
           }

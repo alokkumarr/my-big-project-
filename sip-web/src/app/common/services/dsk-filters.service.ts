@@ -114,7 +114,7 @@ export class DskFiltersService {
 
       case 'ANALYZE':
         let areValid = true;
-        const flattenedFilters = this.analyzeService.flattenAndFetchFilters(filter, []);
+        const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
         forEach(
           flattenedFilters,
           ({
@@ -123,8 +123,13 @@ export class DskFiltersService {
             isAggregationFilter,
             isRuntimeFilter,
             isGlobalFilter,
-            isOptional
+            isOptional,
+            columnName
           }) => {
+            if (isEmpty(columnName)) {
+              areValid = false;
+              return false;
+            }
             if (!isRuntimeFilter && isGlobalFilter) {
               areValid = true;
             } else if (!model) {
@@ -198,13 +203,52 @@ export class DskFiltersService {
         }
 
         const field = <DSKFilterField>query;
-        const values = mode === 'DSK' ? field.model.values : get(field, 'model.modelValues') || get(field, 'model.value');
-        if (isUndefined(values)) {
-          return '';
+        if (mode === 'DSK') {
+          const values =  field.model.values;
+          if (isUndefined(values)) {
+            return '';
+          }
+          return `${field.columnName} <span class="operator">${
+            field.model.operator
+          }</span> [${mode === 'DSK' ? values.join(', ') : values}]`;
+        } else {
+          const values =  get(field, 'model.modelValues');
+          switch (field.type) {
+            case 'string':
+              if (isUndefined(values)) {
+                return '';
+              }
+              return `${field.columnName.split('.keyword')[0]} <span class="operator">${
+                field.model.operator
+              }</span> [${[values]}]`;
+
+            case 'date':
+            const datevalues =  get(field, 'model.preset');
+              if (isUndefined(datevalues)) {
+                return '';
+              }
+
+              if (get(field, 'model.preset') == 'NA') {
+                return `${field.columnName} <span class="operator"> BTW
+                </span> [ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]`;
+              } else {
+                return `${field.columnName} = <span class="operator">${
+                  get(field, 'model.preset')
+                }</span>`;
+              }
+            default:
+              if (field.model.operator === 'BTW') {
+                return `${field.columnName} <span class="operator">${
+                  field.model.operator
+                }</span> [${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]`;
+              } else {
+                return `${field.columnName} <span class="operator">${
+                  field.model.operator
+                }</span> [${[get(field, 'model.value')]}]`;
+              }
+          }
         }
-        return `${field.columnName} <span class="operator">${
-          field.model.operator
-        }</span> [${mode === 'DSK' ? values.join(', ') : values}]`;
+
       })
       .join(
         ` <strong class="bool-op">${filterGroup.booleanCriteria}</strong> `
