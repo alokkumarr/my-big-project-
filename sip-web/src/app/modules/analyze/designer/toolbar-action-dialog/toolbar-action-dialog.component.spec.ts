@@ -4,7 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog.component';
 import { MaterialModule } from 'src/app/material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import {
+  MatDialog,
+  MatDialogConfig,
+  MatDialogRef,
+  MAT_DIALOG_DATA
+} from '@angular/material';
 import { DesignerService } from '../designer.service';
 import { HeaderProgressService } from '../../../../common/services';
 import { Subject, timer } from 'rxjs';
@@ -16,24 +21,17 @@ const mockService = {};
 const dataStub: IToolbarActionData = {
   action: 'save',
   analysis: {
-    artifacts: [{
-      artifactName: 'sample',
-      columns: [],
-      artifactPosition: [5]
-    }],
-    categoryId: 5,
-    chartTitle: 'sample',
-    checked: true,
-    createdTimestamp: 1571920398528,
-    disabled: false,
-    isScheduled: 'true',
-    metric: 'MCT TGT Session ES',
+    artifacts: [
+      {
+        artifactName: 'sample',
+        columns: [],
+        artifactPosition: [5]
+      }
+    ],
+    category: 5,
     saved: true,
     schedule: null,
     scheduled: null,
-    userFullName: 'sawadmin@synchronoss.com',
-    metricId: 'MCT TGT Session ES',
-    metrics: ['MCT TGT Session ES'],
     createdBy: 'sawadmin@synchronoss.com',
     customerCode: 'SYNCHRONOSS',
     description: '',
@@ -45,15 +43,13 @@ const dataStub: IToolbarActionData = {
     parentAnalysisId: '57b39194-0c8c-4384-9e66-7cb1c9c8ae01',
     parentCategoryId: '4',
     semanticId: 'tf-es-201901160115',
-    sqlBuilder: {},
-    supports: undefined,
     type: 'pivot',
     userId: 1
-  }
+  } as any
 };
 
 class HeaderProgressStubService {
-  subscribe = (fn) => {
+  subscribe = fn => {
     const _subject$ = new Subject<boolean>();
     return _subject$
       .pipe(
@@ -61,7 +57,7 @@ class HeaderProgressStubService {
         debounce(() => timer(100))
       )
       .subscribe(fn);
-  }
+  };
 }
 
 describe('Designer Chart Component', () => {
@@ -70,12 +66,14 @@ describe('Designer Chart Component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      providers: [{ provide: MatDialog, useValue: mockService },
+      providers: [
+        { provide: MatDialog, useValue: mockService },
         { provide: MatDialogRef, useValue: mockService },
         { provide: MAT_DIALOG_DATA, useValue: mockService },
         { provide: MatDialogConfig, useValue: mockService },
         { provide: DesignerService, useValue: mockService },
-        { provide: HeaderProgressService, useClass: HeaderProgressStubService }],
+        { provide: HeaderProgressService, useClass: HeaderProgressStubService }
+      ],
       imports: [MaterialModule, FormsModule, BrowserAnimationsModule],
       declarations: [ToolbarActionDialogComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
