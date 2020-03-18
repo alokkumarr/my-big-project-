@@ -598,12 +598,7 @@ public class DLSparkQueryBuilder {
     return groupBy;
   }
 
-  String joinString(List<Object> strList) {
-    Function<Object, String> addQuotes = s -> "\'" + s + "\'";
-    return strList.stream().map(addQuotes).collect(Collectors.joining(", "));
-  }
-
-  public static String dskForManualQuery(
+  public String dskForManualQuery(
       SipQuery sipQuery, String query, SipDskAttribute attribute) {
     StringBuffer dskFilter13 = new StringBuffer();
     dskFilter13.append(" (").append(SELECT).append(" * ").append(" ").append(FROM).append(" ");

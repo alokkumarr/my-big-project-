@@ -156,14 +156,14 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     try {
       HFileOperations.deleteEnt(path);
     } catch (Exception e) {
-      logger.error("cannot get the file in path" + path);
+      logger.error("cannot get the file in path:{}", path);
     }
     return true;
   }
 
   private void waitForResultRetry(String resultId, Integer retries) {
     if (retries == 0) {
-      throw new RuntimeException("Timed out waiting for result: " + resultId);
+      throw new RuntimeException("Timed out waiting for result: {}" + resultId);
     }
     logger.info("Waiting for result: {}", resultId);
     try {
@@ -237,7 +237,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       dataStream
           .limit(limit)
           .forEach(
-              (element) -> {
+              element -> {
                 try {
                   JsonNode jsonNode = mapper.readTree(element);
                   data.add((jsonNode));
@@ -252,7 +252,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           .skip(startIndex)
           .limit(pageSize)
           .forEach(
-              (element) -> {
+              element -> {
                 try {
                   JsonNode jsonNode = mapper.readTree(element);
                   data.add((jsonNode));
@@ -265,7 +265,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   }
 
   private Long getRecordCount(String outputLocation) throws Exception {
-    logger.info("Getting record count reading results for Dl reports: {}");
+    logger.info("Getting record count reading results for Dl reports:");
     ObjectMapper mapper = new ObjectMapper();
     InputStream inputStream = null;
     Long count = null;
@@ -347,9 +347,9 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           throw new RuntimeException(
               "Run time filter for queryMode : {ModelValues} can't be null or empty!! ");
         }
-        filter.getModel().getModelValues().forEach(val -> {
-          filList.add(String.format("'%s'", val));
-        });
+        filter.getModel().getModelValues().forEach(val ->
+          filList.add(String.format("'%s'", val))
+        );
       }
       runTimeFilter = String.join(", ", filList);
     }

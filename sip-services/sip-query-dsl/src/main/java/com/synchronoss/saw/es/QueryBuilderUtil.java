@@ -47,12 +47,12 @@ public class QueryBuilderUtil {
   private static final String MONTH = "month";
   private static final String KEYWORD = ".keyword";
 
-  public static Map<String, String> dateFormats = new HashMap<String, String>();
+  public static final Map<String, String> dateFormats;
 
   private QueryBuilderUtil() {}
 
     static {
-    Map<String, String> formats = new HashMap<String, String>();
+    Map<String, String> formats = new HashMap<>();
     formats.put("YYYY", "year");
     formats.put("MMMYYYY", MONTH);
     formats.put("MMYYYY", MONTH);
@@ -250,9 +250,7 @@ public class QueryBuilderUtil {
         }
       case EQ:
         {
-          TermQueryBuilder termQueryBuilder =
-              new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-          return termQueryBuilder;
+          return new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
         }
       case NEQ:
         {
@@ -439,7 +437,7 @@ public class QueryBuilderUtil {
   private static List<?> buildStringTermsfilter(List<?> modelValues) {
     List<Object> stringValues = new ArrayList<>();
     modelValues.forEach(
-        (val) -> {
+        val -> {
           // Add the lowercase value as terms to lookup based on custom analyser.
           if (val instanceof String) {
             stringValues.add(((String) val).trim().toLowerCase().trim());

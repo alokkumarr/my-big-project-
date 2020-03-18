@@ -4,12 +4,10 @@ import static com.synchronoss.saw.es.QueryBuilderUtil.queryDSKBuilder;
 import static com.synchronoss.saw.util.BuilderUtil.buildNestedFilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.exceptions.SipDslRuntimeException;
 import com.synchronoss.saw.model.Aggregate;
-import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Filter.Type;
@@ -20,7 +18,6 @@ import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -153,7 +150,7 @@ public class ElasticSearchQueryBuilder {
     DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
 
     if (item.getType().value().equals(Filter.Type.DATE.value())) {
-      logger.trace("rangeQueryBuilder.format(dateFormat.format(date)) :{} ", dateFormat.format(date));
+      logger.trace("date format is  :{} ", EPOCH_TO_DATE_FORMAT);
       rangeQueryBuilder.format(EPOCH_TO_DATE_FORMAT);
     }
 
@@ -210,18 +207,6 @@ public class ElasticSearchQueryBuilder {
     return searchSourceBuilder;
   }
 
-  /**
-   * @param dataSecurityString
-   * @return
-   * @throws IOException
-   */
-  public DataSecurityKey buildDsk(String dataSecurityString) throws IOException {
-    DataSecurityKey dataSecurityKeyNode;
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode objectNode = objectMapper.readTree(dataSecurityString);
-    dataSecurityKeyNode = objectMapper.treeToValue(objectNode, DataSecurityKey.class);
-    return dataSecurityKeyNode;
-  }
 
   /**
    * @param dataFields
@@ -241,7 +226,7 @@ public class ElasticSearchQueryBuilder {
       BooleanCriteria booleanCriteria) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
     AggregationBuilder finalAggregationBuilder = null;
-    if (aggregationFields.size() == 0) {
+    if (!aggregationFields.isEmpty()) {
       String[] excludes = null;
       String[] includes = getFieldsInclude(dataFields);
       searchSourceBuilder.fetchSource(includes, excludes);
