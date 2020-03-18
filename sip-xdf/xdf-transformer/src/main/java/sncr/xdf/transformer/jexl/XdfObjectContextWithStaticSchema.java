@@ -44,7 +44,9 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
                     + "\nRecord Field Type = " + record.schema().fields()[fInx].dataType());
                 }
                 if (this.record.get(fInx) != null) {
-                    targetRow.put(fieldName, fullRow.get(fieldName));
+                    Object value = fullRow.get(fieldName);
+                    if (value != null)
+                        targetRow.put(fieldName, value);
                 }
             }
             else{

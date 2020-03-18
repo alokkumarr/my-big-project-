@@ -32,18 +32,11 @@ public class XdfObjectContext extends XdfObjectContextBase {
             targetRowTypes.put(fieldNames[i], schema.fields()[i]);
             if (this.record.get(i) != null) {
                 Object value = getValue(fieldNames[i], i);
+                fullRow.put(fieldNames[i], value);
                 if (value != null)
                     targetRow.put(fieldNames[i], value);
             }
         }
-/*
-            StringBuilder sb = new StringBuilder();
-            String[] fs = targetRow.keySet().toArray(new String[0]);
-            for (int j = 0; j < fs.length; j++) {
-                sb.append( ", " + j + " = " +  fs[j].toString());
-            }
-            System.out.println("Initialized fields from in record: " + sb.toString());
-*/
     }
 
     public Map<String, StructField> getNewOutputSchema(){ return targetRowTypes; }
