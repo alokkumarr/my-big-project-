@@ -169,8 +169,10 @@ public class RetryExecutorService {
           BisRouteEntity bisRouteEntity;
           if (bisRouteEntityPresent.isPresent()) {
             bisRouteEntity = bisRouteEntityPresent.get();
+
+            String routeMetadatStr = bisRouteEntity.getRouteMetadata();
             nodeEntity = objectMapper
-                .readTree(bisRouteEntity.getRouteMetadata());
+                .readTree(routeMetadatStr);
             rootNode = (ObjectNode) nodeEntity;
             String channelType = channelTypeService
                 .findChannelTypeFromRouteId(bisRouteEntity.getBisRouteSysId());

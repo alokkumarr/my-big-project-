@@ -162,6 +162,9 @@ the operation's activity in MaprDB and finally provides the results back to the 
 .Figure: Executing an analysis using the SIP Workbench Service
 plantuml::sip-design/figure-workbench-sequence.pum[]
 
+.Figure: Preview of analysis using the SIP Workbench Service
+plantuml::sip-design/figure-workbench-executor-sequence.pum[]
+
 The SIP Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
 semantic metadata configuration REST APU & data wrangling related REST API.

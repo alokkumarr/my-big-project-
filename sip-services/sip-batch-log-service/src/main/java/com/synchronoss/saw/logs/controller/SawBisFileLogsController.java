@@ -9,6 +9,7 @@ import com.synchronoss.saw.logs.models.BisRouteHistory;
 import com.synchronoss.saw.logs.models.ScheduleDetail;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -34,10 +35,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-
-
-
 
 @RestController
 @RequestMapping(value = "/ingestion/batch")
@@ -189,19 +186,20 @@ public class SawBisFileLogsController {
     Long latFired = null;
     Long nextFired = null;
     try {
-      rootNode = objectMapper.readTree(response);
+      String sanitizedResponse = SipCommonUtils.sanitizeJson(response);
+      rootNode = objectMapper.readTree(sanitizedResponse);
       dataNode = rootNode.get("data");
       logger.trace("data node from response " + dataNode);
       if (dataNode.isArray() && dataNode.size() > 0) {
         JsonNode objNode = dataNode.get(0);
         if (!objNode.get("lastFiredTime").isNull()) {
           logger.trace(
-              "Retreive from Database lastFiredTime :" + objNode.get("lastFiredTime").asLong());
+              "Retrieve from Database lastFiredTime :" + objNode.get("lastFiredTime").asLong());
           latFired = objNode.get("lastFiredTime").asLong();
         }
         if (!objNode.get("nextFireTime").isNull()) {
           logger.trace(
-              "Retreive from Database nextFireTime :" + objNode.get("nextFireTime").asLong());
+              "Retrieve from Database nextFireTime :" + objNode.get("nextFireTime").asLong());
           nextFired = objNode.get("nextFireTime").asLong();
         }
         
