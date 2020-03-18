@@ -18,7 +18,6 @@ import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { DesignerLoadMetric } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
-import { PublishService } from '../../services/publish.service';
 import { AnalyzeActionsService } from '../../actions';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
