@@ -326,7 +326,11 @@ export class ChartService {
           chartType
         ),
         data: map(parsedData, dataPoint =>
-          mapValues(axesFieldNameMap, val => dataPoint[val])
+          mapValues(axesFieldNameMap, val => {
+            return axesFieldNameMap.y === val && dataPoint[val] === ''
+              ? null
+              : dataPoint[val];
+          })
         )
       }
     ];
@@ -339,9 +343,16 @@ export class ChartService {
     const dateFields = filter(fieldsArray, ({ type }) =>
       DATE_TYPES.includes(type)
     );
+    const aggregateYFields = fields.y.filter(
+      field => Boolean(field.aggregate) || Boolean(field.expression)
+    );
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
-      this.formatDatesIfNeeded(parsedData, dateFields);
+      this.formatDatesIfNeeded(
+        parsedData,
+        dateFields,
+        aggregateYFields.length > 0
+      );
     } else {
       this.dateStringToTimestamp(parsedData, dateFields);
     }
@@ -472,7 +483,7 @@ export class ChartService {
     }
   }
 
-  formatDatesIfNeeded(parsedData, dateFields) {
+  formatDatesIfNeeded(parsedData, dateFields, aggregatesExist) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat, groupInterval }) => {
@@ -480,8 +491,11 @@ export class ChartService {
             dateFormat,
             groupInterval
           );
+          const parseFormat = aggregatesExist
+            ? dateFormats.dateFormat
+            : 'YYYY-MM-DD hh:mm:ss';
           dataPoint[removeKeyword(columnName)] = moment
-            .utc(dataPoint[removeKeyword(columnName)], dateFormats.dateFormat)
+            .utc(dataPoint[removeKeyword(columnName)], parseFormat)
             .format(dateFormats.momentFormat || dateFormats.dateFormat);
         });
       });
@@ -517,14 +531,15 @@ export class ChartService {
       comboType || displayType
     );
     const zIndex = this.getZIndex(comboType || displayType);
-    const nameWithAggregate = expression
-      ? displayName
-      : `${
-          AGGREGATE_TYPES_OBJ[aggregate].designerLabel
-        }(${displayNameWithoutAggregateFor({
-          displayName,
-          dataField
-        } as ArtifactColumnDSL)})`;
+    const nameWithAggregate =
+      expression || !aggregate
+        ? displayName
+        : `${
+            AGGREGATE_TYPES_OBJ[aggregate].designerLabel
+          }(${displayNameWithoutAggregateFor({
+            displayName,
+            dataField
+          } as ArtifactColumnDSL)})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -548,9 +563,12 @@ export class ChartService {
     );
     // the backend and moment.js require different date formats for days of month
     // the backend represents it with "d", and momentjs with "Do"
+    let format = replace(dateFormat, 'dd', 'DD');
+    format = replace(format, 'd', 'Do');
+    format = replace(format, /y/g, 'Y');
     return {
       /* Date format saved with column will cater to backend. Make adjustments for FE */
-      dateFormat: replace(replace(dateFormat, 'd', 'Do'), /y/g, 'Y'),
+      dateFormat: format,
 
       /* If an explicit moment format is defined for this date format, return that too */
       momentFormat:
@@ -610,7 +628,13 @@ export class ChartService {
     }
 
     return fpPipe(
-      fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
+      fpMap(dataPoint =>
+        mapValues(axesFieldNameMap, val => {
+          return axesFieldNameMap.y === val && dataPoint[val] === ''
+            ? null
+            : dataPoint[val];
+        })
+      ),
       fpGroupBy('g'),
       fpToPairs,
       fpMap(([name, data]) => ({
@@ -845,24 +869,16 @@ export class ChartService {
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
-            if (!isUndefined(field.alias)) {
-              return (
-                field.alias ||
-                (field.expression
-                  ? field.displayName
-                  : `${
-                      AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
-                    }(${displayNameWithoutAggregateFor(field)})`)
-              );
-            }
-            return (
-              opts.labels.y ||
-              (field.expression
+            const fieldDisplayName =
+              field.expression || !field.aggregate
                 ? field.displayName
                 : `${
                     AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
-                  }(${displayNameWithoutAggregateFor(field)})`)
-            );
+                  }(${displayNameWithoutAggregateFor(field)})`;
+            if (!isUndefined(field.alias)) {
+              return field.alias || fieldDisplayName;
+            }
+            return opts.labels.y || fieldDisplayName;
           }).join('<br/>');
           const isSingleField = fields.length === 1;
           return {
