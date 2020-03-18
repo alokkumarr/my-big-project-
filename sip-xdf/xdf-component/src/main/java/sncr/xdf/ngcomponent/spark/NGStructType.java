@@ -18,7 +18,7 @@ public class NGStructType implements Serializable {
         structType = new StructType();
     }
 
-    public NGStructType(NGStructField[] fields, boolean isSchemaIndexBased){
+    public NGStructType(NGStructField[] fields, boolean isSkipFieldsEnabled){
         structType = new StructType(fields);
         ngFields = fields;
         this.isSkipFieldsEnabled = isSkipFieldsEnabled;
