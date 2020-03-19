@@ -40,6 +40,10 @@ public class Field {
     @Expose
     private String defaultValue;
 
+    @SerializedName("isFlatteningEnabled")
+    @Expose
+    private boolean isFlatteningEnabled = false;
+
     /**
      * No args constructor for use in serialization
      *
@@ -65,7 +69,8 @@ public class Field {
                  String definitionFile,
                  Integer sourceIndex,
                  String sourceFieldName,
-                 String defaultValue) {
+                 String defaultValue,
+                 boolean isFlatteningEnabled) {
         this.name = name;
         this.type = type;
         this.format = format;
@@ -74,6 +79,7 @@ public class Field {
         this.sourceIndex = sourceIndex;
         this.sourceFieldName = sourceFieldName;
         this.defaultValue = defaultValue;
+        this.isFlatteningEnabled = isFlatteningEnabled;
     }
 
     /**
@@ -204,6 +210,19 @@ public class Field {
         return this;
     }
 
+    public boolean isFlatteningEnabled() {
+        return isFlatteningEnabled;
+    }
+
+    public void setFlatteningEnabled(boolean isFlatteningEnabled) {
+        this.isFlatteningEnabled = isFlatteningEnabled;
+    }
+
+    public Field withFlatteningEnabled(boolean isFlatteningEnabled) {
+        this.isFlatteningEnabled = isFlatteningEnabled;
+        return this;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -221,6 +240,7 @@ public class Field {
             .append(sourceIndex)
             .append(sourceFieldName)
             .append(defaultValue)
+            .append(isFlatteningEnabled)
             .toHashCode();
     }
 
@@ -242,6 +262,7 @@ public class Field {
             .append(sourceIndex, rhs.sourceIndex)
             .append(sourceFieldName, rhs.sourceFieldName)
             .append(defaultValue, rhs.defaultValue)
+            .append(isFlatteningEnabled, rhs.isFlatteningEnabled)
             .isEquals();
     }
 }
