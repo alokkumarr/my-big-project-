@@ -9,6 +9,7 @@ import { from } from 'rxjs';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
+import * as set from 'lodash/set';
 
 import { guid } from '../../../../../common/utils/guid';
 import { DATE_TYPES } from '../../../../../common/consts';
@@ -16,6 +17,10 @@ import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ObserveService } from '../../../services/observe.service';
 import { HeaderProgressService } from '../../../../../common/services';
 
+const kpiNotElgibleMsg =
+  'This Dataset is not configured with any KPI eligible metrics.';
+const dateColMissingMsg =
+  'This Dataset does not contain at least one eligible Date type field.';
 @Component({
   selector: 'widget-metric',
   templateUrl: './widget-metric.component.html',
@@ -26,6 +31,7 @@ export class WidgetMetricComponent implements OnInit, OnDestroy {
   progressSub;
   metrics: Array<any> = [];
   showProgress = false;
+  errorMessage = '';
 
   constructor(
     public analyze: AnalyzeService,
@@ -77,6 +83,16 @@ export class WidgetMetricComponent implements OnInit, OnDestroy {
 
     metric.kpiEligible =
       metric.kpiColumns.length > 0 && metric.dateColumns.length > 0;
+
+    const errorMessage =
+      metric.kpiColumns.length === 0
+        ? kpiNotElgibleMsg
+        : metric.dateColumns.length === 0
+        ? dateColMissingMsg
+        : kpiNotElgibleMsg;
+
+    // Setting the specific error message for each metric. Added as part of SIP-9254.
+    set(metric, 'errorMessage', errorMessage);
   }
 
   onSelectMetricColumn(column, metric) {

@@ -2,6 +2,7 @@ package com.synchronoss.saw.batch.entities.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -101,12 +102,12 @@ public class BisRouteDto implements Serializable {
 
   @JsonProperty("routeMetadata")
   public String getRouteMetadata() {
-    return routeMetadata;
+    return SipCommonUtils.sanitizeJson(routeMetadata);
   }
 
   @JsonProperty("routeMetadata")
   public void setRouteMetadata(String routeMetadata) {
-    this.routeMetadata = routeMetadata;
+    this.routeMetadata = SipCommonUtils.sanitizeJson(routeMetadata);
   }
 
   @JsonProperty("bisChannelSysId")

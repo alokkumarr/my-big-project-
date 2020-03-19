@@ -9,11 +9,15 @@ import * as isFinite from 'lodash/isFinite';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as isUndefined from 'lodash/isUndefined';
+import { ENTER } from '@angular/cdk/keycodes';
 
 import {
   CUSTOM_DATE_PRESET_VALUE,
   DATE_TYPES,
-  NUMBER_TYPES
+  NUMBER_TYPES,
+  SQL_QUERY_KEYWORDS,
+  QUERY_RUNTIME_IDENTIFIER
 } from '../../../consts';
 import { Artifact, FilterModel, Filter } from '../../types';
 import { ArtifactDSL } from '../../../../../models';
@@ -27,6 +31,9 @@ export interface DesignerFilterDialogData {
   supportsGlobalFilters?: boolean;
   supportsAggregationFilters?: boolean;
   showFilterOptions: boolean;
+  analysisReportType?: string;
+  designerPage?: boolean;
+  query?: string;
 }
 export interface DesignerFilterDialogResult {
   filters: Filter[];
@@ -43,6 +50,9 @@ export class DesignerFilterDialogComponent implements OnInit {
   filters: Filter[];
   groupedFilters;
   areFiltersValid = false;
+  queryWithClass;
+  readonly separatorKeysCodes: number[] = [ENTER];
+  modelValueArray: string[][] = [];
 
   constructor(
     public dialogRef: MatDialogRef<DesignerFilterDialogData>,
@@ -50,10 +60,19 @@ export class DesignerFilterDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.queryWithClass = this.data.analysisType === 'report'
+      && this.data.analysisReportType === 'query'
+        ? this.loadQueryWithClasses()
+        : '';
     this.filters = cloneDeep(this.data.filters);
     forEach(this.filters, filtr => {
+      this.modelValueArray.push([]);
       if (filtr.artifactsName) {
         filtr.tableName = filtr.artifactsName;
+      }
+
+      if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
+        filtr.model.modelValues = [];
       }
     });
     this.groupedFilters = groupBy(this.filters, 'tableName');
@@ -66,6 +85,28 @@ export class DesignerFilterDialogComponent implements OnInit {
       }
     });
     this.onFiltersChange();
+  }
+
+  // As we show the query in filter pop up, we need to add colors
+  // to the keywords present in the sql query for better understanding
+  // if the query is too long
+  loadQueryWithClasses() {
+    // reset filter values
+    forEach(this.filters, filter => {
+      filter.model.modelValues = [];
+    });
+    let addClass = '';
+    this.data.query.replace(/[\s]+/g, " ").trim().split(" ").forEach(function(val) {
+      if (SQL_QUERY_KEYWORDS.indexOf(val.trim().toUpperCase()) > -1) {
+        addClass += "<span class='sql-keyword'>" + val + "&nbsp;</span>";
+      }
+      else if (val.trim().toUpperCase() === QUERY_RUNTIME_IDENTIFIER) {
+        addClass += "<span class='runtime-indicator'>" + val + "&nbsp;</span>";
+      } else {
+        addClass += "<span class='other'>" + val + "&nbsp;</span>";
+      }
+    });
+    return addClass;
   }
 
   aggregatedFiltersFor(artifactName: string): Filter[] {
@@ -158,7 +199,10 @@ export class DesignerFilterDialogComponent implements OnInit {
 
   ok() {
     const result: DesignerFilterDialogResult = {
-      filters: filter(this.filters, 'columnName'),
+      filters:
+        this.data.analysisType === 'report' && this.data.analysisReportType === 'query'
+          ? this.filters
+          :  filter(this.filters, 'columnName'),
       booleanCriteria: this.data.booleanCriteria
     };
     this.dialogRef.close(result);
@@ -166,36 +210,45 @@ export class DesignerFilterDialogComponent implements OnInit {
 
   validateFilters(filters) {
     let areValid = true;
-    forEach(
-      filters,
-      ({
-        type,
-        model,
-        isAggregationFilter,
-        isRuntimeFilter,
-        isGlobalFilter,
-        isOptional
-      }: Filter) => {
-        if (!isRuntimeFilter && isGlobalFilter) {
-          areValid = true;
-        } else if (!model) {
-          areValid = Boolean(
-            this.data.isInRuntimeMode
-              ? isOptional && isRuntimeFilter
-              : isRuntimeFilter
-          );
-        } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
-          areValid = this.isNumberFilterValid(model);
-        } else if (type === 'string') {
-          areValid = this.isStringFilterValid(model);
-        } else if (DATE_TYPES.includes(type)) {
-          areValid = this.isDateFilterValid(model);
+    if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
+      forEach(filters, filter => {
+        areValid = isUndefined(filter.model) ? false : areValid;
+        if (!isUndefined(filter.model)) {
+          areValid = isEmpty(filter.model.modelValues) ? false: areValid;
         }
-        if (!areValid) {
-          return false;
+      })
+    } else {
+      forEach(
+        filters,
+        ({
+          type,
+          model,
+          isAggregationFilter,
+          isRuntimeFilter,
+          isGlobalFilter,
+          isOptional
+        }: Filter) => {
+          if (!isRuntimeFilter && isGlobalFilter) {
+            areValid = true;
+          } else if (!model) {
+            areValid = Boolean(
+              this.data.isInRuntimeMode
+                ? isOptional && isRuntimeFilter
+                : isRuntimeFilter
+            );
+          } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
+            areValid = this.isNumberFilterValid(model);
+          } else if (type === 'string') {
+            areValid = this.isStringFilterValid(model);
+          } else if (DATE_TYPES.includes(type)) {
+            areValid = this.isDateFilterValid(model);
+          }
+          if (!areValid) {
+            return false;
+          }
         }
-      }
-    );
+      );
+    }
     return areValid;
   }
 
@@ -223,5 +276,40 @@ export class DesignerFilterDialogComponent implements OnInit {
 
   cancel() {
     this.dialogRef.close();
+  }
+
+  createFilterRequest(event, i, id) {
+    switch (id) {
+      case 'column':
+        this.filters[i].displayName = event.srcElement.value;
+        break;
+      case 'description':
+        this.filters[i].description = event.srcElement.value;
+        break;
+    }
+    this.onFiltersChange();
+  }
+
+
+  addOpt(event, index: number): void {
+    const input = event.input;
+    const value = event.value;
+    if ((value || '').trim()) {
+      this.modelValueArray[index].push(value.trim());
+    }
+    if (input) {
+      input.value = '';
+    }
+    this.filters[index].model.modelValues = this.modelValueArray[index];
+    this.onFiltersChange();
+  }
+
+  removeOpt(opt: string, index: number): void {
+    const optIndex = this.modelValueArray[index].indexOf(opt);
+    if (optIndex >= 0) {
+      this.modelValueArray[index].splice(optIndex, 1);
+    }
+    this.filters[index].model.modelValues = this.modelValueArray[index];
+    this.onFiltersChange();
   }
 }

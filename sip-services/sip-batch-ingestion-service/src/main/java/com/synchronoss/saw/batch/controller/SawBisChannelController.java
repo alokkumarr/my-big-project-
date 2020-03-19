@@ -19,6 +19,7 @@ import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -108,7 +109,10 @@ public class SawBisChannelController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode nodeEntity = null;
     ObjectNode rootNode = null;
-    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+    String channelMetadata = requestBody.getChannelMetadata();
+    String sanitizedChannelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
+
+    nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
     rootNode = (ObjectNode) nodeEntity;
     String channelName = rootNode.get("channelName").asText();
     if (bisChannelService.isChannelNameExists(channelName)) {
@@ -305,7 +309,12 @@ public class SawBisChannelController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode nodeEntity = null;
     ObjectNode rootNode = null;
-    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+
+    String channelMetadata = requestBody.getChannelMetadata();
+
+    String sanitizedChannelMetadata = SipCommonUtils.sanitizeJson(channelMetadata);
+
+    nodeEntity = objectMapper.readTree(sanitizedChannelMetadata);
     rootNode = (ObjectNode) nodeEntity;
 
     String channelType = requestBody.getChannelType();

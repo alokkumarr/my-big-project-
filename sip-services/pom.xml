@@ -199,7 +199,7 @@
     <module>sip-batch-plugin-api-pull</module>
     <module>sip-common-components</module>
     <module>sip-alert-service</module>
-		<module>dist</module>
+    		<module>dist</module>
   </modules>
   <distributionManagement>
     <repository>

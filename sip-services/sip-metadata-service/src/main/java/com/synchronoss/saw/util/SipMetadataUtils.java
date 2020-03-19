@@ -20,6 +20,7 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -273,7 +274,8 @@ public class SipMetadataUtils {
     com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
     JsonElement jsonElement;
     try {
-      jsonElement = jsonParser.parse(jsonString);
+      String sanitizedJsonString = SipCommonUtils.sanitizeJson(jsonString);
+      jsonElement = jsonParser.parse(sanitizedJsonString);
       logger.info("json element parsed successfully");
       logger.trace("Parsed String = ", jsonElement);
       return jsonElement;

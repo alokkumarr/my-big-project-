@@ -207,7 +207,7 @@
       <artifactId>sip-common-components</artifactId>
       <version>${revision}</version>
     </dependency>
-	</dependencies>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>

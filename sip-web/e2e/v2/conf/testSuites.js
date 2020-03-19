@@ -63,6 +63,9 @@ const CRITICAL = [
   'schedule/createDeleteSchedule.test.js',
   'alert/addAlert.test.js',
   'alert/editDeleteAlerts.test.js',
+  'publish/publishPivot.test.js',
+  'publish/publishReports.test.js',
+  'publish/publishCharts.test.js',
   'admin/create-user.test.js'
 ];
 // All tests which were executed in critical with larger data set
