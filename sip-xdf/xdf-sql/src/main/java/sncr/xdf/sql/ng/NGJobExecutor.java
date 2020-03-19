@@ -1,6 +1,6 @@
 package sncr.xdf.sql.ng;
 
-import net.sf.jsqlparser.statement.Statement;
+import io.prestosql.sql.tree.Statement;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +94,7 @@ public class NGJobExecutor {
 
             HFileOperations.exists(tempDir);
 
-            List<Statement> statements = scriptDescriptor.getParsedStatements().getStatements();
+            List<Statement> statements = scriptDescriptor.getParsedStatements();
 
             for (int i = 0; i < statements.size(); i++) {
 

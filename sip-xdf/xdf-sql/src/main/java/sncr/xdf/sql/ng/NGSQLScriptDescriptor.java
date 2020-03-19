@@ -1,9 +1,10 @@
 package sncr.xdf.sql.ng;
 
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.Statements;
+import com.google.common.collect.ImmutableSet;
+import io.prestosql.sql.parser.ParsingOptions;
+import io.prestosql.sql.parser.SqlParser;
+import io.prestosql.sql.parser.StatementSplitter;
+import io.prestosql.sql.tree.Statement;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import sncr.bda.conf.Input;
@@ -39,7 +40,7 @@ public class NGSQLScriptDescriptor {
 
     private static final Logger logger = Logger.getLogger(NGSQLScriptDescriptor.class);
 
-    private Statements stmts;
+    private List<Statement> stmts = new ArrayList<>();
     private List<SQLDescriptor> statementDescriptors = new ArrayList<>();
     private Map<String, TableDescriptor> scriptWideTableMap = new HashMap<>();
 
@@ -155,17 +156,23 @@ public class NGSQLScriptDescriptor {
                 return;
             }
 
-            stmts = CCJSqlParserUtil.parseStatements(script);
+            //stmts = CCJSqlParserUtil.parseStatements(script);
+            StatementSplitter splitter = new StatementSplitter(script, ImmutableSet.of(";"));
+            List<StatementSplitter.Statement> stmtsList = splitter.getCompleteStatements();
+            logger.debug("SQL Statements = " + stmtsList);
 
             // We have array of statements - check the table names
             // Since same table names will be mentioned multiple times in multiple
             // statements we have to support "grand" list and maintain precedence of the flags
 
-            SqlScriptParser p = new SqlScriptParser();
+            SqlParser parser = new SqlParser();
+            PrestoSQLParser p = new PrestoSQLParser();
             int i = 0;
-            for(Statement stmt : stmts.getStatements()) {
+            for(StatementSplitter.Statement stmt : stmtsList) {
                 i++;
-                List<TableDescriptor> tables = p.getTableList(stmt, i);
+                Statement statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
+                stmts.add(statement);
+                List<TableDescriptor> tables = p.getTableList(statement, i);
                 logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
                     + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
                 TableDescriptor targetTable = null;
@@ -248,7 +255,7 @@ public class NGSQLScriptDescriptor {
                 logger.trace("SQL Statement descriptor: \n" + sqlDesc + "\n");
             }
             logger.debug("Table list: \n" + scriptWideTableMap );
-        } catch(JSQLParserException e){
+        } catch(Exception e){
             throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
         }
         return;
@@ -353,11 +360,7 @@ public class NGSQLScriptDescriptor {
 
     public Map<String, TableDescriptor> getScriptWideTableMap(){  return scriptWideTableMap; }
 
-    public Statements getParsedStatements() {
+    public List<Statement> getParsedStatements() {
         return stmts;
     }
-
-
-
-
 }

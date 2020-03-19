@@ -1,6 +1,6 @@
 package sncr.xdf.sql;
 
-import net.sf.jsqlparser.statement.Statement;
+import io.prestosql.sql.tree.Statement;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -79,7 +79,7 @@ public class JobExecutor {
             }
             HFileOperations.createDir(tempDir);
 
-            List<Statement> statements = scriptDescriptor.getParsedStatements().getStatements();
+            List<Statement> statements = scriptDescriptor.getParsedStatements();
 
             for (int i = 0; i < statements.size(); i++) {
 

@@ -22,6 +22,16 @@
       <artifactId>xdf-component</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.prestosql</groupId>
+      <artifactId>presto-parser</artifactId>
+      <version>327</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>26.0-jre</version>
+    </dependency>
   </dependencies>
 
 
