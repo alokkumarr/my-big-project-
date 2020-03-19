@@ -29,7 +29,10 @@ describe('Date Interval Selector', () => {
   });
 
   it('should be initialised with correct date intervals for comparison charts', async(() => {
-    spyOn(TestBed.get(Store), 'selectSnapshot').and.returnValue('comparison');
+    spyOn(TestBed.get(Store), 'selectSnapshot').and.returnValue({
+      type: 'chart',
+      chartOptions: { chartType: 'comparison' }
+    });
     const intervalComponentFixture = TestBed.createComponent(
       DesignerDateIntervalSelectorComponent
     );
