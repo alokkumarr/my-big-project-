@@ -58,6 +58,16 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
 
     public Map<String, StructField> getNewOutputSchema(){ return targetRowTypes; }
 
+    /**
+     *
+     * @param name
+     * @return
+     *
+     * get() method calling in JEXL Script execution to get variable values to substitute in computation.
+     * fullRow is Map contains Record Field Names as Keys and corresponding values from Record as Values.
+     * if Name contains in fullRow map then it will return that value.
+     *
+     */
     @Override
     public Object get(String name) {
         Object retval = null;

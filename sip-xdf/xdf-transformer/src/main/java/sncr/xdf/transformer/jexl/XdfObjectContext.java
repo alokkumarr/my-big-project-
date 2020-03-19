@@ -28,13 +28,13 @@ public class XdfObjectContext extends XdfObjectContextBase {
         super(engine, inSchema, record);
         //Initialize record -- targetRow with values from input Row
         String[] fieldNames = schema.fieldNames();
-        for (int i = 0; i < fieldNames.length; i++) {
-            targetRowTypes.put(fieldNames[i], schema.fields()[i]);
-            if (this.record.get(i) != null) {
-                Object value = getValue(fieldNames[i], i);
-                fullRow.put(fieldNames[i], value);
+        for (int index = 0; index < fieldNames.length; index++) {
+            targetRowTypes.put(fieldNames[index], schema.fields()[index]);
+            if (this.record.get(index) != null) {
+                Object value = getValue(fieldNames[index], index);
+                fullRow.put(fieldNames[index], value);
                 if (value != null)
-                    targetRow.put(fieldNames[i], value);
+                    targetRow.put(fieldNames[index], value);
             }
         }
     }
