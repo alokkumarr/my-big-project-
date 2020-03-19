@@ -38,6 +38,12 @@ $header-font-size: 18px;
     }
   }
 }
+
+map-box,
+map-chart-viewer {
+  height: calc(100% - 47px) !important;
+}
+
 .report-toggle {
   height: calc(100vh - 273px);
 }
