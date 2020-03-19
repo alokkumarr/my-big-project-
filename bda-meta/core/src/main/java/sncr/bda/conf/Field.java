@@ -44,12 +44,12 @@ public class Field {
     @Expose
     private boolean isFlatteningEnabled = false;
 
-    /**
-     * No args constructor for use in serialization
-     *
-     */
-    public Field() {
-    }
+	/**
+	 * No args constructor for use in serialization
+	 *
+	 */
+	public Field() {
+	}
 
     /**
      *

@@ -138,7 +138,7 @@ public class NGComponentUtil {
      */
     public static int countChar(String inputString, char character) {
         int count = 0;
-        for (char c : inputString.toCharArray()) {
+        for(char c: inputString.toCharArray()) {
             if (c == character) {
                 count += 1;
             }

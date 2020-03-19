@@ -508,7 +508,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Dataset later on to insure output number of files.
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(sourcePath, outputNOF);
-        
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
         inputDSCount = rdd.count();
         if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
@@ -534,6 +533,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
 
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema.getStructType()).select(outputColumns);
+
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
         outputDataset = convertJsonStringColToStruct(outputDataset, ngctx.componentConfiguration.getParser().getFields());
         Dataset<Row> outputDS = pivotOrFlattenDataset(outputDataset);
@@ -744,7 +744,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         Dataset<Row> outputDS = convertRddToDS(outputRdd);
         outputDS = convertJsonStringColToStruct(outputDS, ngctx.componentConfiguration.getParser().getFields());
-
         Dataset<Row> pivotDS = pivotOrFlattenDataset(outputDS);
         logger.debug("Final DS Schema : "+ pivotDS.schema());
         logger.debug("************************************** Dest dir for rdd = " + tempDir + "\n");
