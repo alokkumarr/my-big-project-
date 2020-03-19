@@ -1,5 +1,4 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import { Analysis } from '../types';
 import {
   USER_ANALYSIS_CATEGORY_NAME,
   USER_ANALYSIS_SUBCATEGORY_NAME
@@ -13,6 +12,7 @@ import { MatCheckboxChange } from '@angular/material';
 import { AnalyzeService } from '../../services/analyze.service';
 import { PRIVILEGES } from '../../consts';
 import * as find from 'lodash/find';
+import { AnalysisDSL } from '../../types';
 
 @Component({
   selector: 'designer-save',
@@ -24,7 +24,7 @@ export class DesignerSaveComponent implements OnInit {
   @Output() public parentPublishChange: EventEmitter<
     number
   > = new EventEmitter();
-  @Input() public analysis: Analysis;
+  @Input() public analysis: AnalysisDSL;
   @Input() public designerMode: string;
 
   publishingToParentCategory = false;
@@ -127,6 +127,10 @@ export class DesignerSaveComponent implements OnInit {
     return this.publishingToParentCategory && this.parentCategory
       ? this.parentCategory.subCategoryName
       : this.userSubCategoryName;
+  }
+
+  onCategorySelect(event) {
+    console.log(event);
   }
 
   onPublishToggle({ checked }: MatCheckboxChange) {
