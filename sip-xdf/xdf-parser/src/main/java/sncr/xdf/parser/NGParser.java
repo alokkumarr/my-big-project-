@@ -1051,6 +1051,16 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return false;
     }
 
+    /**
+     *
+     * @param dataset
+     * @param fields
+     * @return
+     *
+     * convertJsonStringColToStruct() checks if any filed type is json or json_array
+     * and converts then to StructType or ArrayType columns in Dataset.
+     *
+     */
     public Dataset<Row> convertJsonStringColToStruct(Dataset<Row> dataset, List<Field> fields) {
         if (isSchemaContainsJsonType) {
             logger.debug("Parser isFlatteningEnabled : " + isFlatteningEnabled);
@@ -1065,6 +1075,20 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return dataset;
     }
 
+    /**
+     *
+     * @param dataset
+     * @param field
+     * @return
+     *
+     * processJsonColumnInCSV() converts String json type column to StructType column.
+     * To achieve this, First extracts String json field as separate Dataset
+     * Then extract schema from above Json Dataset
+     * Then Apply this StructType schema to String Json field in input Dataset.
+     * Then it will apply sanitize on field names of StructType
+     * Then Cast Json Field to Sanitized StructType
+     * If Flattening Enabled then it will apply Flattening logic on StructType Json field.
+     */
     private Dataset<Row> processJsonColumnInCSV(Dataset<Row> dataset,Field field) {
         String jsonFieldName = field.getName().trim();
         Dataset<Row> jsonDS = ctx.sparkSession.read().json(dataset.select(jsonFieldName).as(Encoders.STRING()));
@@ -1083,6 +1107,21 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return dataset;
     }
 
+    /**
+     *
+     * @param dataset
+     * @param field
+     * @return
+     *
+     * processJsonArrayColumnInCSV() converts String json_array type column to ArrayType<StructType> column.
+     * To achieve this, First extracts String json_array field as separate Dataset
+     * Then extract schema from above Json Dataset
+     * Then Creates ArrayType of above StructType schema
+     * Then Apply this ArrayType<StructType> to String json_array field in input Dataset.
+     * Then it will apply sanitize on field names of ArrayType<StructType>
+     * Then Cast Json Field to Sanitized ArrayType<StructType>
+     * If Flattening Enabled then it will apply Flattening logic on ArrayType<StructType> json_array field.
+     */
     private Dataset<Row> processJsonArrayColumnInCSV(Dataset<Row> dataset, Field field) {
         String jsonFieldName = field.getName().trim();
         Dataset<Row> jsonDS = ctx.sparkSession.read().json(dataset.select(jsonFieldName).as(Encoders.STRING()));

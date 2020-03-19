@@ -82,6 +82,29 @@ public class NGComponentUtil {
         return false;
     }
 
+    /**
+     *
+     * @param structType
+     * @return
+     *
+     * getSanitizedStructType() method rename all sub field names like below
+     *
+     * example: If sub field name is " Test col.name * "
+     * If we observe sub field name contains special charcters, spaces, and "."
+     * 1) Trim Filed Name. It becomes "Test col.name *"
+     * 2) Replace "." with "_". It becomes "Test col_name *"
+     * 3) Remove all special characters. It becomes "Test col_name "
+     * 4) Trim Name. It becomes "Test col_name"
+     * 5) Replace spaces with "_". It becomes "Test_col_name"
+     * 6) Uppercase name. It becomes "TEST_COL_NAME"
+     *
+     * It repeat this logic for all sub fields in given StructType
+     *
+     * It calls recursively if subfields again StructType or ArrayType.
+     *
+     * And returns new StructType with Sanitized field names.
+     *
+     */
     public static StructType getSanitizedStructType(StructType structType) {
         StructType sanitizedStructType = new StructType();
         for(StructField field : structType.fields()){
@@ -96,6 +119,29 @@ public class NGComponentUtil {
         return sanitizedStructType;
     }
 
+    /**
+     *
+     * @param arrayType
+     * @return
+     *
+     * getSanitizedArrayType() method rename all nested field names like below
+     *
+     * example: If nested field name is " Test col.name * "
+     * If we observe sub field name contains special charcters, spaces, and "."
+     * 1) Trim Filed Name. It becomes "Test col.name *"
+     * 2) Replace "." with "_". It becomes "Test col_name *"
+     * 3) Remove all special characters. It becomes "Test col_name "
+     * 4) Trim Name. It becomes "Test col_name"
+     * 5) Replace spaces with "_". It becomes "Test_col_name"
+     * 6) Uppercase name. It becomes "TEST_COL_NAME"
+     *
+     * It repeat this logic for all nested fields in given ArrayType
+     *
+     * It calls recursively if subfields again StructType or ArrayType.
+     *
+     * And returns new ArrayType with Sanitized field names.
+     *
+     */
     public static ArrayType getSanitizedArrayType(ArrayType arrayType) {
         DataType childType = arrayType.elementType();
         if(childType instanceof StructType){
@@ -107,11 +153,37 @@ public class NGComponentUtil {
         return sanitizedArrayType;
     }
 
+    /**
+     *
+     * @param Dataset<Row>
+     * @param String
+     * @param DataType
+     * @return Dataset<Row>
+     *
+     *changeColumnType() will cast input field with new input DataType.
+     */
     public static Dataset<Row> changeColumnType(Dataset<Row> dataset, String colName, DataType dataType) {
         dataset = dataset.withColumn(colName,dataset.col(colName).cast(dataType));
         return dataset;
     }
 
+    /**
+     *
+     * @param fieldName
+     * @return
+     *
+     * getSanitizedFieldName() method rename name like below
+     *
+     * example: If name is " Test col.name * "
+     * If we observe sub field name contains special charcters, spaces, and "."
+     * 1) Trim Filed Name. It becomes "Test col.name *"
+     * 2) Replace "." with "_". It becomes "Test col_name *"
+     * 3) Remove all special characters. It becomes "Test col_name "
+     * 4) Trim Name. It becomes "Test col_name"
+     * 5) Replace spaces with "_". It becomes "Test_col_name"
+     * 6) Uppercase name. It becomes "TEST_COL_NAME"
+     *
+     */
     public static String getSanitizedFieldName(String fieldName) {
         if(fieldName != null && !fieldName.trim().isEmpty()){
             fieldName = sanitizeFieldName(fieldName.trim().replaceAll("\\.", "_"));
@@ -119,6 +191,21 @@ public class NGComponentUtil {
         return fieldName;
     }
 
+    /**
+     *
+     * @param fieldName
+     * @return
+     *
+     * sanitizeFieldName() method rename name like below
+     *
+     * example: If is " Test col_name * "
+     * If we observe sub field name contains special charcters, spaces
+     * 1) Remove all special characters. It becomes " Test col_name "
+     * 2) Trim Name. It becomes "Test col_name"
+     * 3) Replace spaces with "_". It becomes "Test_col_name"
+     * 4) Uppercase name. It becomes "TEST_COL_NAME"
+     *
+     */
     public static String sanitizeFieldName(String fieldName) {
         String invalidCharRegex = "[^a-zA-Z0-9_ ]";
         if(fieldName != null && !fieldName.trim().isEmpty()){

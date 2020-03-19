@@ -30,6 +30,18 @@ public class Flattener {
         setCheckpointDir(ctx, withDataSet, datasetHelper);
     }
 
+    /**
+     *
+     * @param ctx
+     * @param withDataSet
+     * @param datasetHelper
+     *
+     * setCheckpointDir() gets temp checkpoint directory path and assign as checkpointDir to SparkContext.
+     * checkpointDir is require to apply checkpoint on Spark Dataset.
+     * checkpoint is require in Flattening because of too many transformations apply if it is nested structure.
+     * if there are too many transformations then Spark DAG will break. Checkpoint will help DAG to remember all transformations.
+     *
+     */
     private void setCheckpointDir(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper) {
         try {
             String checkpointDir = withDataSet.generateCheckpointLocation(datasetHelper, null, null);
