@@ -1,12 +1,15 @@
 package sncr.xdf.adapters.readers;
 
+
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
+
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.XDFReturnCode;
+
 
 public class DLBatchReader {
     private static final Logger logger = Logger.getLogger(DLBatchReader.class);
@@ -38,7 +41,7 @@ public class DLBatchReader {
             default:
                 throw new XDFException( XDFReturnCode.UNSUPPORTED_DATA_FORMAT);
         }
-        inctx.registerDataset(name, ds.cache());
+        inctx.registerDataset(name, ds);
         return ds;
     }
 
