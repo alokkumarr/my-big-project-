@@ -114,8 +114,7 @@ export class SingleTableDesignerLayoutComponent {
     }
   }
 
-  onRemoveFilter(index) {
-    this.filters.splice(index, 1);
+  onRemoveFilter() {
     this.change.emit({ subject: 'filter' });
   }
 

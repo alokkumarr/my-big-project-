@@ -66,7 +66,6 @@ export class DskFilterGroupComponent implements OnInit {
   @Input() data;
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || cloneDeep(defaultFilters);
-    console.log(this.filterGroup );
     this.onChange.emit(this.filterGroup);
   }
   @Input() selfIndex: number; // stores the position inside parent (for removal)

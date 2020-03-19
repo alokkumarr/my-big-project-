@@ -58,12 +58,13 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     if (!filters) {
       return;
     }
-
-    this.filters = this.analyzeService.flattenAndFetchFilters(filters, []);
+    this.filters = filters;
+    this.flattenedfilters = this.analyzeService.flattenAndFetchFiltersChips(filters, []);
   }
 
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   private subscriptions: Subscription[] = [];
+  flattenedfilters;
 
   @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
     IDEsignerSettingGroupAdapter[]
@@ -279,5 +280,11 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   dragReleased() {
     this._dndPubsub.emit('dragEnd');
+  }
+
+  removeFilterFromTree(filter, index) {
+    this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+    this.flattenedfilters.splice(index, 1);
+    this.removeFilter.emit();
   }
 }

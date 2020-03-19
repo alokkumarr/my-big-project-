@@ -4,6 +4,7 @@ import { getFilterDisplayName } from './../../../../analyze/consts';
 import { AnalyzeService } from '../../../services/analyze.service';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
+
 @Component({
   selector: 'filter-chips-u',
   templateUrl: './filter-chips.component.html',
@@ -30,19 +31,24 @@ export class FilterChipsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.filters);
-    this.flattenedFilters = this.analyzeService.flattenAndFetchFilters(this.filters, []);
+    this.flattenedFilters = this.analyzeService.flattenAndFetchFiltersChips(this.filters, []);
   }
 
   getDisplayName(filter: Filter) {
     return getFilterDisplayName(this.nameMap, filter);
   }
 
-  onRemove(index) {
-    this.remove.emit(index);
+  onRemove(filter, index) {
+    this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+    this.flattenedFilters.splice(index, 1);
+    if (this.flattenedFilters.length === 0) {
+      this.onRemoveAll();
+    }
   }
 
   onRemoveAll() {
+    this.filters = [];
+    this.flattenedFilters = [];
     this.removeAll.emit();
   }
 }
