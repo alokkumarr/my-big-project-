@@ -88,8 +88,8 @@ export class DskFiltersService {
     );
   }
 
-  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false, mode) {
-    switch (mode) {
+  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false, data) {
+    switch (data.mode) {
       case 'DSK':
         let condition;
         condition = filter.booleanQuery.length > 0;
@@ -113,8 +113,9 @@ export class DskFiltersService {
         );
 
       case 'ANALYZE':
-        let areValid = true;
         const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
+        let areValid = true;
+
         forEach(
           flattenedFilters,
           ({
@@ -134,7 +135,7 @@ export class DskFiltersService {
               areValid = true;
             } else if (!model) {
               areValid = Boolean(
-                false
+                data.isInRuntimeMode
                   ? isOptional && isRuntimeFilter
                   : isRuntimeFilter
               );
@@ -151,7 +152,7 @@ export class DskFiltersService {
           }
         );
         return areValid;
-    }
+      }
   }
 
   updateDskFiltersForGroup(groupId: string, filters: DSKFilterGroup) {

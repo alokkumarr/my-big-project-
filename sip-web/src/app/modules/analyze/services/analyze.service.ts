@@ -836,7 +836,7 @@ export class AnalyzeService {
         this.flattenAndCheckFilters(filter, flattenedFilters);
       }
 
-      if (filter.uuid) {
+      if (filter.artifactsName) {
         flattenedFilters.push(filter);
       }
     });

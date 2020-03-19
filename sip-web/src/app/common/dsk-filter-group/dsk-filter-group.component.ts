@@ -66,6 +66,7 @@ export class DskFilterGroupComponent implements OnInit {
   @Input() data;
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || cloneDeep(defaultFilters);
+    console.log(this.filterGroup );
     this.onChange.emit(this.filterGroup);
   }
   @Input() selfIndex: number; // stores the position inside parent (for removal)
@@ -247,12 +248,7 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   onFilterModelChange(filter, childId) {
-    if ((<DSKFilterField>this.filterGroup.booleanQuery[childId]).isRuntimeFilter
-      || (<DSKFilterField>this.filterGroup.booleanQuery[childId]).isGlobalFilter) {
-      delete (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model;
-    } else {
-      (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
-    }
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
     this.onChange.emit(this.filterGroup);
   }
 

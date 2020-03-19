@@ -30,6 +30,7 @@ export class FilterChipsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log(this.filters);
     this.flattenedFilters = this.analyzeService.flattenAndFetchFilters(this.filters, []);
   }
 

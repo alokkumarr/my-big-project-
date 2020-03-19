@@ -9,10 +9,10 @@
       color="primary"
       matTooltip="Toggle Boolean Criteria"
       (click)="toggleCriteria()"
+      [disabled]="!((data.mode === 'ANALYZE' && !data.isInRuntimeMode) || data.mode === 'DSK')"
     >
       {{ filterGroup.booleanCriteria }}
     </button>
-
     <button
       mat-icon-button
       [popper]="newDSKChild"
@@ -20,6 +20,7 @@
       popperTrigger="click"
       [popperHideOnClickOutside]="true"
       popperPlacement="right"
+      *ngIf="(data.mode === 'ANALYZE' && !data.isInRuntimeMode) || data.mode === 'DSK'"
     >
       <mat-icon fontIcon="icon-plus2"></mat-icon>
     </button>
@@ -35,7 +36,7 @@
   </div>
   <button
     mat-icon-button
-    *ngIf="selfIndex >= 0"
+    *ngIf="(data.mode === 'DSK' && selfIndex >= 0 ) || (data.mode === 'ANALYZE' && !data.isInRuntimeMode)"
     aria-label="Remove dsk field attribute"
     matTooltip="Remove Group"
     (click)="onRemoveGroup.emit(selfIndex)"
@@ -117,8 +118,12 @@
         >
       </div>
 
-      <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center" *ngIf="data.mode === 'ANALYZE'">
-        <div class="input-fields" fxLayout="row">
+      <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center"
+        *ngIf="data.mode === 'ANALYZE' && !filterGroup.booleanQuery[childId].isAggregationFilter"
+      >
+        <div class="input-fields" fxLayout="row"
+        *ngIf="(data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter) || !data.isInRuntimeMode"
+        >
           <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
               <mat-label>Artifacts</mat-label>
               <mat-select (selectionChange)="artifactSelect($event.value, childId)"
@@ -142,27 +147,30 @@
             </mat-form-field>
 
             <div [ngSwitch]="TYPE_MAP[fetchType(childId)]"
-              *ngIf="!filterGroup.booleanQuery[childId].isRuntimeFilter &&
-              !filterGroup.booleanQuery[childId].isGlobalFilter"
+              *ngIf="(!data.isInRuntimeMode && !filterGroup.booleanQuery[childId].isRuntimeFilter)
+                || (data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter)"
             >
-              <designer-string-filter
-                *ngSwitchCase="'string'"
-                (filterModelChange)="onFilterModelChange($event, childId)"
-                [filterModel]="filterGroup.booleanQuery[childId].model || {}"
-              >
-              </designer-string-filter>
-              <designer-date-filter
-                *ngSwitchCase="'date'"
-                (filterModelChange)="onFilterModelChange($event, childId)"
-                [filterModel]="filterGroup.booleanQuery[childId].model"
-              >
-              </designer-date-filter>
-              <designer-number-filter
-                *ngSwitchCase="'number'"
-                (filterModelChange)="onFilterModelChange($event, childId)"
-                [filterModel]="filterGroup.booleanQuery[childId].model"
-              >
-              </designer-number-filter>
+              <div *ngIf="!filterGroup.booleanQuery[childId].isGlobalFilter">
+                <designer-string-filter
+                  *ngSwitchCase="'string'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model || {}"
+                >
+                </designer-string-filter>
+                <designer-date-filter
+                  *ngSwitchCase="'date'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-date-filter>
+                <designer-number-filter
+                  *ngSwitchCase="'number'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-number-filter>
+              </div>
+
             </div>
           </div>
           <div
@@ -205,6 +213,7 @@
         mat-icon-button
         aria-label="Remove dsk field attribute"
         matTooltip="Remove Field"
+        *ngIf="data.mode === 'DSK' || (data.mode === 'ANALYZE' && !data.isInRuntimeMode)"
         (click)="removeField(childId)"
       >
         <mat-icon fontIcon="icon-close"></mat-icon>

@@ -604,13 +604,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   /**
    * setEmptyData - In case of no data returned from refresh,
-   * this returns a sane default emtpy data object based on
+   * this returns a same default empty data object based on
    * analysis type.
    *
    * @returns {Array<any>}
    */
   setEmptyData(): Array<any> {
     const emptyReportData = () => {
+      if (this.data === null) {
+        this.data = {};
+      }
       const columnMap = this.data[0] || {};
 
       forOwn(columnMap, (val, key) => {

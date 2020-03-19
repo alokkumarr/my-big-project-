@@ -139,17 +139,28 @@ export class AnalyzeDialogService {
       analysisType: analysis.type,
       supportsAggregationFilters,
       isInRuntimeMode: true,
-      showFilterOptions: true,
+      showFilterOptions: false,
       analysisReportType: reportType,
       designerPage,
-      query: analysis.sipQuery.query
+      query: analysis.sipQuery.query,
+      mode: 'ANALYZE'
     };
-    return this.dialog.open(DesignerFilterDialogComponent, {
-      width: 'auto',
-      height: 'auto',
-      autoFocus: false,
-      data
-    } as MatDialogConfig);
+    if (reportType == 'query') {
+      return this.dialog.open(DesignerFilterDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig);
+    } else {
+      return this.dialog.open(DskFilterDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig);
+    }
+
   }
 
   openPreviewDialog(analysis: Analysis | AnalysisDSL) {

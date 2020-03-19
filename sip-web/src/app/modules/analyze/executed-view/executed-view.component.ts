@@ -12,6 +12,7 @@ import * as get from 'lodash/get';
 import * as values from 'lodash/values';
 import * as find from 'lodash/find';
 import * as isUndefined from 'lodash/isUndefined';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as moment from 'moment';
 import {
   Subscription,
@@ -123,6 +124,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
+    console.log(this.filters);
   }
 
   generateDSLDateFilters(filters) {
@@ -253,9 +255,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = get(this.analysis, 'type') === 'report';
     this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
-    this.filters = isDSLAnalysis(this.analysis)
+    this.filters = cloneDeep(isDSLAnalysis(this.analysis)
       ? this.generateDSLDateFilters(response.queryBuilder.filters)
-      : response.queryBuilder.filters;
+      : response.queryBuilder.filters);
+    console.log(this.filters);
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',

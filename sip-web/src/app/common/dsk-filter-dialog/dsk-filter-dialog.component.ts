@@ -85,7 +85,7 @@ export class DskFilterDialogComponent implements OnInit {
     this.errorState = !this.datasecurityService.isDSKFilterValid(
       this.data.mode === 'DSK' ? this.dskFilterObject : concat([analyzeResult], this.aggregatedFilters),
       true,
-      this.data.mode
+      this.data
     );
 
 

@@ -1,5 +1,7 @@
 <div *ngIf="data.supportsAggregationFilters" fxLayout="row">
-  <div class="input-fields" fxLayout="row">
+  <div class="input-fields" fxLayout="row"
+  *ngIf="(data.isInRuntimeMode && filter.isRuntimeFilter) || !data.isInRuntimeMode"
+  >
       <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
           <mat-label>Columns</mat-label>
           <mat-select (selectionChange)="columnsSelect($event.value)"
@@ -15,7 +17,8 @@
         class="select-form-field"
         style="max-width: 145px; margin-left: 10px"
         appearance="outline"
-        *ngIf="!filter.isRuntimeFilter"
+        *ngIf="(!data.isInRuntimeMode && !filter.isRuntimeFilter)
+                || (data.isInRuntimeMode && filter.isRuntimeFilter)"
         >
           <mat-label>Aggregate</mat-label>
           <mat-select
@@ -34,7 +37,8 @@
         </mat-form-field>
 
         <designer-number-filter
-          *ngIf="!filter.isRuntimeFilter"
+        *ngIf="(!data.isInRuntimeMode && !filter.isRuntimeFilter)
+        || (data.isInRuntimeMode && filter.isRuntimeFilter)"
           (filterModelChange)="onFilterModelChange($event)"
           [filterModel]="filter.model"
         >
@@ -65,7 +69,7 @@
       </mat-checkbox>
     </div>
 
-    <button mat-icon-button (click)="remove()">
+    <button mat-icon-button (click)="remove()" *ngIf="!data.isInRuntimeMode">
       <mat-icon fontIcon="icon-close" class="filter__remove-button__icon">
       </mat-icon>
     </button>
