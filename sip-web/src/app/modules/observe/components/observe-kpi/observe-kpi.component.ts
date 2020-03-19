@@ -72,6 +72,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
     this._kpi = data;
     this.dataFormat = get(this._kpi, 'dataFields.0.format');
+    this.executeKPI(data)
   }
 
   @Input()
