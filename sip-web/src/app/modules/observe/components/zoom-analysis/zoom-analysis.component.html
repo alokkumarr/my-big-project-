@@ -1,9 +1,24 @@
 <div class="dialog-container" #zoomAnalysisChartContainer>
-  <div class="dialog__content" fxLayout="column">
+  <div
+    class="dialog__content"
+    fxLayout="column"
+    fxLayoutAlign="start stretch"
+    fxLayoutGap="10px"
+  >
+    <div fxLayout="row" fxLayoutAlign="end center">
+      <button
+        style="position: fixed; background: white; z-index: 1;"
+        mat-icon-button
+        (click)="close()"
+      >
+        <mat-icon class="close-icon" fontIcon="icon-close"></mat-icon>
+      </button>
+    </div>
     <div
       fxLayout="row"
       fxLayoutAlign="start center"
       fxLayoutGap="5px"
+      class="filter-row"
       *ngIf="(filterCount$ | async) > 0"
     >
       <div fxLayout="column">
@@ -90,11 +105,29 @@
         [updater]="data.updater"
       >
       </observe-report>
-      <mat-icon
-        (click)="close()"
-        class="close-icon"
-        fontIcon="icon-close"
-      ></mat-icon>
     </div>
+
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Details</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div fxLayout="column" fxLayoutGap="10px">
+          <div fxLayout="row" fxLayoutGap="10px">
+            <strong>Description:</strong>
+            <div style="margin: 0px; word-break: break-all;">
+              {{ data.analysis.description || 'No description provided.' }}
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <strong>Data Pod:</strong>
+            <div style="margin: 0px">
+              {{ data.analysis.metricName || 'Not Available' }}
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>
