@@ -34,11 +34,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static com.sncr.saw.security.common.constants.ErrorMessages.unAuthorizedMessage;
 
 /**
  * Service class to perform the external security related operation
@@ -978,26 +981,24 @@ public class ExternalSecurityService {
    * @param response HttpServletResponse
    * @return Returns UserDetailsResponse
    */
-  public UserDetailsResponse addUserDetails(
+  public UserDetails addUserDetails(
       UserDetails userDetails,
       String masterLoginId,
       Long loginCustomerId,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     logger.trace("User details body :{}", userDetails);
 
     UserDetailsResponse userDetailsResponse = validateUserDetails(userDetails);
     if (userDetailsResponse != null
         && userDetailsResponse.getValid() != null
         && !userDetailsResponse.getValid()) {
-      response.setStatus(HttpStatus.BAD_REQUEST.value());
-      return userDetailsResponse;
+      response.sendError(HttpStatus.BAD_REQUEST.value(), userDetailsResponse.getValidityMessage());
+      return null;
     }
     if (userDetails.getCustomerId() != loginCustomerId) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
       logger.debug(ErrorMessages.unAuthorizedMessage, "Customer Id doesn't match with token");
-      return userDetailsResponse;
+      response.sendError(HttpStatus.UNAUTHORIZED.value(),unAuthorizedMessage);
+      return null;
     }
 
     Valid valid;
@@ -1016,8 +1017,8 @@ public class ExternalSecurityService {
           userDetailsResponse.setValid(true);
         } else {
           logger.debug("Error occurred while getting user details:{}", valid.getError());
-          userDetailsResponse.setValid(false);
-          userDetailsResponse.setValidityMessage(valid.getError());
+          response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), valid.getError());
+          return null;
         }
       }
     } catch (Exception e) {
@@ -1026,31 +1027,31 @@ public class ExternalSecurityService {
       String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
       userDetailsResponse.setValidityMessage(message + " Please contact server Administrator");
       userDetailsResponse.setError(e.getMessage());
-      return userDetailsResponse;
+        response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), message +
+            " Please contact server Administrator");
+        return null;
     }
-    return userDetailsResponse;
+    return userDetailsResponse.getUser();
   }
 
-  public UserDetailsResponse updateUserDetails(
+  public UserDetails updateUserDetails(
       UserDetails userDetails,
       String masterLoginId,
       Long customerId,
       Long userSysId,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     logger.trace("User details body :{}", userDetails);
     UserDetailsResponse userDetailsResponse = validateUserDetails(userDetails);
     if (userDetailsResponse != null
         && userDetailsResponse.getValid() != null
         && !userDetailsResponse.getValid()) {
-      response.setStatus(HttpStatus.BAD_REQUEST.value());
-      return userDetailsResponse;
+        response.sendError(HttpStatus.BAD_REQUEST.value(), userDetailsResponse.getValidityMessage());
+      return null;
     }
     if (userDetails.getCustomerId() != customerId) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
-      logger.debug(ErrorMessages.unAuthorizedMessage, "Customer Id doesn't match with token");
-      return userDetailsResponse;
+        logger.debug(ErrorMessages.unAuthorizedMessage, "Customer Id doesn't match with token");
+        response.sendError(HttpStatus.UNAUTHORIZED.value(),unAuthorizedMessage);
+        return null;
     }
     Valid valid;
 
@@ -1082,14 +1083,14 @@ public class ExternalSecurityService {
       String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
       userDetailsResponse.setValidityMessage(message + " Please contact server Administrator");
       userDetailsResponse.setError(e.getMessage());
-      return userDetailsResponse;
+      return null;
     }
     if (userDetailsResponse.getUser()==null){
         logger.debug("Unable to update user ");
         userDetailsResponse.setValid(false);
         userDetailsResponse.setValidityMessage("Unable to update user");
     }
-    return userDetailsResponse;
+    return null;
   }
 
   private UserDetailsResponse validateUserDetails(UserDetails userDetails) {
