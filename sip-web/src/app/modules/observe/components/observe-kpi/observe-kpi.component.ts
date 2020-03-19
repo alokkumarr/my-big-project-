@@ -10,6 +10,7 @@ import * as round from 'lodash/round';
 import * as trim from 'lodash/trim';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isFinite from 'lodash/isFinite';
+import * as debounce from 'lodash/debounce';
 import * as moment from 'moment';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
@@ -52,7 +53,9 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     public observe: ObserveService,
     public globalFilterService: GlobalFilterService,
     public dialog: MatDialog
-  ) {}
+  ) {
+    this.executeKPI = debounce(this.executeKPI, 100);
+  }
 
   ngOnInit() {
     this.kpiFilterSubscription = this.globalFilterService.onApplyKPIFilter.subscribe(
@@ -72,7 +75,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
     this._kpi = data;
     this.dataFormat = get(this._kpi, 'dataFields.0.format');
-    this.executeKPI(data)
+    this.executeKPI(data);
   }
 
   @Input()
@@ -99,22 +102,23 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   }
 
   constructGlobalFilter(model, kpiFilters) {
-    const globalFilters = kpiFilters.length === 1
-    // Check backward compatibility
-    ? fpPipe(
-      fpMap(filt => {
-        filt.model = model;
-        return filt;
-      })
-    )(kpiFilters)
-    : fpPipe(
-      fpMap(filt => {
-        if (filt.primaryKpiFilter) {
-          filt.model = model;
-        }
-        return filt;
-      })
-    )(kpiFilters);
+    const globalFilters =
+      kpiFilters.length === 1
+        ? // Check backward compatibility
+          fpPipe(
+            fpMap(filt => {
+              filt.model = model;
+              return filt;
+            })
+          )(kpiFilters)
+        : fpPipe(
+            fpMap(filt => {
+              if (filt.primaryKpiFilter) {
+                filt.model = model;
+              }
+              return filt;
+            })
+          )(kpiFilters);
     return globalFilters;
   }
 
@@ -123,14 +127,8 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       return '';
     }
     const executedKpi = this._executedKPI || this._kpi;
-    let primaryFilter = get(
-      executedKpi,
-      'filters.0.model'
-    );
-    let preset = get(
-      executedKpi,
-      'filters.0.model.preset'
-    );
+    let primaryFilter = get(executedKpi, 'filters.0.model');
+    let preset = get(executedKpi, 'filters.0.model.preset');
     // For backward compatibility. identify the primary filter
     // after adding new filters for already existing KPIs
     if (isUndefined(preset)) {
@@ -207,7 +205,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         const currentParsed = parseFloat(primary.current) || 0;
         const priorParsed = parseFloat(primary.prior);
         let change =
-          round((currentParsed - priorParsed) * 100 / priorParsed) || 0;
+          round(((currentParsed - priorParsed) * 100) / priorParsed) || 0;
         change = isFinite(change) ? change : 0;
         this.primaryChange = change;
         this.primaryResult = {
@@ -238,7 +236,9 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       return value;
     }
     formattedValue = value.toFixed(this.dataFormat.precision);
-    formattedValue = this.dataFormat.comma ? this.fetchCommaValue(formattedValue) : formattedValue;
+    formattedValue = this.dataFormat.comma
+      ? this.fetchCommaValue(formattedValue)
+      : formattedValue;
     formattedValue = `${this.dataFormat.prefix} ${formattedValue} ${this.dataFormat.suffix}`;
     return formattedValue;
   }
