@@ -983,6 +983,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         final boolean[] isIndexConfigNotExists = new boolean[1];
         isIndexConfigNotExists[0] = true;
         final int[] index = new int[1];
+        fieldDefaultValuesMap = new HashMap<>();
         index[0] = 0;
         //configFields contains only fields which provided in Parser Config.
         configFields.forEach(field -> {
