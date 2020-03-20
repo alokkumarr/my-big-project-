@@ -76,13 +76,11 @@ export class DskFilterGroupComponent implements OnInit {
     jwtService: JwtService,
     dskFilterService: DskFiltersService
   ) {
-    if (this.data.mode === 'DSK') {
       dskFilterService
       .getEligibleDSKFieldsFor(jwtService.customerId, jwtService.productId)
       .subscribe(fields => {
         this.dskEligibleFields = fields;
       });
-    }
   }
 
   ngOnInit() {
