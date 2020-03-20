@@ -128,6 +128,7 @@ export class DskFilterDialogComponent implements OnInit {
       isOptional: false,
       model: {}
     });
+    this.validateFilterGroup();
   }
 
   removeAggrFilter(targetIndex) {
