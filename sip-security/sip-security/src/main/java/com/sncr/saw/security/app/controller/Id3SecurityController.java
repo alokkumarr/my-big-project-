@@ -314,7 +314,6 @@ public class Id3SecurityController {
       return response;
     }
 
-    // Ticket ticket = SipCommonUtils.getTicket(httpRequest);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
     Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     if (id3Claims == null) {
@@ -384,14 +383,13 @@ public class Id3SecurityController {
       response = UserDetailsResponse.class)
   @PostMapping(value = "/users")
   @ResponseBody
-  public UserDetails createUser(
+  public UserDetailsResponse createUser(
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "User details to store", required = true) @RequestBody
           UserDetails userDetails,
       @RequestHeader("Authorization") String id3token)
       throws IOException {
-    // Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
     Id3User id3user = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
@@ -415,10 +413,10 @@ public class Id3SecurityController {
       return null;
     } else if (!userDetailsResponse.getValid()) {
       response.sendError(
-          HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error occurred while creating user ");
+          HttpStatus.INTERNAL_SERVER_ERROR.value(), userDetailsResponse.getValidityMessage());
       return null;
     }
-    return userDetailsResponse.getUser();
+    return userDetailsResponse;
   }
 
   /**
@@ -436,7 +434,7 @@ public class Id3SecurityController {
       response = UserDetailsResponse.class)
   @PutMapping(value = "/users/{id}")
   @ResponseBody
-  public UserDetails updateUser(
+  public UserDetailsResponse updateUser(
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "User details to store", required = true) @RequestBody
@@ -444,7 +442,6 @@ public class Id3SecurityController {
       @PathVariable(name = "id") Long userSysId,
       @RequestHeader("Authorization") String id3token)
       throws IOException {
-    //  Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
     Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
@@ -470,10 +467,10 @@ public class Id3SecurityController {
       return null;
     } else if (!userDetailsResponse.getValid()) {
       response.sendError(
-          HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error occurred while updating user ");
+          HttpStatus.INTERNAL_SERVER_ERROR.value(), userDetailsResponse.getValidityMessage());
       return null;
     }
-    return userDetailsResponse.getUser();
+    return userDetailsResponse;
   }
 
   /**
