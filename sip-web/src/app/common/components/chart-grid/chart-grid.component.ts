@@ -167,6 +167,10 @@ export class ChartGridComponent {
    * @memberof ChartGridComponent
    */
   hasAggregatesInScatter() {
+    if (this.analysis.type !== 'chart') {
+      return true;
+    }
+
     if (
       (<AnalysisChartDSL>this.analysis).chartOptions.chartType !== 'scatter'
     ) {
