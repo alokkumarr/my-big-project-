@@ -94,6 +94,12 @@
       <artifactId>spark-core_${scala.version}</artifactId>
       <version>${spark-version}</version>
       <scope>${s-value}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -101,12 +107,24 @@
       <artifactId>spark-streaming_${scala.version}</artifactId>
       <version>${spark-version}</version>
       <scope>${s-value}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
 	<groupId>org.apache.spark</groupId>
 	<version>2.4.4.0-mapr-630</version>
 	<artifactId>spark-sql_2.11</artifactId>
       <scope>${s-value}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -143,18 +161,36 @@
       <artifactId>hadoop-common</artifactId>
       <version>${mapr.hadoop.client.version}</version>
       <scope>${s-value}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
       <version>${mapr.hadoop.client.version}</version>
       <scope>${s-value}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-mapreduce-client-core</artifactId>
       <version>${mapr.hadoop.client.version}</version>
       <scope>${s-value}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.mapr.streams</groupId>
@@ -165,12 +201,22 @@
           <groupId>org.apache.kafka</groupId>
           <artifactId>kafka-clients</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
       <version>${kafka.driver.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
@@ -210,6 +256,16 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>${slfj.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prestosql</groupId>
+      <artifactId>presto-parser</artifactId>
+      <version>327</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>28.2-jre</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/log4j/log4j -->
     <dependency>

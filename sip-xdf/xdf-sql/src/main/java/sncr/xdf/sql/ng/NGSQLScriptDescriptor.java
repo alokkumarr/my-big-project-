@@ -1,5 +1,6 @@
 package sncr.xdf.sql.ng;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import io.prestosql.sql.parser.ParsingOptions;
 import io.prestosql.sql.parser.SqlParser;
@@ -15,6 +16,7 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.sql.*;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,7 +114,7 @@ public class NGSQLScriptDescriptor {
             Matcher m = r.matcher(a_script);
 
             int position = 0;
-//Should be only one iteration
+            //Should be only one iteration
             while (m.find(position)  ) {
 
                 if(parameterValues == null || parameterValues.isEmpty())
@@ -149,6 +151,9 @@ public class NGSQLScriptDescriptor {
      * that will be info source for SQL Executor calls
      */
     public void parseSQLScript(){
+
+        URL location = Preconditions.class.getResource('/' + Preconditions.class.getName().replace('.', '/') + ".class");
+        logger.info("Logger for presto guava test :" + location.getPath());
         try{
             logger.debug("Step 4: Parse SQL Script");
             if (script == null ) {
