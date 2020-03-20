@@ -1,7 +1,7 @@
 package sncr.xdf.parser.spark;
 
-import sncr.xdf.ngcomponent.spark.NGStructType;
-import sncr.xdf.ngcomponent.spark.NGStructField;
+import org.apache.commons.lang3.ArrayUtils;
+import scala.Tuple2;
 import sncr.xdf.ngcomponent.util.NGComponentUtil;
 import com.univocity.parsers.common.processor.NoopRowProcessor;
 import com.univocity.parsers.csv.CsvParser;
@@ -18,6 +18,8 @@ import org.apache.spark.util.LongAccumulator;
 import java.text.SimpleDateFormat;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
@@ -25,7 +27,6 @@ import java.util.*;
 public class ConvertToRow implements Function<String, Row> {
 
     private static final Logger logger = Logger.getLogger(ConvertToRow.class);
-    private NGStructType ngSchema;
     private StructType schema;
     private List<String> tsFormats;
 
@@ -44,8 +45,10 @@ public class ConvertToRow implements Function<String, Row> {
 
     private CsvParser parser = null;
     private boolean allowInconsistentCol;
+    private Map<String, Tuple2<Integer, Object>> fieldDefaultValuesMap = null;
+    private boolean isSkipFieldsEnabled;
 
-    public ConvertToRow(NGStructType ngSchema,
+    public ConvertToRow(StructType schema,
                         List<String> tsFormats,
                         String lineSeparator,
                         char delimiter,
@@ -54,12 +57,15 @@ public class ConvertToRow implements Function<String, Row> {
                         char charToEscapeQuoteEscaping,
                         LongAccumulator recordCounter,
                         LongAccumulator errorCounter,
-                        boolean allowInconsistentCol) {
-        this(ngSchema.getStructType(),tsFormats,
+                        boolean allowInconsistentCol,
+                        Map<String, Tuple2<Integer, Object>> fieldDefaultValuesMap,
+                        boolean isSkipFieldsEnabled) {
+        this(schema,tsFormats,
             lineSeparator,delimiter,quoteChar,
             quoteEscapeChar,charToEscapeQuoteEscaping,
             recordCounter,errorCounter,allowInconsistentCol);
-        this.ngSchema = ngSchema;
+        this.fieldDefaultValuesMap = fieldDefaultValuesMap;
+        this.isSkipFieldsEnabled = isSkipFieldsEnabled;
     }
 
     public ConvertToRow(StructType schema,
@@ -129,7 +135,7 @@ public class ConvertToRow implements Function<String, Row> {
     }
 
     private Object[] constructRecord(String line, Object[] record, String[] parsed) {
-        if(ngSchema != null && ngSchema.isSkipFieldsEnabled()){
+        if(isSkipFieldsEnabled){
             record = constructRecordWithIndices(line, record, parsed);
         }else{
             record = constructRecordFromLine(line, record, parsed);
@@ -139,20 +145,28 @@ public class ConvertToRow implements Function<String, Row> {
 
     private Object[] constructRecordWithIndices(String line, Object[] record, String[] parsed) {
         try {
-            int parsedLength = parsed.length;
-            NGStructField[] ngStructFields = ngSchema.getNgFields();
-            int i = 0;
-            for (NGStructField ngStructField : ngStructFields) {
-                Object fieldValue = null;
-                if(ngStructField.getSourceColumnIndex() < parsedLength){
-                    fieldValue = getFieldValue(parsed[ngStructField.getSourceColumnIndex()], ngStructField, i);
+            final int parsedLength = parsed.length;
+            final int schemaLength = schema.length();
+            StructField[] structFields = schema.fields();
+            AtomicInteger index = new AtomicInteger(0);
+            AtomicReference<Object[]> recordValues = new AtomicReference<>(new Object[schemaLength]);
+            Arrays.stream(structFields).forEach(structField -> {
+                try {
+                    Tuple2<Integer, Object> fieldTuple = fieldDefaultValuesMap.get(structField.name());
+                    Object fieldValue = null;
+                    if(fieldTuple._1 < parsedLength){
+                        fieldValue = getFieldValue(parsed[fieldTuple._1], structField, index.get());
+                    }
+                    if(fieldValue == null){
+                        fieldValue = fieldTuple._2;
+                    }
+                    recordValues.get()[index.get()] = fieldValue;
+                    index.getAndIncrement();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-                if(fieldValue == null){
-                    fieldValue = ngStructField.getDefaultValue();
-                }
-                record[i] = fieldValue;
-                i++;
-            }
+            });
+            record = ArrayUtils.addAll(recordValues.get(), record[schemaLength], record[schemaLength+1]);
         } catch(Exception ex){
             errCounter.add(1);
             if(ex instanceof  NumberFormatException){
@@ -172,33 +186,29 @@ public class ConvertToRow implements Function<String, Row> {
         } else {
             try {
                 int parsedLength = parsed.length;
-                int validSchemaLength = schema.fields().length;
+                int schemaLength = schema.length();
 
                 // Don't reject the record if columns are inconsistent (less than the schema length)
                 // Copy the input row array and create a valid schema length array with default values
-                if(allowInconsistentCol && parsedLength < validSchemaLength){
-                    parsed = Arrays.copyOf(parsed, validSchemaLength);
+                if(allowInconsistentCol && parsedLength < schemaLength){
+                    parsed = Arrays.copyOf(parsed, schemaLength);
                     logger.debug("Column with default values : " + Arrays.toString(parsed));
                 }
                 if (Arrays.stream(parsed).filter(Objects::nonNull).count() == 0) {
                     record = createRejectedRecord(line, "All fields are null");
                 }
 
-                int ngFiledsLength = 0;
-                if(ngSchema != null && ngSchema.getNgFields() != null){
-                    ngFiledsLength = ngSchema.getNgFields().length;
-                }
-
-                int i = 0;
+                int index = 0;
                 for (StructField sf : schema.fields()) {
                     //Should accept null values unless mentioned as mandatory
                     //Reject rows with all null fields
-                    Object fieldValue = getFieldValue(parsed[i], sf, i);
-                    if(fieldValue == null && ngFiledsLength > i){
-                        fieldValue = ngSchema.getNgFields()[i].getDefaultValue();
+                    Object fieldValue = getFieldValue(parsed[index], sf, index);
+                    if(fieldValue == null){
+                        Tuple2<Integer, Object> fieldTuple = fieldDefaultValuesMap.get(sf.name());
+                        fieldValue = fieldTuple._2;
                     }
-                    record[i] = fieldValue;
-                    i++;
+                    record[index] = fieldValue;
+                    index++;
                 }
             } catch(Exception ex){
                 errCounter.add(1);
