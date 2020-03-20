@@ -949,6 +949,18 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return retval;
     }
 
+    /**
+     *
+     * @param fields
+     * @param optHeader
+     *
+     * createSchema() will assign values to below things
+     * 1) schema - Which is Spark StructType schema from Fields config
+     * 2) internalSchema - It is again spark StructType schema (schema + 2 rejected details fields)
+     * 3) fieldDefaultValuesMap - For each field - it will add index and Default Value in Map
+     * 4) isSkipFieldsEnabled - Do we have to skip any fields from Input source.
+     *
+     */
     private void createSchema(List<Field> fields, Optional<String> optHeader){
         AtomicReference<StructField[]> structFields = new AtomicReference<>(new StructField[fields.size()]);
         AtomicReference<List<String>> fieldNames = new AtomicReference<>();
@@ -989,6 +1001,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
     }
 
+    /**
+     *
+     * @param field
+     * @param optFieldNames
+     * @return
+     *
+     * getFieldIndex() will get Index of field based sourceIndex or sourceFieldName config from Field
+     *
+     */
     private int getFieldIndex(Field field, Optional<List<String>> optFieldNames) {
         int index = -1;
         if(field.getSourceIndex() != null){
@@ -1016,6 +1037,17 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return index;
     }
 
+    /**
+     *
+     * @param dataType
+     * @param defaultValue
+     * @param optTsFormat
+     * @return
+     *
+     * getFieldDefaultValue() will get Object type of default value from defaultValue config from Field
+     * Default Value Object returned by this method is Type of Spark DataType
+     *
+     */
     private Object getFieldDefaultValue(DataType dataType, String defaultValue, Optional<String> optTsFormat) {
         if(defaultValue != null){
             defaultValue = defaultValue.trim();

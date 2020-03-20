@@ -48,6 +48,25 @@ public class ConvertToRow implements Function<String, Row> {
     private Map<String, Tuple2<Integer, Object>> fieldDefaultValuesMap = null;
     private boolean isSkipFieldsEnabled;
 
+    /**
+     *
+     * @param schema
+     * @param tsFormats
+     * @param lineSeparator
+     * @param delimiter
+     * @param quoteChar
+     * @param quoteEscapeChar
+     * @param charToEscapeQuoteEscaping
+     * @param recordCounter
+     * @param errorCounter
+     * @param allowInconsistentCol
+     * @param fieldDefaultValuesMap
+     * @param isSkipFieldsEnabled
+     *
+     * ConvertToRow() new constructor added with 2 additional parameters fieldDefaultValuesMap, isSkipFieldsEnabled
+     * fieldDefaultValuesMap - For each field - it will add index and Default Value in Map
+     * isSkipFieldsEnabled - Do we have to skip any fields from Input source.
+     */
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
                         String lineSeparator,
@@ -134,6 +153,18 @@ public class ConvertToRow implements Function<String, Row> {
         return  RowFactory.create(record);
     }
 
+    /**
+     *
+     * @param line
+     * @param record
+     * @param parsed
+     * @return
+     *
+     * constructRecord() checks if isSkipFieldsEnabled is true or false
+     * If it is true then it will construct output record based on Field Indices
+     * If it is false then traditional way, it don't skip any fields from Input source record.
+     *
+     */
     private Object[] constructRecord(String line, Object[] record, String[] parsed) {
         if(isSkipFieldsEnabled){
             record = constructRecordWithIndices(line, record, parsed);
@@ -143,6 +174,19 @@ public class ConvertToRow implements Function<String, Row> {
         return record;
     }
 
+    /**
+     *
+     * @param line
+     * @param record
+     * @param parsed
+     * @return
+     *
+     * constructRecordWithIndices() will construct output record based on Field Indices
+     * It will get Field Tuple2 (contains field Index and Default value) from fieldDefaultValuesMap
+     * Get Value from record with Tuple2 _1 (Index Integer value)
+     * If value is Null then it will assign default value from Tuple2 _2 (Default Object).
+     *
+     */
     private Object[] constructRecordWithIndices(String line, Object[] record, String[] parsed) {
         try {
             final int parsedLength = parsed.length;
@@ -178,6 +222,20 @@ public class ConvertToRow implements Function<String, Row> {
         return record;
     }
 
+    /**
+     *
+     * @param line
+     * @param record
+     * @param parsed
+     * @return
+     *
+     * constructRecordFromLine() will construct output record in traditional way.
+     * It don't skip any fields from Input source record.
+     * It will get all Field values from record.
+     * It will get Field Tuple2 (contains field Index and Default value) from fieldDefaultValuesMap
+     * If value is Null then it will assign default value from Tuple2 _2 (Default Object).
+     *
+     */
     private Object[] constructRecordFromLine(String line, Object[] record, String[] parsed) {
         if(parsed.length > schema.fields().length || (!allowInconsistentCol && parsed.length != schema.fields().length)) {
             // Create record with rejected flag
@@ -222,6 +280,19 @@ public class ConvertToRow implements Function<String, Row> {
         return record;
     }
 
+    /**
+     *
+     * @param value
+     * @param sf
+     * @param sfIndex
+     * @return
+     * @throws Exception
+     *
+     * getFieldValue() return Field Value which is Object Type
+     * Field Value Object internally it is type of spark DataType
+     * This method converts value to specific Spark DataType based on StructField datatype
+     *
+     */
     private Object getFieldValue(String value, StructField sf, int sfIndex) throws Exception {
         if(value != null && (!value.trim().isEmpty() || sf.dataType().equals(DataTypes.StringType))){
             value = value.trim();

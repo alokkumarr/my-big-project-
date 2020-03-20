@@ -88,6 +88,17 @@ public class NGComponentUtil {
         return false;
     }
 
+    /**
+     *
+     * @param zipIndexRdd
+     * @param headerSize
+     * @param lineNumber
+     * @return
+     *
+     * getLineFromRdd() will take lineNumber and return that line from PairedRDD
+     * We are using this method to get Header from CSV File RDD.
+     *
+     */
     public static String getLineFromRdd(JavaPairRDD<String, Long> zipIndexRdd, int headerSize, int lineNumber){
         String line  = null;
         if(headerSize == 1){
