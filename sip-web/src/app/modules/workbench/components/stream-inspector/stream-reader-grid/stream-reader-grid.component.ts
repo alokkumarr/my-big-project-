@@ -1,7 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { DxDataGridComponent } from 'devextreme-angular';
+
 import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
 import * as union from 'lodash/union';
+import * as isArray from 'lodash/isArray';
 
 interface StreamGridColumns {
   caption: string;
@@ -26,9 +29,12 @@ const DEFAULT_PAGE_SIZE = 10;
 })
 export class StreamReaderGridComponent implements OnInit {
   public gridData;
-  public gridolumns: Array<StreamGridColumns> = [];
+  public gridColumns: Array<StreamGridColumns> = [];
   public DEFAULT_PAGE_SIZE;
   public enaplePaging = false;
+  public topicName: string;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
 
   @Input('gridData') set setGridData(data) {
     if (data) {
@@ -44,8 +50,16 @@ export class StreamReaderGridComponent implements OnInit {
 
   setGridColumns() {
     let cols = [];
+
+    // Sorting is not cleared when grid data is changed so here clearing sort manually.
+    if (this.dataGrid.instance) {
+      this.dataGrid.instance.clearSorting();
+    }
+
     forEach(this.gridData, data => {
-      cols = union(cols, keys(data));
+      if (!isArray(data)) {
+        cols = union(cols, keys(data));
+      }
     });
 
     this.enaplePaging =
@@ -60,7 +74,7 @@ export class StreamReaderGridComponent implements OnInit {
         allowSorting: true
       });
     });
-    this.gridolumns = gridColumn;
+    this.gridColumns = gridColumn;
   }
 
   customizeColumn(columns: StreamGridColumns) {

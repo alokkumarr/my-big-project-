@@ -322,8 +322,19 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', [])));
   }
 
-  getStreamAndTopicList(): Observable<any> {
-    const endpoint = `${this.api}/stream/inspector/url/goes/here`;
+  getListOfStreams(): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/workbench/projects/${userProject}/streams`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
+  getListOfTopics(name): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/workbench/projects/${userProject}/streams/${name}/content`;
     return this.http
       .get(endpoint)
       .pipe(catchError(this.handleError('data', [])));
