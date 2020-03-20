@@ -117,7 +117,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
       }
     });
-    return filters;
+    return this.analyzeService.flattenAndFetchFiltersChips(filters, []);
   }
 
   getChartHeight(chartHeight) {
