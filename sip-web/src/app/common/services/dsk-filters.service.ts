@@ -125,10 +125,15 @@ export class DskFiltersService {
             isRuntimeFilter,
             isGlobalFilter,
             isOptional,
-            columnName
+            columnName, aggregate
           }) => {
             if (isEmpty(columnName)) {
               areValid = false;
+              return false;
+            }
+
+            if (isAggregationFilter) {
+              areValid = !isEmpty(aggregate);
               return false;
             }
             if (!isRuntimeFilter && isGlobalFilter) {
