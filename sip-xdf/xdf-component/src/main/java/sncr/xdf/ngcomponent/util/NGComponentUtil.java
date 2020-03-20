@@ -116,8 +116,8 @@ public class NGComponentUtil {
     public static String getHeaderRecordFromRdd(JavaPairRDD<String, Long> zipIndexRdd, int headerSize, int fieldDefRowNumber){
         if(headerSize < 1){
             throw new XDFException(XDFReturnCode.CONFIG_ERROR, "headerSize should not be less than 1.");
-        }else if(fieldDefRowNumber < 1){
-            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "fieldDefRowNumber should not be less than 1.");
+        }else if(fieldDefRowNumber < 0){
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "fieldDefRowNumber should not be less than 0.");
         }else if(headerSize < fieldDefRowNumber){
             throw new XDFException(XDFReturnCode.CONFIG_ERROR, "fieldDefRowNumber should not be greater than headerSize");
         }else if(headerSize == 1){
