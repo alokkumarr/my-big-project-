@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Observable, of, SubscriptionLike } from 'rxjs';
-import * as filter from 'lodash/filter';
+
+import * as union from 'lodash/union';
+import * as keys from 'lodash/keys';
+import * as forEach from 'lodash/forEach';
 
 import { WorkbenchService } from '../../services/workbench.service';
-import { mockedData } from './index';
 
 @Component({
   selector: 'stream-inspector',
@@ -14,12 +16,15 @@ import { mockedData } from './index';
 export class StreamInspectorComponent implements OnInit, OnDestroy {
   public streamData$: Observable<any>;
   public topicData$: Observable<any>;
-  public streamTopicData: Array<any> = [];
+  private streamResult$: Observable<any>;
+  public streamTopicData$: Observable<any>;
   private subscriptions: SubscriptionLike[] = [];
+  public streamName: string;
+  public topicName = '';
   constructor(private _workbench: WorkbenchService) {}
 
   ngOnInit() {
-    this.streamData$ = of(mockedData);
+    this.getAllStreamAndTopic();
   }
 
   ngOnDestroy() {
@@ -27,44 +32,59 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
   }
 
   getAllStreamAndTopic() {
-    this._workbench.getStreamAndTopicList().subscribe(res => {
-      console.log('stream data');
+    this.streamData$ = of([]);
+    this.topicData$ = of([]);
+    this.streamTopicData$ = of([]);
+    this.streamName = '';
+    this.topicName = '';
+    this.streamResult$ = this._workbench.getListOfStreams();
+
+    this.streamResult$.subscribe(result => {
+      let cols;
+      forEach(result, item => {
+        cols = union(cols, keys(item));
+      });
+      cols.shift();
+      const stream = [];
+      forEach(cols, col => {
+        stream.push({
+          streamTitle: col,
+          streamId: col
+        });
+      });
+      this.streamData$ = of(stream);
     });
-    /* this.streamData$ = of([]);
+  }
+
+  streamChanged() {
     this.resetTopicAndDataGrid();
+    const subs = this.streamResult$.subscribe(result => {
+      const topic = [];
+      forEach(result, data => {
+        const streamandtopic = data[this.streamName];
+        forEach(streamandtopic, topicDetail => {
+          topic.push({
+            title: topicDetail.topic
+          });
+        });
+        this.topicData$ = of(topic);
+      });
+    });
+
+    this.subscriptions.push(subs);
+  }
+
+  topicChanged() {
+    this.streamTopicData$ = of([]);
     setTimeout(() => {
-      // this.streamData$ = of(mockedData);
-    }, 1500); */
+      this.streamTopicData$ = this._workbench.getListOfTopics(this.streamName);
+    }, 200);
   }
-
-  streamChanged(event) {
-    this.resetTopicAndDataGrid();
-    const subs = this.streamData$.subscribe(result => {
-      const streamTopic = filter(result, {
-        streamId: event.value
-      });
-      this.topicData$ = of(streamTopic[0].topic);
-    });
-
-    this.subscriptions.push(subs);
-  }
-
-  topicChanged(event) {
-    const subs = this.topicData$.subscribe(result => {
-      const topic = filter(result, {
-        title: event.value
-      });
-      this.streamTopicData = topic[0].topicData;
-    });
-
-    this.subscriptions.push(subs);
-  }
-
-  getTopicData(id) {}
 
   resetTopicAndDataGrid() {
-    this.streamTopicData = [];
+    this.streamTopicData$ = of([]);
     this.topicData$ = of([]);
+    this.topicName = '';
   }
 
   trackByFn(index) {

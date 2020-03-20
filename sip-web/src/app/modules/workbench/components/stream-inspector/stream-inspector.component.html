@@ -27,7 +27,7 @@
   <section class="input-section">
     <mat-form-field class="margin20" appearance="outline">
       <mat-label i18n>Stream</mat-label>
-      <mat-select (selectionChange)="streamChanged($event)">
+      <mat-select [(ngModel)]="streamName" (selectionChange)="streamChanged()">
         <mat-option
           *ngFor="let stream of (streamData$ | async); trackBy: trackByFn"
           [value]="stream.streamId"
@@ -39,7 +39,7 @@
 
     <mat-form-field class="margin20" appearance="outline">
       <mat-label i18n>Topic</mat-label>
-      <mat-select (selectionChange)="topicChanged($event)">
+      <mat-select [(ngModel)]="topicName" (selectionChange)="topicChanged()">
         <mat-option
           *ngFor="let topic of (topicData$ | async)"
           [value]="topic.title"
@@ -52,5 +52,6 @@
 </div>
 
 <div fxLayout="column">
-  <stream-reader-grid [gridData]="streamTopicData"> </stream-reader-grid>
+  <stream-reader-grid [gridData]="streamTopicData$ | async">
+  </stream-reader-grid>
 </div>
