@@ -6,7 +6,6 @@ import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.Id3Repository;
 import com.sncr.saw.security.app.repository.ProductModuleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
-import com.sncr.saw.security.app.repository.impl.Id3RepositoryImpl;
 import com.sncr.saw.security.app.service.ExternalSecurityService;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.common.bean.Role;
@@ -123,7 +122,7 @@ public class Id3SecurityController {
     Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     String roleType = id3User.getRoleType();
     String masterLoginId = id3User.getUserId();
-    if (masterLoginId != null || !roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
+    if (masterLoginId != null && !roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
       logger.info("You are not authorized to perform this operation.");
       httpResponse.sendError(
           HttpStatus.UNAUTHORIZED.value(), "You are not authorized to perform this operation.");
@@ -322,7 +321,7 @@ public class Id3SecurityController {
     }
     String roleType = id3User.getRoleType();
     String masterLoginId = id3User.getUserId();
-    if (masterLoginId != null || !roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
+    if (masterLoginId != null && !roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
       httpResponse.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.unAuthorizedMessage);
       return null;
     }
