@@ -17,12 +17,21 @@ gridster.dashboard-gridster {
   width: auto;
 
   gridster-item {
-    .zoom-icon {
+    .header-action-icon {
       position: absolute;
+      display: flex;
       margin: 15px;
-      cursor: pointer;
       font-size: 18px;
       font-weight: 800;
+
+      * {
+        cursor: pointer;
+        margin-right: 10px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
     }
 
     .backdrop {

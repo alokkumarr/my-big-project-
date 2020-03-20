@@ -26,9 +26,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -782,7 +779,7 @@ public class DLSparkQueryBuilder {
     filterQuery = buildSipFilters(fil);
 
     String filter = filterQuery.toString();
-    if (filter != null && !StringUtils.isEmpty(filter)) {
+    if (!StringUtils.isEmpty(filter)) {
       select
           .append(SPACE)
           .append(WHERE)
@@ -792,7 +789,7 @@ public class DLSparkQueryBuilder {
           .append(")")
           .append(SPACE);
     }
-    select.append(queryDskBuilder(sipDskAttribute, sipQuery)).append(buildGroupBy());
+    select.append(queryDskBuilder(sipDskAttribute, sipQuery, filter)).append(buildGroupBy());
 
     String sort = buildSort(sipQuery.getSorts());
     if (sort != null && !StringUtils.isEmpty(sort)) {
@@ -804,17 +801,19 @@ public class DLSparkQueryBuilder {
   /**
    * @param sipDskAttribute
    * @param sipQuery
-   * @param sipQuery
+   * @param filter
    * @return
    */
-  public static String queryDskBuilder(SipDskAttribute sipDskAttribute, SipQuery sipQuery) {
+  public static String queryDskBuilder(SipDskAttribute sipDskAttribute, SipQuery sipQuery,
+      String filter) {
     StringBuilder dskFilter = new StringBuilder();
     if (sipDskAttribute != null
         && (sipDskAttribute.getBooleanCriteria() != null
             || sipDskAttribute.getBooleanQuery() != null)) {
 
       String condition = null;
-      if (sipQuery.getFilters() != null && sipQuery.getFilters().size() > 0) {
+      if (sipQuery.getFilters() != null && sipQuery.getFilters().size() > 0 && !StringUtils
+          .isEmpty(filter)) {
         condition = AND;
       } else {
         condition = WHERE;
@@ -824,8 +823,8 @@ public class DLSparkQueryBuilder {
         String artifactName = artifact.getArtifactsName();
         String dskFormedQuery = dskQueryForArtifact(sipDskAttribute, artifactName);
         if (dskFormedQuery != null && !StringUtils.isEmpty(dskFormedQuery)) {
-          dskFilter.append(" ").append(condition).append(" ");
-          dskFilter.append(" ").append(dskFormedQuery);
+          dskFilter.append(SPACE).append(condition).append(SPACE);
+          dskFilter.append(SPACE).append(dskFormedQuery);
           condition = AND;
         }
       }

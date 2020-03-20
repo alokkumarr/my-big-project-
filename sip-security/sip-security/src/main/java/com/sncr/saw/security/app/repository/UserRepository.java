@@ -42,7 +42,7 @@ public interface UserRepository {
 	List<User> getUsers(Long customerId);
 	Valid addUser(User user,String createdBy);
 	Valid updateUser(User user);
-	boolean deleteUser(Long userId, String masterLoginId);
+	boolean deleteUser(Long userId, String masterLoginId , Long customerSysId);
 	List<Role> getRolesDropDownList(Long customerId);
 	List<RoleDetails> getRoles(Long customerId);
 	List<Role> getRoletypesDropDownList();

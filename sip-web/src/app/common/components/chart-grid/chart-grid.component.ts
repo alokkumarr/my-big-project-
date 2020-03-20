@@ -158,6 +158,29 @@ export class ChartGridComponent {
     );
   }
 
+  /**
+   * For scatter charts, we can remove aggregates on y fields. If there
+   * are no aggregates, BE sends dates in a fixed format, regardless of
+   * format selected from FE.
+   *
+   * @returns
+   * @memberof ChartGridComponent
+   */
+  hasAggregatesInScatter() {
+    if (
+      (<AnalysisChartDSL>this.analysis).chartOptions.chartType !== 'scatter'
+    ) {
+      return true;
+    }
+
+    const aggregateYFields = this.analysis.sipQuery.artifacts[0].fields.filter(
+      field =>
+        (Boolean(field.aggregate) || Boolean(field.expression)) &&
+        field.area === 'y'
+    );
+    return aggregateYFields.length > 0;
+  }
+
   fetchColumnData(axisName, value) {
     let alias = axisName;
     const columns = this.analysis.sipQuery.artifacts[0].fields;
@@ -188,17 +211,21 @@ export class ChartGridComponent {
             ? column.groupInterval
             : null
         );
+        const parseFormat = this.hasAggregatesInScatter()
+          ? dateFormat
+          : 'YYYY-MM-DD hh:mm:ss';
+
         value =
           column.type === 'date'
             ? moment
-                .utc(value, dateFormat)
+                .utc(value, parseFormat)
                 .format(
                   momentFormat ||
                     (columnFormat === 'MMM d YYYY'
                       ? 'MMM DD YYYY'
                       : columnFormat === 'MMMM d YYYY, h:mm:ss a'
                       ? 'MMMM DD YYYY, h:mm:ss a'
-                      : columnFormat)
+                      : dateFormat)
                 )
             : value;
         if (
