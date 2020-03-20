@@ -71,7 +71,7 @@ export const routes: Routes = [
         component: AppkeysViewComponent
       },
       {
-        path: 'stream/topic',
+        path: 'stream/inspector',
         component: StreamInspectorComponent
       },
       {
