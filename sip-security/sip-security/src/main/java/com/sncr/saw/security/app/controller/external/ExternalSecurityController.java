@@ -50,8 +50,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sncr.saw.security.common.constants.ErrorMessages.unAuthorizedMessage;
-
 /**
  * @author alok.kumarr
  * @since 3.5.0
@@ -359,7 +357,7 @@ public class ExternalSecurityController {
       response = UserDetailsResponse.class)
   @PostMapping(value = "/users")
   @ResponseBody
-  public UserDetails createUser(
+  public UserDetailsResponse createUser(
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "User details to store", required = true) @RequestBody
@@ -369,9 +367,11 @@ public class ExternalSecurityController {
     String masterLoginId = ticket.getMasterLoginId();
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (roleType != RoleType.ADMIN) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
       logger.error("user is not admin");
-        response.sendError(HttpStatus.UNAUTHORIZED.value(),unAuthorizedMessage );
-      return null;
+      userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+      return userDetailsResponse;
     }
     Long customerId = Long.valueOf(ticket.getCustID());
     return securityService.addUserDetails(userDetails, masterLoginId, customerId, response);
@@ -392,7 +392,7 @@ public class ExternalSecurityController {
         response = UserDetailsResponse.class)
     @PutMapping(value = "/users/{id}")
     @ResponseBody
-    public UserDetails updateUser(
+    public UserDetailsResponse updateUser(
         HttpServletRequest request,
         HttpServletResponse response,
         @ApiParam(value = "User details to store", required = true) @RequestBody
@@ -402,9 +402,11 @@ public class ExternalSecurityController {
         String masterLoginId = ticket.getMasterLoginId();
         UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
         if (roleType != RoleType.ADMIN) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            userDetailsResponse.setValid(false);
             logger.error("user is not admin");
-            response.sendError(HttpStatus.UNAUTHORIZED.value(),unAuthorizedMessage );
-            return null;
+            userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+            return userDetailsResponse;
         }
         userDetails.setUserId(userSysId);
         Long customerId = Long.valueOf(ticket.getCustID());
@@ -422,18 +424,20 @@ public class ExternalSecurityController {
         value = " Fetch User API ",
         nickname = "fetchUserWithDsk",
         notes = "Admin can only use this API to fetch the user",
-        response = UserDetails.class)
+        response = UserDetailsResponse.class)
     @GetMapping(value = "/users/{id}")
-    public UserDetails getUser(
+    public UserDetailsResponse getUser(
         HttpServletRequest request,
-        HttpServletResponse response, @PathVariable(name = "id") Long userSysId) throws IOException {
+        HttpServletResponse response, @PathVariable(name = "id") Long userSysId) {
         Ticket ticket = SipCommonUtils.getTicket(request);
         RoleType roleType = ticket.getRoleType();
         UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
         if (roleType != RoleType.ADMIN) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            userDetailsResponse.setValid(false);
             logger.error("user is not admin");
-            response.sendError(HttpStatus.UNAUTHORIZED.value(),unAuthorizedMessage );
-            return null;
+            userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+            return userDetailsResponse;
         }
         Long customerId = Long.valueOf(ticket.getCustID());
         UserDetails userDetails = userRepository.getUserbyId(userSysId,customerId);
@@ -448,7 +452,7 @@ public class ExternalSecurityController {
             userDetailsResponse.setValidityMessage("Unable to fetch the user Details");
             userDetailsResponse.setError("Error occurred while fetching user details ");
         }
-        return userDetailsResponse.getUser();
+        return userDetailsResponse;
     }
 
 
@@ -463,18 +467,20 @@ public class ExternalSecurityController {
         value = " delete User API ",
         nickname = "deleteUserWithDsk",
         notes = "Admin can only use this API to delete the user",
-        response = UserDetails.class)
+        response = UserDetailsResponse.class)
     @DeleteMapping(value = "/users/{id}")
-    public UserDetails deleteUser(
+    public UserDetailsResponse deleteUser(
         HttpServletRequest request,
-        HttpServletResponse response, @PathVariable(name = "id") Long userSysId) throws IOException {
+        HttpServletResponse response, @PathVariable(name = "id") Long userSysId) {
         Ticket ticket = SipCommonUtils.getTicket(request);
         RoleType roleType = ticket.getRoleType();
         UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
         if (roleType != RoleType.ADMIN) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            userDetailsResponse.setValid(false);
             logger.error("user is not admin");
-            response.sendError(HttpStatus.UNAUTHORIZED.value(),unAuthorizedMessage );
-            return null;
+            userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+            return userDetailsResponse;
         }
         Long customerId = Long.valueOf(ticket.getCustID());
         UserDetails userDetails = userRepository.getUserbyId(userSysId,customerId);
@@ -498,12 +504,12 @@ public class ExternalSecurityController {
             userDetailsResponse.setValidityMessage("Unable to delete the user Details");
             userDetailsResponse.setError("Error occurred while deleting user details ");
         }
-        return userDetails;
+        return userDetailsResponse;
     }
 
   /**
    * gets all users.
-   *HeaderFilter
+   *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
    * @return Returns UsersDetailsList

@@ -981,7 +981,7 @@ public class ExternalSecurityService {
    * @param response HttpServletResponse
    * @return Returns UserDetailsResponse
    */
-  public UserDetails addUserDetails(
+  public UserDetailsResponse addUserDetails(
       UserDetails userDetails,
       String masterLoginId,
       Long loginCustomerId,
@@ -1031,10 +1031,10 @@ public class ExternalSecurityService {
             " Please contact server Administrator");
         return null;
     }
-    return userDetailsResponse.getUser();
+    return userDetailsResponse;
   }
 
-  public UserDetails updateUserDetails(
+  public UserDetailsResponse updateUserDetails(
       UserDetails userDetails,
       String masterLoginId,
       Long customerId,
@@ -1090,7 +1090,7 @@ public class ExternalSecurityService {
         userDetailsResponse.setValid(false);
         userDetailsResponse.setValidityMessage("Unable to update user");
     }
-    return null;
+    return userDetailsResponse;
   }
 
   private UserDetailsResponse validateUserDetails(UserDetails userDetails) {
