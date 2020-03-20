@@ -42,6 +42,7 @@
       *ngIf="data.analysis"
       [ngSwitch]="data.analysis.type"
       class="observe-analysis"
+      [ngClass]="{ 'observe-map-analysis': data.analysis.type === 'map' }"
     >
       <observe-map
         *ngIf="
