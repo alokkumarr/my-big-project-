@@ -50,16 +50,20 @@ public class WorkbenchInspectController {
 		restTemplate = restUtil.restTemplate();
 	}
 
-	@RequestMapping(value = "{project}/streams", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "{project}/streams", method = RequestMethod.GET, 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public Object getAppKeys(HttpServletRequest req, @PathVariable(name = "project", required = true) String project)
+	public Object getAppKeys(HttpServletRequest req, 
+			@PathVariable(name = "project", required = true) String project)
 			throws JsonProcessingException, Exception {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", req.getHeader("Authorization"));
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
-		logger.info("Authroization header.....####" + req.getHeader("Authorization"));
-		ResponseEntity<Object[]> appKeys = restTemplate.exchange("http://localhost:9501/internal/rtisconfig/appKeys",
+		logger.debug("Authroization header.....####" + req.
+				getHeader("Authorization"));
+		ResponseEntity<Object[]> appKeys = restTemplate.
+				exchange("http://localhost:9501/internal/rtisconfig/appKeys",
 				HttpMethod.GET, entity, Object[].class, new Object[0]);
 		logger.debug(appKeys.toString());
 
@@ -71,31 +75,24 @@ public class WorkbenchInspectController {
 		for (final JsonNode objNode : objects) {
 			ObjectNode resultNode = mapper.createObjectNode();
 			JsonNode appKey = objNode.get("app_key");
-			logger.info("########" + appKey.asText());
+			logger.debug("########" + appKey.asText());
 
 			ResponseEntity<Object[]> config = restTemplate.exchange(
-					"http://localhost:9501/internal/rtisconfig/config/" + appKey.asText(), HttpMethod.GET, entity,
+					"http://localhost:9501/internal/rtisconfig/config/" 
+			+ appKey.asText(), HttpMethod.GET, entity,
 					Object[].class, new Object[0]);
 			logger.debug("##### config response ###" + config.toString());
-
 			String configJson = mapper.writeValueAsString(config.getBody());
-
-			logger.info("#####config response ::" + configJson);
-
+			logger.debug("#####config response ::" + configJson);
 			JsonNode configObjects = mapper.readTree(configJson);
-
 			if (configObjects.isArray()) {
 				logger.debug("Is array @####");
-
 				resultNode.put("key:", appKey.asText());
-
 				for (JsonNode jsonNode : configObjects) {
 					resultNode.put("streams_1:", jsonNode.get("streams_1"));
 					resultNode.put("streams_2:", jsonNode.get("streams_2"));
-
 				}
 			}
-
 			entities.add(resultNode);
 
 		}
@@ -103,51 +100,55 @@ public class WorkbenchInspectController {
 		return new ResponseEntity<List<JsonNode>>(entities, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "{project}/streams/{stream}/content", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "{project}/streams/{stream}/content", 
+			method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public Object getStreamContent(@PathVariable(name = "project", required = true) String project,
+	public Object getStreamContent(
+			@PathVariable(name = "project", required = true) String project,
 			@PathVariable(name = "stream", required = true) String stream) {
-		Streams streams = new Streams();
 		logger.debug("Stream Name :::" + stream);
 		List<JsonNode> entities = new ArrayList<JsonNode>();
-		try {
-			MessageStore store = (MessageStore) Streams.getMessageStore("/var/sip/streams/stream_1");
+		
+			MessageStore store = null;
+			try {
+				store = (MessageStore) Streams.getMessageStore("/var/sip/streams/stream_1");
+			} catch (IOException exception) {
+				logger.error(exception.getMessage());
+			}
+			
+			
 			System.out.print("########Retrived store...." + store);
 			MarlinDocumentStream docStream = (MarlinDocumentStream) store.find();
-			System.out.print("########Retrived documentstore...." + store);
-			Properties properties = new Properties();
-
+			ObjectMapper mapper = new ObjectMapper();
 			docStream.forEach(document -> {
-				ObjectMapper mapper = new ObjectMapper();
-				ObjectNode resultNode = mapper.createObjectNode();
-				System.out.print("####Content here ####");
-				Base64.Decoder decoder = Base64.getDecoder();
-				// Decoding string
-				String dStr = new String(decoder.decode(document.asJsonString()));
-
-				System.out.println(dStr);
 				try {
-					entities.add(mapper.readTree(dStr));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				System.out.print("####End of content ####");
+				System.out.print("########Retrived stream content...." + document.asJsonString());
+					JsonNode json = mapper.readTree(document.asJsonString());
+					String valText = json.get("value").asText();
+					logger.debug("###Value###::"+ valText);
+					byte[] bytes =  Base64.getDecoder().decode(valText);
+					logger.debug("###bytes legnth ::" + bytes.length);
+					String content = new String(bytes);
+					
+					
+					JsonNode jsonObj = mapper.readTree(content);
+					logger.debug("####Entire JSON ::"+ jsonObj);
+					JsonNode value = jsonObj.get("payload");
+					logger.debug("####Entire payload ::"+ value);
+					String data = new String(Base64.getDecoder().decode(value.asText()));
+					logger.debug("####Final ###"+ data);
+					entities.add(mapper.readTree(data));
+					
+			} catch (IOException exception) {
+				logger.error(exception.getMessage());
+			}	catch (Exception exception) {
+				logger.error(exception.getMessage());
+			}
+						
 			});
 			store.close();
 
-			// close the OJAI connection and release any resources held by the connection
-			// connection.close();
-
-			System.out.println("==== End Application ===");
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		System.out.println("#### END OF MAPR ######");
-
+		
 		return entities;
 
 	}
