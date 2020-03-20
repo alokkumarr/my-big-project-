@@ -136,9 +136,16 @@
             </mat-form-field>
 
             <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
-              <mat-label>Columns</mat-label>
+              <mat-label> Columns
+                <span
+                *ngIf="!filterGroup.booleanQuery[childId].isOptional && data.isInRuntimeMode"
+                class="mandatory-asterisk"
+                style="color:red; margin-left: 47px"
+                >*</span>
+              </mat-label>
               <mat-select (selectionChange)="columnsSelect($event.value, childId)"
-                          [value]="filterGroup.booleanQuery[childId].columnName">
+                          [value]="filterGroup.booleanQuery[childId].columnName"
+                          [disabled]="data.isInRuntimeMode">
                 <mat-option *ngFor="let column of fetchColumns(childId);"
                             [value]="column.columnName">
                   {{ column.displayName }}

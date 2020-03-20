@@ -238,6 +238,9 @@ export class DskFiltersService {
                 }</span>`;
               }
             default:
+              if (field.isRuntimeFilter) {
+                return `${field.columnName} <span class="operator"></span> []`;
+              }
               if (field.model.operator === 'BTW') {
                 return `${field.columnName} <span class="operator">${
                   field.model.operator

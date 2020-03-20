@@ -136,6 +136,7 @@ export class DskFilterDialogComponent implements OnInit {
       this.aggregatedFilters,
       (_, index) => targetIndex !== index
     );
+    this.validateFilterGroup();
   }
 
   onFilterChange(e) {
