@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -36,15 +35,11 @@ import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.parser.spark.HeaderFilter;
-
-import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.util.*;
-
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
 import sncr.xdf.context.XDFReturnCode;
@@ -52,16 +47,9 @@ import sncr.xdf.ngcomponent.util.NGComponentUtil;
 import sncr.bda.conf.PivotFields;
 import sncr.xdf.parser.spark.Pivot;
 import sncr.xdf.parser.spark.Flattener;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 import org.apache.spark.sql.Encoders;
-import sncr.xdf.parser.spark.Flattener;
 import static org.apache.spark.sql.functions.from_json;
-import org.apache.spark.sql.catalyst.encoders.RowEncoder;
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder;
 import scala.Tuple2;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
@@ -74,6 +62,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private char quoteChar;
     private char quoteEscapeChar;
     private int headerSize;
+    /**
+     * fieldDefRowNumber - It is Field Names Line number from Header if Header size is greater than 1.
+     * It require to be passed if Header size is greater than 1 to retrieve sourceFieldName index from Actual Header.
+     */
     private int fieldDefRowNumber;
     private String sourcePath;
     private String tempDir;
@@ -115,8 +107,16 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private boolean isSchemaContainsJsonType;
     private DataSetHelper datasetHelper = null;
     private Flattener flattner = null;
+    /**
+     * fieldDefaultValuesMap - Contains all Parser Config Field Names as Keys and Tuple2 as value
+     * Tuple2 contains key as Field index from source.
+     * Tuple2 contains value as default value provided in Field config after converting into spark DataType object
+     */
     private Map<String, Tuple2<Integer, Object>> fieldDefaultValuesMap = null;
-    private boolean isSkipFieldsEnabled;
+    /**
+     * isSkipFieldsEnabled - Do we have to skip any fields from Input source.
+     */
+    private Boolean isSkipFieldsEnabled = false;
 
     private static final String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
@@ -596,7 +596,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Add line numbers
         JavaPairRDD<String, Long> zipIndexRdd = rdd.zipWithIndex();
 
-        String headerLine = NGComponentUtil.getLineFromRdd(zipIndexRdd, headerSize, fieldDefRowNumber);
+        String headerLine = NGComponentUtil.getHeaderRecordFromRdd(zipIndexRdd, headerSize, fieldDefRowNumber);
         createSchema(ngctx.componentConfiguration.getParser().getFields(), Optional.ofNullable(headerLine));
         logger.debug("schema"+ schema);
         logger.debug("internalSchema"+internalSchema);
@@ -652,7 +652,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if (headerSize >= 1) {
             // Add line numbers
             JavaPairRDD<String, Long> zipIndexRdd = rdd.zipWithIndex();
-            headerLine = NGComponentUtil.getLineFromRdd(zipIndexRdd, headerSize, fieldDefRowNumber);
+            headerLine = NGComponentUtil.getHeaderRecordFromRdd(zipIndexRdd, headerSize, fieldDefRowNumber);
             rddWithoutHeader = zipIndexRdd
                 // Filter out header based on line number
                 .filter(new HeaderFilter(headerSize))
@@ -711,7 +711,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 // Add line numbers
                 JavaPairRDD<String, Long> zipIndexRdd = rdd.zipWithIndex();
                 if(headerLine == null){
-                    headerLine = NGComponentUtil.getLineFromRdd(zipIndexRdd, headerSize, fieldDefRowNumber);
+                    headerLine = NGComponentUtil.getHeaderRecordFromRdd(zipIndexRdd, headerSize, fieldDefRowNumber);
                 }
                 JavaRDD<String> rddWithoutHeader = zipIndexRdd
                     // Filter out header based on line number
@@ -951,54 +951,84 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     /**
      *
-     * @param fields
-     * @param optHeader
+     * @param configFields - List<Field> - Fields config Entities List
+     * @param optHeader - Optional<String> - Optional Header Record String
      *
-     * createSchema() will assign values to below things
+     * This method() will assign values to below things
      * 1) schema - Which is Spark StructType schema from Fields config
      * 2) internalSchema - It is again spark StructType schema (schema + 2 rejected details fields)
      * 3) fieldDefaultValuesMap - For each field - it will add index and Default Value in Map
      * 4) isSkipFieldsEnabled - Do we have to skip any fields from Input source.
      *
+     * configFields contains only fields which provided in Parser Config.
+     * fieldDefaultValuesMap - Contains all Parser Config Field Names as Keys and Tuple2 as value
+     * Tuple2 contains key as Field index from source.
+     * Tuple2 contains value as default value provided in Field config after converting into spark DataType object
+     *
      */
-    private void createSchema(List<Field> fields, Optional<String> optHeader){
-        AtomicReference<StructField[]> structFields = new AtomicReference<>(new StructField[fields.size()]);
-        AtomicReference<List<String>> fieldNames = new AtomicReference<>();
+    private void createSchema(List<Field> configFields, Optional<String> optHeader){
+        StructField[] structFields = new StructField[configFields.size()];
+        //fieldNames - contains all field names from CSV File Header record
+        List<String> fieldNames = null;
         if(optHeader.isPresent()){
             String header = optHeader.get().trim();
             if(!header.isEmpty()){
-                fieldNames.set(Arrays.asList(header.toUpperCase().split("\\s*"+delimiter+"\\s*",-1)));
+                fieldNames = Arrays.asList(header.toUpperCase().split("\\s*"+delimiter+"\\s*",-1));
             }
         }
-        AtomicBoolean isIndexConfigNotExists = new AtomicBoolean(true);
-        AtomicBoolean skipFieldsEnabled = new AtomicBoolean(true);
-        AtomicReference<Map<String, Tuple2<Integer, Object>>> arFieldDefaultValuesMap = new AtomicReference<>(new HashMap<>());
-        AtomicInteger index = new AtomicInteger(0);
-        fields.stream().forEach(field -> {
+        //headerFieldNames - contains all field names from CSV File Header record
+        final List<String> headerFieldNames = fieldNames;
+        final boolean[] skipFieldsEnabled = new boolean[1];
+        skipFieldsEnabled[0] = true;
+        final boolean[] isIndexConfigNotExists = new boolean[1];
+        isIndexConfigNotExists[0] = true;
+        final int[] index = new int[1];
+        index[0] = 0;
+        //configFields contains only fields which provided in Parser Config.
+        configFields.forEach(field -> {
             DataType dataType = convertXdfToSparkType(field.getType());
-            structFields.get()[index.get()] = new StructField(field.getName(), dataType, true, Metadata.empty());
-            int fieldIndex = getFieldIndex(field, Optional.ofNullable(fieldNames.get()));
+            structFields[index[0]] = new StructField(field.getName(), dataType, true, Metadata.empty());
+            int fieldIndex = getFieldIndex(field, Optional.ofNullable(headerFieldNames));
             if(fieldIndex == -1){
-                skipFieldsEnabled.set(false);
-                fieldIndex=index.get();
+                skipFieldsEnabled[0]=false;
+                fieldIndex=index[0];
             }else{
-                isIndexConfigNotExists.set(false);
+                isIndexConfigNotExists[0]=false;
             }
-            Object defaultValObj =  getFieldDefaultValue(dataType, field.getDefaultValue(), Optional.ofNullable(tsFormats.get(index.get())));
-            arFieldDefaultValuesMap.get().put(field.getName(), new Tuple2<>(fieldIndex, defaultValObj));
-            index.getAndDecrement();
+            Object defaultValObj =  getFieldDefaultValue(dataType, field.getDefaultValue(), Optional.ofNullable(tsFormats.get(index[0])));
+            /**
+             * fieldDefaultValuesMap - Contains all Parser Config Field Names as Keys and Tuple2 as value
+             * Tuple2 contains key as Field index from source.
+             * Tuple2 contains value as default value provided in Field config after converting into spark DataType object
+             */
+            fieldDefaultValuesMap.put(field.getName(), new Tuple2<>(fieldIndex, defaultValObj));
+            index[0] = index[0]+1;
         });
-        fieldDefaultValuesMap = arFieldDefaultValuesMap.get();
-        isSkipFieldsEnabled = skipFieldsEnabled.get();
-        if(isSkipFieldsEnabled || isIndexConfigNotExists.get()){
-            schema = new StructType(structFields.get());
-            StructField rejFlagField = new StructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty());
-            StructField rejRsnField = new StructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty());
-            StructField[] structFields1 = ArrayUtils.addAll(structFields.get(), rejFlagField, rejRsnField);
-            internalSchema = new StructType(structFields1);
+        isSkipFieldsEnabled = skipFieldsEnabled[0];
+        //If isSkipFieldsEnabled is true then it is new config where we have to ignore few fields from source.
+        //If isIndexConfigNotExists is true then it is traditional way - we have to include all fields from source.
+        //Always both will not be true
+        //One should be true, Otherwise it is error.
+        if(isSkipFieldsEnabled || isIndexConfigNotExists[0]){
+            schema = new StructType(structFields);
+            createInternalSchema(structFields);
         }else{
             throw new XDFException(XDFReturnCode.CONFIG_ERROR,"Fields sourceIndex or sourceFieldName config is incorrect.");
         }
+    }
+
+    /**
+     *
+     * @param structFields - StructField[] - Schema Fields
+     *
+     * This method assigns value to internalSchema
+     * internalSchema is spark StructType schema contains structFields (schema fields) + 2 rejected details fields
+     */
+    private void createInternalSchema(StructField[] structFields){
+        StructField rejFlagField = new StructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty());
+        StructField rejRsnField = new StructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty());
+        StructField[] structFields1 = ArrayUtils.addAll(structFields, rejFlagField, rejRsnField);
+        internalSchema = new StructType(structFields1);
     }
 
     /**
@@ -1198,6 +1228,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         System.exit(rc);
     }
 
+    /**
+     *
+     * @param fields - List<Field> - Field Config Entities List
+     * @return boolean - returns true if Fields contains json or json_array type field or returns false.
+     *
+     * This method returns true if Fields contains json or json_array type field or returns false.
+     */
     private boolean isSchemaContainsJsonType(List<Field> fields){
         for(Field field : fields){
             if(CsvInspectorRowProcessor.T_JSON.equalsIgnoreCase(field.getType().trim())) {
@@ -1209,11 +1246,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     /**
      *
-     * @param dataset
-     * @param fields
-     * @return
+     * @param dataset - Dataset<Row> - Input Dataset
+     * @param fields - List<Field> - Field Config Entities List
+     * @return - Dataset<Row> - Returns Dataset after converting json and json_array field types to StructType or ArrayType<StructType>
      *
-     * convertJsonStringColToStruct() checks if any filed type is json or json_array
+     * This method checks if any filed type is json or json_array
      * and converts then to StructType or ArrayType columns in Dataset.
      *
      */
@@ -1233,11 +1270,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     /**
      *
-     * @param dataset
-     * @param field
-     * @return
+     * @param dataset - Dataset<Row> - Input Dataset
+     * @param field - Field - json Field Config Entity
+     * @return - Dataset<Row> - Returns Dataset after converting Field type to StructType
      *
-     * processJsonColumnInCSV() converts String json type column to StructType column.
+     * This method converts String json type column to StructType column.
      * To achieve this, First extracts String json field as separate Dataset
      * Then extract schema from above Json Dataset
      * Then Apply this StructType schema to String Json field in input Dataset.
@@ -1265,11 +1302,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     /**
      *
-     * @param dataset
-     * @param field
-     * @return
+     * @param dataset - Dataset<Row> - Input Dataset
+     * @param field - Field - json_array Field Config Entity
+     * @return - Dataset<Row> - Returns Dataset after converting Field type to ArrayType<StructType>
      *
-     * processJsonArrayColumnInCSV() converts String json_array type column to ArrayType<StructType> column.
+     * This method converts String json_array type column to ArrayType<StructType> column.
      * To achieve this, First extracts String json_array field as separate Dataset
      * Then extract schema from above Json Dataset
      * Then Creates ArrayType of above StructType schema
@@ -1297,6 +1334,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return dataset;
     }
 
+    /**
+     *
+     * @param dataset - Dataset<Row> - Input Dataset
+     * @return Dataset<Row> - Returns Pivoted or Flatten Dataset
+     *
+     * This method checks for Pivot or Flatten config, if they enabled
+     * Then returns Pivoted or Flatten Dataset
+     */
     public Dataset<Row> pivotOrFlattenDataset(Dataset<Row> dataset) {
         if(isPivotApplied) {
             dataset = new Pivot().applyPivot(dataset, pivotFields);
@@ -1313,12 +1358,25 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         }
         return dataset;
     }
-
+    /**
+     *
+     * @param dataset - Dataset<Row> - Input Dataset
+     * @return Dataset<Row> - Returns Flatten Dataset
+     *
+     * Then method returns Flattened Dataset if contains StructType or ArrayType fields in Dataset
+     */
     public Dataset<Row> flattenDataset(Dataset<Row> dataset) {
         if(flattner == null) {flattner = new Flattener(ctx, this, datasetHelper);}
         return flattner.flattenDataset(dataset);
     }
 
+    /**
+     *
+     * @param dataset - Dataset<Row> - Input Dataset
+     * @return Dataset<Row> - Returns Sorted Fields Dataset
+     *
+     * Then method returns Sorted Fields Dataset based on Alphabetical order of Field Names.
+     */
     public Dataset<Row> sortColumnNames(Dataset<Row> dataset){
         String[] dsCols = dataset.columns();
         logger.debug("Before Sort - Columns : " + Arrays.toString(dsCols));

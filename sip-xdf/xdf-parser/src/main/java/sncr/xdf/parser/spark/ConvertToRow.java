@@ -2,7 +2,6 @@ package sncr.xdf.parser.spark;
 
 import org.apache.commons.lang3.ArrayUtils;
 import scala.Tuple2;
-import sncr.xdf.ngcomponent.util.NGComponentUtil;
 import com.univocity.parsers.common.processor.NoopRowProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -18,8 +17,6 @@ import org.apache.spark.util.LongAccumulator;
 import java.text.SimpleDateFormat;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class build and validate the every column of the row while collecting in RDD. Mark the accepted/rejected record with the addition schema column.
@@ -50,21 +47,26 @@ public class ConvertToRow implements Function<String, Row> {
 
     /**
      *
-     * @param schema
-     * @param tsFormats
-     * @param lineSeparator
-     * @param delimiter
-     * @param quoteChar
-     * @param quoteEscapeChar
-     * @param charToEscapeQuoteEscaping
-     * @param recordCounter
-     * @param errorCounter
-     * @param allowInconsistentCol
-     * @param fieldDefaultValuesMap
-     * @param isSkipFieldsEnabled
+     * @param schema - StructType - Parser output schema
+     * @param tsFormats - List<String>  -Timestamp formats list
+     * @param lineSeparator - String - Line separator in Source file
+     * @param delimiter - char - Field Delimiter in Source file
+     * @param quoteChar - char - Quote Character in Source file
+     * @param quoteEscapeChar - char - Quote Escape Character in Source file
+     * @param charToEscapeQuoteEscaping - char - Escape Quoting Character in Source file
+     * @param recordCounter - LongAccumulator - Record Counter
+     * @param errorCounter - LongAccumulator - Error Record counter
+     * @param allowInconsistentCol - boolean - Inconsistent record length is valid or not
+     * @param fieldDefaultValuesMap - Map<String, Tuple2<Integer, Object>> - Contains all Parser Config Field Names as Keys and Tuple2 as value
+     * @param isSkipFieldsEnabled - boolean - Do we have to skip any fields from Input source.
      *
-     * ConvertToRow() new constructor added with 2 additional parameters fieldDefaultValuesMap, isSkipFieldsEnabled
-     * fieldDefaultValuesMap - For each field - it will add index and Default Value in Map
+     * ConvertToRow() new constructor added to support ignore few fields from Input File
+     * Added 2 additional parameters fieldDefaultValuesMap, isSkipFieldsEnabled to existing constructor
+     *
+     * fieldDefaultValuesMap - Contains all Parser Config Field Names as Keys and Tuple2 as value
+     * Tuple2 contains key as Field index from source.
+     * Tuple2 contains value as default value provided in Field config after converting into spark DataType object
+     *
      * isSkipFieldsEnabled - Do we have to skip any fields from Input source.
      */
     public ConvertToRow(StructType schema,
@@ -192,25 +194,26 @@ public class ConvertToRow implements Function<String, Row> {
             final int parsedLength = parsed.length;
             final int schemaLength = schema.length();
             StructField[] structFields = schema.fields();
-            AtomicInteger index = new AtomicInteger(0);
-            AtomicReference<Object[]> recordValues = new AtomicReference<>(new Object[schemaLength]);
+            final int[] index = new int[1];
+            index[0] = 0;
+            Object[] recordValues = new Object[schemaLength];
             Arrays.stream(structFields).forEach(structField -> {
                 try {
                     Tuple2<Integer, Object> fieldTuple = fieldDefaultValuesMap.get(structField.name());
                     Object fieldValue = null;
                     if(fieldTuple._1 < parsedLength){
-                        fieldValue = getFieldValue(parsed[fieldTuple._1], structField, index.get());
+                        fieldValue = getFieldValue(parsed[fieldTuple._1], structField, index[0]);
                     }
                     if(fieldValue == null){
                         fieldValue = fieldTuple._2;
                     }
-                    recordValues.get()[index.get()] = fieldValue;
-                    index.getAndIncrement();
+                    recordValues[index[0]] = fieldValue;
+                    index[0] = index[0]+1;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });
-            record = ArrayUtils.addAll(recordValues.get(), record[schemaLength], record[schemaLength+1]);
+            record = ArrayUtils.addAll(recordValues, record[schemaLength], record[schemaLength+1]);
         } catch(Exception ex){
             errCounter.add(1);
             if(ex instanceof  NumberFormatException){
