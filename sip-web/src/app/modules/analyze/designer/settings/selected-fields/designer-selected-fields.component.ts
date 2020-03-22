@@ -283,8 +283,13 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   removeFilterFromTree(filter, index) {
-    this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
     this.flattenedfilters.splice(index, 1);
+    if (filter.isAggregationFilter) {
+      index = index === 0 ? index + 1 : index;
+      this.filters.splice(index, 1);
+    } else {
+      this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+    }
     this.removeFilter.emit();
   }
 }

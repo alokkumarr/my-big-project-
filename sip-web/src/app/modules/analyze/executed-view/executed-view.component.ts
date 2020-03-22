@@ -124,7 +124,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
-    console.log(this.filters);
   }
 
   generateDSLDateFilters(filters) {
@@ -258,7 +257,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.filters = cloneDeep(isDSLAnalysis(this.analysis)
       ? this.generateDSLDateFilters(response.queryBuilder.filters)
       : response.queryBuilder.filters);
-    console.log(this.filters);
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',

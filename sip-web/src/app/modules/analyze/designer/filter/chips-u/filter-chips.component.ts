@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Filter, Artifact } from '../../types';
 import { getFilterDisplayName } from './../../../../analyze/consts';
 import { AnalyzeService } from '../../../services/analyze.service';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
 
@@ -10,7 +11,7 @@ import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
   templateUrl: './filter-chips.component.html',
   styleUrls: ['./filter-chips.component.scss']
 })
-export class FilterChipsComponent implements OnInit {
+export class FilterChipsComponent {
   @Output() remove: EventEmitter<number> = new EventEmitter();
   @Output() removeAll: EventEmitter<null> = new EventEmitter();
   @Input() filters;
@@ -20,6 +21,7 @@ export class FilterChipsComponent implements OnInit {
       return;
     }
     this.nameMap = this.analyzeService.calcNameMap(artifacts);
+    this.flattenedFilters = cloneDeep(this.analyzeService.flattenAndFetchFiltersChips(this.filters, []));
   }
   @Input() readonly: boolean;
 
@@ -29,10 +31,6 @@ export class FilterChipsComponent implements OnInit {
   constructor(
     private analyzeService: AnalyzeService
   ) {}
-
-  ngOnInit() {
-    this.flattenedFilters = this.analyzeService.flattenAndFetchFiltersChips(this.filters, []);
-  }
 
   getDisplayName(filter: Filter) {
     return getFilterDisplayName(this.nameMap, filter);

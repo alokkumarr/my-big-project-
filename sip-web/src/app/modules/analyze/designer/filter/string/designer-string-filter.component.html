@@ -27,6 +27,7 @@
         <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
       </mat-chip>
       <input [matChipInputFor]="chipList"
+             style="margin-bottom: 18px;"
              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
              matChipInputAddOnBlur="true"
              (matChipInputTokenEnd)="add($event)"

@@ -1107,6 +1107,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         )
         break;
       case 'filter':
+        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+        this.requestDataIfPossible();
+        break;
       case 'sort':
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.requestDataIfPossible();

@@ -139,8 +139,6 @@ export class FilterService {
     const clone = cloneDeep(analysis);
     const cleanedRuntimeFilters = this.getCleanedRuntimeFilterValues(clone);
 
-    console.log(cleanedRuntimeFilters);
-
     if (!cleanedRuntimeFilters.length) {
       return Promise.resolve(clone);
     }

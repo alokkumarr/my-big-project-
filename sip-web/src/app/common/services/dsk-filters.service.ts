@@ -132,10 +132,6 @@ export class DskFiltersService {
               return false;
             }
 
-            if (isAggregationFilter) {
-              areValid = !isEmpty(aggregate);
-              return false;
-            }
             if (!isRuntimeFilter && isGlobalFilter) {
               areValid = true;
             } else if (!model) {
@@ -146,6 +142,9 @@ export class DskFiltersService {
               );
             } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
               areValid = this.isNumberFilterValid(model);
+              if (isAggregationFilter && areValid) {
+                areValid = !isEmpty(aggregate);
+              }
             } else if (type === 'string') {
               areValid = this.isStringFilterValid(model);
             } else if (DATE_TYPES.includes(type)) {
