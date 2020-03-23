@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Router } from '@angular/router';
 import {
   DSKFilterGroup,
   DSKFilterField,
@@ -74,13 +75,16 @@ export class DskFilterGroupComponent implements OnInit {
 
   constructor(
     jwtService: JwtService,
-    dskFilterService: DskFiltersService
+    dskFilterService: DskFiltersService,
+    router: Router
   ) {
+    if (!(router.url).includes('/analyze/')) {
       dskFilterService
       .getEligibleDSKFieldsFor(jwtService.customerId, jwtService.productId)
       .subscribe(fields => {
         this.dskEligibleFields = fields;
       });
+    }
   }
 
   ngOnInit() {
