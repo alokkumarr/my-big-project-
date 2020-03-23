@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 import * as isEmpty from 'lodash/isEmpty';
+import * as startCase from 'lodash/startCase';
 
 @Component({
   selector: 'dataset-string-filter',
@@ -11,22 +12,38 @@ import * as isEmpty from 'lodash/isEmpty';
 export class DatasetStringFilterComponent implements OnInit {
   public filterFormGroup: FormGroup;
   public filterList;
-  @Output() typeFilterChange = new EventEmitter<any>();
+  public filterLabel;
+  public dropDownLabel;
+  public isMultiSelect;
+  @Output() filterChange = new EventEmitter<any>();
+  @Output() filterRemoved = new EventEmitter<any>();
+  @Output() emptyFilter = new EventEmitter<any>();
 
   @Input('resetFilters') set resetFilter(data) {
     if (data) {
       this.filterFormGroup.patchValue({
-        value: ''
+        filter: ''
       });
     }
   }
 
-  @Input('typeFilterList') set setFilterList(data) {
+  @Input('filterList') set setFilterList(data) {
     if (!isEmpty(data)) {
       this.filterList = data;
     }
   }
 
+  @Input('filterLabel') set setFilterLabel(data) {
+    this.filterLabel = data;
+  }
+
+  @Input('label') set setLabel(data) {
+    this.dropDownLabel = startCase(data) || 'Select a value';
+  }
+
+  @Input('isMultiSelect') set setMultiSelect(data) {
+    this.isMultiSelect = data;
+  }
   constructor(private fb: FormBuilder) {
     this.createFilterForm();
   }
@@ -34,13 +51,34 @@ export class DatasetStringFilterComponent implements OnInit {
 
   createFilterForm() {
     this.filterFormGroup = this.fb.group({
-      value: ['']
+      filter: ['']
     });
 
-    this.filterFormGroup.valueChanges.subscribe(({ value }) => {
-      if (this.filterFormGroup.valid && !isEmpty(value)) {
-        this.typeFilterChange.emit({ name: 'dsStringFilter', data: value });
+    this.filterFormGroup.valueChanges.subscribe(({ filter }) => {
+      if (!isEmpty(filter)) {
+        this.filterChange.emit({
+          data: filter,
+          filterType: this.dropDownLabel.toLowerCase()
+        });
+      } else {
+        this.dropDownLabel
+          ? this.filterRemoved.emit({
+              name: 'removeFilter',
+              filterType: this.dropDownLabel.toLowerCase()
+            })
+          : ''; // Do Nothing in else
       }
     });
   }
+
+  /* // Use this function to remove/reset individual filter.
+  removeFilter() {
+    this.filterFormGroup.patchValue({
+      filter: ''
+    });
+    this.filterRemoved.emit({
+      name: 'resetFilter',
+      filterType: this.dropDownLabel.toLowerCase()
+    });
+  } */
 }

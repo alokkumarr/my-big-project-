@@ -59,7 +59,8 @@ import {
   DesignerJoinsArray,
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
-  DesignerCheckAggregateFilterSupport
+  DesignerCheckAggregateFilterSupport,
+  DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -67,10 +68,15 @@ import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
-  DATE_FORMATS_OBJ
+  DATE_FORMATS_OBJ,
+  QUERY_RUNTIME_IDENTIFIER
 } from '../../consts';
 import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
+import {
+  COMPARISON_CHART_DATE_INTERVALS,
+  COMPARISON_CHART_DATE_INTERVALS_OBJ
+} from 'src/app/common/consts';
 
 // setAutoFreeze(false);
 
@@ -335,9 +341,8 @@ export class DesignerState {
     if (artifactColumn.dataField) {
       artifactColumn.dataField = DesignerService.dataFieldFor({
         columnName: artifactColumn.columnName,
-        aggregate:
-          artifactColumn.aggregate ||
-          artifacts[artifactIndex].fields[artifactColumnIndex].aggregate
+        aggregate: artifactColumn.aggregate
+        /* || artifacts[artifactIndex].fields[artifactColumnIndex].aggregate */
       } as ArtifactColumnDSL);
     }
 
@@ -345,10 +350,10 @@ export class DesignerState {
       displayName:
         artifactColumn.displayName ||
         artifacts[artifactIndex].fields[artifactColumnIndex].displayName,
-      aggregate:
-        artifactColumn.aggregate ||
-        artifacts[artifactIndex].fields[artifactColumnIndex].aggregate,
-      area: artifactColumn.hasOwnProperty('area')
+      aggregate: artifactColumn.aggregate,
+      /* || artifacts[artifactIndex].fields[artifactColumnIndex].aggregate */ area: artifactColumn.hasOwnProperty(
+        'area'
+      )
         ? artifactColumn.area
         : artifacts[artifactIndex].fields[artifactColumnIndex].area
     } as any);
@@ -773,11 +778,26 @@ export class DesignerState {
     if (artifactColumn.type === 'date') {
       switch (analysis.type) {
         case 'chart':
-          groupInterval.groupInterval =
-            DATE_FORMATS_OBJ[
-              artifactColumn.dateFormat || <string>artifactColumn.format
-            ].groupInterval;
+          const isComparisonChart =
+            (<AnalysisChartDSL>analysis).chartOptions.chartType ===
+            'comparison';
+
+          /* Assigns default group interval. For comparison chart, we only
+            support a subset of all possible group intervals, so use that */
+          groupInterval.groupInterval = isComparisonChart
+            ? artifactColumn.groupInterval ||
+              COMPARISON_CHART_DATE_INTERVALS[0].value
+            : DATE_FORMATS_OBJ[
+                artifactColumn.dateFormat || <string>artifactColumn.format
+              ].groupInterval;
+
+          /* Adds a default date format for comparison chart */
+          artifactColumn.format = isComparisonChart
+            ? COMPARISON_CHART_DATE_INTERVALS_OBJ[groupInterval.groupInterval]
+                .formatForBackEnd
+            : artifactColumn.dateFormat;
           break;
+
         case 'pivot':
           groupInterval.groupInterval = 'day';
           break;
@@ -1033,6 +1053,39 @@ export class DesignerState {
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
+    });
+  }
+
+  @Action(DesignerUpdateQueryFilters)
+  updateQueryFilters(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { filters }: DesignerUpdateQueryFilters
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const sqlQuery = analysis.sipQuery.query;
+    const runTimeFiltersInQueryCount =
+      sqlQuery.split(QUERY_RUNTIME_IDENTIFIER).length - 1;
+    // const regex = new RegExp(`/[^${QUERY_RUNTIME_IDENTIFIER}]/g`);
+    // const runTimeFiltersInQueryCount = sqlQuery.replace(regex, "");
+    //check if query has runtime filters
+    const runTimeFilters = [];
+    for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
+      runTimeFilters.push({
+        isRuntimeFilter: true,
+        displayName: isEmpty(filters[i]) ? '' : filters[i].displayName,
+        description: isEmpty(filters[i]) ? '' : filters[i].description,
+        model: {
+          modelValues: isEmpty(filters[i]) ? [] : filters[i].model.modelValues,
+          operator: 'EQ'
+        }
+      });
+    }
+    return patchState({
+      analysis: {
+        ...analysis,
+        sipQuery: { ...sipQuery, filters: runTimeFilters }
+      }
     });
   }
 }

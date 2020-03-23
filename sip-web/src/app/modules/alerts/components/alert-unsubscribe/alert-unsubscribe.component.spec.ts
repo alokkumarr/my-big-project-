@@ -16,7 +16,7 @@ class UserServiceStub {
 const alertDetailsStub = {
   alertId: '1',
   alertDesc: '123abc'
-}
+};
 
 describe('AlertUnsubscribe', () => {
   let component: AlertUnsubscribe;
@@ -29,7 +29,7 @@ describe('AlertUnsubscribe', () => {
         { provide: AlertUnsubscribeService, useValue: {} },
         { provide: ToastService, useValue: {} },
         { provide: UserService, useClass: UserServiceStub },
-        { provide: JwtService, useValue: {} }
+        { provide: JwtService, useValue: { parseJWT: () => {} } }
       ],
       imports: [RouterTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]

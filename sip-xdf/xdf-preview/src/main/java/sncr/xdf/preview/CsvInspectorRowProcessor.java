@@ -22,6 +22,8 @@ public class CsvInspectorRowProcessor extends ObjectRowProcessor {
     public final static String T_DOUBLE = "double";
     public final static String T_LONG = "long";
     public final static String T_DATETIME = "date";
+    public final static String T_JSON = "json";
+    public final static String T_JSON_ARRAY = "json_array";
     public final static String T_NULL = "unknown";
 
     private int SAMPLE_SIZE;

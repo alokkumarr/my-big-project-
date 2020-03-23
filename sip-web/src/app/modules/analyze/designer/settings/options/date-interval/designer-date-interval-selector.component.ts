@@ -3,6 +3,7 @@ import { ArtifactColumnPivot, DesignerChangeEvent } from '../../../types';
 import { DATE_INTERVALS, DATE_INTERVALS_OBJ } from '../../../../consts';
 import { DesignerUpdateArtifactColumn } from './../../../actions/designer.actions';
 import { Store } from '@ngxs/store';
+import { COMPARISON_CHART_DATE_INTERVALS } from 'src/app/common/consts';
 
 @Component({
   selector: 'designer-date-interval-selector',
@@ -11,11 +12,23 @@ import { Store } from '@ngxs/store';
 export class DesignerDateIntervalSelectorComponent implements OnInit {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifactColumn: ArtifactColumnPivot;
-  public DATE_INTERVALS = DATE_INTERVALS;
+  public DATE_INTERVALS;
 
   constructor(private _store: Store) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    const analysis = this._store.selectSnapshot(
+      state => state.designerState.analysis
+    );
+    if (
+      analysis.type === 'chart' &&
+      analysis.chartOptions.chartType === 'comparison'
+    ) {
+      this.DATE_INTERVALS = COMPARISON_CHART_DATE_INTERVALS;
+    } else {
+      this.DATE_INTERVALS = DATE_INTERVALS;
+    }
+  }
 
   onDateIntervalChange(groupInterval) {
     const dateFormat = DATE_INTERVALS_OBJ[groupInterval].formatForBackEnd;

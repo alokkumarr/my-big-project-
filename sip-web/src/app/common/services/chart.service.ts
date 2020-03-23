@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as clone from 'lodash/clone';
+import * as replace from 'lodash/replace';
 import * as sum from 'lodash/sum';
 import * as map from 'lodash/map';
 import * as round from 'lodash/round';
@@ -44,7 +45,8 @@ import {
   DATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   CHART_COLORS,
-  DATE_FORMATS_OBJ
+  DATE_FORMATS_OBJ,
+  DATE_INTERVALS
 } from '../consts';
 
 const removeKeyword = (input: string) => {
@@ -120,10 +122,16 @@ const donutConfig = config => {
   return pieConfig(config);
 };
 
+const comparisonConfig = config => {
+  set(config, 'chart.type', 'column');
+  return config;
+};
+
 const configCustomizer = {
   stack: stackConfig,
   pie: pieConfig,
-  donut: donutConfig
+  donut: donutConfig,
+  comparison: comparisonConfig
 };
 
 const addCommas = nStr => {
@@ -319,7 +327,11 @@ export class ChartService {
           chartType
         ),
         data: map(parsedData, dataPoint =>
-          mapValues(axesFieldNameMap, val => dataPoint[val])
+          mapValues(axesFieldNameMap, val => {
+            return axesFieldNameMap.y === val && dataPoint[val] === ''
+              ? null
+              : dataPoint[val];
+          })
         )
       }
     ];
@@ -332,9 +344,16 @@ export class ChartService {
     const dateFields = filter(fieldsArray, ({ type }) =>
       DATE_TYPES.includes(type)
     );
+    const aggregateYFields = fields.y.filter(
+      field => Boolean(field.aggregate) || Boolean(field.expression)
+    );
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
-      this.formatDatesIfNeeded(parsedData, dateFields);
+      this.formatDatesIfNeeded(
+        parsedData,
+        dateFields,
+        aggregateYFields.length > 0
+      );
     } else {
       this.dateStringToTimestamp(parsedData, dateFields);
     }
@@ -432,7 +451,7 @@ export class ChartService {
     if (DATE_TYPES.includes(field.type)) {
       const momentDateFormat = this.getMomentDateFormat(
         field.dateFormat || field.format
-      );
+      ).dateFormat;
       return moment(value, momentDateFormat);
     }
 
@@ -454,7 +473,8 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat }) => {
-          const momentDateFormat = this.getMomentDateFormat(dateFormat);
+          const momentDateFormat = this.getMomentDateFormat(dateFormat)
+            .dateFormat;
           dataPoint[removeKeyword(columnName)] =
             moment(dataPoint[removeKeyword(columnName)], momentDateFormat)
               .utc()
@@ -464,14 +484,20 @@ export class ChartService {
     }
   }
 
-  formatDatesIfNeeded(parsedData, dateFields) {
+  formatDatesIfNeeded(parsedData, dateFields, aggregatesExist) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
-        forEach(dateFields, ({ columnName, dateFormat }) => {
-          const momentDateFormat = this.getMomentDateFormat(dateFormat);
+        forEach(dateFields, ({ columnName, dateFormat, groupInterval }) => {
+          const dateFormats = this.getMomentDateFormat(
+            dateFormat,
+            groupInterval
+          );
+          const parseFormat = aggregatesExist
+            ? dateFormats.dateFormat
+            : 'YYYY-MM-DD hh:mm:ss';
           dataPoint[removeKeyword(columnName)] = moment
-            .utc(dataPoint[removeKeyword(columnName)], momentDateFormat)
-            .format(momentDateFormat);
+            .utc(dataPoint[removeKeyword(columnName)], parseFormat)
+            .format(dateFormats.momentFormat || dateFormats.dateFormat);
         });
       });
     }
@@ -506,14 +532,15 @@ export class ChartService {
       comboType || displayType
     );
     const zIndex = this.getZIndex(comboType || displayType);
-    const nameWithAggregate = expression
-      ? displayName
-      : `${
-          AGGREGATE_TYPES_OBJ[aggregate].designerLabel
-        }(${displayNameWithoutAggregateFor({
-          displayName,
-          dataField
-        } as ArtifactColumnDSL)})`;
+    const nameWithAggregate =
+      expression || !aggregate
+        ? displayName
+        : `${
+            AGGREGATE_TYPES_OBJ[aggregate].designerLabel
+          }(${displayNameWithoutAggregateFor({
+            displayName,
+            dataField
+          } as ArtifactColumnDSL)})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -529,10 +556,29 @@ export class ChartService {
     };
   }
 
-  getMomentDateFormat(dateFormat) {
+  getMomentDateFormat(dateFormat, groupInterval = null) {
+    if (groupInterval === null) {
+      return DATE_FORMATS_OBJ[dateFormat].momentValue;
+    }
+
+    const momentFormatId = DATE_INTERVALS.findIndex(
+      interval =>
+        interval.formatForBackEnd === dateFormat &&
+        (groupInterval ? interval.value === groupInterval : true)
+    );
     // the backend and moment.js require different date formats for days of month
     // the backend represents it with "d", and momentjs with "Do"
-    return DATE_FORMATS_OBJ[dateFormat].momentValue;
+    let format = replace(dateFormat, 'dd', 'DD');
+    format = replace(format, 'd', 'Do');
+    format = replace(format, /y/g, 'Y');
+    return {
+      /* Date format saved with column will cater to backend. Make adjustments for FE */
+      dateFormat: format,
+
+      /* If an explicit moment format is defined for this date format, return that too */
+      momentFormat:
+        momentFormatId >= 0 ? DATE_INTERVALS[momentFormatId].momentFormat : null
+    };
   }
 
   getZIndex(type) {
@@ -587,7 +633,13 @@ export class ChartService {
     }
 
     return fpPipe(
-      fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
+      fpMap(dataPoint =>
+        mapValues(axesFieldNameMap, val => {
+          return axesFieldNameMap.y === val && dataPoint[val] === ''
+            ? null
+            : dataPoint[val];
+        })
+      ),
       fpGroupBy('g'),
       fpToPairs,
       fpMap(([name, data]) => ({
@@ -822,24 +874,16 @@ export class ChartService {
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
-            if (!isUndefined(field.alias)) {
-              return (
-                field.alias ||
-                (field.expression
-                  ? field.displayName
-                  : `${
-                      AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
-                    }(${displayNameWithoutAggregateFor(field)})`)
-              );
-            }
-            return (
-              opts.labels.y ||
-              (field.expression
-                ? field.dislplayName
+            const fieldDisplayName =
+              field.expression || !field.aggregate
+                ? field.displayName
                 : `${
                     AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
-                  }(${displayNameWithoutAggregateFor(field)})`)
-            );
+                  }(${displayNameWithoutAggregateFor(field)})`;
+            if (!isUndefined(field.alias)) {
+              return field.alias || fieldDisplayName;
+            }
+            return opts.labels.y || fieldDisplayName;
           }).join('<br/>');
           const isSingleField = fields.length === 1;
           return {
@@ -993,6 +1037,9 @@ export class ChartService {
       case 'pie':
         changes = this.getPieChangeConfig(type, fields, gridData, opts);
         break;
+      case 'comparison':
+        changes = this.getComparisonChangeConfig(type, fields, gridData, opts);
+        break;
       case 'column':
       case 'bar':
       case 'line':
@@ -1008,6 +1055,163 @@ export class ChartService {
     }
 
     return concat(changes, this.addTooltipsAndLegend(fields, type));
+  }
+
+  getCategoriesForComparisonChart(interval = 'month') {
+    switch (interval) {
+      case 'month':
+        return [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec'
+        ];
+      case 'quarter':
+      default:
+        return ['Q1', 'Q2', 'Q3', 'Q4'];
+    }
+  }
+
+  getComparisonChangeConfig(chartType, fields, gridData, opts) {
+    const labels = {
+      x:
+        get(fields, 'x.alias') ||
+        get(opts, 'labels.x') ||
+        get(fields, 'x.displayName', '')
+    };
+
+    const yAxesChanges = this.getYAxesChanges(chartType, fields.y, opts);
+    const changes = [
+      {
+        path: 'xAxis.title.text',
+        data: labels.x || (opts.labels && opts.labels.x)
+      },
+      {
+        path: 'yAxis',
+        data: yAxesChanges
+      }
+    ];
+
+    const dataField = isArray(fields.y) ? fields.y[0] : fields.y;
+    const dateField = fields.x;
+    if (!DATE_TYPES.includes(dateField.type)) {
+      return changes;
+    }
+    let categories = this.getCategoriesForComparisonChart(
+      dateField.groupInterval
+    );
+
+    const dataCategoryFormat =
+      dateField.groupInterval === 'month' ? 'MMM' : '[Q]Q';
+    const sort = find(opts.sorts, s => s.columnName === dateField.columnName);
+
+    if (sort) {
+      categories = fpOrderBy(
+        [
+          category =>
+            dateField.groupInterval === 'month'
+              ? +moment(category, dataCategoryFormat)
+              : category
+        ],
+        [sort.order],
+        categories
+      );
+    }
+
+    const series = [];
+    const categoriesWithData = {};
+
+    let seriesId = 0;
+
+    forEach(gridData, row => {
+      const momentDate = moment(row[dateField.columnName], 'YYYY-MM');
+      const year = `${momentDate.year()}`;
+      let yearSeries = series.find(s => s.name === year);
+      if (!yearSeries) {
+        yearSeries = {
+          name: year,
+          aggregate: dataField.aggregate,
+          color: CHART_COLORS[seriesId++],
+          type: dataField.displayType || 'column',
+          dataType: dataField.type,
+          yAxis: 0,
+          zIndex: 1,
+          data: []
+        };
+        series.push(yearSeries);
+      }
+      const formattedData = momentDate.format(dataCategoryFormat);
+      categoriesWithData[formattedData] = true;
+
+      yearSeries.data.push({
+        x: formattedData,
+        y: row[this.getDataFieldIdentifier(dataField)]
+      });
+    });
+
+    categories = categories.filter(category => categoriesWithData[category]);
+
+    /* Covert actual string values to category indices inside data.
+      We have to do this in separate forEach, so as to fully configure
+      categories before it */
+    forEach(series, yearSeries => {
+      yearSeries.data = yearSeries.data.map(dataRow => ({
+        x: categories.indexOf(dataRow.x),
+        y: dataRow.y
+      }));
+
+      yearSeries.data = fpOrderBy(
+        [dataRow => dataRow.x],
+        ['asc'],
+        yearSeries.data
+      );
+    });
+
+    /* Disables negative extrapolation of x-axis if categories are hidden */
+    changes.push({
+      path: 'xAxis.min',
+      data: 0
+    });
+
+    changes.push({
+      path: 'xAxis.categories',
+      data: categories.filter(category => categoriesWithData[category])
+    });
+
+    changes.push({
+      path: 'series',
+      data: series
+    });
+
+    return changes;
+  }
+
+  /**
+   * For a data field (generall used in y axis), returns the key name
+   * backend will use in execute response.
+   *
+   * @param {ArtifactColumnDSL} field
+   * @returns {string}
+   * @memberof ChartService
+   */
+  getDataFieldIdentifier(field: ArtifactColumnDSL): string {
+    if (field.expression) {
+      return field.columnName;
+    } else if (field.aggregate) {
+      return `${field.aggregate}@@${removeKeyword(
+        field.columnName
+      )}`.toLowerCase();
+    } else {
+      return removeKeyword(field.columnName);
+    }
   }
 
   getPackedBubbleChartConfig(fields, gridData) {
@@ -1078,6 +1282,8 @@ export class ChartService {
   addTooltipsAndLegend(fields, chartType) {
     const changes = [];
     const yIsSingle = fields.y.length === 1;
+    const enableLegend =
+      chartType === 'comparison' || !yIsSingle || Boolean(fields.g);
     if (!this.getViewOptionsFor(chartType).customTooltip) {
       return changes;
     }
@@ -1116,7 +1322,7 @@ export class ChartService {
     // because there is only one data series
     changes.push({
       path: 'legend.enabled',
-      data: Boolean(!yIsSingle || fields.g)
+      data: enableLegend
     });
 
     return changes;

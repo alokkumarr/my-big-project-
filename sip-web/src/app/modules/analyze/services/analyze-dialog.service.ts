@@ -115,8 +115,10 @@ export class AnalyzeDialogService {
   openFilterPromptDialog(
     filters,
     analysis: AnalysisDSL,
-    supportsAggregationFilters = false
+    supportsAggregationFilters = false,
+    designerPage
   ) {
+    const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
     const data: DesignerFilterDialogData = {
       filters,
       artifacts: this._store.selectSnapshot(
@@ -125,7 +127,10 @@ export class AnalyzeDialogService {
       analysisType: analysis.type,
       supportsAggregationFilters,
       isInRuntimeMode: true,
-      showFilterOptions: true
+      showFilterOptions: true,
+      analysisReportType: reportType,
+      designerPage,
+      query: analysis.sipQuery.query
     };
     return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',

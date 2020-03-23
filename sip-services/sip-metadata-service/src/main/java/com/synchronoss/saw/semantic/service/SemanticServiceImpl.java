@@ -20,6 +20,7 @@ import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -260,7 +261,9 @@ public class SemanticServiceImpl implements SemanticService {
     for (String dataSetId : semanticNode.getParentDataSetIds()) {
       logger.trace("Request URL to pull DataSet Details : " + requestUrl + dataSetId);
       dataSet = restTemplate.getForObject(requestUrl + dataSetId, DataSet.class);
-      node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
+      String datasetStr = objectMapper.writeValueAsString(dataSet);
+      String sanitizedDatasetStr = SipCommonUtils.sanitizeJson(datasetStr);
+      node = objectMapper.readTree(sanitizedDatasetStr);
       rootNode = (ObjectNode) node;
       systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());
       physicalLocation = systemNode.get(DataSetProperties.PhysicalLocation.toString()).asText();

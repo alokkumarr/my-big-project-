@@ -13,6 +13,7 @@ import { SQLEXEC_SAMPLE, ARTIFACT_SAMPLE } from '../sample-data';
 import APP_CONFIG from '../../../../../appConfig';
 
 const userProject = 'workbench';
+const categoryList = 'sip-category';
 
 @Injectable({
   providedIn: 'root'
@@ -222,6 +223,16 @@ export class WorkbenchService {
       })
     );
   }
+  
+  
+  retrievePreview(name: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews/${name}`;
+    return this.http.get(endpoint).pipe(
+      catchError((e: any) => {
+        return of(e);
+      })
+    );
+  }
 
   createSemantic(payload) {
     const endpoint = `${this.api}/internal/semantic/${userProject}/create`;
@@ -280,6 +291,34 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/datasets/search`;
     return this.http
       .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
+  /** GET datasets from the server */
+  getCategoryList(): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/proxy/storage/product-module/${categoryList}/configuration`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
+  /** GET list of allowable tags for workbech DS from the server */
+  getWorkbenchAllowableTagsList(): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/workbench/projects/${userProject}/metadata`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
+  /** GET list of allowable tags for all projects from the server */
+  getAllProjectsAllowableTagList(): Observable<any> {
+    const endpoint = `${this.api}/internal/workbench/projects/all/metadata`;
+    return this.http
+      .get(endpoint)
       .pipe(catchError(this.handleError('data', [])));
   }
 

@@ -21,7 +21,6 @@ import { ChartService } from '../../services';
 import {
   ArtifactColumnReport,
   AnalysisDSL,
-  SqlBuilderChart,
   AnalysisChartDSL,
   isDSLAnalysis,
   ChartOptions
@@ -121,42 +120,6 @@ export class ChartGridComponent {
     });
   }
 
-  /**
-   * Converts sipQuery to sqlBuilder like object for use in chart service.
-   * This is a non-ideal work-around made until we can locate all the places
-   * we need to change.
-   *
-   * @param {*} queryOrBuilder
-   * @returns {SqlBuilderChart}
-   * @memberof DesignerChartComponent
-   */
-  sipQueryToSQLBuilderFields(queryOrBuilder): SqlBuilderChart {
-    if (queryOrBuilder.nodeFields || queryOrBuilder.dataFields) {
-      return queryOrBuilder;
-    }
-
-    const builderLike: SqlBuilderChart = {
-      dataFields: [],
-      nodeFields: [],
-      filters: queryOrBuilder.filters,
-      sorts: queryOrBuilder.sorts,
-      orderByColumns: queryOrBuilder.orderByColumns,
-      booleanCriteria: queryOrBuilder.booleanCriteria
-    };
-
-    (queryOrBuilder.artifacts || []).forEach(table => {
-      (table.fields || []).forEach(column => {
-        if (['y', 'z'].includes(column.area)) {
-          builderLike.dataFields.push(column);
-        } else {
-          builderLike.nodeFields.push(column);
-        }
-      });
-    });
-
-    return builderLike;
-  }
-
   initChartOptions(analysis) {
     this.toggleToGrid = false;
     const { LEGEND_POSITIONING, LAYOUT_POSITIONS } = this._chartService;
@@ -195,6 +158,33 @@ export class ChartGridComponent {
     );
   }
 
+  /**
+   * For scatter charts, we can remove aggregates on y fields. If there
+   * are no aggregates, BE sends dates in a fixed format, regardless of
+   * format selected from FE.
+   *
+   * @returns
+   * @memberof ChartGridComponent
+   */
+  hasAggregatesInScatter() {
+    if (this.analysis.type !== 'chart') {
+      return true;
+    }
+
+    if (
+      (<AnalysisChartDSL>this.analysis).chartOptions.chartType !== 'scatter'
+    ) {
+      return true;
+    }
+
+    const aggregateYFields = this.analysis.sipQuery.artifacts[0].fields.filter(
+      field =>
+        (Boolean(field.aggregate) || Boolean(field.expression)) &&
+        field.area === 'y'
+    );
+    return aggregateYFields.length > 0;
+  }
+
   fetchColumnData(axisName, value) {
     let alias = axisName;
     const columns = this.analysis.sipQuery.artifacts[0].fields;
@@ -211,6 +201,35 @@ export class ChartGridComponent {
           (isDataField
             ? dataFieldToHuman(column.dataField)
             : column.displayName);
+
+        // const columnFormat = column.dateFormat;
+        // const {
+        //   dateFormat,
+        //   momentFormat
+        // } = this._chartService.getMomentDateFormat(
+        //   columnFormat,
+        //   get(<AnalysisChartDSL>this.analysis, 'chartOptions.chartType') ===
+        //     'comparison'
+        //     ? column.groupInterval
+        //     : null
+        // );
+        // const parseFormat = this.hasAggregatesInScatter()
+        //   ? dateFormat
+        //   : 'YYYY-MM-DD hh:mm:ss';
+
+        // value =
+        //   column.type === 'date'
+        //     ? moment
+        //         .utc(value, parseFormat)
+        //         .format(
+        //           momentFormat ||
+        //             (columnFormat === 'MMM d YYYY'
+        //               ? 'MMM DD YYYY'
+        //               : columnFormat === 'MMMM d YYYY, h:mm:ss a'
+        //               ? 'MMMM DD YYYY, h:mm:ss a'
+        //               : dateFormat)
+        //         )
+        //     : value;
         if (
           value &&
           (column.aggregate === 'percentage' || column.aggregate === 'avg')
@@ -269,7 +288,7 @@ export class ChartGridComponent {
       }
       res[field.columnName] = this._chartService.getMomentDateFormat(
         field.dateFormat
-      );
+      ).dateFormat;
       return res;
     }, {});
   }
@@ -353,6 +372,7 @@ export class ChartGridComponent {
         }
       });
     }
+
     return chartHeight;
   }
 

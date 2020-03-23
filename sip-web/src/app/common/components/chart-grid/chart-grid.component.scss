@@ -4,6 +4,9 @@ $header-padding-bottom: 12px;
 $header-font-size: 18px;
 
 :host {
+  display: block;
+  height: 100%;
+
   .title {
     margin: 0;
     padding: $header-padding-top 0 $header-padding-bottom;
@@ -35,6 +38,12 @@ $header-font-size: 18px;
     }
   }
 }
+
+map-box,
+map-chart-viewer {
+  height: calc(100% - 47px) !important;
+}
+
 .report-toggle {
   height: calc(100vh - 273px);
 }

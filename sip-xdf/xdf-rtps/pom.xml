@@ -40,10 +40,11 @@
 		<app.user>mapr</app.user>
 		<app.group>mapr</app.group>
 		<!-- deps versions -->
-		<spark-version>2.3.1</spark-version>
+		<spark-version>2.4.4</spark-version>
+    <spark-streaming-version>2.4.4.0-mapr-630</spark-streaming-version>
 		<scala.version>2.11</scala.version>
 		<mapr.client>6.1.0-mapr</mapr.client>
-		<es.version>6.3.0</es.version>
+		<es.version>7.6.0</es.version>
 		<scala.version.exclude>20_2.11</scala.version.exclude>
 
 		<junit.version>4.11</junit.version>
@@ -135,19 +136,11 @@
 		<!-- MapR specifics -->
 		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-kafka-0-10 -->
 		<dependency>
-	      <!-- TODO: Check on this version -->
 	      <groupId>org.apache.spark</groupId>
 	      <artifactId>spark-streaming-kafka-0-10_${scala.version}</artifactId>
-	      <version>2.3.2.0-mapr-1901</version>
+	      <version>${spark-streaming-version}</version>
 	      <scope>provided</scope>
     </dependency>
-		<dependency>
-	<!-- TODO: Check on this version -->
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-streaming-kafka-0-10_${scala.version}</artifactId>
-		<version>2.3.2.0-mapr-1901</version>
-		<scope>provided</scope>
-	</dependency>
 		<dependency>
 			<groupId>com.mapr.streams</groupId>
 			<artifactId>mapr-streams</artifactId>

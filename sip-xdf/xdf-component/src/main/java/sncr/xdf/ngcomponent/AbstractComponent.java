@@ -133,12 +133,15 @@ public abstract class AbstractComponent implements WithContext{
             throw new IllegalArgumentException("NGContext must not be null");
         ngctx.setStartTs();
         this.ngctx = ngctx;
-        logger.warn(this.ngctx.toString());
+        logger.debug(this.ngctx.toString());
         if (this.ngctx.serviceStatus.isEmpty())
             throw new IllegalArgumentException("NGContext is not initialized correctly");
     }
 
-    public AbstractComponent() {}
+    public AbstractComponent() {
+    	
+    	logger.debug("#########Hello Workbench from XDFNG!!");
+    }
 
     public String getError(){
         return error;
@@ -441,7 +444,7 @@ public abstract class AbstractComponent implements WithContext{
     private int initSpark(JavaSparkContext jsc){
         if (this instanceof WithSpark && ngctx.serviceStatus.containsKey(ComponentServices.Spark)) {
             if (ctx.extSparkCtx) {
-                SparkSession ss = new SparkSession(jsc.sc());
+                SparkSession ss = new SparkSession(jsc.sc().getOrCreate());
                 ((WithSpark) this).initSpark(ss, ctx, ngctx);
             }
             else{
@@ -510,6 +513,7 @@ public abstract class AbstractComponent implements WithContext{
         try {
             ctx = new InternalContext();
             ctx.extSparkCtx = (jsc != null);
+            ctx.javaSparkContext = jsc;
             ctx.fs = HFileOperations.getFileSystem();
             ctx.fc = HFileOperations.getFileContext();
         } catch (Exception e) {
@@ -872,7 +876,7 @@ public abstract class AbstractComponent implements WithContext{
         public TransformationService transformationMD;
     }
 
-    public void validateOutputDSCounts(long inputDSCount){
+    public void validateOutputDSCounts(long inputDSCount, boolean isPivotApplied){
         if(ngctx.componentConfiguration.isErrorHandlingEnabled()){
             logger.debug("inputDSCount : " + inputDSCount);
             String outDataSetName = null;
@@ -888,7 +892,7 @@ public abstract class AbstractComponent implements WithContext{
             logger.debug("outputDSCount : " + outputDSCount);
             if(outputDSCount == 0){
                 throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
-            }else if(inputDSCount > outputDSCount){
+            }else if(!isPivotApplied && inputDSCount > outputDSCount){
                 XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
                 errors.put(retCd.getCode(), retCd.getDescription(inputDSCount-outputDSCount));
             }
