@@ -10,6 +10,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.*;
 import scala.Tuple2;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import java.sql.Timestamp;
 
@@ -21,31 +23,38 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
     //TODO:: Output schema???
     public XdfObjectContextWithStaticSchema(JexlEngine engine, StructType inSchema, Row record) throws Exception {
         super(engine, inSchema, record);
-        String[] fieldNames = schema.fieldNames();
         String[] recordFieldNames = record.schema().fieldNames();
-        for (int i = 0; i < fieldNames.length; i++) {
-            targetRowTypes.put(fieldNames[i], schema.fields()[i]);
-            int fInx = findField(recordFieldNames, fieldNames[i]);
+        AtomicInteger fieldIndex = new AtomicInteger(0);
+        Arrays.stream(recordFieldNames).forEach(fieldName -> {
+            Object value = getValue(fieldName, fieldIndex.get());
+            fullRow.put(fieldName, value);
+            fieldIndex.getAndIncrement();
+        });
+        String[] fieldNames = schema.fieldNames();
+        int index = 0;
+        for (String fieldName : fieldNames) {
+            targetRowTypes.put(fieldName, schema.fields()[index]);
+            int fInx = findField(recordFieldNames, fieldName);
             if(fInx >= 0) {
-                if (!schema.fields()[i].dataType().sameType(record.schema().fields()[fInx].dataType())) {
+                if (!schema.fields()[index].dataType().sameType(record.schema().fields()[fInx].dataType())) {
                     throw new Exception("Explicit data type conversion is required " +
                             "if output schema is given. Do not use existing field " +
                             "name in output schema with different data type"
-                    + "\nSchema Field = " + schema.fields()[i]
+                    + "\nSchema Field = " + schema.fields()[index]
                     + "\nRecord Field = " + record.schema().fields()[fInx]
-                    + "\nSchema Field Type = " + schema.fields()[i].dataType()
+                    + "\nSchema Field Type = " + schema.fields()[index].dataType()
                     + "\nRecord Field Type = " + record.schema().fields()[fInx].dataType());
                 }
                 if (this.record.get(fInx) != null) {
-                    Object value = getValue(fieldNames[i], fInx);
+                    Object value = fullRow.get(fieldName);
                     if (value != null)
-                        targetRow.put(fieldNames[i], value);
-
+                        targetRow.put(fieldName, value);
                 }
             }
             else{
                 // Field not found
             }
+            index++;
         }
     }
 

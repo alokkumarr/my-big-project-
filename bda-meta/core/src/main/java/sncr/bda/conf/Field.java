@@ -28,6 +28,10 @@ public class Field {
 	@Expose
 	private String definitionFile;
 
+    @SerializedName("isFlatteningEnabled")
+    @Expose
+    private boolean isFlatteningEnabled = false;
+
 	/**
 	 * No args constructor for use in serialization
 	 * 
@@ -41,12 +45,13 @@ public class Field {
 	 * @param format
 	 * @param type
 	 */
-	public Field(String name, String type, String format, String model, String definitionFile) {
+	public Field(String name, String type, String format, String model, String definitionFile, boolean isFlatteningEnabled) {
 		this.name = name;
 		this.type = type;
 		this.format = format;
 		this.model = model;
 		this.definitionFile = definitionFile;
+        this.isFlatteningEnabled = isFlatteningEnabled;
 	}
 
 	/**
@@ -138,7 +143,20 @@ public class Field {
 		this.definitionFile = definitionFile;
 	}
 
-	@Override
+    public boolean isFlatteningEnabled() {
+        return isFlatteningEnabled;
+    }
+
+    public void setFlatteningEnabled(boolean isFlatteningEnabled) {
+        this.isFlatteningEnabled = isFlatteningEnabled;
+    }
+
+    public Field withFlatteningEnabled(boolean isFlatteningEnabled) {
+        this.isFlatteningEnabled = isFlatteningEnabled;
+        return this;
+    }
+
+    @Override
 	public boolean equals(Object other) {
 		if (other == this) {
 			return true;
@@ -147,8 +165,9 @@ public class Field {
 			return false;
 		}
 		Field rhs = ((Field) other);
-		return new EqualsBuilder().append(name, rhs.name).append(type, rhs.type).append(format, rhs.format).
-				append(model, rhs.model).append(definitionFile, rhs.definitionFile).isEquals();
+		return new EqualsBuilder().append(name, rhs.name).append(type, rhs.type).append(format, rhs.format)
+            .append(model, rhs.model).append(definitionFile, rhs.definitionFile)
+            .append(isFlatteningEnabled, rhs.isFlatteningEnabled).isEquals();
 	}
 
 }
