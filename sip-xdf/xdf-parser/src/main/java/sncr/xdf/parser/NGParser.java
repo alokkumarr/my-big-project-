@@ -5,6 +5,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Column;
@@ -28,6 +29,7 @@ import sncr.xdf.parser.parsers.NGParquetFileParser;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.parser.spark.ConvertToRow;
+import sncr.xdf.parser.spark.HeaderMapFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
@@ -44,6 +46,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Arrays;
 import java.util.Optional;
+
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
 import sncr.xdf.context.XDFReturnCode;
@@ -504,7 +507,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Dataset later on to insure output number of files.
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(sourcePath, outputNOF);
-        
+
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
         inputDSCount = rdd.count();
         if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
@@ -556,50 +559,41 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
-        // Files
-
-        for (FileStatus file : files) {
-            if (file.isFile()) {
-                String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
-
-                int retVal = parseSingleFile(file.getPath(), new Path(tempPath));
-                if (retVal == 0) {
-                    ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
-                } else {
-                    return retVal;
-                }
+            // Files
+            int retVal = parseMultipleFiles(new Path(tempDir));
+            if (retVal == 0) {
+               ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
+            } else {
+               return retVal;
             }
-        }
-        if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
-            throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
-        }
-        return 0;
+
+            if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
+                throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
+            }
+            return 0;
     }
 
 
-    private int parseSingleFile(Path file, Path destDir){
-        logger.trace("Parsing " + file + " to " + destDir +"\n");
+    private int parseMultipleFiles(Path destDir){
+        logger.trace("Parsing " + sourcePath + " files to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
 
-        JavaRDD<String> rdd = null;
-        
+        JavaPairRDD<String, String> javaPairRDD;
         if(this.ctx.extSparkCtx) {
-
-        	logger.debug("##### Using existing JavaSparkContext ...");
-        	rdd = this.ctx.javaSparkContext
-                    .textFile(file.toString(), 1);
+            logger.debug("##### Using existing JavaSparkContext ...");
+            javaPairRDD = this.ctx.javaSparkContext.wholeTextFiles(new Path(sourcePath).toString(), outputNOF);
         } else {
-        	logger.debug("##### Crating new JavaSparkContext ...");
-        	JavaSparkContext context  = new JavaSparkContext(ctx.sparkSession.sparkContext());
-        	rdd = context
-                    .textFile(file.toString(), 1);
+            logger.debug("##### Crating new JavaSparkContext ...");
+            javaPairRDD = new JavaSparkContext(ctx.sparkSession.sparkContext())
+                .wholeTextFiles(new Path(sourcePath).toString(), outputNOF);
         }
 
-        JavaRDD<String> rddWithoutHeader = rdd
+        JavaRDD<String> rddWithoutHeader = javaPairRDD
+                // Filter out header based on line number from all values
+                .flatMapValues(new HeaderMapFilter(headerSize, lineSeparator))
+                .values()
                 // Add line numbers
                 .zipWithIndex()
-                // Filter out header based on line number
-                .filter(new HeaderFilter(headerSize))
                 // Get rid of file numbers
                 .keys();
         long rddCount = rddWithoutHeader.count();
@@ -621,10 +615,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             logger.debug("Output rdd length = " + recCounter.value() + "\n");
             logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
-            logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
+            logger.debug("Dest dir for file " + sourcePath + " = " + destDir + "\n");
 
             rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
-            logger.debug("************************************** Dest dir for file " + file + " = " + destDir + "\n");
+            logger.debug("************************************** Dest dir for file " + sourcePath + " = " + destDir + "\n");
 
             logger.debug("Write dataset status = " + rc);
 
