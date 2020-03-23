@@ -153,7 +153,7 @@ public class NGSQLScriptDescriptor {
     public void parseSQLScript(){
 
         URL location = Preconditions.class.getResource('/' + Preconditions.class.getName().replace('.', '/') + ".class");
-        logger.info("Logger for presto guava test :" + location.getPath());
+        logger.info("Logger for presto guava test library :" + location.getPath());
         try{
             logger.debug("Step 4: Parse SQL Script");
             if (script == null ) {
