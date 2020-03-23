@@ -5,6 +5,7 @@ import { Observable, of, SubscriptionLike } from 'rxjs';
 import * as union from 'lodash/union';
 import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
 
 import { WorkbenchService } from '../../services/workbench.service';
 
@@ -40,19 +41,21 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
     this.streamResult$ = this._workbench.getListOfStreams();
 
     this.streamResult$.subscribe(result => {
-      let cols;
-      forEach(result, item => {
-        cols = union(cols, keys(item));
-      });
-      cols.shift();
-      const stream = [];
-      forEach(cols, col => {
-        stream.push({
-          streamTitle: col,
-          streamId: col
+      if (!isEmpty(result)) {
+        let cols;
+        forEach(result, item => {
+          cols = union(cols, keys(item));
         });
-      });
-      this.streamData$ = of(stream);
+        cols.shift();
+        const stream = [];
+        forEach(cols, col => {
+          stream.push({
+            streamTitle: col,
+            streamId: col
+          });
+        });
+        this.streamData$ = of(stream);
+      }
     });
   }
 
