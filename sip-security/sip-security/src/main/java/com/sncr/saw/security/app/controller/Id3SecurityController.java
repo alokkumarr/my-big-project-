@@ -339,8 +339,7 @@ public class Id3SecurityController {
     final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
     if (customerSysId == null || customerSysId == 0) {
       httpResponse.sendError(
-          HttpStatus.INTERNAL_SERVER_ERROR.value(), "Role Name can't be blank or empty.");
-      response.setValid(false);
+          HttpStatus.BAD_REQUEST.value(), "Product and Module does not exist for this user.");
       response.setMessage("Product and Module does not exist for this user.");
       response.setProductName(productName);
       response.setModuleName(moduleName);
@@ -397,6 +396,11 @@ public class Id3SecurityController {
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    if (id3user.getCustomerCode() != userDetails.getCustomerCode()) {
+      logger.error("Token is not valid for the request");
+      response.sendError(HttpStatus.UNAUTHORIZED.value(), "Token is not valid for the request");
+      return null;
+    }
     String roleType = id3user.getRoleType();
     String masterLoginId = id3Claims.getMasterLoginId();
 
@@ -447,6 +451,11 @@ public class Id3SecurityController {
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
+      return null;
+    }
+    if (id3User.getCustomerCode() != userDetails.getCustomerCode()) {
+      logger.error("Token is not valid for the request");
+      response.sendError(HttpStatus.UNAUTHORIZED.value(), "Token is not valid for the request");
       return null;
     }
     String roleType = id3User.getRoleType();
@@ -514,8 +523,10 @@ public class Id3SecurityController {
       userDetailsResponse.setValidityMessage("User details fetched successfully");
       userDetailsResponse.setError("");
     } else {
-      logger.error("User Type isn't Admin, can't perform this operation");
-      response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.unAuthorizedMessage);
+      logger.error("User does't exists / " + "Error occurred while fetching the user details");
+      response.sendError(
+          HttpStatus.BAD_REQUEST.value(),
+          "User does't exists / " + "Error occurred while fetching the user details");
       return null;
     }
     return userDetailsResponse;
