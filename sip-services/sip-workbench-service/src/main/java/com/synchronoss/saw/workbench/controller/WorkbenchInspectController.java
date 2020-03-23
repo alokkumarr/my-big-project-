@@ -8,10 +8,12 @@ import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -44,7 +46,22 @@ public class WorkbenchInspectController {
 	private RestUtil restUtil;
 
 	private RestTemplate restTemplate = null;
+	
+	@Value("${workbench.rtis-stream-base}")
+	@NotNull
+	private String rtisBasePath;
+	
+	@Value("${workbench.rtis-appkeys-url}")
+	@NotNull
+	private String rtisAppkeysUrl;
+	
+	@Value("${workbench.rtis-config-url}")
+	@NotNull
+	private String rtisConfigUrl;
+	
+	
 
+	  
 	@PostConstruct
 	public void init() {
 		restTemplate = restUtil.restTemplate();
@@ -63,7 +80,7 @@ public class WorkbenchInspectController {
 		logger.debug("Authroization header.....####" + req.
 				getHeader("Authorization"));
 		ResponseEntity<Object[]> appKeys = restTemplate.
-				exchange("http://localhost:9501/internal/rtisconfig/appKeys",
+				exchange(this.rtisAppkeysUrl,
 				HttpMethod.GET, entity, Object[].class, new Object[0]);
 		logger.debug(appKeys.toString());
 
@@ -78,7 +95,7 @@ public class WorkbenchInspectController {
 			logger.debug("########" + appKey.asText());
 
 			ResponseEntity<Object[]> config = restTemplate.exchange(
-					"http://localhost:9501/internal/rtisconfig/config/" 
+					this.rtisConfigUrl 
 			+ appKey.asText(), HttpMethod.GET, entity,
 					Object[].class, new Object[0]);
 			logger.debug("##### config response ###" + config.toString());
@@ -109,9 +126,11 @@ public class WorkbenchInspectController {
 		logger.debug("Stream Name :::" + stream);
 		List<JsonNode> entities = new ArrayList<JsonNode>();
 		
-			MessageStore store = null;
+		logger.debug("#####stream name:::"+ stream);
+			
+		MessageStore store = null;
 			try {
-				store = (MessageStore) Streams.getMessageStore("/var/sip/streams/stream_1");
+				store = (MessageStore) Streams.getMessageStore(rtisBasePath + "/" +stream  );
 			} catch (IOException exception) {
 				logger.error(exception.getMessage());
 			}
