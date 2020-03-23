@@ -96,6 +96,10 @@
       <scope>${s-value}</scope>
       <exclusions>
         <exclusion>
+          <groupId>org.apache.hive</groupId>
+          <artifactId>hive-exec</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
         </exclusion>
@@ -120,6 +124,10 @@
 	<artifactId>spark-sql_2.11</artifactId>
       <scope>${s-value}</scope>
       <exclusions>
+        <exclusion>
+          <groupId>org.apache.hive</groupId>
+          <artifactId>hive-exec</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
@@ -187,6 +195,10 @@
       <scope>${s-value}</scope>
       <exclusions>
         <exclusion>
+          <groupId>org.apache.hive</groupId>
+          <artifactId>hive-exec</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
         </exclusion>
@@ -197,6 +209,10 @@
       <artifactId>mapr-streams</artifactId>
       <version>${mapr.streams.version}</version>
       <exclusions>
+        <exclusion>
+          <groupId>org.apache.hive</groupId>
+          <artifactId>hive-exec</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.apache.kafka</groupId>
           <artifactId>kafka-clients</artifactId>
@@ -267,6 +283,17 @@
       <artifactId>guava</artifactId>
       <version>28.2-jre</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-exec</artifactId>
+      <version>1.2.0-mapr-spark-MEP-6.0.0-1901</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/log4j/log4j -->
     <dependency>
         <groupId>log4j</groupId>
@@ -332,8 +359,7 @@
       <artifactId>meta-api</artifactId>
       <version>${revision}</version>
     </dependency>
-<!-- BDA Internal dependencies END -->
-
+  <!-- BDA Internal dependencies END -->
 
   </dependencies>
   <!--/dependencyManagement-->
