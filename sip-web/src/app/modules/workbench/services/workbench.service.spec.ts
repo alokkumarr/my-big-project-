@@ -98,4 +98,16 @@ describe('Workbench Service', () => {
       workbenchService.getAllProjectsAllowableTagList() instanceof Observable
     ).toBeTruthy();
   });
+
+  it('should fetch list of names of streams and topics ', () => {
+    expect(
+      workbenchService.getListOfStreams() instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('should fetch data for topic grid ', () => {
+    expect(
+      workbenchService.getListOfTopics('streams_!') instanceof Observable
+    ).toBeTruthy();
+  });
 });
