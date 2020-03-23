@@ -1,9 +1,9 @@
-<div *ngIf="!isTileSizeOk" class="small-tile--message">
+<div [ngClass]="{ hidden: isTileSizeOk }" class="small-tile--message">
   <h2>
     This KPI needs a bigger size to be displayed properly.
   </h2>
 </div>
-<div *ngIf="isTileSizeOk">
+<div [ngClass]="{ hidden: !isTileSizeOk }">
   <div class="filter-icon-bullet" *ngIf="_kpi.filters.length > 1">
     <mat-icon
       class="mat-icon icon-info-solid"

@@ -12,11 +12,53 @@ import static org.apache.spark.sql.functions.explode_outer;
 import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.size;
 import java.util.Arrays;
+import java.util.Optional;
+import sncr.xdf.context.InternalContext;
+import sncr.xdf.services.WithDataSet;
+import sncr.bda.core.file.HFileOperations;
+import org.apache.hadoop.fs.Path;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class Flattener {
     private static final Logger logger = Logger.getLogger(Flattener.class);
     private static final String SPARK_COLUMN_NAME_DELIMITER = ".";
     private static final String NEW_COLUMN_NAME_DELIMITER = "_";
+
+    public Flattener(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper){
+        setCheckpointDir(ctx, withDataSet, datasetHelper);
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param withDataSet
+     * @param datasetHelper
+     *
+     * setCheckpointDir() gets temp checkpoint directory path and assign as checkpointDir to SparkContext.
+     * checkpointDir is require to apply checkpoint on Spark Dataset.
+     * checkpoint is require in Flattening because of too many transformations apply if it is nested structure.
+     * if there are too many transformations then Spark DAG will break. Checkpoint will help DAG to remember all transformations.
+     *
+     */
+    private void setCheckpointDir(InternalContext ctx, WithDataSet withDataSet, WithDataSet.DataSetHelper datasetHelper) {
+        try {
+            String checkpointDir = withDataSet.generateCheckpointLocation(datasetHelper, null, null);
+            if (ctx.fs.exists(new Path(checkpointDir))) {
+                HFileOperations.deleteEnt(checkpointDir);
+            }
+            HFileOperations.createDir(checkpointDir);
+            ctx.sparkSession.sparkContext().setCheckpointDir(checkpointDir);
+        }catch (Exception e) {
+            logger.error("Exception in creating checkpoint Dir : ", e);
+            if (e instanceof XDFException) {
+                throw ((XDFException) e);
+            } else {
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
+            }
+        }
+    }
 
     public Dataset<Row> flattenDataset(Dataset<Row> dataset){
         StructType dsSchema = dataset.schema();
@@ -29,15 +71,19 @@ public class Flattener {
             DataType datatype = field.dataType();
             logger.debug("Field Type : "+ datatype);
             if(datatype instanceof StructType){
-                dataset = processStructType(dataset, field.name(), (StructType)datatype);
+                StructType newStructType = NGComponentUtil.getSanitizedStructType((StructType)datatype);
+                dataset = NGComponentUtil.changeColumnType(dataset, name, newStructType);
+                dataset = processStructType(dataset, name, newStructType);
             }else if(datatype instanceof ArrayType){
-                dataset = processArrayType(dataset, field.name(), (ArrayType)datatype);
+                ArrayType newArrayType = NGComponentUtil.getSanitizedArrayType((ArrayType)datatype);
+                dataset = NGComponentUtil.changeColumnType(dataset, name, newArrayType);
+                dataset = processArrayType(dataset, name, newArrayType);
             }
         }
         return dataset;
     }
 
-    private Dataset<Row> processStructType(Dataset<Row> dataset, String parentColName, StructType structType){
+    public Dataset<Row> processStructType(Dataset<Row> dataset, String parentColName, StructType structType){
         logger.debug("Processing StructType Field");
         logger.debug("Parent Column Name : "+ parentColName);
         StructField[] subFields = structType.fields();
@@ -69,7 +115,7 @@ public class Flattener {
         return dataset;
     }*/
 
-    private Dataset<Row> processArrayType(Dataset<Row> dataset, String parentColName, ArrayType arrayType){
+    public Dataset<Row> processArrayType(Dataset<Row> dataset, String parentColName, ArrayType arrayType){
         logger.debug("Processing ArrayType Field");
         logger.debug("Parent Column Name : "+ parentColName);
         int arrSize = getArrayFieldMaxSize(dataset, parentColName);
@@ -94,7 +140,7 @@ public class Flattener {
         return dataset;
     }
 
-    private int getArrayFieldMaxSize(Dataset<Row> dataset, String arrayColName){
+    public int getArrayFieldMaxSize(Dataset<Row> dataset, String arrayColName){
         String newSizeColumn = arrayColName + NEW_COLUMN_NAME_DELIMITER + "arrSize";
         Dataset<Row> arraySizeDS = dataset.withColumn(newSizeColumn,size(dataset.col(arrayColName)));
         int arrSize = arraySizeDS.agg(max(arraySizeDS.col(newSizeColumn))).head().getInt(0);

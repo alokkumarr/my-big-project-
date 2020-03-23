@@ -87,11 +87,13 @@ function getFieldLabelWithAggregateFun(field) {
   /* Don't try to apply aggregate to a derived metric */
   if (field.expression) {
     return field.alias || `${field.displayName}`;
-  } else {
+  } else if (field.aggregate) {
     const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
     return (
       field.alias || `${aggregate}(${displayNameWithoutAggregateFor(field)})`
     );
+  } else {
+    return field.alias || `${displayNameWithoutAggregateFor(field)}`;
   }
 }
 

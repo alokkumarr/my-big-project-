@@ -17,13 +17,17 @@ export class DesignerDateIntervalSelectorComponent implements OnInit {
   constructor(private _store: Store) {}
 
   ngOnInit() {
-    const chartType = this._store.selectSnapshot(
-      state => state.designerState.analysis.chartOptions.chartType
+    const analysis = this._store.selectSnapshot(
+      state => state.designerState.analysis
     );
-    this.DATE_INTERVALS =
-      chartType === 'comparison'
-        ? COMPARISON_CHART_DATE_INTERVALS
-        : DATE_INTERVALS;
+    if (
+      analysis.type === 'chart' &&
+      analysis.chartOptions.chartType === 'comparison'
+    ) {
+      this.DATE_INTERVALS = COMPARISON_CHART_DATE_INTERVALS;
+    } else {
+      this.DATE_INTERVALS = DATE_INTERVALS;
+    }
   }
 
   onDateIntervalChange(groupInterval) {
