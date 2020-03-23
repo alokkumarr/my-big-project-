@@ -14,13 +14,7 @@
     <dependency>
       <groupId>com.mapr.db</groupId>
       <artifactId>maprdb</artifactId>
-        <exclusions>
-            <exclusion>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-            </exclusion>
-        </exclusions>
-        <version>${maprdb.version}</version>
+      <version>${maprdb.version}</version>
       <scope>${scope-value}</scope>
     </dependency>
     <dependency>
@@ -33,10 +27,6 @@
           <groupId>org.slf4j</groupId>
           <artifactId>log4j-over-slf4j</artifactId>
         </exclusion>
-          <exclusion>
-              <groupId>com.google.guava</groupId>
-              <artifactId>guava</artifactId>
-          </exclusion>
       </exclusions>
     </dependency>
       <dependency>
