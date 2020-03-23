@@ -1,18 +1,14 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import {
-  USER_ANALYSIS_CATEGORY_NAME,
-  USER_ANALYSIS_SUBCATEGORY_NAME
-} from '../../../../common/consts';
-import {
   validateEntityName,
   entityNameErrorMessage
 } from './../../../../common/validators/field-name-rule.validator';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatCheckboxChange } from '@angular/material';
+import { MatSelectChange } from '@angular/material';
 import { AnalyzeService } from '../../services/analyze.service';
 import { PRIVILEGES } from '../../consts';
-import * as find from 'lodash/find';
 import { AnalysisDSL } from '../../types';
+import { JwtService } from 'src/app/common/services';
 
 @Component({
   selector: 'designer-save',
@@ -27,16 +23,17 @@ export class DesignerSaveComponent implements OnInit {
   @Input() public analysis: AnalysisDSL;
   @Input() public designerMode: string;
 
-  publishingToParentCategory = false;
   categories = [];
 
-  userCategoryName = USER_ANALYSIS_CATEGORY_NAME;
-  userSubCategoryName = USER_ANALYSIS_SUBCATEGORY_NAME;
-  parentCategory = null;
+  userSubCategoryId = +this.jwtService.userAnalysisCategoryId;
 
   public saveForm: FormGroup;
 
-  constructor(public fb: FormBuilder, private analyzeService: AnalyzeService) {}
+  constructor(
+    public fb: FormBuilder,
+    private analyzeService: AnalyzeService,
+    private jwtService: JwtService
+  ) {}
 
   ngOnInit() {
     this.saveForm = this.fb.group({
@@ -59,29 +56,6 @@ export class DesignerSaveComponent implements OnInit {
       this.categories = await this.analyzeService.getCategories(
         PRIVILEGES.PUBLISH
       );
-      const parentAnalysis = await this.analyzeService.readAnalysis(
-        this.analysis.parentAnalysisId,
-        true
-      );
-
-      this.parentCategory = this.categories.reduce((result, cat) => {
-        if (result) {
-          return result;
-        }
-
-        const subCategory = find(
-          cat.children,
-          subCat => subCat.id.toString() === parentAnalysis.category.toString()
-        );
-        if (subCategory) {
-          return {
-            id: cat.id,
-            name: cat.name,
-            subCategoryId: subCategory.id,
-            subCategoryName: subCategory.name
-          };
-        }
-      }, null);
     } catch (error) {
       throw error;
     }
@@ -117,27 +91,11 @@ export class DesignerSaveComponent implements OnInit {
     this.descriptionChange.emit(description);
   }
 
-  getDestinationCategoryName() {
-    return this.publishingToParentCategory && this.parentCategory
-      ? this.parentCategory.name
-      : this.userCategoryName;
-  }
-
-  getDestinationSubCategoryName() {
-    return this.publishingToParentCategory && this.parentCategory
-      ? this.parentCategory.subCategoryName
-      : this.userSubCategoryName;
-  }
-
-  onCategorySelect(event) {
-    console.log(event);
-  }
-
-  onPublishToggle({ checked }: MatCheckboxChange) {
-    this.publishingToParentCategory = checked;
-
-    this.parentPublishChange.emit(
-      checked && this.parentCategory ? this.parentCategory.subCategoryId : null
-    );
+  onCategorySelect({ value }: MatSelectChange) {
+    if (+value === this.userSubCategoryId) {
+      this.parentPublishChange.emit(null);
+    } else {
+      this.parentPublishChange.emit(value);
+    }
   }
 }
