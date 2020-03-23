@@ -396,7 +396,7 @@ public class Id3SecurityController {
     }
     Id3User id3user = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
-    if (id3user.getCustomerCode() != userDetails.getCustomerCode()) {
+    if (!id3user.getCustomerCode().equalsIgnoreCase(userDetails.getCustomerCode())) {
       logger.error("Token is not valid for the request");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), "Token is not valid for the request");
       return null;
@@ -453,7 +453,7 @@ public class Id3SecurityController {
     }
     Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
-    if (id3User.getCustomerCode() != userDetails.getCustomerCode()) {
+    if (!id3User.getCustomerCode().equalsIgnoreCase(userDetails.getCustomerCode())) {
       logger.error("Token is not valid for the request");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), "Token is not valid for the request");
       return null;
