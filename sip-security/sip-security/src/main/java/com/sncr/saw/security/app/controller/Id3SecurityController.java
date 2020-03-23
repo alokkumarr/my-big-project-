@@ -314,11 +314,11 @@ public class Id3SecurityController {
     }
 
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     if (id3Claims == null) {
       httpResponse.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     String roleType = id3User.getRoleType();
     String masterLoginId = id3User.getUserId();
     if (masterLoginId != null && !roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
@@ -389,13 +389,13 @@ public class Id3SecurityController {
       @RequestHeader("Authorization") String id3token)
       throws IOException {
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3user = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
-    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3user = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
+    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (id3user.getCustomerCode() != userDetails.getCustomerCode()) {
       logger.error("Token is not valid for the request");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), "Token is not valid for the request");
@@ -446,13 +446,13 @@ public class Id3SecurityController {
       @RequestHeader("Authorization") String id3token)
       throws IOException {
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
-    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
+    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (id3User.getCustomerCode() != userDetails.getCustomerCode()) {
       logger.error("Token is not valid for the request");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), "Token is not valid for the request");
@@ -502,14 +502,14 @@ public class Id3SecurityController {
       throws IOException {
     // Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
-    String roleType = id3User.getRoleType();
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
+    String roleType = id3User.getRoleType();
     if (!roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
       logger.error("User Type isn't Admin, can't perform this operation");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.unAuthorizedMessage);
@@ -553,14 +553,14 @@ public class Id3SecurityController {
       throws IOException {
     // Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
-    String roleType = id3User.getRoleType();
-    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
+    String roleType = id3User.getRoleType();
+    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (!roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
       logger.error("User Type isn't Admin, can't perform this operation");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.unAuthorizedMessage);
@@ -611,14 +611,15 @@ public class Id3SecurityController {
       throws IOException {
     // Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
-    String roleType = id3User.getRoleType();
-    UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
+
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
+    String roleType = id3User.getRoleType();
+    UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
     if (!roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
       logger.error("User Type isn't Admin, can't perform this operation");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.unAuthorizedMessage);
@@ -645,6 +646,11 @@ public class Id3SecurityController {
       throws IOException {
     // Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
+    if (id3Claims == null) {
+      logger.error("Invalid Token");
+      response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
+      return null;
+    }
     Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     Long customerId = id3User.getCustomerSysId();
     String createdBy = "System";
@@ -729,13 +735,12 @@ public class Id3SecurityController {
 
     // Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
-
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     String roleType = id3User.getRoleType();
 
     if (!roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
@@ -771,13 +776,12 @@ public class Id3SecurityController {
     // Ticket ticket = SipCommonUtils.getTicket(request);
 
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
-
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     String roleType = id3User.getRoleType();
 
     if (!roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
@@ -815,14 +819,15 @@ public class Id3SecurityController {
 
     //  Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
-    String roleType = id3User.getRoleType();
-    Valid valid;
+
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
+    String roleType = id3User.getRoleType();
+    Valid valid;
     if (!roleType.equalsIgnoreCase(RoleType.ADMIN.name())) {
       logger.error("Invalid user");
       response.sendError(
@@ -873,12 +878,13 @@ public class Id3SecurityController {
 
     // Ticket ticket = SipCommonUtils.getTicket(request);
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
-    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
+
     if (id3Claims == null) {
       logger.error("Invalid Token");
       response.sendError(HttpStatus.UNAUTHORIZED.value(), ErrorMessages.INVALID_TOKEN);
       return null;
     }
+    Id3User id3User = id3Repository.getId3Userdetails(id3Claims.getMasterLoginId());
     Long customerId = id3User.getCustomerSysId();
 
     String roleType = id3User.getRoleType();
