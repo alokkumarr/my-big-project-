@@ -60,10 +60,6 @@ public class EmailNotifier implements Notifier {
   @NotNull
   private String notificationLogTable;
 
-  @Value("${sip.service.metastore.alertRulesTable}")
-  @NotNull
-  private String alertRulesMetadata;
-
   @Value("${sip.service.alert.unsubscribe.url}")
   private String alertUnsubscribePath;
 
@@ -78,6 +74,22 @@ public class EmailNotifier implements Notifier {
 
   private AlertRuleDetails alertRule;
 
+  public String getAlertTriggerSysId() {
+    return alertTriggerSysId;
+  }
+
+  public void setAlertTriggerSysId(String alertTriggerSysId) {
+    this.alertTriggerSysId = alertTriggerSysId;
+  }
+
+  public AlertRuleDetails getAlertRule() {
+    return alertRule;
+  }
+
+  public void setAlertRule(AlertRuleDetails alertRule) {
+    this.alertRule = alertRule;
+  }
+
   public EmailNotifier() {}
 
   public EmailNotifier(AlertRuleDetails alertRule, String alertTriggerSysId) {
@@ -87,6 +99,8 @@ public class EmailNotifier implements Notifier {
 
   @Override
   public void notify(String content) {
+    logger.info("checking null pointer inside notify : {}",
+        alertRule.getAlertRuleName(), alertTriggerSysId);
     sendMailNotification(alertRule, alertTriggerSysId);
   }
 
@@ -98,7 +112,10 @@ public class EmailNotifier implements Notifier {
    */
   public void sendMailNotification(AlertRuleDetails alertRulesDetails, String alertTriggerSysId) {
     logger.info("sending email notification");
+    logger.info("secret key : {}", secretKey);
     AlertNotificationLog notificationLog = new AlertNotificationLog();
+    logger.info("checking null pointers : {}",
+        alertRulesDetails.getAlertRuleName(), alertTriggerSysId);
     notificationLog.setAlertRuleName(alertRulesDetails.getAlertRuleName());
     notificationLog.setThresholdValue(alertRulesDetails.getThresholdValue());
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());

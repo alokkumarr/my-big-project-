@@ -29,6 +29,8 @@ public class AlertNotifier {
 
   @Autowired Notifier notifier;
 
+  @Autowired EmailNotifier emailNotifier;
+
   @Value("${sip.service.metastore.base}")
   @NotNull
   private String basePath;
@@ -62,6 +64,9 @@ public class AlertNotifier {
 //          notifier.notify();
 
 //          sendMailNotification(alertRule, alertTriggerSysId);
+          emailNotifier.setAlertRule(alertRule);
+          emailNotifier.setAlertTriggerSysId(alertTriggerSysId);
+          notifier = emailNotifier;
           notifier.notify("email");
         } else {
           String msg =
@@ -83,7 +88,7 @@ public class AlertNotifier {
         saveNotificationStatus(notificationLog);
       }
     } catch (Exception e) {
-      logger.error("Exeception occured while sending notification" + e);
+      logger.error("Exeception occured while sending notification {}", e.getStackTrace());
     }
   }
 
