@@ -39,9 +39,9 @@ public class ValidateId3IdentityToken {
     String masterLoginId = null;
     String id3DomainName = null;
     String clientId = null;
-    Id3Claims id3Claims = new Id3Claims();
+    Id3Claims id3Claims = null;
     try {
-      String[] jwtParts = token.split(TokenParser.SEPARATOR);
+      String[] jwtParts = token.replace("Bearer ","").split(TokenParser.SEPARATOR);
       ObjectMapper objectMapper = new ObjectMapper();
       if (jwtParts.length == 3) {
         String payload = new String(Base64.getDecoder().decode(jwtParts[1]));
@@ -65,9 +65,10 @@ public class ValidateId3IdentityToken {
               .withIssuer(issuer)
               // add more checks here if you like
               .build(); // Reusable verifier instance
-      DecodedJWT jwt = verifier.verify(token);
+      DecodedJWT jwt = verifier.verify(token.replace("Bearer ",""));
       if (jwt.getAlgorithm().equalsIgnoreCase("RS256")
           && id3Repository.validateId3Request(masterLoginId, id3DomainName, clientId)) {
+          id3Claims = new Id3Claims();
         id3Claims.setClientId(jwt.getClaims().get("aud").asString());
         id3Claims.setDomainName(id3DomainName);
         id3Claims.setType(Id3Claims.Type.BEARER);
