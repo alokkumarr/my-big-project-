@@ -29,6 +29,7 @@ import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as unionWith from 'lodash/unionWith';
 
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -354,19 +355,16 @@ export class DashboardGridComponent
 
       let gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
 
-      // Global filters are being ignored by backend. Set that property
-      // false to make them execute properly.
-      gFilters = map(gFilters, f => {
-        if (f.model) {
-          f.isGlobalFilter = false;
-        }
-        return f;
-      });
+      if (isEmpty(tile.origAnalysis.sipQuery.filters)) {
+        tile.origAnalysis.sipQuery.filters = [{
+          booleanCriteria: "AND",
+          filters: gFilters
+        }]
+      } else {
+        this.addGlobalValuestoFilters(tile.origAnalysis.sipQuery.filters, gFilters);
+      }
 
-      const combinedFilters = this._filterService
-        .mergeValuedRuntimeFiltersIntoFilters(gFilters, tile.origAnalysis.sipQuery.filters);
-
-      const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters: combinedFilters } };
+      const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters: tile.origAnalysis.sipQuery.filters } };
       tile.analysis = {
         ...tile.origAnalysis,
         ...{ sipQuery },
@@ -375,6 +373,46 @@ export class DashboardGridComponent
 
       this.dashboard.splice(id, 1, { ...tile });
     });
+  }
+
+  addGlobalValuestoFilters(tree, gFilters) {
+    forEach(tree, a => {
+      if (a.filters) {
+        const globalFilters = cloneDeep(gFilters);
+        a.filters = unionWith(
+          globalFilters,
+          a.filters,
+          (gFilt, filt) =>
+            (gFilt.tableName || gFilt.artifactsName) ===
+              (filt.tableName || filt.artifactsName) &&
+            gFilt.columnName === filt.columnName &&
+            gFilt.isAggregationFilter === filt.isAggregationFilter &&
+            gFilt.isGlobalFilter === filt.isGlobalFilter &&
+            gFilt.isGlobalFilter
+        );
+        forEach(a.filters, filter => {
+          if (filter.filters) {
+            filter.filters = unionWith(
+              globalFilters,
+              filter.filters,
+              (gFilt, filt) =>
+                (gFilt.tableName || gFilt.artifactsName) ===
+                  (filt.tableName || filt.artifactsName) &&
+                gFilt.columnName === filt.columnName &&
+                gFilt.isAggregationFilter === filt.isAggregationFilter &&
+                gFilt.isGlobalFilter === filt.isGlobalFilter &&
+                gFilt.isGlobalFilter
+            );
+            this.addGlobalValuestoFilters(filter.filters, gFilters);
+          } else {
+            if (filter.model) {
+              filter.isGlobalFilter = false;
+            }
+          }
+        })
+      }
+    })
+
   }
 
   refreshKPIs() {
