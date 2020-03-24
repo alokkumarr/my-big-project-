@@ -45,7 +45,6 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
 import { ObserveService } from '../../services/observe.service';
 import { AnalyzeService } from 'src/app/modules/analyze/services/analyze.service';
-import { FilterService } from 'src/app/modules/analyze/services/filter.service'
 import { isDSLAnalysis } from 'src/app/common/types';
 
 const MARGIN_BETWEEN_TILES = 10;
@@ -103,8 +102,7 @@ export class DashboardGridComponent
     private sidenav: SideNavService,
     private _dialog: MatDialog,
     private _analyzeService: AnalyzeService,
-    private store: Store,
-    private _filterService: FilterService
+    private store: Store
   ) {}
 
   ngOnInit() {
