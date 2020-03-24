@@ -12,8 +12,10 @@ import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.modal.SubscriberStatus;
 import com.synchronoss.sip.alert.service.AlertService;
+import com.synchronoss.sip.alert.service.SubscriberService;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
@@ -65,6 +67,7 @@ public class SipAlertController {
 
   @Autowired private AlertUtils utils;
   @Autowired private AlertService alertService;
+  @Autowired private SubscriberService subscriberService;
 
   private static final String ACCESS = "Access";
   private static final String VIEW_ALERT = "View Alerts";
@@ -598,6 +601,22 @@ public class SipAlertController {
       return utils.validatePermissionResponse(response, ACCESS);
     }
     return alertService.retrieveMonitoringType(ticket);
+  }
+
+  @ApiOperation(value = "/subscriber/deactivate", response = String.class)
+  @RequestMapping(
+      value = "/subscriber/addAll",
+      method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public void addSubscribers(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody List<NotificationSubscriber> subscribers) {
+    if (subscribers == null || subscribers.size() == 0) {
+      // Throw error here
+    }
+    subscriberService.addSubscribers(subscribers);
   }
 
   /**

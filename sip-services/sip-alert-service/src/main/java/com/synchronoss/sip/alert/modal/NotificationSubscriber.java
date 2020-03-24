@@ -3,6 +3,9 @@ package com.synchronoss.sip.alert.modal;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class NotificationSubscriber {
   @JsonProperty("subscriberId")
@@ -14,8 +17,15 @@ public class NotificationSubscriber {
   @JsonProperty("subscriberName")
   private String subscriberName;
 
+  @JsonProperty("channelType")
+  @ApiModelProperty(notes = "SIP supported Channel Types", name = "channelType")
+  private NotificationChannelType channelType;
+
   @JsonProperty("channelValue")
   private String channelValue;
+
+  @JsonProperty("customerCode")
+  private String customerCode;
 
   @JsonProperty("active")
   private Boolean active;
@@ -25,10 +35,6 @@ public class NotificationSubscriber {
 
   @JsonProperty("modifiedTime")
   private Date modifiedTime;
-
-  @JsonProperty("NotificationChannel")
-  @ApiModelProperty(notes = "SIP supported Channel Types", name = "NotificationChannel")
-  private NotificationChannel notificationChannel;
 
   @JsonProperty("subscriberId")
   public String getSubscriberId() {
@@ -58,16 +64,6 @@ public class NotificationSubscriber {
   @JsonProperty("subscriberName")
   public void setSubscriberName(String subscriberName) {
     this.subscriberName = subscriberName;
-  }
-
-  @JsonProperty("channelValue")
-  public String getChannelValue() {
-    return channelValue;
-  }
-
-  @JsonProperty("channelValue")
-  public void setChannelValue(String channelValue) {
-    this.channelValue = channelValue;
   }
 
   @JsonProperty("active")
@@ -100,28 +96,68 @@ public class NotificationSubscriber {
     this.modifiedTime = modifiedTime;
   }
 
-  @JsonProperty("NotificationChannel")
-  public NotificationChannel getNotificationChannel() {
-    return notificationChannel;
+  @JsonProperty("channelType")
+  public NotificationChannelType getChannelType() {
+    return channelType;
   }
 
-  @JsonProperty("NotificationChannel")
-  public void setNotificationChannel(
-      NotificationChannel notificationChannel) {
-    this.notificationChannel = notificationChannel;
+  @JsonProperty("channelType")
+  public void setChannelType(NotificationChannelType channelType) {
+    this.channelType = channelType;
   }
 
   @Override
   public String toString() {
-    return "NotificationSubscriber{" +
-        "subscriberId='" + subscriberId + '\'' +
-        ", alertRulesSysId='" + alertRulesSysId + '\'' +
-        ", subscriberName='" + subscriberName + '\'' +
-        ", channelValue='" + channelValue + '\'' +
-        ", active=" + active +
-        ", createdTime=" + createdTime +
-        ", modifiedTime=" + modifiedTime +
-        ", notificationChannel=" + notificationChannel +
-        '}';
+    return new ToStringBuilder(this)
+        .append("subscriberId", subscriberId)
+        .append("alertRulesSysId", alertRulesSysId)
+        .append("subscriberName", subscriberName)
+        .append("channelType", channelType)
+        .append("channelValue", channelValue)
+        .append("customerCode", customerCode)
+        .append("active", active)
+        .append("createdTime", createdTime)
+        .append("modifiedTime", modifiedTime)
+        .toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    NotificationSubscriber that = (NotificationSubscriber) o;
+
+    return new EqualsBuilder()
+        .append(subscriberId, that.subscriberId)
+        .append(alertRulesSysId, that.alertRulesSysId)
+        .append(subscriberName, that.subscriberName)
+        .append(channelType, that.channelType)
+        .append(channelValue, that.channelValue)
+        .append(customerCode, that.customerCode)
+        .append(active, that.active)
+        .append(createdTime, that.createdTime)
+        .append(modifiedTime, that.modifiedTime)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .append(subscriberId)
+        .append(alertRulesSysId)
+        .append(subscriberName)
+        .append(channelType)
+        .append(channelValue)
+        .append(customerCode)
+        .append(active)
+        .append(createdTime)
+        .append(modifiedTime)
+        .toHashCode();
   }
 }

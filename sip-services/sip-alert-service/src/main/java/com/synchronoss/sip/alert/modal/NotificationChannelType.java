@@ -1,7 +1,6 @@
 package com.synchronoss.sip.alert.modal;
 
-public enum NotificationChannel {
-
+public enum NotificationChannelType {
   EMAIL("email");
 
   //  Only Email is supported for now, Phone("Phone"), Slack("Slack"),
@@ -9,7 +8,7 @@ public enum NotificationChannel {
 
   private String value;
 
-  NotificationChannel(String value) {
+  NotificationChannelType(String value) {
     this.value = value;
   }
 
