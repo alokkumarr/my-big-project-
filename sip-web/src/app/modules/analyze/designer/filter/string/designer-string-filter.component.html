@@ -21,13 +21,12 @@
   <mat-form-field *ngIf="filterModel.operator === 'ISIN' || filterModel.operator === 'ISNOTIN'" style="margin-left: 10px;">
     <mat-chip-list #chipList>
       <mat-chip *ngFor="let value of filterModel.modelValues; let i = index; trackBy: index"
-               [removable]="true" (removed)="remove(i)" style="word-break: break-word;
-               overflow: scroll;">
+               [removable]="true" (removed)="remove(i)">
         {{value}}
         <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
       </mat-chip>
       <input [matChipInputFor]="chipList"
-             style="margin-bottom: 18px;"
+             style="margin-bottom: 18px;overflow: hidden;"
              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
              matChipInputAddOnBlur="true"
              (matChipInputTokenEnd)="add($event)"

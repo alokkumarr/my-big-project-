@@ -98,10 +98,3 @@ mat-select {
     margin-left: 10px;
   }
 }
-
-::ng-deep {
-  .input-fields div designer-string-filter div mat-form-field .mat-form-field-wrapper .mat-form-field-flex  .mat-form-field-infix{
-    max-height: 120px;
-    overflow: scroll;
-  }
-}

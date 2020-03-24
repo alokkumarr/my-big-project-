@@ -132,6 +132,17 @@ export class DskFiltersService {
               return false;
             }
 
+            if (data.isInRuntimeMode) {
+              if (isOptional) {
+                areValid = Boolean(
+                  data.isInRuntimeMode
+                    ? isOptional && isRuntimeFilter
+                    : isRuntimeFilter
+                );
+                return areValid;
+              }
+            }
+
             if (!isRuntimeFilter && isGlobalFilter) {
               areValid = true;
             } else if (!model) {

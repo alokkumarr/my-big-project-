@@ -290,6 +290,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     } else {
       this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
     }
-    this.removeFilter.emit();
+    setTimeout(() => {
+      this.removeFilter.emit();
+    }, 500);
+
   }
 }
