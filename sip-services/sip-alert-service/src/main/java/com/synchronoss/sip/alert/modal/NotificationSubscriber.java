@@ -3,16 +3,20 @@ package com.synchronoss.sip.alert.modal;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
 public class NotificationSubscriber {
+  @JsonProperty("id")
+  @Id
+  private String id;
+
   @JsonProperty("subscriberId")
   private String subscriberId;
-
-  @JsonProperty("alertRulesSysId")
-  private String alertRulesSysId;
 
   @JsonProperty("subscriberName")
   private String subscriberName;
@@ -36,6 +40,16 @@ public class NotificationSubscriber {
   @JsonProperty("modifiedTime")
   private Date modifiedTime;
 
+  @JsonProperty("id")
+  public String getId() {
+    return id;
+  }
+
+  @JsonProperty("id")
+  public void setId(String id) {
+    this.id = id;
+  }
+
   @JsonProperty("subscriberId")
   public String getSubscriberId() {
     return subscriberId;
@@ -44,16 +58,6 @@ public class NotificationSubscriber {
   @JsonProperty("subscriberId")
   public void setSubscriberId(String subscriberId) {
     this.subscriberId = subscriberId;
-  }
-
-  @JsonProperty("alertRulesSysId")
-  public String getAlertRulesSysId() {
-    return alertRulesSysId;
-  }
-
-  @JsonProperty("alertRulesSysId")
-  public void setAlertRulesSysId(String alertRulesSysId) {
-    this.alertRulesSysId = alertRulesSysId;
   }
 
   @JsonProperty("subscriberName")
@@ -74,6 +78,16 @@ public class NotificationSubscriber {
   @JsonProperty("active")
   public void setActive(Boolean active) {
     this.active = active;
+  }
+
+  @JsonProperty("customerCode")
+  public String getCustomerCode() {
+    return customerCode;
+  }
+
+  @JsonProperty("customerCode")
+  public void setCustomerCode(String customerCode) {
+    this.customerCode = customerCode;
   }
 
   @JsonProperty("createdTime")
@@ -106,11 +120,21 @@ public class NotificationSubscriber {
     this.channelType = channelType;
   }
 
+  @JsonProperty("channelValue")
+  public String getChannelValue() {
+    return channelValue;
+  }
+
+  @JsonProperty("channelValue")
+  public void setChannelValue(String channelValue) {
+    this.channelValue = channelValue;
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)
+        .append("id", "id")
         .append("subscriberId", subscriberId)
-        .append("alertRulesSysId", alertRulesSysId)
         .append("subscriberName", subscriberName)
         .append("channelType", channelType)
         .append("channelValue", channelValue)
@@ -134,8 +158,8 @@ public class NotificationSubscriber {
     NotificationSubscriber that = (NotificationSubscriber) o;
 
     return new EqualsBuilder()
+        .append(id, that.id)
         .append(subscriberId, that.subscriberId)
-        .append(alertRulesSysId, that.alertRulesSysId)
         .append(subscriberName, that.subscriberName)
         .append(channelType, that.channelType)
         .append(channelValue, that.channelValue)
@@ -149,8 +173,8 @@ public class NotificationSubscriber {
   @Override
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
+        .append(id)
         .append(subscriberId)
-        .append(alertRulesSysId)
         .append(subscriberName)
         .append(channelType)
         .append(channelValue)
