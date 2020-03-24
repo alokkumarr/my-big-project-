@@ -58,19 +58,6 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
 
   streamChanged() {
     this.resetTopicAndDataGrid();
-    /* const subs = this.streamResult$.subscribe(result => {
-      const topic = [];
-      forEach(result, data => {
-        const streamandtopic = data[this.streamName];
-        forEach(streamandtopic, topicDetail => {
-          topic.push({
-            title: topicDetail.topic
-          });
-        });
-        this.topicData$ = of(topic);
-      });
-    }); */
-
     const subs = this.streamData$.subscribe(result => {
       const topic = filter(result, {
         queue: this.streamName
