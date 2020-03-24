@@ -402,10 +402,6 @@ export class DashboardGridComponent
                 gFilt.isGlobalFilter
             );
             this.addGlobalValuestoFilters(filter.filters, gFilters);
-          } else {
-            if (filter.model) {
-              filter.isGlobalFilter = false;
-            }
           }
         })
       }
