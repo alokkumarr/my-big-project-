@@ -6,6 +6,8 @@ import * as union from 'lodash/union';
 import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as head from 'lodash/head';
+import * as filter from 'lodash/filter';
 
 import { WorkbenchService } from '../../services/workbench.service';
 
@@ -43,16 +45,11 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
     this.streamResult$.subscribe(result => {
       if (!isEmpty(result)) {
         let cols;
-        forEach(result, item => {
-          cols = union(cols, keys(item));
-        });
-        cols.shift();
         const stream = [];
-        forEach(cols, col => {
-          stream.push({
-            streamTitle: col,
-            streamId: col
-          });
+        forEach(result, item => {
+          cols = union([], keys(item));
+          cols.shift();
+          stream.push(head(item[head(cols)]));
         });
         this.streamData$ = of(stream);
       }
@@ -61,7 +58,7 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
 
   streamChanged() {
     this.resetTopicAndDataGrid();
-    const subs = this.streamResult$.subscribe(result => {
+    /* const subs = this.streamResult$.subscribe(result => {
       const topic = [];
       forEach(result, data => {
         const streamandtopic = data[this.streamName];
@@ -72,6 +69,13 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
         });
         this.topicData$ = of(topic);
       });
+    }); */
+
+    const subs = this.streamData$.subscribe(result => {
+      const topic = filter(result, {
+        queue: this.streamName
+      });
+      this.topicData$ = of(topic);
     });
 
     this.subscriptions.push(subs);

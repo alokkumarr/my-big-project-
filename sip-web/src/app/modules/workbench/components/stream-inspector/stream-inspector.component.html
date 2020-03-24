@@ -30,9 +30,9 @@
       <mat-select [(ngModel)]="streamName" (selectionChange)="streamChanged()">
         <mat-option
           *ngFor="let stream of (streamData$ | async); trackBy: trackByFn"
-          [value]="stream.streamId"
+          [value]="stream.queue"
         >
-          {{ stream.streamTitle }}</mat-option
+          {{ stream.queue }}</mat-option
         >
       </mat-select>
     </mat-form-field>
@@ -42,9 +42,9 @@
       <mat-select [(ngModel)]="topicName" (selectionChange)="topicChanged()">
         <mat-option
           *ngFor="let topic of (topicData$ | async)"
-          [value]="topic.title"
+          [value]="topic.topic"
         >
-          {{ topic.title }}
+          {{ topic.topic }}
         </mat-option>
       </mat-select>
     </mat-form-field>
