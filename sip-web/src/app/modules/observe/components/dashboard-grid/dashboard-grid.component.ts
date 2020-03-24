@@ -247,7 +247,7 @@ export class DashboardGridComponent
       return;
     }
 
-    const headerHeight = 48; // px
+    const headerHeight = item.bullet ? 0 : 48; // px
     const comparisonOptionsHeight =
       get(item, 'analysis.chartOptions.chartType') === 'comparison' ? 48 : 0;
 
