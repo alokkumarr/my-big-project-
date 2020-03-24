@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mapr.streams.Streams;
 import com.mapr.streams.impl.MarlinDocumentStream;
@@ -66,11 +69,22 @@ public class WorkbenchInspectController {
 	public void init() {
 		restTemplate = restUtil.restTemplate();
 	}
-
+	
+	/**
+	 * Retrieves  streams and their configuration
+	 * from current Kafka queue.
+	 * 
+	 * 
+	 * @param req request object
+	 * @param project projId
+	 * @return streams details
+	 * @throws JsonProcessingException exception while parsing json
+	 * @throws Exception exception
+	 */
 	@RequestMapping(value = "{project}/streams", method = RequestMethod.GET, 
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public Object getAppKeys(HttpServletRequest req, 
+	public Object retrieveStreamsDetails(HttpServletRequest req, 
 			@PathVariable(name = "project", required = true) String project)
 			throws JsonProcessingException, Exception {
 
@@ -102,12 +116,32 @@ public class WorkbenchInspectController {
 			String configJson = mapper.writeValueAsString(config.getBody());
 			logger.debug("#####config response ::" + configJson);
 			JsonNode configObjects = mapper.readTree(configJson);
-			if (configObjects.isArray()) {
+			if (configObjects.isArray()) {	
 				logger.debug("Is array @####");
-				resultNode.put("key:", appKey.asText());
 				for (JsonNode jsonNode : configObjects) {
-					resultNode.put("streams_1:", jsonNode.get("streams_1"));
-					resultNode.put("streams_2:", jsonNode.get("streams_2"));
+					
+					//resultNode.put("streams_2:", jsonNode.get("streams_2"));
+					
+					JsonNode streamInfo = jsonNode.get("streams_1");
+					List<String> streamsNames = new ArrayList<String>();
+					
+					if(streamInfo.isArray()) {
+						for (final JsonNode streamNode : streamInfo) {
+					        logger.debug("###Inside loop ###"+ streamNode.get("queue").asText());
+					        streamsNames.add(streamNode.get("queue").asText());
+					    }
+					}
+					
+					
+					
+					List<String> eventTypes = this.retriveEventTypes(streamsNames.get(0));
+					ArrayNode eventSNode = mapper.valueToTree(eventTypes);
+					resultNode.putArray("eventTypes").addAll(eventSNode);
+					resultNode.set("stream", jsonNode.get("streams_1"));
+					
+					//resultNode.put("streams_1:", jsonNode.get("streams_1"));
+					
+					
 				}
 			}
 			entities.add(resultNode);
@@ -116,28 +150,26 @@ public class WorkbenchInspectController {
 
 		return new ResponseEntity<List<JsonNode>>(entities, HttpStatus.OK);
 	}
-
-	@RequestMapping(value = "{project}/streams/{stream}/content", 
+	
+	/**
+	 * Retrieve content from stream.
+	 * 
+	 * @param project project id
+	 * @param stream stream name
+	 * @param eventType event type
+	 * @return stream content
+	 */
+	@RequestMapping(value = "{project}/streams/{stream}/content/{eventType}", 
 			method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public Object getStreamContent(
+	public Object getStreamContentByEvent(
 			@PathVariable(name = "project", required = true) String project,
-			@PathVariable(name = "stream", required = true) String stream) {
-		logger.debug("Stream Name :::" + stream);
-		List<JsonNode> entities = new ArrayList<JsonNode>();
+			@PathVariable(name = "stream", required = true) String stream,
+			@PathVariable(name = "eventType", required = true) String eventType) {
 		
-		logger.debug("#####stream name:::"+ stream);
-			
-		MessageStore store = null;
-			try {
-				store = (MessageStore) Streams.getMessageStore(rtisBasePath + "/" +stream  );
-			} catch (IOException exception) {
-				logger.error(exception.getMessage());
-			}
-			
-			
-			System.out.print("########Retrived store...." + store);
-			MarlinDocumentStream docStream = (MarlinDocumentStream) store.find();
+			logger.debug("Stream Name :::" + stream);
+			List<JsonNode> entities = new ArrayList<JsonNode>();
+			MarlinDocumentStream docStream = this.retriveStream(stream);
 			ObjectMapper mapper = new ObjectMapper();
 			docStream.forEach(document -> {
 				try {
@@ -152,11 +184,17 @@ public class WorkbenchInspectController {
 					
 					JsonNode jsonObj = mapper.readTree(content);
 					logger.debug("####Entire JSON ::"+ jsonObj);
-					JsonNode value = jsonObj.get("payload");
-					logger.debug("####Entire payload ::"+ value);
-					String data = new String(Base64.getDecoder().decode(value.asText()));
-					logger.debug("####Final ###"+ data);
-					entities.add(mapper.readTree(data));
+					if(jsonObj.get("EVENT_TYPE").
+							asText().equals(eventType)) {
+						
+						JsonNode value = jsonObj.get("payload");
+						logger.debug("####Entire payload ::"+ value);
+						String data = new String(Base64.getDecoder().decode(value.asText()));
+						logger.debug("####Final ###"+ data);
+						entities.add(mapper.readTree(data));
+					}
+					
+					
 					
 			} catch (IOException exception) {
 				logger.error(exception.getMessage());
@@ -165,10 +203,74 @@ public class WorkbenchInspectController {
 			}
 						
 			});
-			store.close();
 
 		
 		return entities;
+
+	}
+	
+	
+	/**
+	 * Retrieves unique event types from content.
+	 * 
+	 * @param stream stream name
+	 * @return list of event types
+	 */
+	private List<String> retriveEventTypes(String stream) {
+		   
+			MarlinDocumentStream docStream = this.retriveStream(stream);
+			ObjectMapper mapper = new ObjectMapper();
+			final List<String> eventTypes = new ArrayList<String>();
+			docStream.forEach(document -> {
+				try {
+				System.out.print("########Retrived stream content...." + document.asJsonString());
+					JsonNode json = mapper.readTree(document.asJsonString());
+					String valText = json.get("value").asText();
+					logger.debug("###Value###::"+ valText);
+					byte[] bytes =  Base64.getDecoder().decode(valText);
+					logger.debug("###bytes legnth ::" + bytes.length);
+					String content = new String(bytes);
+					
+					
+					JsonNode jsonObj = mapper.readTree(content);
+					logger.debug("####Entire JSON ::"+ jsonObj);
+					JsonNode value = jsonObj.get("EVENT_TYPE");
+					logger.debug("####Event Type ::"+ value);
+					eventTypes.add(value.asText());
+					
+			} catch (IOException exception) {
+				logger.error(exception.getMessage());
+			}	catch (Exception exception) {
+				logger.error(exception.getMessage());
+			}
+						
+			});
+		
+		return eventTypes.stream().distinct().
+				collect(Collectors.toList());
+
+	
+		
+	}
+	
+	private MarlinDocumentStream retriveStream(String stream) {
+
+		logger.debug("Stream Name :::" + stream);
+		List<JsonNode> entities = new ArrayList<JsonNode>();
+
+		logger.debug("#####stream name:::" + stream);
+
+		MessageStore store = null;
+		try {
+			store = (MessageStore) Streams.getMessageStore(rtisBasePath + "/" + stream);
+		} catch (IOException exception) {
+			logger.error(exception.getMessage());
+		}
+
+		logger.debug("########Retrived store...." + store);
+		MarlinDocumentStream docStream = (MarlinDocumentStream) store.find();
+		store.close();
+		return docStream;
 
 	}
 }
