@@ -164,8 +164,18 @@ public class Id3RepositoryImpl implements Id3Repository {
                 && authorizationCodeDetails.getValidUpto() >= System.currentTimeMillis())
                 logger.trace("Successfully validated request for user: " + masterLoginId);
             authorizationCodeDetails.setValid(true);
+            // Authorization code is for onetime use, Invalidate the code once used.
+            String invalidateCodeSql = "UPDATE ID3_TICKET_DETAILS SET VALID_INDICATOR=0 , MODIFIED_TIME = sysdate() " +
+                "WHERE SIP_TICKET_ID = ? AND ID3_TICKET_DETAILS_SYS_ID=?";
+            jdbcTemplate.update(invalidateCodeSql, preparedStatement -> {
+                preparedStatement.setString(1, id3ClientTicketDetails.getSipTicketId());
+                preparedStatement.setLong(2, authorizationCodeDetails.getTicketDetailsId());
+            });
         }
-        logger.info("Authentication failed request for user: " + masterLoginId);
+        else {
+            logger.info("Authentication failed request for user: " + masterLoginId);
+        }
+
         return authorizationCodeDetails;
     }
 
