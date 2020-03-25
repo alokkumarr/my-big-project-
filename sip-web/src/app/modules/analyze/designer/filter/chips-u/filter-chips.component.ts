@@ -14,14 +14,19 @@ import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
 export class FilterChipsComponent {
   @Output() remove: EventEmitter<number> = new EventEmitter();
   @Output() removeAll: EventEmitter<null> = new EventEmitter();
-  @Input() filters;
+  private filters;
+  @Input('filters') set _filters(value) {
+    this.filters = value;
+    this.refreshFilters();
+  }
+  private artifacts = [];
   @Input('artifacts')
-  set artifacts(artifacts: Artifact[] | ArtifactDSL[]) {
+  set _artifacts(artifacts: Artifact[] | ArtifactDSL[]) {
     if (!artifacts) {
       return;
     }
-    this.nameMap = this.analyzeService.calcNameMap(artifacts);
-    this.flattenedFilters = cloneDeep(this.analyzeService.flattenAndFetchFiltersChips(this.filters, []));
+    this.artifacts = artifacts;
+    this.refreshFilters();
   }
   @Input() readonly: boolean;
 
@@ -48,5 +53,12 @@ export class FilterChipsComponent {
     this.filters = [];
     this.flattenedFilters = [];
     this.removeAll.emit();
+  }
+
+  refreshFilters() {
+    this.nameMap = this.analyzeService.calcNameMap(this.artifacts || []);
+    this.flattenedFilters = cloneDeep(
+      this.analyzeService.flattenAndFetchFiltersChips(this.filters, [])
+    );
   }
 }

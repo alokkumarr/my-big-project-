@@ -353,16 +353,18 @@ export class DashboardGridComponent
 
       let gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
 
-      if (isEmpty(tile.origAnalysis.sipQuery.filters)) {
+      let filters = cloneDeep(tile.origAnalysis.sipQuery.filters);
+      if (isEmpty(filters)) {
         tile.origAnalysis.sipQuery.filters = [{
           booleanCriteria: "AND",
           filters: gFilters
         }]
       } else {
-        this.addGlobalValuestoFilters(tile.origAnalysis.sipQuery.filters, gFilters);
+        this.addGlobalValuestoFilters(filters, gFilters);
       }
-
-      const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters: tile.origAnalysis.sipQuery.filters } };
+      const sipQuery = { ...tile.origAnalysis.sipQuery,
+          ...{ filters: this.fetchGlobalValues(filters) }
+      };
       tile.analysis = {
         ...tile.origAnalysis,
         ...{ sipQuery },
@@ -371,6 +373,17 @@ export class DashboardGridComponent
 
       this.dashboard.splice(id, 1, { ...tile });
     });
+  }
+
+  fetchGlobalValues(tree) {
+    for (var i in tree) {
+      if (tree[i].model && !tree[i].isAggregationFilter) {
+        tree[i].isGlobalFilter = false;
+        return 1;
+      }
+      if (typeof tree[i] == 'object') this.fetchGlobalValues(tree[i])
+    }
+    return tree;
   }
 
   addGlobalValuestoFilters(tree, gFilters) {
