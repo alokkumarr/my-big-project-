@@ -229,19 +229,23 @@ export class DskFiltersService {
           }</span> [${mode === 'DSK' ? values.join(', ') : values}]`;
         } else {
           const values =  get(field, 'model.modelValues');
+          if (!field.model) {
+            return `${field.columnName.split('.keyword')[0]}`;
+          }
           switch (field.type) {
             case 'string':
               if (isUndefined(values)) {
-                return '';
+                return `${field.columnName.split('.keyword')[0]}`;
               }
+
               return `${field.columnName.split('.keyword')[0]} <span class="operator">${
-                field.model.operator
+                field.model.operator || ''
               }</span> [${[values]}]`;
 
             case 'date':
             const datevalues =  get(field, 'model.preset');
               if (isUndefined(datevalues)) {
-                return '';
+                return `${field.columnName}`;
               }
 
               if (get(field, 'model.preset') == 'NA') {
@@ -249,20 +253,17 @@ export class DskFiltersService {
                 </span> [ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]`;
               } else {
                 return `${field.columnName} = <span class="operator">${
-                  get(field, 'model.preset')
+                  get(field, 'model.preset') || ''
                 }</span>`;
               }
             default:
-              if (field.isRuntimeFilter) {
-                return `${field.columnName} <span class="operator"></span> []`;
-              }
               if (field.model.operator === 'BTW') {
                 return `${field.columnName} <span class="operator">${
                   field.model.operator
                 }</span> [${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]`;
               } else {
                 return `${field.columnName} <span class="operator">${
-                  field.model.operator
+                  field.model.operator || ''
                 }</span> [${[get(field, 'model.value')]}]`;
               }
           }
