@@ -352,16 +352,18 @@ export class DashboardGridComponent
       }
 
       let gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
-
       let filters = cloneDeep(tile.origAnalysis.sipQuery.filters);
+
+
       if (isEmpty(filters)) {
-        tile.origAnalysis.sipQuery.filters = [{
+        filters = [{
           booleanCriteria: "AND",
           filters: gFilters
         }]
       } else {
         this.addGlobalValuestoFilters(filters, gFilters);
       }
+      console.log(filters, gFilters, tile.origAnalysis)
       const sipQuery = { ...tile.origAnalysis.sipQuery,
           ...{ filters: this.fetchGlobalValues(filters) }
       };
@@ -370,7 +372,7 @@ export class DashboardGridComponent
         ...{ sipQuery },
         _executeTile: true
       };
-
+      console.log(tile.analysis);
       this.dashboard.splice(id, 1, { ...tile });
     });
   }
@@ -379,7 +381,6 @@ export class DashboardGridComponent
     for (var i in tree) {
       if (tree[i].model && !tree[i].isAggregationFilter) {
         tree[i].isGlobalFilter = false;
-        return 1;
       }
       if (typeof tree[i] == 'object') this.fetchGlobalValues(tree[i])
     }
@@ -458,7 +459,6 @@ export class DashboardGridComponent
     };
 
     const arrangedTiles = this.arrangeTiles(tiles);
-
     forEach(arrangedTiles, tile => {
       if (tile.bullet) {
         tile.updater = new BehaviorSubject({});
