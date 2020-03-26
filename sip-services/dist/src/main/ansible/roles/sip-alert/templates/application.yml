@@ -84,6 +84,9 @@ connector: http
 
   {% endif %}
 
+alerts:
+  alert-rule-migration-required: true
+
 subscriber:
   secret:
     key : {{ alert_subscriber_jwt_secret | default('WjJwAlQxx7yLWwaOjLFC91') }}

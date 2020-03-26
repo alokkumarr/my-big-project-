@@ -13,6 +13,9 @@ public class Email {
   @JsonProperty("recipients")
   Set<String> recipients;
 
+  @JsonProperty("subscribers")
+  Set<Integer> subscribers;
+
   String template;
 
   /**
@@ -41,5 +44,13 @@ public class Email {
   /** Sets template. */
   public void setTemplate(String template) {
     this.template = template;
+  }
+
+  public Set<Integer> getSubscribers() {
+    return subscribers;
+  }
+
+  public void setSubscribers(Set<Integer> subscribers) {
+    this.subscribers = subscribers;
   }
 }
