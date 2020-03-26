@@ -8,29 +8,13 @@ public class Email {
 
   @JsonPropertyOrder({
       "template",
-      "recipients",
+      "subscribers",
   })
-  @JsonProperty("recipients")
-  Set<String> recipients;
 
   @JsonProperty("subscribers")
-  Set<Integer> subscribers;
+  Set<String> subscribers;
 
   String template;
-
-  /**
-   * Gets recipients.
-   *
-   * @return value of recipients
-   */
-  public Set<String> getRecipients() {
-    return recipients;
-  }
-
-  /** Sets recipients. */
-  public void setRecipients(Set<String> recipients) {
-    this.recipients = recipients;
-  }
 
   /**
    * Gets template.
@@ -46,11 +30,11 @@ public class Email {
     this.template = template;
   }
 
-  public Set<Integer> getSubscribers() {
+  public Set<String> getSubscribers() {
     return subscribers;
   }
 
-  public void setSubscribers(Set<Integer> subscribers) {
+  public void setSubscribers(Set<String> subscribers) {
     this.subscribers = subscribers;
   }
 }

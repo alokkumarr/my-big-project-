@@ -13,6 +13,7 @@ import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -120,9 +121,14 @@ public class EmailNotifier implements Notifier {
     notificationLog.setThresholdValue(alertRulesDetails.getThresholdValue());
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
+    // TODO : To replace this hardcoded list with getting list of recipients for those subscribers.
+    Set<String> subscribers = alertRulesDetails.getNotification().getEmail().getSubscribers();
+    Set<String> recipients = new HashSet<>();
+    recipients.add("Prabhulingappa.AS@synchronoss.com");
+    recipients.add("pbuaradhana@gmail.com");
     List<String> recipientsList =
         getActiveSubscribers(
-            alertRulesDetails.getNotification().getEmail().getRecipients(),
+            recipients,
             alertRulesDetails.getAlertRulesSysId());
     try {
       if (recipientsList != null && recipientsList.size() > 0) {

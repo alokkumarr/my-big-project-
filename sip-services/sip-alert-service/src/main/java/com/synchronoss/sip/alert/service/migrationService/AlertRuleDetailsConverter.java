@@ -21,14 +21,14 @@ public class AlertRuleDetailsConverter implements AlertConverter {
 
   @Override
   public AlertRuleDetails convert(JsonObject oldAlertsDefinition) {
-    AlertRuleDetails alertRuleDetails = new AlertRuleDetails();
+    AlertRuleDetails alertRuleDetails;
     JsonObject email = null;
     JsonObject notification = null;
     JsonArray emailIds = null;
 
     Notification notification1 = new Notification();
     Email email1 = new Email();
-    Set<Integer> subscribersSet = new HashSet<>(); //TODO : Call api and get the subscriber ids for all recipients.
+    Set<String> subscribersSet = new HashSet<>(); //TODO : Call api and get the subscriber ids for all recipients.
 
     Set<String> emailSet = new HashSet();
     String alertRulesSysId = oldAlertsDefinition.get("alertRulesSysId").getAsString();
@@ -49,7 +49,7 @@ public class AlertRuleDetailsConverter implements AlertConverter {
       emailIds.forEach(mail -> {
         emailSet.add(mail.getAsString());
         // TODO : Add this email to subsriber table and relate with AlertMapping.
-        subscribersSet.add(0);
+        subscribersSet.add("test-id");
       });
     }
 
