@@ -37,6 +37,7 @@ sip-host2
 #sip_epel_yum_url = https://download.fedoraproject.org/pub/epel/$releasever/$basearch
 # Mark EPEL already being provided to avoid adding it to repositories
 #sip_epel_yum_provided = true
+#sip_internal_services_ip_allowed = 0.0.0.0
 
 [saw-web]
 sip-host1

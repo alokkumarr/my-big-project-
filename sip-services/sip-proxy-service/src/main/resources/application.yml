@@ -22,6 +22,10 @@ application:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
+management:
+  health:
+    elasticsearch:
+      enabled: false
 schema:
    file: /Users/spau0004/code/SIP/saw-services/saw-proxy-service/src/main/resources/schema/proxy-schema.json
 elastic-search:
