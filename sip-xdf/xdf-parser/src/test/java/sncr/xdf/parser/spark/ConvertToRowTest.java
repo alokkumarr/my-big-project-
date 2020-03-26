@@ -79,7 +79,7 @@ public class ConvertToRowTest extends BaseTest{
     JavaRDD<Row> filterData = data.filter(row -> (int) (row.get(rejectedColumn)) == 0);
 
     long finalCount = filterData.count();
-    long expectedResult = 6;
+    long expectedResult = 4;
     assertEquals(expectedResult, finalCount);
   }
 

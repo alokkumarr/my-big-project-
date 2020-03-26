@@ -99,11 +99,6 @@
     name: pip
     state: latest
 
-- name: Removing existing pyOpenSSL if exists
-  yum:
-    name: pyOpenSSL
-    autoremove: true
-
 - name: Installing libraries on all saw-services hosts using Ansible pip module
   pip:
     name: "{{ packages }}"

@@ -27,6 +27,7 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
     protected StructType schema;
 
     protected Row record;
+    protected Map<String, Object> fullRow;
     protected Map<String, Object> targetRow;
     protected Map<String, StructField> targetRowTypes;
     protected Map<String, Object> localVars;
@@ -41,6 +42,7 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
         this.schema = inSchema;
         if(record != null) {
             //Initialize record -- targetRow with values from input Row
+            fullRow = new HashMap<>();
             targetRow = new HashMap<>();
             targetRowTypes = new HashMap<>();
             this.record = record;
@@ -56,6 +58,16 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
 
     public Map<String, StructField> getNewOutputSchema(){ return targetRowTypes; }
 
+    /**
+     *
+     * @param name
+     * @return
+     *
+     * get() method calling in JEXL Script execution to get variable values to substitute in computation.
+     * fullRow is Map contains Record Field Names as Keys and corresponding values from Record as Values.
+     * if Name contains in fullRow map then it will return that value.
+     *
+     */
     @Override
     public Object get(String name) {
         Object retval = null;
@@ -65,19 +77,8 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
             } else {
                 if (name.charAt(0) == internalFieldPrefix) {
                     String nativeName = name.substring(1);
-
-                    StringBuilder sb = new StringBuilder();
-                    String[] fs = targetRow.keySet().toArray(new String[0]);
- /*
-                    for (int j = 0; j < fs.length; j++) {
-                        sb.append( ", " + j + " = " +  fs[j].toString());
-                    }
-                    System.out.println("Getting value from " + nativeName + " fields: " + sb.toString());
-*/
-                    if ((!nativeName.isEmpty()) && (targetRowTypes != null) && (targetRowTypes.containsKey(nativeName))) {
-                        if ( targetRow != null && targetRow.containsKey(nativeName) ) {
-                            retval = targetRow.get(nativeName);
-                        } // else retval = null;
+                    if (!nativeName.isEmpty() && fullRow != null && fullRow.containsKey(nativeName)) {
+                       retval = fullRow.get(nativeName);
                     } else {
                         throw new JexlScriptException("Field not found " + nativeName);
                     }
@@ -159,7 +160,7 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
 
     //TODO:: Make sure typeName returns such values
         protected Object getValue(String fieldName, int i) {
-            String type = schema.apply(fieldName).dataType().toString();
+            String type = record.schema().apply(fieldName).dataType().toString();
             switch (type) {
                 case "BooleanType": return this.record.getBoolean(i);
                 case "IntegerType":
