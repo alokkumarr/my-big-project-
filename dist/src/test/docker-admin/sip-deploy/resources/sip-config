@@ -27,6 +27,9 @@ sip-admin
 [saw-proxy]
 sip-proxy
 
+[saw-proxy:vars]
+sip_internal_services_ip_allowed = 68.170.16.0/20
+
 [saw-web]
 sip-app1
 sip-app2

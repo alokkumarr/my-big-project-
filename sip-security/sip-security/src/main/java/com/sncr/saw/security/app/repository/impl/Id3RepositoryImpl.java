@@ -8,12 +8,14 @@ import com.sncr.saw.security.app.id3.model.Id3ClientDetails;
 import com.sncr.saw.security.app.id3.model.Id3ClientTicketDetails;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.Id3Repository;
+import com.sncr.saw.security.common.bean.external.response.Id3User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -162,8 +164,18 @@ public class Id3RepositoryImpl implements Id3Repository {
                 && authorizationCodeDetails.getValidUpto() >= System.currentTimeMillis())
                 logger.trace("Successfully validated request for user: " + masterLoginId);
             authorizationCodeDetails.setValid(true);
+            // Authorization code is for onetime use, Invalidate the code once used.
+            String invalidateCodeSql = "UPDATE ID3_TICKET_DETAILS SET VALID_INDICATOR=0 , MODIFIED_TIME = sysdate() " +
+                "WHERE SIP_TICKET_ID = ? AND ID3_TICKET_DETAILS_SYS_ID=?";
+            jdbcTemplate.update(invalidateCodeSql, preparedStatement -> {
+                preparedStatement.setString(1, id3ClientTicketDetails.getSipTicketId());
+                preparedStatement.setLong(2, authorizationCodeDetails.getTicketDetailsId());
+            });
         }
-        logger.info("Authentication failed request for user: " + masterLoginId);
+        else {
+            logger.info("Authentication failed request for user: " + masterLoginId);
+        }
+
         return authorizationCodeDetails;
     }
 
@@ -223,5 +235,44 @@ public class Id3RepositoryImpl implements Id3Repository {
                     return id3ClientDetails1;
                 });
         return id3ClientDetails;
+    }
+
+    @Override
+    public Id3User getId3Userdetails(String masterLoginId) {
+        Id3User id3User = null ;
+        String sql = "SELECT U.USER_ID,U.USER_SYS_ID , C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,R.ROLE_TYPE , U.ID3_ENABLED " +
+            "FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND" +
+            " R.ROLE_SYS_ID=U.ROLE_SYS_ID AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  " +
+            "U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1" +
+            " AND U.USER_ID= ? ";
+        try {
+            id3User =
+                jdbcTemplate.query(
+                    sql,
+                    preparedStatement -> {
+                        preparedStatement.setString(1, masterLoginId);
+                    }, rs -> {
+                        Id3User user =null ;
+                        if (rs.next()) {
+                            user = new Id3User();
+                            user.setUserId(rs.getString("USER_ID"));
+                            user.setId3Enabled(rs.getBoolean("ID3_ENABLED"));
+                            user.setCustomerCode(rs.getString("CUSTOMER_CODE"));
+                            user.setUserSysId(rs.getLong("USER_SYS_ID"));
+                            user.setCustomerSysId(rs.getLong("CUSTOMER_SYS_ID"));
+                            user.setRoleType(rs.getString("ROLE_TYPE"));
+                        }
+                        return user;
+                    });
+        } catch (DataAccessException de) {
+            logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+            throw de;
+        } catch (Exception e) {
+            logger.error(
+                "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+                null,
+                e);
+        }
+        return id3User;
     }
 }

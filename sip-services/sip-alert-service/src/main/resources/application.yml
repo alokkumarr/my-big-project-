@@ -70,5 +70,8 @@ subscriber:
     secret:
       key : "900jrYTKR1FWFgQjMMuA"
 
+alerts:
+  alert-rule-migration-required: true
+
 connector: http
 
