@@ -1,15 +1,19 @@
 package com.synchronoss.sip.alert.modal;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
+@JsonInclude(Include.NON_NULL)
 public class NotificationSubscriber {
   @JsonProperty("id")
   @Id
@@ -23,6 +27,7 @@ public class NotificationSubscriber {
 
   @JsonProperty("channelType")
   @ApiModelProperty(notes = "SIP supported Channel Types", name = "channelType")
+  @Enumerated
   private NotificationChannelType channelType;
 
   @JsonProperty("channelValue")

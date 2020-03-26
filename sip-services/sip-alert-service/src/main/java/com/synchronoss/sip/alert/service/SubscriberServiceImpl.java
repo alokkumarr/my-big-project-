@@ -1,21 +1,19 @@
 package com.synchronoss.sip.alert.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
-import com.synchronoss.sip.alert.modal.Subscriber;
+import com.synchronoss.sip.alert.repository.NotificationSubscriberRepository;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import sncr.bda.base.MaprConnection;
 
 @Service
 public class SubscriberServiceImpl implements SubscriberService {
@@ -25,21 +23,22 @@ public class SubscriberServiceImpl implements SubscriberService {
   @NotNull
   private String basePath;
 
-  @Value("${sip.service.metastore.notificationSubscribersTable}")
-  @NotNull
-  private String notificationSubscribersTable;
-
   @Autowired private NotificationSubscriberRepository notificationSubscriberRepository;
 
   @Override
   public NotificationSubscriber addSubscriber(NotificationSubscriber subscriber) {
     String id = UUID.randomUUID().toString();
-    String subscriberId = UUID.randomUUID().toString();
+
+    // This line can be used when one subscriber with multiple channels is implementeds
+    // String subscriberId = UUID.randomUUID().toString();
 
     subscriber.setId(id);
-    subscriber.setSubscriberId(subscriberId);
+    subscriber.setSubscriberId(id);
 
-    NotificationSubscriber savedSubscriber  = notificationSubscriberRepository.save(subscriber);
+    subscriber.setActive(true);
+    subscriber.setCreatedTime(new Date());
+
+    NotificationSubscriber savedSubscriber = notificationSubscriberRepository.save(subscriber);
     return savedSubscriber;
   }
 
@@ -51,11 +50,28 @@ public class SubscriberServiceImpl implements SubscriberService {
         notificationSubscriberRepository.findById(subscriberId);
 
     if (subscriberOptional.isPresent()) {
-        subscriber = subscriberOptional.get();
+      subscriber = subscriberOptional.get();
     }
 
     return subscriber;
   }
+
+  @Override
+  public List<NotificationSubscriber> getSubscribersByCustomerCode(String customerCode) {
+    List<NotificationSubscriber> subscribers =
+        notificationSubscriberRepository.findByCustomerCode(customerCode);
+    return subscribers;
+  }
+
+//  @Override
+//  public List<NotificationSubscriber> getSubscribersByChannelTypeAndCustomerCode(
+//      NotificationChannelType channelType, String customerCode) {
+//    List<NotificationSubscriber> subscribers =
+//        notificationSubscriberRepository.findByChannelTypeAAndCustomerCode(
+//            channelType, customerCode);
+//
+//    return subscribers;
+//  }
 
   @Override
   public List<NotificationSubscriber> getAllSubscribers() {
@@ -67,9 +83,13 @@ public class SubscriberServiceImpl implements SubscriberService {
   }
 
   @Override
-  public NotificationSubscriber updateSubscriber(String subscriberId) {
-    NotificationSubscriber subscriber = null;
+  public NotificationSubscriber updateSubscriber(
+      String subscriberId, NotificationSubscriber subscriber) {
+    subscriber.setId(subscriberId);
+    subscriber.setSubscriberId(subscriberId);
 
+    subscriber.setModifiedTime(new Date());
+    notificationSubscriberRepository.save(subscriber);
     return subscriber;
   }
 
