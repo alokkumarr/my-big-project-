@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,8 @@ public class SubscriberServiceImpl implements SubscriberService {
   @Autowired private NotificationSubscriberRepository notificationSubscriberRepository;
 
   @Override
-  public NotificationSubscriber addSubscriber(NotificationSubscriber subscriber) {
+  public NotificationSubscriber addSubscriber(
+      NotificationSubscriber subscriber, String customerCode) {
     String id = UUID.randomUUID().toString();
 
     // This line can be used when one subscriber with multiple channels is implementeds
@@ -35,11 +37,39 @@ public class SubscriberServiceImpl implements SubscriberService {
     subscriber.setId(id);
     subscriber.setSubscriberId(id);
 
+    subscriber.setCustomerCode(customerCode);
     subscriber.setActive(true);
     subscriber.setCreatedTime(new Date());
 
     NotificationSubscriber savedSubscriber = notificationSubscriberRepository.save(subscriber);
     return savedSubscriber;
+  }
+
+  @Override
+  public List<NotificationSubscriber> addAllSubscribers(
+      List<NotificationSubscriber> subscribers, String customerCode) {
+    List<NotificationSubscriber> result = new ArrayList<>();
+
+    Date date = new Date();
+    subscribers =
+        subscribers.stream()
+            .map(
+                subscriber -> {
+                  String id = UUID.randomUUID().toString();
+
+                  subscriber.setId(id);
+                  subscriber.setSubscriberId(id);
+                  subscriber.setCustomerCode(customerCode);
+                  subscriber.setActive(true);
+                  subscriber.setCreatedTime(date);
+
+                  return subscriber;
+                })
+            .collect(Collectors.toList());
+
+    notificationSubscriberRepository.saveAll(subscribers);
+
+    return subscribers;
   }
 
   @Override
@@ -58,20 +88,33 @@ public class SubscriberServiceImpl implements SubscriberService {
 
   @Override
   public List<NotificationSubscriber> getSubscribersByCustomerCode(String customerCode) {
+    Boolean active = true;
     List<NotificationSubscriber> subscribers =
-        notificationSubscriberRepository.findByCustomerCode(customerCode);
+        notificationSubscriberRepository.findByCustomerCodeAndActive(customerCode, active);
     return subscribers;
   }
 
-//  @Override
-//  public List<NotificationSubscriber> getSubscribersByChannelTypeAndCustomerCode(
-//      NotificationChannelType channelType, String customerCode) {
-//    List<NotificationSubscriber> subscribers =
-//        notificationSubscriberRepository.findByChannelTypeAAndCustomerCode(
-//            channelType, customerCode);
-//
-//    return subscribers;
-//  }
+  @Override
+  public List<NotificationSubscriber> getSubscribersByChannelTypeAndCustomerCode(
+      NotificationChannelType channelType, String customerCode) {
+    Boolean active = true;
+    List<NotificationSubscriber> subscribers =
+        notificationSubscriberRepository.findByChannelTypeAndCustomerCodeAndActive(
+            channelType, customerCode, active);
+
+    return subscribers;
+  }
+
+  @Override
+  public List<NotificationSubscriber> getSubscriberByChannelTypeAndChannelValueAndCustomerCode(
+      NotificationChannelType channelType, List<String> channelValues, String customerCode) {
+    Boolean active = true;
+    List<NotificationSubscriber> subscribers =
+        notificationSubscriberRepository.findByChannelTypeAndChannelValueInAndCustomerCodeAndActive(
+            channelType, channelValues, customerCode, active);
+
+    return subscribers;
+  }
 
   @Override
   public List<NotificationSubscriber> getAllSubscribers() {
