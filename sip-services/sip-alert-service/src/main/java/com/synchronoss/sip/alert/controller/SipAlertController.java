@@ -603,22 +603,6 @@ public class SipAlertController {
     return alertService.retrieveMonitoringType(ticket);
   }
 
-  @ApiOperation(value = "/subscriber/deactivate", response = String.class)
-  @RequestMapping(
-      value = "/subscriber/addAll",
-      method = RequestMethod.POST,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseBody
-  public void addSubscribers(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      @RequestBody List<NotificationSubscriber> subscribers) {
-    if (subscribers == null || subscribers.size() == 0) {
-      // Throw error here
-    }
-    subscriberService.addSubscribers(subscribers);
-  }
-
   /**
    * Unsubscribe an email id.
    *
