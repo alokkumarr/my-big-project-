@@ -1,0 +1,925 @@
+{
+  "NEWAGGREGATE_FILTER": {
+    "esReport": {
+      "NEWAGG01": {
+        "suites": [
+          "sanity","critical","regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using STRING(CNT = 0)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNT(String): Equal to 0",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "String",
+          "designerLabel": "Count",
+          "operator": "Equal to",
+          "operatorValue": "0"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG02": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using STRING(CNTD >= 1)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNTD(String): Greater than 1",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "String",
+          "designerLabel": "Distinct Count",
+          "operator": "Greater than",
+          "operatorValue": "1"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double",
+              "Float",
+              "Long"
+            ]
+          }
+        ]
+      },
+      "NEWAGG03": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using STATE(CNT <= 5)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNT(State): Less than or equal to 5",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "State",
+          "designerLabel": "Count",
+          "operator": "Less than or equal to",
+          "operatorValue": "5"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Long",
+              "State",
+              "String"
+            ]
+          }
+        ]
+      },
+      "NEWAGG04": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using STATE(CNTD != 25)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNTD(State): Not equal to 10",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "State",
+          "designerLabel": "Distinct Count",
+          "operator": "Not equal to",
+          "operatorValue": "10"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double",
+              "Float",
+              "Long",
+              "String"
+            ]
+          }
+        ]
+      },
+      "NEWAGG05": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using DATE(CNT > 25)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNT(Date): Less than 25",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Date",
+          "designerLabel": "Count",
+          "operator": "Less than",
+          "operatorValue": "25"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Long",
+              "State",
+              "String"
+            ]
+          }
+        ]
+      },
+      "NEWAGG06": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using DATE(CNTD >= 10)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNTD(Date): Greater than or equal to 10",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Date",
+          "designerLabel": "Distinct Count",
+          "operator": "Greater than or equal to",
+          "operatorValue": "10"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Long",
+              "State",
+              "String"
+            ]
+          }
+        ]
+      },
+      "NEWAGG07": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using LONG(SUM = 0)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "SUM(Long): Equal to 0",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Long",
+          "designerLabel": "Sum",
+          "operator": "Equal to",
+          "operatorValue": "0"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG08": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using LONG(AVG > 20)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "AVG(Long): Greater than 20",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Long",
+          "designerLabel": "Average",
+          "operator": " Greater than ",
+          "operatorValue": "20"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG09": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using LONG(MIN >= -1)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MIN(Long): Greater than or equal to -1",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Long",
+          "designerLabel": "Mininum",
+          "operator": "Greater than or equal to",
+          "operatorValue": "-1"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG10": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using LONG(MAX != -10)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MAX(Long): Not equal to -10",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Long",
+          "designerLabel": "Maximum",
+          "operator": "Not equal to",
+          "operatorValue": "-10"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG11": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using FLOAT(MAX != 300)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MAX(Float): Not equal to 300",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Float",
+          "designerLabel": "Maximum",
+          "operator": "Not equal to",
+          "operatorValue": "300"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG12": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using FLOAT(MIN <= 10)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MIN(Float): Greater than or equal to 10",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Float",
+          "designerLabel": "Mininum",
+          "operator": "Greater than or equal to",
+          "operatorValue": "10"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG13": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using FLOAT(CNT = 10)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNT(Float): Equal to 10",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Float",
+          "designerLabel": "Count",
+          "operator": "Equal to",
+          "operatorValue": "10"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG14": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using FLOAT(AVG < 0)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "AVG(Float): Less than 0",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Float",
+          "designerLabel": "Average",
+          "operator": "Less than",
+          "operatorValue": "0"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG15": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Integer(MAX!= 100)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MAX(Integer): Not equal to 100",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Integer",
+          "designerLabel": "Maximum",
+          "operator": "Not equal to",
+          "operatorValue": "100"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG16": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Integer(CNT >= 1000)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNT(Integer): Greater than or equal to 1000",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Integer",
+          "designerLabel": "Count",
+          "operator": "Greater than or equal to",
+          "operatorValue": "1000"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG17": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Integer(CNTD < 1000)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNTD(Integer): Less than 1000",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Integer",
+          "designerLabel": "Distinct Count",
+          "operator": "Less than",
+          "operatorValue": "1000"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG18": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Integer(SUM <= 0)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "SUM(Integer): Less than or equal to 0",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Integer",
+          "designerLabel": "Sum",
+          "operator": "Less than or equal to",
+          "operatorValue": "0"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG19": {
+        "suites": [
+          "sanity","critical","regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Double(MAX <= 10)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MAX(Double): Greater than or equal to 10",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Double",
+          "designerLabel": "Maximum",
+          "operator": "Greater than or equal to",
+          "operatorValue": "10"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG20": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Double(MIN > 100)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MIN(Double): Greater than 100",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Double",
+          "designerLabel": "Mininum",
+          "operator": "Greater than",
+          "operatorValue": "100"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG21": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Double(CNTD! 0)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNTD(Double): Not equal to 0",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Double",
+          "designerLabel": "Distinct Count",
+          "operator": "Not equal to",
+          "operatorValue": "0"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG22": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using Double(AVG < -1)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "AVG(Double): Less than -1",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Double",
+          "designerLabel": "Average",
+          "operator": "Less than",
+          "operatorValue": "-1"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG23": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using MAX(CNT 0 1)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNT(Date): 0 Between 1",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Date",
+          "designerLabel": "Count",
+          "operator": "Between",
+          "firstValue": "0",
+          "secondValue": "1"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG24": {
+        "suites": [
+          "sanity","critical","regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using MAX(CNTD 10 20)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNTD(Float): 10 Between 20",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Float",
+          "designerLabel": "Distinct Count",
+          "operator": "Between",
+          "firstValue": "10",
+          "secondValue": "20"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG25": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using MAX(Between -1 -2)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MAX(Integer): -1 Between -2",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Integer",
+          "designerLabel": "Maximum",
+          "operator": "Between",
+          "firstValue": "-1",
+          "secondValue": "-2"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG26": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using MIN(Between -1 1)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "MIN(Double): -1 Between 1",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Double",
+          "designerLabel": "Mininum",
+          "operator": "Between",
+          "firstValue": "-1",
+          "secondValue": "1"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG27": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using AVG(Between 100-200)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "AVG(Long): 100 Between 200",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "Long",
+          "designerLabel": "Average",
+          "operator": "Between",
+          "firstValue": "100",
+          "secondValue": "200"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG28": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using CNT(between 5-7)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNT(State): 5 Between 7",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "State",
+          "designerLabel": "Count",
+          "operator": "Between",
+          "firstValue": "5",
+          "secondValue": "7"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG29": {
+        "suites": [
+          "regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to use aggregation filters in report using CNTD(between 0 -1000)",
+        "removeAggregate": false,
+        "expectedAggregateValue": "CNTD(String): 0 Between 1000",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "String",
+          "designerLabel": "Distinct Count",
+          "operator": "Between",
+          "firstValue": "0",
+          "secondValue": "1000"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "NEWAGG30": {
+        "suites": [
+          "sanity","critical","regression"
+        ],
+        "user": "admin",
+        "description": "Admin should be able to apply and remove aggregation filters in es report",
+        "removeAggregate": true,
+        "expectedAggregateValue": "CNTD(String): 0 Between 1000",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "aggregatePopup": {
+          "field": "String",
+          "designerLabel": "Distinct Count",
+          "operator": "Between",
+          "firstValue": "0",
+          "secondValue": "1000"
+        },
+        "tables": [
+          {
+            "name": "sample",
+            "fields": [
+              "Integer",
+              "Date",
+              "Double"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
