@@ -118,6 +118,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
      */
     private Boolean isSkipFieldsEnabled = false;
 
+	private FileStatus[] files;
+
     private static final String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
@@ -290,7 +292,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 else {
                     if (headerSize >= 1) {
                         logger.debug("Header present");
-                        FileStatus[] files = fs.globStatus(new Path(sourcePath));
+                        files = fs.globStatus(new Path(sourcePath));
 
                         if (files != null) {
                             logger.debug("Total number of files in the directory = " + files.length);
@@ -447,7 +449,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
 
             try {
-                FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
+            	
+            	//archieval should be only processed files. Should not do fresh glob search.
 
                 if (files != null && files.length != 0) {
                     // Create archive directory
