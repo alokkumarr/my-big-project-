@@ -26,7 +26,7 @@
 <div fxLayout="column">
   <section class="input-section">
     <mat-form-field class="margin20" appearance="outline">
-      <mat-label i18n>Stream</mat-label>
+      <mat-label i18n>Stream: </mat-label>
       <mat-select [(ngModel)]="streamName" (selectionChange)="streamChanged()">
         <mat-option
           *ngFor="let stream of (streamData$ | async); trackBy: trackByFn"
@@ -38,14 +38,29 @@
     </mat-form-field>
 
     <mat-form-field class="margin20" appearance="outline">
-      <mat-label i18n>Topic</mat-label>
-      <mat-select [(ngModel)]="topicName" (selectionChange)="topicChanged()">
+      <mat-label i18n>Topic: </mat-label>
+      <mat-select [(ngModel)]="topicName">
         <mat-option
           *ngFor="let topic of (topicData$ | async)"
           [value]="topic.topic"
         >
           {{ topic.topic }}
         </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="margin20" appearance="outline">
+      <mat-label i18n>Event Type:</mat-label>
+      <mat-select
+        [(ngModel)]="eventType"
+        (selectionChange)="eventTypeChanged()"
+      >
+        <mat-option
+          *ngFor="let stream of (eventTypeData$ | async); trackBy: trackByFn"
+          [value]="stream.value"
+        >
+          {{ stream.displayValue }}</mat-option
+        >
       </mat-select>
     </mat-form-field>
   </section>

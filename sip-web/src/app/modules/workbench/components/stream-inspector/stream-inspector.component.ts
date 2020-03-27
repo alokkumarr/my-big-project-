@@ -21,9 +21,12 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
   public topicData$: Observable<any>;
   private streamResult$: Observable<any>;
   public streamTopicData$: Observable<any>;
+  private eventTypeResult$: Observable<any>;
+  public eventTypeData$: Observable<any>;
   private subscriptions: SubscriptionLike[] = [];
   public streamName: string;
   public topicName = '';
+  public eventType: string;
   constructor(private _workbench: WorkbenchService) {}
 
   ngOnInit() {
@@ -40,26 +43,48 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
     this.streamTopicData$ = of([]);
     this.streamName = '';
     this.topicName = '';
+    this.eventTypeData$ = of([]);
+    this.eventType = '';
     this.streamResult$ = this._workbench.getListOfStreams();
 
     this.streamResult$.subscribe(result => {
       if (!isEmpty(result)) {
         let cols;
         const stream = [];
+        const eventType = [];
         forEach(result, item => {
           cols = union([], keys(item));
           cols.shift();
           stream.push(head(item[head(cols)]));
+          eventType.push({
+            stream: head(item[head(cols)]).queue,
+            data: item.eventTypes
+          });
         });
         this.streamData$ = of(stream);
+        this.eventTypeResult$ = of(eventType);
       }
     });
   }
 
   streamChanged() {
     this.resetTopicAndDataGrid();
-    const subs = this.streamData$.subscribe(result => {
-      const topic = filter(result, {
+    this.eventTypeResult$.subscribe(result => {
+      const matched = filter(result, {
+        stream: this.streamName
+      })[0];
+      const eventData = [];
+      forEach(matched.data, data => {
+        eventData.push({
+          displayValue: data,
+          value: data
+        });
+      });
+      this.eventTypeData$ = of(eventData);
+    });
+
+    const subs = this.streamData$.subscribe(res => {
+      const topic = filter(res, {
         queue: this.streamName
       });
       this.topicData$ = of(topic);
@@ -68,16 +93,21 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subs);
   }
 
-  topicChanged() {
+  eventTypeChanged() {
     this.streamTopicData$ = of([]);
     setTimeout(() => {
-      this.streamTopicData$ = this._workbench.getListOfTopics(this.streamName);
+      this.streamTopicData$ = this._workbench.getListOfTopics(
+        this.streamName,
+        this.eventType
+      );
     }, 200);
   }
 
   resetTopicAndDataGrid() {
     this.streamTopicData$ = of([]);
     this.topicData$ = of([]);
+    this.eventTypeData$ = of([]);
+    this.eventType = '';
     this.topicName = '';
   }
 
