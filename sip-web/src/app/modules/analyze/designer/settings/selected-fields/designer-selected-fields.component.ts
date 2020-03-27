@@ -99,8 +99,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     const dndSub = this._dndPubsub.subscribe(this.onDndEvent.bind(this));
     this.subscriptions.push(dndSub);
 
-    this.filters
-
     const adapterSub = this.groupAdapters$.subscribe(adapters => {
       this.canAcceptMap = reduce(
         adapters,
@@ -283,16 +281,24 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   removeFilterFromTree(filter, index) {
-    this.flattenedfilters.splice(index, 1);
-    if (filter.isAggregationFilter) {
-      index = index === 0 ? index + 1 : index;
-      this.filters.splice(index, 1);
+    if (this.filters[0].booleanCriteria) {
+      console.log(this.filters);
+      this.flattenedfilters.splice(index, 1);
+      if (filter.isAggregationFilter) {
+        index = index === 0 ? index + 1 : index;
+        this.filters.splice(index, 1);
+      } else {
+        this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+      }
+
+      setTimeout(() => {
+        this.removeFilter.emit();
+      }, 650);
     } else {
-      this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+      this.flattenedfilters.splice(index, 1);
+      this.filters.splice(index, 1);
+      this.removeFilter.emit();
     }
 
-    setTimeout(() => {
-      this.removeFilter.emit();
-    }, 650);
   }
 }

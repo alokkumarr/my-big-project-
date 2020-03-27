@@ -42,10 +42,23 @@ export class FilterChipsComponent {
   }
 
   onRemove(filter, index) {
-    this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
-    this.flattenedFilters.splice(index, 1);
-    if (this.flattenedFilters.length === 0) {
-      this.onRemoveAll();
+    // this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+    // this.flattenedFilters.splice(index, 1);
+    // if (this.flattenedFilters.length === 0) {
+    //   this.onRemoveAll();
+    // }
+    if (this.filters[0].booleanCriteria) {
+      console.log(this.filters);
+      this.flattenedFilters.splice(index, 1);
+      if (filter.isAggregationFilter) {
+        index = index === 0 ? index + 1 : index;
+        this.filters.splice(index, 1);
+      } else {
+        this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+      }
+    } else {
+      this.flattenedFilters.splice(index, 1);
+      this.filters.splice(index, 1);
     }
   }
 
