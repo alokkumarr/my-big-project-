@@ -181,6 +181,7 @@ public class NGSQLScriptDescriptor {
                 logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
                     + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
                 TableDescriptor targetTable = null;
+                updateTableName(tables);
                 for(TableDescriptor td : tables){
                     logger.trace("Try table: " + td.toString());
                     if (td.isTargetTable) targetTable = td;
@@ -199,7 +200,7 @@ public class NGSQLScriptDescriptor {
 
                 SQLDescriptor sqlDesc = new SQLDescriptor();
                 logger.trace("Qualify statement as: " + p.stType.toString());
-//TODO:: Assume that statement is processMap select statement, generate correct name: add processed data object
+                //TODO:: Assume that statement is processMap select statement, generate correct name: add processed data object
                 switch (p.stType) {
 
                     case SELECT:
@@ -229,7 +230,7 @@ public class NGSQLScriptDescriptor {
                             }
                             if (pos < 0)
                                 throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not find SELECT clause for statement: " + stmt.toString());
-                            sqlDesc.SQL = stmt.toString().substring(pos);
+                            sqlDesc.SQL = stmt.toString().substring(pos).replaceAll(";","");;
                             logger.debug(" \n" + "SQL is :  "  + sqlDesc.SQL  + " \n");
                             sqlDesc.tableDescriptor = targetTable;
                         }
@@ -264,6 +265,20 @@ public class NGSQLScriptDescriptor {
             throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
         }
         return;
+    }
+
+    private void updateTableName(List<TableDescriptor> tables) {
+        if (tables != null && !tables.isEmpty()){
+            for (TableDescriptor td : tables){
+              logger.info("table name start :" + td.toString());
+              logger.info("Update table name start :" + outputDataObjects.keySet());
+                outputDataObjects.keySet().forEach(key -> {
+                  if (key != null && key.equalsIgnoreCase(td.tableName)){
+                    td.tableName = key;
+                  }
+                });
+            }
+        }
     }
 
     private final static String comment_patterns[] = { "\\-{2,}+.*\\n", "\\-{2,}+.*\\r\\n", "\\-{2,}+.*$", "/\\*(?:.|\\n)*?\\*/", "/\\*(?:.|\\r\\n)*?\\*/" };
@@ -341,22 +356,27 @@ public class NGSQLScriptDescriptor {
                 continue;
             }
 
-            logger.debug("TD = " + td + ". Is temp table " + td.isTempTable);
+            logger.info("TD = " + td + ". Is temp table " + td.isTempTable);
 
-            logger.trace("Resolving out table: " + tn);
+            logger.info("Resolving out table: " + tn);
+            logger.info("outputDataObjects dataset size : " + outputDataObjects.size());
+            logger.info("outputDataObjects dataset key details : " + outputDataObjects.keySet());
 
             //TODO:: Access by DataSet name or by parameter [name] -- Outputs???
             //if (outputs.containsKey(tn)) {
-            if (outputDataObjects.containsKey(tn)) {
 
-                Map<String, Object> oDO = outputDataObjects.get(tn);
+            boolean haveValidKey = outputDataObjects.keySet().stream().anyMatch(s -> s.equalsIgnoreCase(tn));
+            if (haveValidKey || outputDataObjects.containsKey(tn)) {
+                String tempTn = outputDataObjects.keySet().stream().filter(s -> s.equalsIgnoreCase(tn)).findAny().get();
+                logger.info("Resolving out temp table name : " + tempTn);
+                Map<String, Object> oDO = outputDataObjects.get(tempTn);
                 td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
                 td.format = (String) oDO.get(DataSetProperties.Format.name());
                 td.mode = (String) oDO.get(DataSetProperties.Mode.name());
                 td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
                 td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
-                logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
-                    tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
+                logger.info(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
+                    tempTn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
             } else {
                 throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
             }
