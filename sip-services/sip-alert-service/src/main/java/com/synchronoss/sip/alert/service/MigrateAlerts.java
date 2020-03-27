@@ -38,39 +38,54 @@ public class MigrateAlerts {
 
   public MigrateAlerts() {}
 
+  /**
+   *  Convert Alerts.
+   */
   public void convertAllAlerts() {
     List<AlertRuleDetails> alertRuleDetailsList = getAllAlerts();
     if (!CollectionUtils.isEmpty(alertRuleDetailsList)) {
-      alertRuleDetailsList.forEach(alertRuleDetails -> {
-        JsonObject alertJsonObject = new Gson()
-            .fromJson(alertRuleDetails.toString(), JsonObject.class);
-        logger.info("Converted Json : {}", gson.toJson(alertJsonObject));
-        AlertRuleDetails alertRuleDetails1 = alertConverter.convert(alertJsonObject);
-        logger.info("Updated AlertRuleDef : {}", gson.toJson(alertRuleDetails1));
-        updateAlertRule(alertRuleDetails1,alertRuleDetails1.getAlertRulesSysId());
-      });
+      alertRuleDetailsList.forEach(
+          alertRuleDetails -> {
+            JsonObject alertJsonObject =
+                new Gson().fromJson(alertRuleDetails.toString(), JsonObject.class);
+            logger.info("Converted Json : {}", gson.toJson(alertJsonObject));
+            AlertRuleDetails alertRuleDetails1 = alertConverter.convert(alertJsonObject);
+            logger.info("Updated AlertRuleDef : {}", gson.toJson(alertRuleDetails1));
+            updateAlertRule(alertRuleDetails1, alertRuleDetails1.getAlertRulesSysId());
+          });
     } else {
       logger.info("No Alerts definitions to migrate !!");
     }
   }
 
+  /**
+   * Fetch all alerts.
+   *
+   * @return List of alerts
+   */
   public List<AlertRuleDetails> getAllAlerts() {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     List<AlertRuleDetails> alertRuleList =
-        connection.runMaprDbQueryWithFilter(
-            null, null, null, null, AlertRuleDetails.class);
+        connection.runMaprDbQueryWithFilter(null, null, null, null, AlertRuleDetails.class);
     Long noOfRecords = connection.runMapDbQueryForCount(null);
     logger.info("number of Alerts definitions that needs migration : {}", noOfRecords);
     return alertRuleList;
   }
 
-  public AlertRuleDetails updateAlertRule(
-          AlertRuleDetails alertRuleDetails, String alertRuleId) {
+  /**
+   * Update alert rule definition.
+   *
+   * @param alertRuleDetails Alert rule details
+   * @param alertRuleId Alert rule id
+   *
+   * @return Updated alert rule
+   */
+  public AlertRuleDetails updateAlertRule(AlertRuleDetails alertRuleDetails, String alertRuleId) {
     try {
       MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
       alertRuleDetails.setAlertRulesSysId(alertRuleId);
       connection.update(alertRuleId, alertRuleDetails);
-      logger.info("AlertDefinition update : {}",gson.toJson(alertRuleDetails));
+      logger.info("AlertDefinition update : {}", gson.toJson(alertRuleDetails));
     } catch (Exception e) {
       logger.info("Exception occurred while updating AlertDefinition : {}", e.getMessage());
     }

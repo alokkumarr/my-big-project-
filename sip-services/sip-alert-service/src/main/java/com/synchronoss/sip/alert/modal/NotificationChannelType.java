@@ -1,12 +1,8 @@
 package com.synchronoss.sip.alert.modal;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public enum NotificationChannelType {
   @JsonProperty("email")

@@ -1,5 +1,8 @@
 package com.synchronoss.sip.alert.service;
 
+import com.synchronoss.sip.alert.modal.ModuleName;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMapping;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import java.util.List;
@@ -25,4 +28,8 @@ public interface SubscriberService {
   NotificationSubscriber updateSubscriber(String subscriberId, NotificationSubscriber subscriber);
 
   void deleteSubscriber(String subscriberId);
+
+  void addSubscribersToModule(ModuleSubscriberMappingPayload payload);
+
+  ModuleSubscriberMappingPayload fetchSubscribersForModule(String moduleId, ModuleName moduleName);
 }

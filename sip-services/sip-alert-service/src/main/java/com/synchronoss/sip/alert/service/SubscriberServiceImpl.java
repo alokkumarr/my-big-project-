@@ -1,7 +1,12 @@
 package com.synchronoss.sip.alert.service;
 
+import com.synchronoss.sip.alert.modal.ModuleName;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMapping;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
+import com.synchronoss.sip.alert.modal.SubscriberDetails;
+import com.synchronoss.sip.alert.repository.ModuleSubscriberMappingRepository;
 import com.synchronoss.sip.alert.repository.NotificationSubscriberRepository;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +30,8 @@ public class SubscriberServiceImpl implements SubscriberService {
   private String basePath;
 
   @Autowired private NotificationSubscriberRepository notificationSubscriberRepository;
+
+  @Autowired private ModuleSubscriberMappingRepository moduleSubscriberMappingRepository;
 
   @Override
   public NotificationSubscriber addSubscriber(
@@ -139,5 +146,47 @@ public class SubscriberServiceImpl implements SubscriberService {
   @Override
   public void deleteSubscriber(String subscriberId) {
     notificationSubscriberRepository.deleteById(subscriberId);
+  }
+
+  @Override
+  public void addSubscribersToModule(ModuleSubscriberMappingPayload payload) {
+
+    List<ModuleSubscriberMapping> mappingList = new ArrayList<>();
+
+    String moduleId = payload.getModuleId();
+    ModuleName moduleName = payload.getModuleName();
+    List<SubscriberDetails> subscribers = payload.getSubscribers();
+
+    for (SubscriberDetails subscriber : subscribers) {
+      List<NotificationChannelType> channelTypes = subscriber.getChannelTypes();
+
+      for (NotificationChannelType channelType : channelTypes) {
+        ModuleSubscriberMapping mapping = new ModuleSubscriberMapping();
+        String id = UUID.randomUUID().toString();
+
+        mapping.setId(id);
+        mapping.setModuleId(moduleId);
+        mapping.setModuleName(moduleName);
+
+        mapping.setAcknowledged(false);
+        mapping.setSubscriberId(subscriber.getSubscriberId());
+        mapping.setChannelType(channelType);
+        mappingList.add(mapping);
+      }
+    }
+
+    moduleSubscriberMappingRepository.saveAll(mappingList);
+  }
+
+  @Override
+  public ModuleSubscriberMappingPayload fetchSubscribersForModule(
+      String moduleId, ModuleName moduleName) {
+    ModuleSubscriberMappingPayload payload = new ModuleSubscriberMappingPayload();
+    //    return moduleSubscriberMappingRepository.findAllByModuleIdAndModuleName(moduleId,
+    // moduleName);
+
+    // TODO: Complete this method
+
+    return payload;
   }
 }
