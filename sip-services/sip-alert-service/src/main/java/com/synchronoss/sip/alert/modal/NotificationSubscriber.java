@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -27,7 +28,7 @@ public class NotificationSubscriber {
 
   @JsonProperty("channelType")
   @ApiModelProperty(notes = "SIP supported Channel Types", name = "channelType")
-  @Enumerated
+  @Enumerated(EnumType.STRING)
   private NotificationChannelType channelType;
 
   @JsonProperty("channelValue")

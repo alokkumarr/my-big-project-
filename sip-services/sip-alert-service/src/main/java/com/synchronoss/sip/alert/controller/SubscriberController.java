@@ -1,6 +1,9 @@
 package com.synchronoss.sip.alert.controller;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.alert.modal.ModuleName;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMapping;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.service.SubscriberService;
@@ -10,6 +13,7 @@ import io.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sun.security.pkcs11.Secmod.ModuleType;
 
 @RestController
 @RequestMapping("/subscribers")
@@ -81,7 +86,7 @@ public class SubscriberController {
   }
 
   /**
-   * API to fetch subscribers by list channel values
+   * API to fetch subscribers by list channel values.
    *
    * @param request Request object
    * @param response Response Object
@@ -194,5 +199,42 @@ public class SubscriberController {
       HttpServletResponse response,
       @PathVariable("subscriberid") String subscriberId) {
     subscriberService.deleteSubscriber(subscriberId);
+  }
+
+  /**
+   * API to subscriber to a module.
+   *
+   * @param request Request object
+   * @param response Response Object
+   * @param payload Request body
+   * @return Mapping details
+   */
+  @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
+  public String subscribeToModule(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody ModuleSubscriberMappingPayload payload) {
+    subscriberService.addSubscribersToModule(payload);
+
+    return "Mapped successfully";
+  }
+
+  /**
+   * Fetch subscribers for a given module id and module name.
+   *
+   * @param request Request object
+   * @param response Response Object
+   * @param moduleId Module ID
+   * @param moduleName Module name (ALERT/ANALYZE)
+   * @return Subscriber Details
+   */
+  public ModuleSubscriberMappingPayload fetchSubscribersForModule(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @QueryParam("moduleId") String moduleId,
+      @QueryParam("moduleName") ModuleName moduleName) {
+    ModuleSubscriberMappingPayload payload = new ModuleSubscriberMappingPayload();
+
+    return payload;
   }
 }
