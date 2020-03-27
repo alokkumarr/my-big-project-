@@ -202,7 +202,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 FileSystem fs = HFileOperations.getFileSystem();
                 logger.debug("Input Source Path = " + sourcePath);
                 Path inputPath = new Path(sourcePath);
-                FileStatus[] files = fs.globStatus(inputPath);
+                files = fs.globStatus(inputPath);
                 if(files != null && files.length == 1 && files[0].isDirectory()){
                     logger.debug("Files length = 1 and is a directory");
                     // If so - we have to process all the files inside - create the mask
@@ -292,7 +292,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 else {
                     if (headerSize >= 1) {
                         logger.debug("Header present");
-                        files = fs.globStatus(new Path(sourcePath));
+                        //files = fs.globStatus(new Path(sourcePath));
 
                         if (files != null) {
                             logger.debug("Total number of files in the directory = " + files.length);
@@ -303,7 +303,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                             // If so - we have to process all the files inside - create the mask
                             sourcePath += Path.SEPARATOR + "*";
                             // ... and query content
-                            files = fs.globStatus(new Path(sourcePath));
+                            //files = fs.globStatus(new Path(sourcePath));
                         }
                         if(isPivotApplied || isFlatteningEnabled || isSchemaContainsJsonType){
                             retval = parseAndUnionFiles(files, outputDataSetMode);
@@ -314,6 +314,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         logger.debug("No Header");
                         retval = parse(outputDataSetMode);
                     }
+                    
                 }
                 if(!isPivotApplied && !isFlatteningEnabled && !isSchemaContainsJsonType) {
                     //Write Consolidated Accepted data
@@ -447,6 +448,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if (!this.isRealTime) {
 
             logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
+            logger.debug("####files length at beginning of archive ####"+ files.length);
 
             try {
             	
