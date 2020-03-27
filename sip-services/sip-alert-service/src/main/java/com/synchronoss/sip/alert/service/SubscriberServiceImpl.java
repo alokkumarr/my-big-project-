@@ -17,13 +17,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SubscriberServiceImpl implements SubscriberService {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(SubscriberServiceImpl.class);
 
   @Value("${sip.service.metastore.base}")
   @NotNull
   private String basePath;
 
-  @Autowired private NotificationSubscriberRepository notificationSubscriberRepository;
+  @Autowired
+  private NotificationSubscriberRepository notificationSubscriberRepository;
 
   @Override
   public NotificationSubscriber addSubscriber(NotificationSubscriber subscriber) {

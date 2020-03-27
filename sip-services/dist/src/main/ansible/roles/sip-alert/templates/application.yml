@@ -85,7 +85,7 @@ connector: http
   {% endif %}
 
 alerts:
-  alert-rule-migration-required: true
+  alert-rule-migration-required: false
 
 subscriber:
   secret:

@@ -32,11 +32,13 @@ public class MigrateAlerts {
   @NotNull
   private boolean migrationRequired;
 
-  @Autowired private AlertConverter alertConverter;
+  @Autowired
+  private AlertConverter alertConverter;
 
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-  public MigrateAlerts() {}
+  public MigrateAlerts() {
+  }
 
   public void convertAllAlerts() {
     List<AlertRuleDetails> alertRuleDetailsList = getAllAlerts();
@@ -47,7 +49,7 @@ public class MigrateAlerts {
         logger.info("Converted Json : {}", gson.toJson(alertJsonObject));
         AlertRuleDetails alertRuleDetails1 = alertConverter.convert(alertJsonObject);
         logger.info("Updated AlertRuleDef : {}", gson.toJson(alertRuleDetails1));
-        updateAlertRule(alertRuleDetails1,alertRuleDetails1.getAlertRulesSysId());
+        updateAlertRule(alertRuleDetails1, alertRuleDetails1.getAlertRulesSysId());
       });
     } else {
       logger.info("No Alerts definitions to migrate !!");
@@ -65,12 +67,12 @@ public class MigrateAlerts {
   }
 
   public AlertRuleDetails updateAlertRule(
-          AlertRuleDetails alertRuleDetails, String alertRuleId) {
+      AlertRuleDetails alertRuleDetails, String alertRuleId) {
     try {
       MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
       alertRuleDetails.setAlertRulesSysId(alertRuleId);
       connection.update(alertRuleId, alertRuleDetails);
-      logger.info("AlertDefinition update : {}",gson.toJson(alertRuleDetails));
+      logger.info("AlertDefinition update : {}", gson.toJson(alertRuleDetails));
     } catch (Exception e) {
       logger.info("Exception occurred while updating AlertDefinition : {}", e.getMessage());
     }

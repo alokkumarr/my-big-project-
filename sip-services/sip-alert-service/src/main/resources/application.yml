@@ -71,7 +71,7 @@ subscriber:
       key : "900jrYTKR1FWFgQjMMuA"
 
 alerts:
-  alert-rule-migration-required: true
+  alert-rule-migration-required: false
 
 connector: http
 

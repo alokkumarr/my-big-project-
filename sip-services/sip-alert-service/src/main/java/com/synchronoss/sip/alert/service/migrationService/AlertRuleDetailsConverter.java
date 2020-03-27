@@ -28,7 +28,8 @@ public class AlertRuleDetailsConverter implements AlertConverter {
 
     Notification notification1 = new Notification();
     Email email1 = new Email();
-    Set<String> subscribersSet = new HashSet<>(); //TODO : Call api and get the subscriber ids for all recipients.
+    Set<String> subscribersSet = new HashSet<>();
+    //TODO : Call api and get the subscriber ids for all recipients.
 
     Set<String> emailSet = new HashSet();
     String alertRulesSysId = oldAlertsDefinition.get("alertRulesSysId").getAsString();

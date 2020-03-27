@@ -5,6 +5,7 @@ import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import java.util.List;
 
 public interface SubscriberService {
+
   NotificationSubscriber addSubscriber(NotificationSubscriber subscriber);
 
   NotificationSubscriber getSubscriber(String subscriberId);
