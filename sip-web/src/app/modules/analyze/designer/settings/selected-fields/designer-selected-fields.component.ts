@@ -284,19 +284,23 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     if (this.filters[0].booleanCriteria) {
       this.flattenedfilters.splice(index, 1);
       if (filter.isAggregationFilter) {
-        index = index === 0 ? index + 1 : index;
-        this.filters.splice(index, 1);
+        this.filters = cloneDeep(this.filters.filter(option => {
+          return option.uuid !== filter.uuid;
+        }));
+        console.log(this.filters);
+        this.removeFilter.emit({subject: 'filters', data: this.filters});
       } else {
         this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+        setTimeout(() => {
+          this.removeFilter.emit({subject: 'filters', data: this.filters});
+        }, 650);
       }
 
-      setTimeout(() => {
-        this.removeFilter.emit();
-      }, 650);
+
     } else {
       this.flattenedfilters.splice(index, 1);
       this.filters.splice(index, 1);
-      this.removeFilter.emit();
+      this.removeFilter.emit({subject: 'filters', data: this.filters});
     }
 
   }

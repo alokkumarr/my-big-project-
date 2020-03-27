@@ -874,5 +874,8 @@ export class AnalyzeService {
 
     var index = -1;
     [tree].some(getNode);
+    return tree;
+
+
   }
 }
