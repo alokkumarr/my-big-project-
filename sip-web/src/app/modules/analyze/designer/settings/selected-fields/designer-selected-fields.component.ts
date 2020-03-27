@@ -282,7 +282,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   removeFilterFromTree(filter, index) {
     if (this.filters[0].booleanCriteria) {
-      console.log(this.filters);
       this.flattenedfilters.splice(index, 1);
       if (filter.isAggregationFilter) {
         index = index === 0 ? index + 1 : index;

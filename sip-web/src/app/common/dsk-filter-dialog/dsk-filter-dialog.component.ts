@@ -71,9 +71,9 @@ export class DskFilterDialogComponent implements OnInit {
             this.data.filters = [];
             this.data.filters.push({
               booleanCriteria: this.data.booleanCriteria,
-              filters: oldFormatFilters
+              booleanQuery: oldFormatFilters
             })
-            return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
+            return this.data.filters[0];
           }
         }
       case 'DSK':
