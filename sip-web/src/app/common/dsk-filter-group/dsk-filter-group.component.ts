@@ -251,7 +251,7 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   onFilterModelChange(filter, childId) {
-    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = filter;
+    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model = cloneDeep(filter);
     this.onChange.emit(this.filterGroup);
   }
 

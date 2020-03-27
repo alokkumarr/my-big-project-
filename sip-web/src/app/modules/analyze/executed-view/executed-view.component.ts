@@ -559,6 +559,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
                   this.executedAnalysis.sqlBuilder
               })
         };
+        this.filters = get(this.executedAnalysis, 'sipQuery.filters');
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = this.utcToLocal(executeResponse.executedAt);
         this.data = this.flattenData(

@@ -164,7 +164,7 @@
                 <designer-string-filter
                   *ngSwitchCase="'string'"
                   (filterModelChange)="onFilterModelChange($event, childId)"
-                  [filterModel]="filterGroup.booleanQuery[childId].model || {}"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
                 >
                 </designer-string-filter>
                 <designer-date-filter
