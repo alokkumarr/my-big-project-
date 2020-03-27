@@ -1,6 +1,7 @@
 package com.synchronoss.sip.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -17,7 +18,7 @@ public class ModuleSubscriberMappingPayload {
   private ModuleName moduleName;
 
   @JsonProperty("subscribers")
-  private List<SubscriberDetails> subscribers;
+  private List<SubscriberDetails> subscribers = new ArrayList<>();
 
   /**
    * Constructor.

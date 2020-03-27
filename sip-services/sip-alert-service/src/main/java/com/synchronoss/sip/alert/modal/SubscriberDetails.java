@@ -1,6 +1,7 @@
 package com.synchronoss.sip.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -11,7 +12,7 @@ public class SubscriberDetails {
   private String subscriberId;
 
   @JsonProperty("channelTypes")
-  private List<NotificationChannelType> channelTypes;
+  private List<NotificationChannelType> channelTypes = new ArrayList<>();
 
   public SubscriberDetails(String subscriberId, List<NotificationChannelType> channelTypes) {
     this.subscriberId = subscriberId;

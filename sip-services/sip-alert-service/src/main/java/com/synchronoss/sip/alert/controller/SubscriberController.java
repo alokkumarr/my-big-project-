@@ -1,8 +1,9 @@
 package com.synchronoss.sip.alert.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.alert.modal.ModuleName;
-import com.synchronoss.sip.alert.modal.ModuleSubscriberMapping;
 import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sun.security.pkcs11.Secmod.ModuleType;
 
 @RestController
 @RequestMapping("/subscribers")
@@ -121,7 +121,7 @@ public class SubscriberController {
    * @return Subscriber details
    */
   @RequestMapping(value = "/", method = RequestMethod.POST)
-  public NotificationSubscriber addSubscriber(
+  public Object addSubscriber(
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestBody NotificationSubscriber notificationSubscriber) {
@@ -129,7 +129,20 @@ public class SubscriberController {
 
     String customerCode = ticket.getCustCode();
 
-    return subscriberService.addSubscriber(notificationSubscriber, customerCode);
+    NotificationSubscriber subscriber = null;
+    try {
+
+      subscriber = subscriberService.addSubscriber(notificationSubscriber, customerCode);
+      return subscriber;
+    } catch (Exception exception) {
+      ObjectMapper mapper = new ObjectMapper();
+      ObjectNode node = mapper.createObjectNode();
+      node.put("error", "Duplicate email");
+
+      response.setStatus(org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+      return node;
+    }
   }
 
   /**
@@ -228,12 +241,14 @@ public class SubscriberController {
    * @param moduleName Module name (ALERT/ANALYZE)
    * @return Subscriber Details
    */
+  @RequestMapping(value = "/getSubscribers", method = RequestMethod.GET)
   public ModuleSubscriberMappingPayload fetchSubscribersForModule(
       HttpServletRequest request,
       HttpServletResponse response,
       @QueryParam("moduleId") String moduleId,
       @QueryParam("moduleName") ModuleName moduleName) {
-    ModuleSubscriberMappingPayload payload = new ModuleSubscriberMappingPayload();
+    ModuleSubscriberMappingPayload payload =
+        subscriberService.fetchSubscribersForModule(moduleId, moduleName);
 
     return payload;
   }

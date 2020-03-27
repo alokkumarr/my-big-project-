@@ -13,12 +13,15 @@ CREATE TABLE `NOTIFICATION_SUBSCRIBER`
   SUBSCRIBER_ID     VARCHAR(50)  NOT NULL COMMENT 'Unique subscriber id',
   SUBSCRIBER_NAME   VARCHAR(100) COMMENT 'Name of the subscriber',
   CHANNEL_TYPE      VARCHAR(20) NOT NULL COMMENT 'Type of the notification channel',
-  CHANNEL_VALUE     TEXT NOT NULL COMMENT 'Channel value in stringified json form',
+  CHANNEL_VALUE     TEXT UNIQUE NOT NULL COMMENT 'Channel value in stringified json form',
   CUSTOMER_CODE     VARCHAR(50) NOT NULL COMMENT 'Customer for which subscriber is associated with',
   ACTIVE            TINYINT(4) NOT NULL DEFAULT 1 COMMENT 'Indicates whether subscriber is active or not',
   CREATED_TIME      DATETIME NULL COMMENT 'Created timestamp',
   MODIFIED_TIME     DATETIME COMMENT 'Modified timestamp'
 )ENGINE=InnoDB COMMENT 'PURPOSE: NOTIFICATION_SUBSCRIBERS is used to hold the list of all subscribers';
+
+ALTER TABLE `NOTIFICATION_SUBSCRIBER`
+ADD CONSTRAINT PK_NOTIFICATION_SUBSCRIBER PRIMARY KEY (ID);
 
 CREATE TABLE `MODULE_SUBSCRIBER_MAPPING`
 (
@@ -29,3 +32,6 @@ CREATE TABLE `MODULE_SUBSCRIBER_MAPPING`
   CHANNEL_TYPE      VARCHAR (20)  NOT NULL COMMENT 'Type of the channel, for E.g.: EMAIL, SMS',
   ACKNOWLEDGED      TINYINT(4)    NOT NULL DEFAULT 0 COMMENT 'Whether subscriber has acknowledged for the notification'
 )ENGINE=InnoDB COMMENT='Purpose: MODULE_SUBSCRIBER_MAPPING is used to maintain the list of subscribers subscribed for a given module';
+
+ALTER TABLE `MODULE_SUBSCRIBER_MAPPING`
+ADD CONSTRAINT PK_MODULE_SUBSCRIBER_MAPPING PRIMARY KEY (ID);

@@ -10,7 +10,10 @@ import com.synchronoss.sip.alert.repository.ModuleSubscriberMappingRepository;
 import com.synchronoss.sip.alert.repository.NotificationSubscriberRepository;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -182,11 +185,43 @@ public class SubscriberServiceImpl implements SubscriberService {
   public ModuleSubscriberMappingPayload fetchSubscribersForModule(
       String moduleId, ModuleName moduleName) {
     ModuleSubscriberMappingPayload payload = new ModuleSubscriberMappingPayload();
-    //    return moduleSubscriberMappingRepository.findAllByModuleIdAndModuleName(moduleId,
-    // moduleName);
+    List<ModuleSubscriberMapping> list =
+        moduleSubscriberMappingRepository.findAllByModuleIdAndModuleName(moduleId, moduleName);
 
-    // TODO: Complete this method
+    if (list != null && !list.isEmpty()) {
+      payload.setModuleId(list.get(0).getModuleId());
+      payload.setModuleName(list.get(0).getModuleName());
+
+      payload.setSubscribers(groupSubscribers(list));
+    }
 
     return payload;
+  }
+
+  private List<SubscriberDetails> groupSubscribers(List<ModuleSubscriberMapping> list) {
+    List<SubscriberDetails> subscriberDetailsList = new ArrayList<>();
+
+    Map<String, List<NotificationChannelType>> subscriberMap = new HashMap<>();
+
+    for (ModuleSubscriberMapping mapping : list) {
+      String subscriberId = mapping.getSubscriberId();
+
+      List<NotificationChannelType> channelTypes =
+          subscriberMap.getOrDefault(subscriberId, new ArrayList<>());
+
+      channelTypes.add(mapping.getChannelType());
+
+      subscriberMap.put(subscriberId, channelTypes);
+    }
+
+    for (Entry<String, List<NotificationChannelType>> entry : subscriberMap.entrySet()) {
+      SubscriberDetails details = new SubscriberDetails();
+      details.setSubscriberId(entry.getKey());
+      details.setChannelTypes(entry.getValue());
+
+      subscriberDetailsList.add(details);
+    }
+
+    return subscriberDetailsList;
   }
 }
