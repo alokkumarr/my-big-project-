@@ -22,14 +22,19 @@ import sncr.bda.base.MaprConnection;
 
 @Component
 public class AlertNotifier {
+
   private static final Logger logger = LoggerFactory.getLogger(AlertNotifier.class);
-  @Autowired RestUtil restUtil;
+  @Autowired
+  RestUtil restUtil;
 
-  @Autowired AlertService alertService;
+  @Autowired
+  AlertService alertService;
 
-  @Autowired Notifier notifier;
+  @Autowired
+  Notifier notifier;
 
-  @Autowired EmailNotifier emailNotifier;
+  @Autowired
+  EmailNotifier emailNotifier;
 
   @Value("${sip.service.metastore.base}")
   @NotNull

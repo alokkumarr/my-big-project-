@@ -8,6 +8,7 @@ import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import java.util.List;
 
 public interface SubscriberService {
+
   NotificationSubscriber addSubscriber(NotificationSubscriber subscriber, String customerCode);
 
   List<NotificationSubscriber> addAllSubscribers(

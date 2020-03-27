@@ -32,11 +32,13 @@ public class MigrateAlerts {
   @NotNull
   private boolean migrationRequired;
 
-  @Autowired private AlertConverter alertConverter;
+  @Autowired
+  private AlertConverter alertConverter;
 
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-  public MigrateAlerts() {}
+  public MigrateAlerts() {
+  }
 
   /**
    *  Convert Alerts.

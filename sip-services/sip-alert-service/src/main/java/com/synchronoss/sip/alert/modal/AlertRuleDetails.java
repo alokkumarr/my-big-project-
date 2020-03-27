@@ -1,9 +1,11 @@
 package com.synchronoss.sip.alert.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
+import java.util.List;
 
 public class AlertRuleDetails {
 
@@ -79,6 +81,7 @@ public class AlertRuleDetails {
   @JsonProperty("sipQuery")
   private SipQuery sipQuery;
 
+  @JsonIgnore
   @JsonProperty("notification")
   private Notification notification;
 
@@ -87,6 +90,19 @@ public class AlertRuleDetails {
 
   @JsonProperty("triggerOnLookback")
   private Boolean triggerOnLookback = false;
+
+  @JsonProperty("subscribers")
+  private List<String> subscribers;
+
+  @JsonProperty("subscribers")
+  public List<String> getSubscribers() {
+    return subscribers;
+  }
+
+  @JsonProperty("subscribers")
+  public void setSubscribers(List<String> subscribers) {
+    this.subscribers = subscribers;
+  }
 
   /**
    * Gets alertRulesSysId.
@@ -98,7 +114,9 @@ public class AlertRuleDetails {
     return alertRulesSysId;
   }
 
-  /** Sets alertRulesSysId. */
+  /**
+   * Sets alertRulesSysId.
+   */
   @JsonProperty("alertRulesSysId")
   public void setAlertRulesSysId(String alertRulesSysId) {
     this.alertRulesSysId = alertRulesSysId;
@@ -114,7 +132,9 @@ public class AlertRuleDetails {
     return datapodId;
   }
 
-  /** Sets datapodId. */
+  /**
+   * Sets datapodId.
+   */
   @JsonProperty("datapodId")
   public void setDatapodId(String datapodId) {
     this.datapodId = datapodId;
@@ -130,7 +150,9 @@ public class AlertRuleDetails {
     return datapodName;
   }
 
-  /** Sets datapodName. */
+  /**
+   * Sets datapodName.
+   */
   @JsonProperty("datapodName")
   public void setDatapodName(String datapodName) {
     this.datapodName = datapodName;
@@ -146,7 +168,9 @@ public class AlertRuleDetails {
     return categoryId;
   }
 
-  /** Sets categoryID. */
+  /**
+   * Sets categoryID.
+   */
   @JsonProperty("categoryId")
   public void setCategoryId(String categoryId) {
     this.categoryId = categoryId;
@@ -162,7 +186,9 @@ public class AlertRuleDetails {
     return product;
   }
 
-  /** Sets product. */
+  /**
+   * Sets product.
+   */
   @JsonProperty("product")
   public void setProduct(String product) {
     this.product = product;
@@ -178,7 +204,9 @@ public class AlertRuleDetails {
     return alertRuleName;
   }
 
-  /** Sets alertRuleName. */
+  /**
+   * Sets alertRuleName.
+   */
   public void setAlertRuleName(String alertRuleName) {
     this.alertRuleName = alertRuleName;
   }
@@ -193,7 +221,9 @@ public class AlertRuleDetails {
     return alertRuleDescription;
   }
 
-  /** Sets alertRuleDescription. */
+  /**
+   * Sets alertRuleDescription.
+   */
   @JsonProperty("alertRuleDescription")
   public void setAlertRuleDescription(String alertRuleDescription) {
     this.alertRuleDescription = alertRuleDescription;
@@ -208,7 +238,9 @@ public class AlertRuleDetails {
     return alertSeverity;
   }
 
-  /** Sets alertSeverity. */
+  /**
+   * Sets alertSeverity.
+   */
   public void setAlertSeverity(AlertSeverity alertSeverity) {
     this.alertSeverity = alertSeverity;
   }
@@ -222,7 +254,9 @@ public class AlertRuleDetails {
     return activeInd;
   }
 
-  /** Sets activeInd. */
+  /**
+   * Sets activeInd.
+   */
   public void setActiveInd(Boolean activeInd) {
     this.activeInd = activeInd;
   }
@@ -236,7 +270,9 @@ public class AlertRuleDetails {
     return customerCode;
   }
 
-  /** Sets customerCode. */
+  /**
+   * Sets customerCode.
+   */
   public void setCustomerCode(String customerCode) {
     this.customerCode = customerCode;
   }
@@ -250,7 +286,9 @@ public class AlertRuleDetails {
     return attributeName;
   }
 
-  /** Sets attributeName. */
+  /**
+   * Sets attributeName.
+   */
   public void setAttributeName(String attributeName) {
     this.attributeName = attributeName;
   }
@@ -264,7 +302,9 @@ public class AlertRuleDetails {
     return attributeValue;
   }
 
-  /** Sets attributeValue. */
+  /**
+   * Sets attributeValue.
+   */
   public void setAttributeValue(String attributeValue) {
     this.attributeValue = attributeValue;
   }
@@ -278,7 +318,9 @@ public class AlertRuleDetails {
     return lookbackColumn;
   }
 
-  /** Sets lookbackColumn. */
+  /**
+   * Sets lookbackColumn.
+   */
   public void setLookbackColumn(String lookbackColumn) {
     this.lookbackColumn = lookbackColumn;
   }
@@ -292,7 +334,9 @@ public class AlertRuleDetails {
     return lookbackPeriod;
   }
 
-  /** Sets lookbackPeriod. */
+  /**
+   * Sets lookbackPeriod.
+   */
   public void setLookbackPeriod(String lookbackPeriod) {
     this.lookbackPeriod = lookbackPeriod;
   }
@@ -306,7 +350,9 @@ public class AlertRuleDetails {
     return aggregationType;
   }
 
-  /** Sets aggregationType. */
+  /**
+   * Sets aggregationType.
+   */
   public void setAggregationType(Aggregate aggregationType) {
     this.aggregationType = aggregationType;
   }
@@ -320,7 +366,9 @@ public class AlertRuleDetails {
     return operator;
   }
 
-  /** Sets operator. */
+  /**
+   * Sets operator.
+   */
   public void setOperator(Operator operator) {
     this.operator = operator;
   }
@@ -334,7 +382,9 @@ public class AlertRuleDetails {
     return metricsColumn;
   }
 
-  /** Sets metricsColumn. */
+  /**
+   * Sets metricsColumn.
+   */
   public void setMetricsColumn(String metricsColumn) {
     this.metricsColumn = metricsColumn;
   }
@@ -348,7 +398,9 @@ public class AlertRuleDetails {
     return thresholdValue;
   }
 
-  /** Sets thresholdValue. */
+  /**
+   * Sets thresholdValue.
+   */
   public void setThresholdValue(Double thresholdValue) {
     this.thresholdValue = thresholdValue;
   }
@@ -362,7 +414,9 @@ public class AlertRuleDetails {
     return otherThresholdValue;
   }
 
-  /** Sets otherThresholdValue. */
+  /**
+   * Sets otherThresholdValue.
+   */
   public void setOtherThresholdValue(Double otherThresholdValue) {
     this.otherThresholdValue = otherThresholdValue;
   }
@@ -376,7 +430,9 @@ public class AlertRuleDetails {
     return createdTime;
   }
 
-  /** Sets createdTime . */
+  /**
+   * Sets createdTime .
+   */
   public void setCreatedTime(Long createdTime) {
     this.createdTime = createdTime;
   }
@@ -390,7 +446,9 @@ public class AlertRuleDetails {
     return modifiedTime;
   }
 
-  /** Sets modifiedTime. */
+  /**
+   * Sets modifiedTime.
+   */
   public void setModifiedTime(Long modifiedTime) {
     this.modifiedTime = modifiedTime;
   }
@@ -404,7 +462,9 @@ public class AlertRuleDetails {
     return createdBy;
   }
 
-  /** Sets createdBy. */
+  /**
+   * Sets createdBy.
+   */
   public void setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
   }
@@ -418,7 +478,9 @@ public class AlertRuleDetails {
     return updatedBy;
   }
 
-  /** Sets updatedBy. */
+  /**
+   * Sets updatedBy.
+   */
   public void setUpdatedBy(String updatedBy) {
     this.updatedBy = updatedBy;
   }
@@ -432,7 +494,9 @@ public class AlertRuleDetails {
     return sipQuery;
   }
 
-  /** Sets sipQuery. */
+  /**
+   * Sets sipQuery.
+   */
   public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
   }
@@ -446,7 +510,9 @@ public class AlertRuleDetails {
     return notification;
   }
 
-  /** Sets notification. */
+  /**
+   * Sets notification.
+   */
   public void setNotification(Notification notification) {
     this.notification = notification;
   }
@@ -460,7 +526,9 @@ public class AlertRuleDetails {
     return monitoringType;
   }
 
-  /** Sets monitoringType. */
+  /**
+   * Sets monitoringType.
+   */
   public void setMonitoringType(MonitoringType monitoringType) {
     this.monitoringType = monitoringType;
   }
@@ -474,7 +542,9 @@ public class AlertRuleDetails {
     return triggerOnLookback;
   }
 
-  /** Sets triggerOnLookback. */
+  /**
+   * Sets triggerOnLookback.
+   */
   public void setTriggerOnLookback(Boolean triggerOnLookback) {
     this.triggerOnLookback = triggerOnLookback;
   }

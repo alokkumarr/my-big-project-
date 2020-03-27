@@ -122,10 +122,8 @@ public class EmailNotifier implements Notifier {
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
     // TODO : To replace this hardcoded list with getting list of recipients for those subscribers.
-    Set<String> subscribers = alertRulesDetails.getNotification().getEmail().getSubscribers();
     Set<String> recipients = new HashSet<>();
     recipients.add("Prabhulingappa.AS@synchronoss.com");
-    recipients.add("pbuaradhana@gmail.com");
     List<String> recipientsList =
         getActiveSubscribers(
             recipients,
