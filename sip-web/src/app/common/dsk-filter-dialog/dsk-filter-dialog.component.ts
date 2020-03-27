@@ -62,11 +62,12 @@ export class DskFilterDialogComponent implements OnInit {
           this.aggregatedFilters = this.data.filters.filter(option => {
             return option.isAggregationFilter === true;
           });
-
           if (this.data.filters[0].filters) {
             return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
           } else {
-            const oldFormatFilters = cloneDeep(this.data.filters);
+            const oldFormatFilters = this.data.filters.filter(option => {
+              return option.isAggregationFilter !== true;
+            });
             this.data.filters = [];
             this.data.filters.push({
               booleanCriteria: this.data.booleanCriteria,

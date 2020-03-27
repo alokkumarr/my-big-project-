@@ -363,7 +363,6 @@ export class DashboardGridComponent
       } else {
         this.addGlobalValuestoFilters(filters, gFilters);
       }
-      console.log(filters, gFilters, tile.origAnalysis)
       const sipQuery = { ...tile.origAnalysis.sipQuery,
           ...{ filters: this.fetchGlobalValues(filters) }
       };
@@ -372,7 +371,6 @@ export class DashboardGridComponent
         ...{ sipQuery },
         _executeTile: true
       };
-      console.log(tile.analysis);
       this.dashboard.splice(id, 1, { ...tile });
     });
   }

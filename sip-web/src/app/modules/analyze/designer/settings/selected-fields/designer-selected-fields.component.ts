@@ -59,9 +59,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       return;
     }
     this.filters = filters;
-    console.log(this.filters);
     this.flattenedfilters = this.analyzeService.flattenAndFetchFiltersChips(filters, []);
-    console.log(this.flattenedfilters);
   }
 
   public groupAdapters: IDEsignerSettingGroupAdapter[];
