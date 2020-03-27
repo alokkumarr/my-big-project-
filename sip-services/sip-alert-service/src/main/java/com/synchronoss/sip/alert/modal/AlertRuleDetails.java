@@ -99,9 +99,6 @@ public class AlertRuleDetails {
     return subscribers;
   }
 
-  /**
-   * Sets subscribers list
-   */
   @JsonProperty("subscribers")
   public void setSubscribers(List<String> subscribers) {
     this.subscribers = subscribers;
