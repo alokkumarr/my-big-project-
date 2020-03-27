@@ -107,7 +107,8 @@ describe('Workbench Service', () => {
 
   it('should fetch data for topic grid ', () => {
     expect(
-      workbenchService.getListOfTopics('streams_!') instanceof Observable
+      workbenchService.getListOfTopics('streams_!', 'type_1') instanceof
+        Observable
     ).toBeTruthy();
   });
 });
