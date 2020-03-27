@@ -93,15 +93,15 @@ public class AlertServiceImpl implements AlertService {
 
   @Autowired EvaluatorListener evaluatorListener;
 
-  @PostConstruct
-  public void init() {
-    try {
-      MaprConnection alertRuleTableConnection = new MaprConnection(basePath, alertRulesMetadata);
-      MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertResults);
-    } catch (OjaiException e) {
-      LOGGER.error("Error occurred while setup tables {}", e);
-    }
-  }
+//  @PostConstruct
+//  public void init() {
+//    try {
+//      MaprConnection alertRuleTableConnection = new MaprConnection(basePath, alertRulesMetadata);
+//      MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertResults);
+//    } catch (OjaiException e) {
+//      LOGGER.error("Error occurred while setup tables {}", e);
+//    }
+//  }
 
   /**
    * Create Alert rule.

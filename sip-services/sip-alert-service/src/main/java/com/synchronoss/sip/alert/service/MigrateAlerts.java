@@ -40,6 +40,9 @@ public class MigrateAlerts {
   public MigrateAlerts() {
   }
 
+  /**
+   *
+   */
   public void convertAllAlerts() {
     List<AlertRuleDetails> alertRuleDetailsList = getAllAlerts();
     if (!CollectionUtils.isEmpty(alertRuleDetailsList)) {
@@ -56,6 +59,9 @@ public class MigrateAlerts {
     }
   }
 
+  /**
+   * @return
+   */
   public List<AlertRuleDetails> getAllAlerts() {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     List<AlertRuleDetails> alertRuleList =
@@ -66,6 +72,11 @@ public class MigrateAlerts {
     return alertRuleList;
   }
 
+  /**
+   * @param alertRuleDetails
+   * @param alertRuleId
+   * @return
+   */
   public AlertRuleDetails updateAlertRule(
       AlertRuleDetails alertRuleDetails, String alertRuleId) {
     try {

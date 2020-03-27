@@ -7,10 +7,15 @@ import com.google.gson.JsonObject;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.Email;
 import com.synchronoss.sip.alert.modal.Notification;
+import com.synchronoss.sip.alert.modal.NotificationChannelType;
+import com.synchronoss.sip.alert.modal.NotificationSubscriber;
+import com.synchronoss.sip.alert.service.SubscriberService;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +24,9 @@ public class AlertRuleDetailsConverter implements AlertConverter {
   private static final Logger logger = LoggerFactory.getLogger(AlertRuleDetailsConverter.class);
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+  @Autowired
+  private SubscriberService subscriberService;
+
   @Override
   public AlertRuleDetails convert(JsonObject oldAlertsDefinition) {
     AlertRuleDetails alertRuleDetails;
@@ -26,12 +34,6 @@ public class AlertRuleDetailsConverter implements AlertConverter {
     JsonObject notification = null;
     JsonArray emailIds = null;
 
-    Notification notification1 = new Notification();
-    Email email1 = new Email();
-    Set<String> subscribersSet = new HashSet<>();
-    //TODO : Call api and get the subscriber ids for all recipients.
-
-    Set<String> emailSet = new HashSet();
     String alertRulesSysId = oldAlertsDefinition.get("alertRulesSysId").getAsString();
     logger.info(String.format("Migrating Alert Id : %s has started", alertRulesSysId));
     if (oldAlertsDefinition.has("notification")) {
@@ -48,16 +50,17 @@ public class AlertRuleDetailsConverter implements AlertConverter {
 
     if (emailIds != null && emailIds.size() > 0) {
       emailIds.forEach(mail -> {
-        emailSet.add(mail.getAsString());
         // TODO : Add this email to subsriber table and relate with AlertMapping.
-        subscribersSet.add("test-id");
+        NotificationSubscriber notificationSubscriber = new NotificationSubscriber();
+        notificationSubscriber.setChannelType(NotificationChannelType.EMAIL);
+        notificationSubscriber.setChannelValue(mail.getAsString());
+        notificationSubscriber.setSubscriberName(mail.getAsString());
+        subscriberService.addSubscriber(notificationSubscriber,
+            oldAlertsDefinition.get("customerCode").getAsString());
       });
     }
-
-    email1.setSubscribers(subscribersSet);
-    notification1.setEmail(email1);
+    oldAlertsDefinition.remove("notification");
     alertRuleDetails = gson.fromJson(oldAlertsDefinition, AlertRuleDetails.class);
-    alertRuleDetails.setNotification(notification1);
     return alertRuleDetails;
   }
 }

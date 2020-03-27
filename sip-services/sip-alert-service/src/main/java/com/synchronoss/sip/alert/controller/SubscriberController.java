@@ -1,7 +1,6 @@
 package com.synchronoss.sip.alert.controller;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.sip.alert.modal.Notification;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.service.SubscriberService;
@@ -51,20 +50,38 @@ public class SubscriberController {
     return subscribers;
   }
 
-//  @RequestMapping(value = "/{channelType}", method = RequestMethod.GET)
-//  public List<NotificationSubscriber> getSubscribersByChannelType(
-//      HttpServletRequest request,
-//      HttpServletResponse response,
-//      @PathVariable NotificationChannelType channelType) {
-//    Ticket ticket = SipCommonUtils.getTicket(request);
-//
-//    String customerCode = ticket.getCustCode();
-//
-//    List<NotificationSubscriber> subscribers =
-//        subscriberService.getSubscribersByChannelTypeAndCustomerCode(channelType, customerCode);
-//
-//    return subscribers;
-//  }
+  @RequestMapping(value = "/channeltype/{channelType}", method = RequestMethod.GET)
+  public List<NotificationSubscriber> getSubscribersByChannelType(
+      HttpServletRequest request, HttpServletResponse response, @PathVariable String channelType) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+
+    String customerCode = ticket.getCustCode();
+
+    NotificationChannelType channelTypeObj = NotificationChannelType.fromValue(channelType);
+
+    List<NotificationSubscriber> subscribers =
+        subscriberService.getSubscribersByChannelTypeAndCustomerCode(channelTypeObj, customerCode);
+
+    return subscribers;
+  }
+
+  @RequestMapping(value = "/channeltype/{channelType}/channelvalue/", method = RequestMethod.POST)
+  public List<NotificationSubscriber> getSubscribersByChannelTypeAndValue(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @PathVariable("channelType") String channelType,
+      @RequestBody List<String> channelValues) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+
+    String customerCode = ticket.getCustCode();
+
+    NotificationChannelType channelTypeObj = NotificationChannelType.fromValue(channelType);
+    List<NotificationSubscriber> subscribers =
+        subscriberService.getSubscriberByChannelTypeAndChannelValueAndCustomerCode(
+            channelTypeObj, channelValues, customerCode);
+
+    return subscribers;
+  }
 
   @RequestMapping(value = "/", method = RequestMethod.POST)
   public NotificationSubscriber addSubscriber(
@@ -75,9 +92,17 @@ public class SubscriberController {
 
     String customerCode = ticket.getCustCode();
 
-    notificationSubscriber.setCustomerCode(customerCode);
+    return subscriberService.addSubscriber(notificationSubscriber, customerCode);
+  }
 
-    return subscriberService.addSubscriber(notificationSubscriber);
+  @RequestMapping(value = "/addAll", method = RequestMethod.POST)
+  public List<NotificationSubscriber> addAllSubscribers(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody List<NotificationSubscriber> notificationSubscribers) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    String customerCode = ticket.getCustCode();
+    return subscriberService.addAllSubscribers(notificationSubscribers, customerCode);
   }
 
   @RequestMapping(value = "/{subscriberid}", method = RequestMethod.GET)

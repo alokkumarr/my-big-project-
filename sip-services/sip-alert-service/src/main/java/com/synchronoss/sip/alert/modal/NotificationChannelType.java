@@ -2,6 +2,7 @@ package com.synchronoss.sip.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,8 +20,20 @@ public enum NotificationChannelType {
 
   private String value;
 
+  private static Map<String, NotificationChannelType> map = new HashMap<>();
+
+  static {
+    for (NotificationChannelType d : NotificationChannelType.values()) {
+      map.put(d.value, d);
+    }
+  }
+
   NotificationChannelType(String value) {
     this.value = value;
+  }
+
+  public static NotificationChannelType fromValue(String channelTypeStr) {
+    return map.get(channelTypeStr);
   }
 
   public String getValue() {
