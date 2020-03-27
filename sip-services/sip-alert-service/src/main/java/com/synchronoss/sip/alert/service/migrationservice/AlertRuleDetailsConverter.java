@@ -1,4 +1,4 @@
-package com.synchronoss.sip.alert.service.migrationService;
+package com.synchronoss.sip.alert.service.migrationservice;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,40 +21,42 @@ public class AlertRuleDetailsConverter implements AlertConverter {
 
   @Override
   public AlertRuleDetails convert(JsonObject oldAlertsDefinition) {
-    AlertRuleDetails alertRuleDetails;
-    JsonObject email = null;
-    JsonObject notification = null;
-    JsonArray emailIds = null;
-
-    Notification notification1 = new Notification();
-    Email email1 = new Email();
-    Set<String> subscribersSet = new HashSet<>(); //TODO : Call api and get the subscriber ids for all recipients.
+    Set<String> subscribersSet =
+        new HashSet<>(); // TODO : Call api and get the subscriber ids for all recipients.
 
     Set<String> emailSet = new HashSet();
     String alertRulesSysId = oldAlertsDefinition.get("alertRulesSysId").getAsString();
     logger.info(String.format("Migrating Alert Id : %s has started", alertRulesSysId));
+
+    JsonObject notification = null;
     if (oldAlertsDefinition.has("notification")) {
       notification = oldAlertsDefinition.getAsJsonObject("notification");
     }
 
+    JsonObject email = null;
     if (notification != null && notification.has("email")) {
       email = notification.getAsJsonObject("email");
     }
 
+    JsonArray emailIds = null;
     if (email != null && email.has("recipients")) {
       emailIds = email.getAsJsonArray("recipients");
     }
 
     if (emailIds != null && emailIds.size() > 0) {
-      emailIds.forEach(mail -> {
-        emailSet.add(mail.getAsString());
-        // TODO : Add this email to subsriber table and relate with AlertMapping.
-        subscribersSet.add("test-id");
-      });
+      emailIds.forEach(
+          mail -> {
+            emailSet.add(mail.getAsString());
+            // TODO : Add this email to subsriber table and relate with AlertMapping.
+            subscribersSet.add("test-id");
+          });
     }
 
+    Email email1 = new Email();
+    Notification notification1 = new Notification();
     email1.setSubscribers(subscribersSet);
     notification1.setEmail(email1);
+    AlertRuleDetails alertRuleDetails;
     alertRuleDetails = gson.fromJson(oldAlertsDefinition, AlertRuleDetails.class);
     alertRuleDetails.setNotification(notification1);
     return alertRuleDetails;

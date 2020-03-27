@@ -47,7 +47,6 @@ public class AlertNotifier {
 
   private RestTemplate restTemplate = null;
 
-
   /**
    * Send Alert notification.
    *
@@ -61,9 +60,6 @@ public class AlertNotifier {
       if (alertRule != null) {
         Notification notification = alertRule.getNotification();
         if (notification != null && notification.getEmail() != null) {
-//          notifier.notify();
-
-//          sendMailNotification(alertRule, alertTriggerSysId);
           emailNotifier.setAlertRule(alertRule);
           emailNotifier.setAlertTriggerSysId(alertTriggerSysId);
           notifier = emailNotifier;

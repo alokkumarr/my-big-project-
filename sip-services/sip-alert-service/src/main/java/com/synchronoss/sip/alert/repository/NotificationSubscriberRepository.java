@@ -15,17 +15,9 @@ public interface NotificationSubscriberRepository
   List<NotificationSubscriber> findByChannelTypeAndCustomerCodeAndActive(
       NotificationChannelType channelType, String customerCode, Boolean active);
 
-//  @Query(
-//      value = "SELECT NS FROM NOTIFICATION_SUBSCRIBER NS"
-//          + " WHERE NS.channelType=:channelType AND NS.channelValue IN (:channelValues)"
-//          + " AND NS.CUSTOMER_CODE=:customerCode AND NS.ACTIVE=:active")
   List<NotificationSubscriber> findByChannelTypeAndChannelValueInAndCustomerCodeAndActive(
-//      @Param("channelType")
       NotificationChannelType channelType,
-//      @Param("channelValues")
       List<String> channelValues,
-//      @Param("customerCode")
       String customerCode,
-//      @Param("active")
       Boolean active);
 }

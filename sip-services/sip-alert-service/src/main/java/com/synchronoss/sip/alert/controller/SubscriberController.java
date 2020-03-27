@@ -40,6 +40,13 @@ public class SubscriberController {
 
   @Autowired SubscriberService subscriberService;
 
+  /**
+   * Get all subscribers API.
+   *
+   * @param request Request object
+   * @param response Response Object
+   * @return List of subscribers
+   */
   @RequestMapping(value = "/", method = RequestMethod.GET)
   public List<NotificationSubscriber> getAllSubscribers(
       HttpServletRequest request, HttpServletResponse response) {
@@ -52,6 +59,14 @@ public class SubscriberController {
     return subscribers;
   }
 
+  /**
+   * API to fetch all subscribers by channel type.
+   *
+   * @param request Request object
+   * @param response Response Object
+   * @param channelType Type of the channel
+   * @return List of subscribers
+   */
   @RequestMapping(value = "/channeltype/{channelType}", method = RequestMethod.GET)
   public List<NotificationSubscriber> getSubscribersByChannelType(
       HttpServletRequest request, HttpServletResponse response, @PathVariable String channelType) {
@@ -67,6 +82,15 @@ public class SubscriberController {
     return subscribers;
   }
 
+  /**
+   * API to fetch subscribers by list channel values
+   *
+   * @param request Request object
+   * @param response Response Object
+   * @param channelType Type of the channel
+   * @param channelValues List of channel values
+   * @return
+   */
   @RequestMapping(value = "/channeltype/{channelType}/channelvalue/", method = RequestMethod.POST)
   public List<NotificationSubscriber> getSubscribersByChannelTypeAndValue(
       HttpServletRequest request,
@@ -85,6 +109,14 @@ public class SubscriberController {
     return subscribers;
   }
 
+  /**
+   * API to add a subscriber.
+   *
+   * @param request Request object
+   * @param response Response object
+   * @param notificationSubscriber Subscriber details
+   * @return Subscriber details
+   */
   @RequestMapping(value = "/", method = RequestMethod.POST)
   public NotificationSubscriber addSubscriber(
       HttpServletRequest request,
@@ -97,6 +129,14 @@ public class SubscriberController {
     return subscriberService.addSubscriber(notificationSubscriber, customerCode);
   }
 
+  /**
+   * API to add multiple subscribers.
+   *
+   * @param request Request object
+   * @param response Response object
+   * @param notificationSubscribers List of subscriber to be added
+   * @return Subscribers added
+   */
   @RequestMapping(value = "/addAll", method = RequestMethod.POST)
   public List<NotificationSubscriber> addAllSubscribers(
       HttpServletRequest request,
@@ -107,6 +147,14 @@ public class SubscriberController {
     return subscriberService.addAllSubscribers(notificationSubscribers, customerCode);
   }
 
+  /**
+   * API to fetch subscriber by subscriber id.
+   *
+   * @param request Request object
+   * @param response Response object
+   * @param subscriberId Subscriber ID
+   * @return Subscriber details
+   */
   @RequestMapping(value = "/{subscriberid}", method = RequestMethod.GET)
   public NotificationSubscriber getSubscriber(
       HttpServletRequest request,
@@ -117,6 +165,15 @@ public class SubscriberController {
     return subscriber;
   }
 
+  /**
+   * API to update a subscriber.
+   *
+   * @param request Request object
+   * @param response Response Object
+   * @param subscriberId Subscriber ID
+   * @param subscriber Subscriber details
+   * @return Updated subscriber details
+   */
   @RequestMapping(value = "/{subscriberid}", method = RequestMethod.PUT)
   public NotificationSubscriber updateSubscriber(
       HttpServletRequest request,
@@ -126,6 +183,13 @@ public class SubscriberController {
     return subscriberService.updateSubscriber(subscriberId, subscriber);
   }
 
+  /**
+   * Delete subscriber API.
+   *
+   * @param request Request object
+   * @param response Response object
+   * @param subscriberId Subscriber ID
+   */
   @RequestMapping(value = "/{subscriberid}", method = RequestMethod.DELETE)
   public void deleteSubscriber(
       HttpServletRequest request,
