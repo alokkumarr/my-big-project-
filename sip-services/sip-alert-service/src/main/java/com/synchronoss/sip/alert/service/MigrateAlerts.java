@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
-import com.synchronoss.sip.alert.service.migrationService.AlertConverter;
+import com.synchronoss.sip.alert.service.migrationservice.AlertConverter;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;

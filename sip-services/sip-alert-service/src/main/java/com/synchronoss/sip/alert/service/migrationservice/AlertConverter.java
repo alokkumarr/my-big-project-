@@ -1,4 +1,4 @@
-package com.synchronoss.sip.alert.service.migrationService;
+package com.synchronoss.sip.alert.service.migrationservice;
 
 import com.google.gson.JsonObject;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
