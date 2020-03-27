@@ -151,9 +151,6 @@ public class NGSQLScriptDescriptor {
      * that will be info source for SQL Executor calls
      */
     public void parseSQLScript(){
-
-        URL location = Preconditions.class.getResource('/' + Preconditions.class.getName().replace('.', '/') + ".class");
-        logger.info("Logger for presto guava test library :" + location.getPath());
         try{
             logger.debug("Step 4: Parse SQL Script");
             if (script == null ) {
@@ -267,18 +264,22 @@ public class NGSQLScriptDescriptor {
         return;
     }
 
+    /**
+     * Update the table name match with the configured table name.
+     *
+     * @param tables
+     */
     private void updateTableName(List<TableDescriptor> tables) {
-        if (tables != null && !tables.isEmpty()){
-            for (TableDescriptor td : tables){
-              logger.info("table name start :" + td.toString());
-              logger.info("Update table name start :" + outputDataObjects.keySet());
-                outputDataObjects.keySet().forEach(key -> {
-                  if (key != null && key.equalsIgnoreCase(td.tableName)){
-                    td.tableName = key;
-                  }
-                });
+      if (tables != null && !tables.isEmpty()){
+        for (TableDescriptor td : tables){
+          logger.trace("table name start :" + td.toString());
+          outputDataObjects.keySet().forEach(key -> {
+            if (key != null && key.equalsIgnoreCase(td.tableName)){
+              td.tableName = key;
             }
+          });
         }
+      }
     }
 
     private final static String comment_patterns[] = { "\\-{2,}+.*\\n", "\\-{2,}+.*\\r\\n", "\\-{2,}+.*$", "/\\*(?:.|\\n)*?\\*/", "/\\*(?:.|\\r\\n)*?\\*/" };
@@ -356,30 +357,25 @@ public class NGSQLScriptDescriptor {
                 continue;
             }
 
-            logger.info("TD = " + td + ". Is temp table " + td.isTempTable);
+          logger.debug("TD = " + td + ". Is temp table " + td.isTempTable);
 
-            logger.info("Resolving out table: " + tn);
-            logger.info("outputDataObjects dataset size : " + outputDataObjects.size());
-            logger.info("outputDataObjects dataset key details : " + outputDataObjects.keySet());
+          logger.trace("Resolving out table: " + tn);
 
-            //TODO:: Access by DataSet name or by parameter [name] -- Outputs???
-            //if (outputs.containsKey(tn)) {
+          //TODO:: Access by DataSet name or by parameter [name] -- Outputs???
+          //if (outputs.containsKey(tn)) {
+          if (outputDataObjects.containsKey(tn)) {
 
-            boolean haveValidKey = outputDataObjects.keySet().stream().anyMatch(s -> s.equalsIgnoreCase(tn));
-            if (haveValidKey || outputDataObjects.containsKey(tn)) {
-                String tempTn = outputDataObjects.keySet().stream().filter(s -> s.equalsIgnoreCase(tn)).findAny().get();
-                logger.info("Resolving out temp table name : " + tempTn);
-                Map<String, Object> oDO = outputDataObjects.get(tempTn);
-                td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
-                td.format = (String) oDO.get(DataSetProperties.Format.name());
-                td.mode = (String) oDO.get(DataSetProperties.Mode.name());
-                td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
-                td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
-                logger.info(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
-                    tempTn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
-            } else {
-                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
-            }
+            Map<String, Object> oDO = outputDataObjects.get(tn);
+            td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
+            td.format = (String) oDO.get(DataSetProperties.Format.name());
+            td.mode = (String) oDO.get(DataSetProperties.Mode.name());
+            td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
+            td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
+            logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
+                tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
+          } else {
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
+          }
         }
     }
 

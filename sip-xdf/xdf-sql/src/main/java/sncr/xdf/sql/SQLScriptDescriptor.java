@@ -176,6 +176,7 @@ public class SQLScriptDescriptor {
                 logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
                     + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
                 TableDescriptor targetTable = null;
+                updateTableName(tables);
                 for(TableDescriptor td : tables){
                     logger.trace("Try table: " + td.toString());
                     if (td.isTargetTable) targetTable = td;
@@ -261,6 +262,24 @@ public class SQLScriptDescriptor {
             throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
         }
         return;
+    }
+
+    /**
+     * Update the table name match with the configured table name.
+     *
+     * @param tables
+     */
+    private void updateTableName(List<TableDescriptor> tables) {
+        if (tables != null && !tables.isEmpty()){
+            for (TableDescriptor td : tables){
+                logger.trace("table name start :" + td.toString());
+                outputDataObjects.keySet().forEach(key -> {
+                    if (key != null && key.equalsIgnoreCase(td.tableName)){
+                        td.tableName = key;
+                    }
+                });
+            }
+        }
     }
 
     private final static String comment_patterns[] = { "\\-{2,}+.*\\n", "\\-{2,}+.*\\r\\n", "\\-{2,}+.*$", "/\\*(?:.|\\n)*?\\*/", "/\\*(?:.|\\r\\n)*?\\*/" };
