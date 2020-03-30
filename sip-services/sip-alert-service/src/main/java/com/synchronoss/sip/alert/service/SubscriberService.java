@@ -16,6 +16,8 @@ public interface SubscriberService {
 
   NotificationSubscriber getSubscriber(String subscriberId);
 
+  List<NotificationSubscriber> getSubscribersById(List<String> subscriberIds);
+
   List<NotificationSubscriber> getSubscribersByCustomerCode(String customerCode);
 
   List<NotificationSubscriber> getSubscribersByChannelTypeAndCustomerCode(
