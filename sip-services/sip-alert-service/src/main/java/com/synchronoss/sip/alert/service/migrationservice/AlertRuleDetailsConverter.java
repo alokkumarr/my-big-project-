@@ -66,10 +66,12 @@ public class AlertRuleDetailsConverter implements AlertConverter {
       });
     }
 
-    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload = new ModuleSubscriberMappingPayload();
+    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
+        new ModuleSubscriberMappingPayload();
     moduleSubscriberMappingPayload.setModuleId(alertRulesSysId);
     moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
     moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
+    subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
 
     oldAlertsDefinition.remove("notification");
     AlertRuleDetails alertRuleDetails = gson.fromJson(oldAlertsDefinition, AlertRuleDetails.class);

@@ -13,9 +13,11 @@ import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.modal.Subscriber;
+import com.synchronoss.sip.alert.modal.SubscriberDetails;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -131,20 +133,25 @@ public class EmailNotifier implements Notifier {
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
 
-    ModuleSubscriberMappingPayload subscribersForModule =
-        subscriberService
-            .fetchSubscribersForModule(alertRulesDetails.getAlertRulesSysId(), ModuleName.ALERT);
-    List<String> subscriberList = new ArrayList<>();
-    subscribersForModule.getSubscribers().forEach(subs -> {
-      if (subs.getChannelTypes().contains(NotificationChannelType.EMAIL)) {
-        subscriberList.add(subs.getSubscriberId());
-      }
+    List<SubscriberDetails> subscriberDetailsList = new ArrayList<>();
+    alertRulesDetails.getSubscribers().forEach(s -> {
+      SubscriberDetails subscriberDetails = new SubscriberDetails();
+      subscriberDetails.setSubscriberId(s);
+      subscriberDetails.setChannelTypes(Collections.singletonList(NotificationChannelType.EMAIL));
+      subscriberDetailsList.add(subscriberDetails);
     });
+
+    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
+        new ModuleSubscriberMappingPayload();
+    moduleSubscriberMappingPayload.setModuleId(alertRulesDetails.getAlertRulesSysId());
+    moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
+    moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
+    subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
 
     // TODO : Remove this iteration of each subscriber to read value and
     //  call single instance instead.
     Set<String> recipients = new HashSet<>();
-    subscriberList.forEach(s -> {
+    alertRulesDetails.getSubscribers().forEach(s -> {
       NotificationSubscriber subscriber = subscriberService.getSubscriber(s);
       recipients.add(subscriber.getChannelValue());
     });
