@@ -94,7 +94,7 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
         browser.refresh();
         dashboardFunctions.deleteDashboard(dashboardName);
       } catch (e) {
-        logger.error(e);
+       logger.error(e);
       }
     });
   });
