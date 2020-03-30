@@ -8,10 +8,16 @@ import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.sip.alert.modal.AlertNotificationLog;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import com.synchronoss.sip.alert.modal.ModuleName;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
+import com.synchronoss.sip.alert.modal.NotificationChannelType;
+import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.modal.Subscriber;
+import com.synchronoss.sip.alert.modal.SubscriberDetails;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +45,11 @@ public class EmailNotifier implements Notifier {
   @Autowired
   RestUtil restUtil;
 
-  @Autowired AlertService alertService;
+  @Autowired
+  AlertService alertService;
+
+  @Autowired
+  SubscriberService subscriberService;
 
   @Value("${sip.service.alert.mail.body}")
   private String mailBody;
@@ -91,7 +101,8 @@ public class EmailNotifier implements Notifier {
     this.alertRule = alertRule;
   }
 
-  public EmailNotifier() {}
+  public EmailNotifier() {
+  }
 
   public EmailNotifier(AlertRuleDetails alertRule, String alertTriggerSysId) {
     this.alertRule = alertRule;
@@ -121,9 +132,30 @@ public class EmailNotifier implements Notifier {
     notificationLog.setThresholdValue(alertRulesDetails.getThresholdValue());
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
-    // TODO : To replace this hardcoded list with getting list of recipients for those subscribers.
+
+    List<SubscriberDetails> subscriberDetailsList = new ArrayList<>();
+    alertRulesDetails.getSubscribers().forEach(s -> {
+      SubscriberDetails subscriberDetails = new SubscriberDetails();
+      subscriberDetails.setSubscriberId(s);
+      subscriberDetails.setChannelTypes(Collections.singletonList(NotificationChannelType.EMAIL));
+      subscriberDetailsList.add(subscriberDetails);
+    });
+
+    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
+        new ModuleSubscriberMappingPayload();
+    moduleSubscriberMappingPayload.setModuleId(alertRulesDetails.getAlertRulesSysId());
+    moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
+    moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
+    subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
+
+    // TODO : Remove this iteration of each subscriber to read value and
+    //  call single instance instead.
     Set<String> recipients = new HashSet<>();
-    recipients.add("Prabhulingappa.AS@synchronoss.com");
+    alertRulesDetails.getSubscribers().forEach(s -> {
+      NotificationSubscriber subscriber = subscriberService.getSubscriber(s);
+      recipients.add(subscriber.getChannelValue());
+    });
+
     List<String> recipientsList =
         getActiveSubscribers(
             recipients,
@@ -328,6 +360,7 @@ public class EmailNotifier implements Notifier {
   }
 
   interface MailBodyResolver {
+
     String ALERT_RULE_NAME = "$alertRuleName";
     String CATEGORY = "$category";
     String LINK_FOR_ALERT = "$link";
