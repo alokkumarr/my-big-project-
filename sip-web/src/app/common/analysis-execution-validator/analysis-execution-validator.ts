@@ -6,6 +6,7 @@ import moment from 'moment';
 import {
   CUSTOM_DATE_PRESET_VALUE,
   LESS_THAN_A_WEEK_DATE_PRESETS,
+  LESS_THAN_4_DAYS_DATE_PRESETS,
   DATE_TYPES
 } from '../consts';
 import { FilterModel, QueryDSL, Filter, ArtifactColumnDSL } from '../types';
@@ -46,13 +47,20 @@ export function isRequestValid(
 function willRequestHaveTooMuchData(
   sipQuery: QueryDSL
 ): WillRequestBeValidAnswer {
-  const fieldWithMinuteLevelAggregation = getXFieldWithTooMuchGranularity(
-    sipQuery
+  const fieldWithMinuteLevelAggregation = getXFieldWithAggregation(
+    sipQuery,
+    'minute'
   );
-  const willHaveTooMuchData =
+  const fieldWithSecondLevelAggregation = getXFieldWithAggregation(
+    sipQuery,
+    'second'
+  );
+  const willHaveTooMuchDataFromMinuteAggregation =
     fieldWithMinuteLevelAggregation && !hasDateFilterForLessThenAWeek(sipQuery);
+  const willHaveTooMuchDataFromSecondAggregation =
+    fieldWithSecondLevelAggregation && !hasDateFilterForLessThen4Days(sipQuery);
 
-  if (willHaveTooMuchData) {
+  if (willHaveTooMuchDataFromMinuteAggregation) {
     const { alias, displayName } = fieldWithMinuteLevelAggregation;
     return {
       willRequestBeValid: false,
@@ -65,18 +73,32 @@ function willRequestHaveTooMuchData(
       }
     };
   }
+  if (willHaveTooMuchDataFromSecondAggregation) {
+    const { alias, displayName } = fieldWithSecondLevelAggregation;
+    return {
+      willRequestBeValid: false,
+      reason: 'too-much-data__from-second-aggregation',
+      warning: {
+        shouldShow: true,
+        title: 'Second level aggregation will contain too much data.',
+        msg: `Select a filter for field: ${alias ||
+          displayName} that is less than 4 days.`
+      }
+    };
+  }
   return { willRequestBeValid: true };
 }
 
-function getXFieldWithTooMuchGranularity(
-  sipQuery: QueryDSL
+function getXFieldWithAggregation(
+  sipQuery: QueryDSL,
+  aggregation: string
 ): ArtifactColumnDSL {
   // TODO this only works for chart
   const fields = get(sipQuery, 'artifacts.0.fields');
   return find(
     fields,
     ({ area, type, groupInterval }: ArtifactColumnDSL) =>
-      area === 'x' && DATE_TYPES.includes(type) && groupInterval === 'minute'
+      area === 'x' && DATE_TYPES.includes(type) && groupInterval === aggregation
   );
 }
 
@@ -90,6 +112,16 @@ function hasDateFilterForLessThenAWeek(sipQuery) {
   );
 }
 
+function hasDateFilterForLessThen4Days(sipQuery) {
+  return some(
+    sipQuery.filters,
+    ({ type, model, isRuntimeFilter }: Filter) =>
+      DATE_TYPES.includes(type) &&
+      !isRuntimeFilter &&
+      filterModelIsForLessThan4Days(model)
+  );
+}
+
 function filterModelIsForLessThanAWeek(filterModel: FilterModel) {
   if (filterModel.preset === CUSTOM_DATE_PRESET_VALUE) {
     const { gte, lte } = filterModel;
@@ -98,6 +130,19 @@ function filterModelIsForLessThanAWeek(filterModel: FilterModel) {
   }
 
   if (LESS_THAN_A_WEEK_DATE_PRESETS.includes(filterModel.preset)) {
+    return true;
+  }
+  return false;
+}
+
+function filterModelIsForLessThan4Days(filterModel: FilterModel) {
+  if (filterModel.preset === CUSTOM_DATE_PRESET_VALUE) {
+    const { gte, lte } = filterModel;
+    const days = round(moment.duration(moment(lte).diff(moment(gte))).asDays());
+    return days <= 4;
+  }
+
+  if (LESS_THAN_4_DAYS_DATE_PRESETS.includes(filterModel.preset)) {
     return true;
   }
   return false;

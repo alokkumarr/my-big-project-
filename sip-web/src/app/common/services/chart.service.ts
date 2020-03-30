@@ -352,7 +352,8 @@ export class ChartService {
       this.formatDatesIfNeeded(
         parsedData,
         dateFields,
-        aggregateYFields.length > 0
+        aggregateYFields.length > 0,
+        chartType
       );
     } else {
       this.dateStringToTimestamp(parsedData, dateFields);
@@ -484,16 +485,22 @@ export class ChartService {
     }
   }
 
-  formatDatesIfNeeded(parsedData, dateFields, aggregatesExist) {
+  formatDatesIfNeeded(
+    parsedData,
+    dateFields,
+    aggregatesExist,
+    chartType: string
+  ) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat, groupInterval }) => {
           const dateFormats = this.getMomentDateFormat(
             dateFormat,
-            groupInterval
+            groupInterval,
+            chartType
           );
           const parseFormat = aggregatesExist
-            ? dateFormats.dateFormat
+            ? dateFormats.momentFormat
             : 'YYYY-MM-DD hh:mm:ss';
           dataPoint[removeKeyword(columnName)] = moment
             .utc(dataPoint[removeKeyword(columnName)], parseFormat)
@@ -556,9 +563,19 @@ export class ChartService {
     };
   }
 
-  getMomentDateFormat(dateFormat, groupInterval = null) {
-    if (groupInterval === null) {
-      return DATE_FORMATS_OBJ[dateFormat].momentValue;
+  getMomentDateFormat(dateFormat, groupInterval = null, chartType = null) {
+    if (chartType !== 'comparison') {
+      const { value, momentValue, momentFormatForBackend } = DATE_FORMATS_OBJ[
+        dateFormat
+      ];
+      return {
+        /* Date format saved with column will cater to backend. Make adjustments for FE */
+        dateFormat: value,
+
+        momentFormatForBackend: momentFormatForBackend,
+        /* If an explicit moment format is defined for this date format, return that too */
+        momentFormat: momentValue
+      };
     }
 
     const momentFormatId = DATE_INTERVALS.findIndex(

@@ -180,6 +180,10 @@ export const DATE_FORMATS = [
     value: 'MMM d YYYY',
     momentValue: 'MMM Do YYYY',
     groupInterval: 'day',
+    // there are some formats that the backend does not support
+    // for example "Do" for days ex: 1st, 2nd ...
+    // so we have to use a different foramt for backend
+    momentFormatForBackend: 'MMM D, YYYY',
     label: ' Sep 1st 2017'
   },
   {
@@ -234,6 +238,10 @@ export const DATE_FORMATS = [
     value: 'MMMM d YYYY, h:mm:ss a',
     momentValue: 'MMMM Do YYYY, h:mm:ss a',
     groupInterval: 'hour',
+    // there are some formats that the backend does not support
+    // for example "Do" for days ex: 1st, 2nd ...
+    // so we have to use a different foramt for backend
+    momentFormatForBackend: 'MMMM D YYYY, h:mm:ss a',
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {
@@ -650,4 +658,9 @@ export const DATE_PRESETS = [
   }
 ];
 
-export const LESS_THAN_A_WEEK_DATE_PRESETS = ['Yesterday', 'Today', 'TW', 'LW'];
+export const LESS_THAN_4_DAYS_DATE_PRESETS = ['Yesterday', 'Today'];
+export const LESS_THAN_A_WEEK_DATE_PRESETS = [
+  ...LESS_THAN_4_DAYS_DATE_PRESETS,
+  'TW',
+  'LW'
+];

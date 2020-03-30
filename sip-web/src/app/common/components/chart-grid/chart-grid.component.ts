@@ -202,34 +202,8 @@ export class ChartGridComponent {
             ? dataFieldToHuman(column.dataField)
             : column.displayName);
 
-        // const columnFormat = column.dateFormat;
-        // const {
-        //   dateFormat,
-        //   momentFormat
-        // } = this._chartService.getMomentDateFormat(
-        //   columnFormat,
-        //   get(<AnalysisChartDSL>this.analysis, 'chartOptions.chartType') ===
-        //     'comparison'
-        //     ? column.groupInterval
-        //     : null
-        // );
-        // const parseFormat = this.hasAggregatesInScatter()
-        //   ? dateFormat
-        //   : 'YYYY-MM-DD hh:mm:ss';
-
-        // value =
-        //   column.type === 'date'
-        //     ? moment
-        //         .utc(value, parseFormat)
-        //         .format(
-        //           momentFormat ||
-        //             (columnFormat === 'MMM d YYYY'
-        //               ? 'MMM DD YYYY'
-        //               : columnFormat === 'MMMM d YYYY, h:mm:ss a'
-        //               ? 'MMMM DD YYYY, h:mm:ss a'
-        //               : dateFormat)
-        //         )
-        //     : value;
+        value =
+          column.type === 'date' ? this.getFormattedDate(column, value) : value;
         if (
           value &&
           (column.aggregate === 'percentage' || column.aggregate === 'avg')
@@ -242,6 +216,23 @@ export class ChartGridComponent {
       }
     });
     return { alias, value };
+  }
+
+  getFormattedDate(column, value) {
+    const columnFormat = column.dateFormat;
+    const {
+      momentFormat,
+      momentFormatForBackend
+    } = this._chartService.getMomentDateFormat(
+      columnFormat,
+      get(this.analysis, 'chartOptions.chartType') === 'comparison'
+        ? column.groupInterval
+        : null
+    );
+    const parseFormat = this.hasAggregatesInScatter()
+      ? momentFormatForBackend || momentFormat
+      : 'YYYY-MM-DD hh:mm:ss';
+    return moment.utc(value, parseFormat).format(momentFormat);
   }
 
   trimKeyword(data) {
