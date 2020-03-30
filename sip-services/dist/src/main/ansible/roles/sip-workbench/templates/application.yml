@@ -100,7 +100,7 @@ metastore:
 
     
 spark:
-  master: "{{ saw_spark_master_url | default('spark://localhost:7077') }}"
+  master: "local[2]"
   executor.memory: "{{ spark.executor.memory | default('2G') }}"
   cores.max: "{{ spark.cores.max | default('2') }}"
   executor.cores: "{{ spark.cores.max | default('2') }}"

@@ -79,7 +79,7 @@ public class SipId3Controller {
       throws IOException {
     response.setHeader(CACHE_CONTROL, "private");
     String idToken = token.replace(BEARER, "").trim();
-    SSOResponse ssoResponse = ssoRequestHandler.processId3SSORequest(idToken);
+    SSOResponse ssoResponse = ssoRequestHandler.processId3SipAuthentication(idToken);
     if (ssoResponse == null)
       response.sendError(
           HttpStatus.UNAUTHORIZED.value(),

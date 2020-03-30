@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -360,7 +361,7 @@ public class ExternalSecurityController {
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "User details to store", required = true) @RequestBody
-          UserDetails userDetails) {
+          UserDetails userDetails) throws IOException {
     Ticket ticket = SipCommonUtils.getTicket(request);
     RoleType roleType = ticket.getRoleType();
     String masterLoginId = ticket.getMasterLoginId();
@@ -395,7 +396,7 @@ public class ExternalSecurityController {
         HttpServletRequest request,
         HttpServletResponse response,
         @ApiParam(value = "User details to store", required = true) @RequestBody
-            UserDetails userDetails ,  @PathVariable(name = "id") Long userSysId) {
+            UserDetails userDetails ,  @PathVariable(name = "id") Long userSysId) throws IOException {
         Ticket ticket = SipCommonUtils.getTicket(request);
         RoleType roleType = ticket.getRoleType();
         String masterLoginId = ticket.getMasterLoginId();
