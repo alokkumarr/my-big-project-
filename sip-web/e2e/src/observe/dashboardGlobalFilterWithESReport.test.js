@@ -46,7 +46,7 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
       //Delete analysis
       analysesDetails.forEach(function(currentAnalysis) {
         if(currentAnalysis.analysisId){
-          new AnalysisHelper().deleteAnalysis(host, token,protractorConf.config.customerCode, currentAnalysis.analysisId);
+          new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
         }
       });
       //reset the array
@@ -94,7 +94,7 @@ describe('Global filters in dashboard with es report tests: dashboardGlobalFilte
         browser.refresh();
         dashboardFunctions.deleteDashboard(dashboardName);
       } catch (e) {
-       logger.error(e);
+        logger.error(e);
       }
     });
   });
