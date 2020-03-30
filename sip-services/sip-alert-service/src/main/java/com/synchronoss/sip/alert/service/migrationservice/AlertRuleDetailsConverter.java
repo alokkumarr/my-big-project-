@@ -75,6 +75,7 @@ public class AlertRuleDetailsConverter implements AlertConverter {
 
     oldAlertsDefinition.remove("notification");
     AlertRuleDetails alertRuleDetails = gson.fromJson(oldAlertsDefinition, AlertRuleDetails.class);
+    // TODO : Remove below LOC as this mapping is already stored in mariaDB
     List<String> subscribersList = new ArrayList<>();
     subscriberDetailsList.forEach(subscriberDetails -> {
       subscribersList.add(subscriberDetails.getSubscriberId());
