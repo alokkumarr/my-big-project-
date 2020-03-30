@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import * as get from 'lodash/get';
 
-import { Artifact, DesignerChangeEvent, Sort, Filter } from '../../types';
+import { Artifact, DesignerChangeEvent, Sort } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
 import { QueryDSL, ArtifactColumn } from 'src/app/models';
@@ -26,7 +26,7 @@ export class SingleTableDesignerLayoutComponent {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() sorts: Sort[];
-  @Input() filters: Filter[];
+  @Input() filters;
   @Input() designerState: DesignerStates;
   @Input() chartTitle: string;
   @Input('artifacts') set artifactsArray(artifacts: Artifact[]) {
@@ -114,9 +114,9 @@ export class SingleTableDesignerLayoutComponent {
     }
   }
 
-  onRemoveFilter(index) {
-    this.filters.splice(index, 1);
-    this.change.emit({ subject: 'filter' });
+  onRemoveFilter(filters) {
+    console.log(filters);
+    this.change.emit({ subject: 'filter', data: filters });
   }
 
   getNonIdealStateIcon() {

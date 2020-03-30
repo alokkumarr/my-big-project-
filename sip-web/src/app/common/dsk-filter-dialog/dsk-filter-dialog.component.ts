@@ -62,17 +62,18 @@ export class DskFilterDialogComponent implements OnInit {
           this.aggregatedFilters = this.data.filters.filter(option => {
             return option.isAggregationFilter === true;
           });
-
           if (this.data.filters[0].filters) {
             return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
           } else {
-            const oldFormatFilters = cloneDeep(this.data.filters);
+            const oldFormatFilters = this.data.filters.filter(option => {
+              return option.isAggregationFilter !== true;
+            });
             this.data.filters = [];
             this.data.filters.push({
               booleanCriteria: this.data.booleanCriteria,
-              filters: oldFormatFilters
+              booleanQuery: oldFormatFilters
             })
-            return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
+            return this.data.filters[0];
           }
         }
       case 'DSK':
@@ -85,7 +86,7 @@ export class DskFilterDialogComponent implements OnInit {
     this.errorState = !this.datasecurityService.isDSKFilterValid(
       this.data.mode === 'DSK' ? this.dskFilterObject : concat([analyzeResult], this.aggregatedFilters),
       true,
-      this.data.mode
+      this.data
     );
 
 
@@ -128,6 +129,7 @@ export class DskFilterDialogComponent implements OnInit {
       isOptional: false,
       model: {}
     });
+    this.validateFilterGroup();
   }
 
   removeAggrFilter(targetIndex) {
@@ -135,6 +137,7 @@ export class DskFilterDialogComponent implements OnInit {
       this.aggregatedFilters,
       (_, index) => targetIndex !== index
     );
+    this.validateFilterGroup();
   }
 
   onFilterChange(e) {

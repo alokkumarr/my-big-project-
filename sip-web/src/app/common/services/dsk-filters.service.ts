@@ -88,8 +88,8 @@ export class DskFiltersService {
     );
   }
 
-  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false, mode) {
-    switch (mode) {
+  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false, data) {
+    switch (data.mode) {
       case 'DSK':
         let condition;
         condition = filter.booleanQuery.length > 0;
@@ -113,8 +113,9 @@ export class DskFiltersService {
         );
 
       case 'ANALYZE':
-        let areValid = true;
         const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
+        let areValid = true;
+
         forEach(
           flattenedFilters,
           ({
@@ -124,22 +125,37 @@ export class DskFiltersService {
             isRuntimeFilter,
             isGlobalFilter,
             isOptional,
-            columnName
+            columnName, aggregate
           }) => {
             if (isEmpty(columnName)) {
               areValid = false;
               return false;
             }
+
+            if (data.isInRuntimeMode) {
+              if (isOptional) {
+                areValid = Boolean(
+                  data.isInRuntimeMode
+                    ? isOptional && isRuntimeFilter
+                    : isRuntimeFilter
+                );
+                return areValid;
+              }
+            }
+
             if (!isRuntimeFilter && isGlobalFilter) {
               areValid = true;
             } else if (!model) {
               areValid = Boolean(
-                false
+                data.isInRuntimeMode
                   ? isOptional && isRuntimeFilter
                   : isRuntimeFilter
               );
             } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
               areValid = this.isNumberFilterValid(model);
+              if (isAggregationFilter && areValid) {
+                areValid = !isEmpty(aggregate);
+              }
             } else if (type === 'string') {
               areValid = this.isStringFilterValid(model);
             } else if (DATE_TYPES.includes(type)) {
@@ -151,7 +167,7 @@ export class DskFiltersService {
           }
         );
         return areValid;
-    }
+      }
   }
 
   updateDskFiltersForGroup(groupId: string, filters: DSKFilterGroup) {
@@ -213,19 +229,23 @@ export class DskFiltersService {
           }</span> [${mode === 'DSK' ? values.join(', ') : values}]`;
         } else {
           const values =  get(field, 'model.modelValues');
+          if (!field.model) {
+            return `${field.columnName.split('.keyword')[0]}`;
+          }
           switch (field.type) {
             case 'string':
               if (isUndefined(values)) {
-                return '';
+                return `${field.columnName.split('.keyword')[0]}`;
               }
+
               return `${field.columnName.split('.keyword')[0]} <span class="operator">${
-                field.model.operator
+                field.model.operator || ''
               }</span> [${[values]}]`;
 
             case 'date':
             const datevalues =  get(field, 'model.preset');
               if (isUndefined(datevalues)) {
-                return '';
+                return `${field.columnName}`;
               }
 
               if (get(field, 'model.preset') == 'NA') {
@@ -233,7 +253,7 @@ export class DskFiltersService {
                 </span> [ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]`;
               } else {
                 return `${field.columnName} = <span class="operator">${
-                  get(field, 'model.preset')
+                  get(field, 'model.preset') || ''
                 }</span>`;
               }
             default:
@@ -243,7 +263,7 @@ export class DskFiltersService {
                 }</span> [${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]`;
               } else {
                 return `${field.columnName} <span class="operator">${
-                  field.model.operator
+                  field.model.operator || ''
                 }</span> [${[get(field, 'model.value')]}]`;
               }
           }

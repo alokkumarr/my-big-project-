@@ -58,12 +58,13 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     if (!filters) {
       return;
     }
-
-    this.filters = this.analyzeService.flattenAndFetchFilters(filters, []);
+    this.filters = filters;
+    this.flattenedfilters = this.analyzeService.flattenAndFetchFiltersChips(filters, []);
   }
 
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   private subscriptions: Subscription[] = [];
+  flattenedfilters;
 
   @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
     IDEsignerSettingGroupAdapter[]
@@ -97,8 +98,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
     const dndSub = this._dndPubsub.subscribe(this.onDndEvent.bind(this));
     this.subscriptions.push(dndSub);
-
-    this.filters
 
     const adapterSub = this.groupAdapters$.subscribe(adapters => {
       this.canAcceptMap = reduce(
@@ -279,5 +278,30 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   dragReleased() {
     this._dndPubsub.emit('dragEnd');
+  }
+
+  removeFilterFromTree(filter, index) {
+    if (this.filters[0].booleanCriteria) {
+      this.flattenedfilters.splice(index, 1);
+      if (filter.isAggregationFilter) {
+        this.filters = cloneDeep(this.filters.filter(option => {
+          return option.uuid !== filter.uuid;
+        }));
+        console.log(this.filters);
+        this.removeFilter.emit({subject: 'filters', data: this.filters});
+      } else {
+        this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+        setTimeout(() => {
+          this.removeFilter.emit({subject: 'filters', data: this.filters});
+        }, 650);
+      }
+
+
+    } else {
+      this.flattenedfilters.splice(index, 1);
+      this.filters.splice(index, 1);
+      this.removeFilter.emit({subject: 'filters', data: this.filters});
+    }
+
   }
 }

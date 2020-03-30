@@ -15,11 +15,8 @@ import * as fpMap from 'lodash/fp/map';
 import { Filter } from './../../../analyze/types';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import {
-  CUSTOM_DATE_PRESET_VALUE,
   getFilterDisplayName
 } from './../../../analyze/consts';
-import * as forEach from 'lodash/forEach';
-import moment from 'moment';
 import { Observable, Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { isDSLAnalysis } from 'src/app/common/types';
@@ -105,19 +102,13 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   generateDSLDateFilters(filters) {
-    forEach(filters, filtr => {
-      if (
-        !filtr.isRuntimeFilter &&
-        filtr.type === 'date' &&
-        filtr.model &&
-        filtr.model.operator === 'BTW'
-      ) {
-        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
-        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
-        filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
-      }
+    const flattenedFilter = this.analyzeService.flattenAndFetchFiltersChips(filters, [])
+    return flattenedFilter.filter((thing, index) => {
+      const _thing = JSON.stringify(thing);
+      return index === flattenedFilter.findIndex(obj => {
+        return JSON.stringify(obj) === _thing;
+      });
     });
-    return filters;
   }
 
   getChartHeight(chartHeight) {

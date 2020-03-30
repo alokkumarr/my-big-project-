@@ -97,14 +97,14 @@ metastore:
 
     
 spark:
-  master: "{{ saw_spark_master_url | default('spark://localhost:7077') }}"
+  master: "local[2]"
   executor.memory: "{{ spark.executor.memory | default('2G') }}"
   cores.max: "{{ spark.cores.max | default('2') }}"
   executor.cores: "{{ spark.cores.max | default('2') }}"
   driver.memory: "{{ spark.driver.memory | default('2G') }}"
   hadoop.yarn.resourcemanager.hostname: "{{ saw_spark_yarn_resource_manager | default('sip-mapr') }}"
   yarn.jars: "{{saw_spark_yarn_jars| default('/opt/mapr/spark/spark-2.4.4/jars') }}" 
-  yarn.archive: "{{saw_spark_yarn_jars| default('/opt/bda/sip-executor/spark.zip') }}"
+  yarn.archive: "{{saw_spark_yarn_zips| default('/opt/bda/sip-executor/spark.zip') }}"
   executor.instances: "{{ spark.executor.instances | default('1') }}"
   driver.port: 
   driver.host: 

@@ -604,13 +604,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   /**
    * setEmptyData - In case of no data returned from refresh,
-   * this returns a sane default emtpy data object based on
+   * this returns a same default empty data object based on
    * analysis type.
    *
    * @returns {Array<any>}
    */
   setEmptyData(): Array<any> {
     const emptyReportData = () => {
+      if (this.data === null) {
+        this.data = {};
+      }
       const columnMap = this.data[0] || {};
 
       forOwn(columnMap, (val, key) => {
@@ -1071,6 +1074,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         break;
       case 'filterRemove':
+        console.log(event);
+        this._store.dispatch(new DesignerUpdateFilters(event.data));
         break;
       case 'joins':
         this._store.dispatch(new DesignerJoinsArray(event.data));
@@ -1104,6 +1109,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         )
         break;
       case 'filter':
+        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+        this.requestDataIfPossible();
+        break;
       case 'sort':
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.requestDataIfPossible();
@@ -1183,6 +1191,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'dateInterval':
       case 'aggregate':
       case 'filter':
+        console.log(event.data);
+        if (!isUndefined(event.data))
+          this._store.dispatch(new DesignerUpdateFilters(event.data.data));
       case 'format':
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();

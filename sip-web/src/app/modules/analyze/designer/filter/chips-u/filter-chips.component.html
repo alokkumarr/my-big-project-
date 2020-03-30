@@ -24,7 +24,7 @@
     <mat-chip
       *ngFor="let filter of flattenedFilters; let i = index"
       [removable]="!readonly"
-      (removed)="onRemove(i)"
+      (removed)="onRemove(filter, i)"
       [attr.e2e]="'filters-execute-' + getDisplayName(filter)"
     >
       {{ getDisplayName(filter) }}

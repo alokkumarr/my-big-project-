@@ -15,9 +15,11 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
+import * as isArray from 'lodash/isArray';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { v4 as uuid } from 'uuid';
 import {
   Analysis,
   AnalysisDSL,
@@ -35,7 +37,6 @@ import AppConfig from '../../../../../appConfig';
 import { Observable, of } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
-import * as isArray from 'lodash/isArray';
 import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
@@ -836,10 +837,45 @@ export class AnalyzeService {
         this.flattenAndCheckFilters(filter, flattenedFilters);
       }
 
-      if (filter.uuid) {
+      if (filter.artifactsName) {
         flattenedFilters.push(filter);
       }
     });
     return flattenedFilters;
+  }
+
+  flattenAndFetchFiltersChips(filters, flattenedFilters) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.flattenAndFetchFiltersChips(filter, flattenedFilters);
+      }
+      if (filter.columnName) {
+        filter.uuid = uuid();
+        flattenedFilters.push(filter);
+      }
+    });
+    return flattenedFilters;
+  }
+
+  deleteFilterFromTree(tree, uuid) {
+    function getNode(a, i) {
+      if (a.uuid === uuid) {
+        index = i;
+        return true;
+      }
+      if (Array.isArray(a.filters) && a.filters.some(getNode)) {
+        if (~index) {
+          a.filters.splice(index, 1);
+          index = -1;
+        }
+        return true;
+      }
+    }
+
+    var index = -1;
+    [tree].some(getNode);
+    return tree;
+
+
   }
 }
