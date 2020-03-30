@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Properties;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
-import org.mortbay.log.Log;
+import org.apache.kafka.common.requests.ApiError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,8 @@ import com.mapr.streams.Streams;
 import com.mapr.streams.impl.MarlinDocumentStream;
 import com.mapr.streams.impl.MessageStore;
 import com.synchronoss.sip.utils.RestUtil;
+
+import akka.japi.Option;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -134,12 +136,14 @@ public class WorkbenchInspectController {
 					
 					
 					
-					List<String> eventTypes = this.retriveEventTypes(streamsNames.get(0));
-					ArrayNode eventSNode = mapper.valueToTree(eventTypes);
-					resultNode.putArray("eventTypes").addAll(eventSNode);
-					resultNode.set("stream", jsonNode.get("streams_1"));
+					Optional<List<String>> eventTypes = this.retriveEventTypes(streamsNames.get(0));
+					if(eventTypes.isPresent()) {
+						ArrayNode eventSNode = mapper.valueToTree(eventTypes.get());
+						resultNode.putArray("eventTypes").addAll(eventSNode);
+						resultNode.set("stream", jsonNode.get("streams_1"));
+					} 
 					
-					//resultNode.put("streams_1:", jsonNode.get("streams_1"));
+					
 					
 					
 				}
@@ -158,6 +162,7 @@ public class WorkbenchInspectController {
 	 * @param stream stream name
 	 * @param eventType event type
 	 * @return stream content
+	 * @throws IOException 
 	 */
 	@RequestMapping(value = "{project}/streams/{stream}/content/{eventType}", 
 			method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -165,11 +170,15 @@ public class WorkbenchInspectController {
 	public Object getStreamContentByEvent(
 			@PathVariable(name = "project", required = true) String project,
 			@PathVariable(name = "stream", required = true) String stream,
-			@PathVariable(name = "eventType", required = true) String eventType) {
+			@PathVariable(name = "eventType", required = true) String eventType) throws IOException {
 		
 			logger.debug("Stream Name :::" + stream);
 			List<JsonNode> entities = new ArrayList<JsonNode>();
 			MarlinDocumentStream docStream = this.retriveStream(stream);
+			if(docStream == null) {
+					    return new ResponseEntity<Object>
+					    ("No stream exists with name "+ stream, HttpStatus.BAD_REQUEST);
+			}
 			ObjectMapper mapper = new ObjectMapper();
 			docStream.forEach(document -> {
 				try {
@@ -216,9 +225,12 @@ public class WorkbenchInspectController {
 	 * @param stream stream name
 	 * @return list of event types
 	 */
-	private List<String> retriveEventTypes(String stream) {
+	private Optional<List<String>> retriveEventTypes(String stream) {
 		   
 			MarlinDocumentStream docStream = this.retriveStream(stream);
+			if(docStream == null) {
+				return Optional.empty();
+			}
 			ObjectMapper mapper = new ObjectMapper();
 			final List<String> eventTypes = new ArrayList<String>();
 			docStream.forEach(document -> {
@@ -238,7 +250,7 @@ public class WorkbenchInspectController {
 					logger.debug("####Event Type ::"+ value);
 					eventTypes.add(value.asText());
 					
-			} catch (IOException exception) {
+			} catch (com.mapr.db.exceptions.TableNotFoundException exception) {
 				logger.error(exception.getMessage());
 			}	catch (Exception exception) {
 				logger.error(exception.getMessage());
@@ -246,8 +258,8 @@ public class WorkbenchInspectController {
 						
 			});
 		
-		return eventTypes.stream().distinct().
-				collect(Collectors.toList());
+		return Optional.of(eventTypes.stream().distinct().
+				collect(Collectors.toList()));
 
 	
 		
@@ -256,20 +268,35 @@ public class WorkbenchInspectController {
 	private MarlinDocumentStream retriveStream(String stream) {
 
 		logger.debug("Stream Name :::" + stream);
-		List<JsonNode> entities = new ArrayList<JsonNode>();
 
 		logger.debug("#####stream name:::" + stream);
 
 		MessageStore store = null;
+		MarlinDocumentStream docStream = null;
+		boolean isStreamExists = false ;
 		try {
+			
 			store = (MessageStore) Streams.getMessageStore(rtisBasePath + "/" + stream);
-		} catch (IOException exception) {
-			logger.error(exception.getMessage());
+			docStream = (MarlinDocumentStream) store.find();
+			isStreamExists = true;
+		} catch (com.mapr.db.exceptions.TableNotFoundException exception) {
+			logger.info("#### no stream exists ####");
+			logger.warn(exception.getMessage());
+		}catch(IOException exception) {
+			logger.warn(exception.getMessage());
+		}catch(java.lang.IllegalArgumentException exception) {
+			logger.warn(exception.getMessage());
+		}catch(Exception exception) {
+			logger.warn(exception.getMessage());
+		}
+		
+		if(isStreamExists) {
+			logger.debug("########Retrived store...." + store);
+		    docStream = (MarlinDocumentStream) store.find();
+			store.close();
 		}
 
-		logger.debug("########Retrived store...." + store);
-		MarlinDocumentStream docStream = (MarlinDocumentStream) store.find();
-		store.close();
+		
 		return docStream;
 
 	}
