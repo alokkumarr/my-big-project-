@@ -139,14 +139,18 @@
           fxLayout="row"
           fxLayoutAlign="center center"
         >
-          <mat-icon
+          <button
+            mat-icon-button
             (click)="changeAlertStatus(data.data)"
             i18n-matTooltip
-            class="conf-container-content__body__statusIcon"
-            [ngClass]="data.data.activeInd ? 'active' : 'inactive'"
-            fontIcon="icon-logout"
             [matTooltip]="data.data.activeInd ? 'Active' : 'Inactive'"
-          ></mat-icon>
+          >
+            <mat-icon
+              class="conf-container-content__body__statusIcon"
+              [ngClass]="data.data.activeInd ? 'active' : 'inactive'"
+              fontIcon="icon-logout"
+            ></mat-icon>
+          </button>
         </div>
 
         <div
