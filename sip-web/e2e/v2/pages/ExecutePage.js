@@ -4,6 +4,7 @@ const commonFunctions = require('./utils/commonFunctions');
 const Utils = require('./utils/Utils');
 const ConfirmationModel = require('./components/ConfirmationModel');
 const Constants = require('../helpers/Constants');
+const fs = require('fs');
 
 class ExecutePage extends ConfirmationModel {
   constructor() {
@@ -91,6 +92,9 @@ class ExecutePage extends ConfirmationModel {
     this._ScheduleButton = element(by.css(`[e2e="actions-menu-selector-schedule"]`));
     this._previousversionTab = element(by.cssContainingText('span','Previous Versions'));
     this._scheduledInPreviousVersionTab = element(by.xpath('//td[text()="scheduled"]'));
+    this._exportButton = element(
+      by.css(`[e2e="actions-menu-selector-export"]`)
+    );
   }
 
   verifyTitle(title) {
@@ -340,6 +344,21 @@ class ExecutePage extends ConfirmationModel {
 
   editAnalysis() {
     commonFunctions.clickOnElement(this._editAnalysis);
+  }
+
+  exportAnalysis(){
+    commonFunctions.clickOnElement(this._exportButton);
+  }
+
+  verifyExportedAnalysis(downloadDirectory,fileName){
+    fs.readdir(downloadDirectory,function(err, files) {
+      if (err) {
+        return err;
+      }
+      files.forEach( function (file) {
+        expect(file).toContain(fileName);
+      });
+    });
   }
 }
 module.exports = ExecutePage;
