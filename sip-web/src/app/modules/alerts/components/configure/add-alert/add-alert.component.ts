@@ -28,7 +28,10 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import { lessThan } from '../../../../../common/validators';
 // import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
-import { entityNameErrorMessage, minimumNameLength } from './../../../../../common/validators/field-name-rule.validator';
+import {
+  entityNameErrorMessage,
+  minimumNameLength
+} from './../../../../../common/validators/field-name-rule.validator';
 
 import {
   AlertConfig,
@@ -57,6 +60,7 @@ const notificationsOptions = [
 export class AddAlertComponent implements OnInit, OnDestroy {
   @ViewChild('addAlertStepper', { static: true }) addAlertStepper: MatStepper;
   alertDefFormGroup: FormGroup;
+  alertSubscribersFormGroup: FormGroup;
   alertMetricFormGroup: FormGroup;
   alertRuleFormGroup: FormGroup;
   datapods$: Observable<any>;
@@ -105,6 +109,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       this.loadMetrics(datapodId).then(() => {
         this.alertRuleFormGroup.get('attributeName').updateValueAndValidity();
         this.alertDefFormGroup.patchValue(alertForm);
+        this.alertSubscribersFormGroup.patchValue(alertForm);
         this.alertMetricFormGroup.patchValue(alertForm);
         this.alertRuleFormGroup.patchValue(alertForm);
         this.onSelectedMetricsColumn(alertForm.metricsColumn);
@@ -123,10 +128,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const monitoringTypeValues = this.alertMetricFormGroup.get('monitoringType')
       .valueChanges;
 
-    this.aggregations$ = combineLatest(
+    this.aggregations$ = combineLatest([
       monitoringTypeValues,
       this._configureAlertService.getAggregations()
-    ).pipe(
+    ]).pipe(
       map(([monitoringType = {}, aggregations]) => [
         monitoringType === 'AGGREGATION_METRICS'
           ? null
@@ -153,9 +158,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const [stringValue, lookbackPeriodType] = split(lookbackPeriod, '-');
     const lookbackPeriodValue = parseInt(stringValue, 10);
 
-    const notification = fpPipe(fpToPairs, fpMap(([key]) => key))(
-      notificationsFromBackend
-    );
+    const notification = fpPipe(
+      fpToPairs,
+      fpMap(([key]) => key)
+    )(notificationsFromBackend);
 
     const notificationEmails = get(
       notificationsFromBackend,
@@ -193,10 +199,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     return entityNameErrorMessage(state);
   }
 
-  validatePattern(control) {
+  validateAlertNamePattern(control) {
     return new Promise((resolve, reject) => {
       if (/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(control.value)) {
-          resolve({ nameIsInValid: true });
+        resolve({ nameIsInValid: true });
       } else {
         resolve(null);
       }
@@ -205,14 +211,19 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
-      alertRuleName: ['', [Validators.required,
-        Validators.maxLength(30)],
-        this.validatePattern],
+      alertRuleName: [
+        '',
+        [Validators.required, Validators.maxLength(30)],
+        this.validateAlertNamePattern
+      ],
       alertRuleDescription: [''],
       alertSeverity: ['', [Validators.required]],
-      notification: [[], [Validators.required]],
-      notificationEmails: [[]],
       activeInd: [true]
+    });
+
+    this.alertSubscribersFormGroup = this._formBuilder.group({
+      notification: [[], [Validators.required]],
+      notificationEmails: [[], [Validators.required]]
     });
 
     const thresholdValuevalidators = [
@@ -248,7 +259,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       attributeValue: ['']
     });
 
-    this.alertDefFormGroup
+    this.alertSubscribersFormGroup
       .get('notification')
       .valueChanges.subscribe(values => {
         this.showNotificationEmail = values.includes('email');
@@ -379,10 +390,13 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       alertRuleName,
       alertRuleDescription,
       alertSeverity,
-      notification: selectedNotifications,
-      notificationEmails,
       activeInd
     } = this.alertDefFormGroup.value;
+
+    const {
+      notification: selectedNotifications,
+      notificationEmails
+    } = this.alertSubscribersFormGroup.value;
 
     const {
       datapodId,
