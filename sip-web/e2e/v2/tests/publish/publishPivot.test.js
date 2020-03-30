@@ -53,6 +53,7 @@ describe('Executing Publish Functionality from list/Card/Details View for PIVOT 
           new AnalysisHelper().deleteAnalysis(
             host,
             token,
+            protractorConf.config.customerCode,
             currentAnalysis.analysisId
           );
         }

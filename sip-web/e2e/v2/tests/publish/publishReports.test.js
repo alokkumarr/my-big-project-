@@ -52,6 +52,7 @@ describe('Executing Publish Functionality for Reports from list/Card/Details Vie
           new AnalysisHelper().deleteAnalysis(
             host,
             token,
+            protractorConf.config.customerCode,
             currentAnalysis.analysisId
           );
         }

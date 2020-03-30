@@ -55,6 +55,7 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
           new AnalysisHelper().deleteAnalysis(
             host,
             token,
+            protractorConf.config.customerCode,
             currentAnalysis.analysisId,
           );
         }

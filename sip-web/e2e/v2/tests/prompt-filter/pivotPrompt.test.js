@@ -58,6 +58,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           id
         );
       });

@@ -49,6 +49,7 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           analysisId
         );
       }

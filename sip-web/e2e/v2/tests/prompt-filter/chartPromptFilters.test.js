@@ -58,6 +58,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           id
         );
       });

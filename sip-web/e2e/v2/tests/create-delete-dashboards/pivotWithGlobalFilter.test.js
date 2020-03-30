@@ -58,6 +58,7 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           new AnalysisHelper().deleteAnalysis(
             host,
             token,
+            protractorConf.config.customerCode,
             currentAnalysis.analysisId
           );
         }

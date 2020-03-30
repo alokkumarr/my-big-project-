@@ -53,6 +53,7 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           analysisId
         );
       }

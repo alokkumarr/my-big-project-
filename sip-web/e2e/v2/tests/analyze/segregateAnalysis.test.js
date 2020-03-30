@@ -49,6 +49,7 @@ describe('Executing Segregate Analysis by Type Tests', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           id
         );
       });

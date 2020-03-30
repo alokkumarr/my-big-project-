@@ -58,6 +58,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           id
         );
       });

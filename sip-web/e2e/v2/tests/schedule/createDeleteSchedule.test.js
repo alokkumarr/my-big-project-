@@ -38,6 +38,7 @@ describe('Executing Schedule tests from createDeleteSchedule.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           analysisId
         );
       }

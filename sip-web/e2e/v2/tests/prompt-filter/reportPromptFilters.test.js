@@ -59,6 +59,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           id
         );
       });
