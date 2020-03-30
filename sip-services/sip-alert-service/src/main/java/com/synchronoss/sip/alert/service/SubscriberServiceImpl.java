@@ -33,8 +33,7 @@ public class SubscriberServiceImpl implements SubscriberService {
   @NotNull
   private String basePath;
 
-  @Autowired
-  private NotificationSubscriberRepository notificationSubscriberRepository;
+  @Autowired private NotificationSubscriberRepository notificationSubscriberRepository;
 
   @Autowired private ModuleSubscriberMappingRepository moduleSubscriberMappingRepository;
 
@@ -96,6 +95,12 @@ public class SubscriberServiceImpl implements SubscriberService {
     }
 
     return subscriber;
+  }
+
+  @Override
+  public List<NotificationSubscriber> getSubscribersById(List<String> subscriberIds) {
+    Boolean active = true;
+    return notificationSubscriberRepository.findBySubscriberIdInAndActive(subscriberIds, active);
   }
 
   @Override

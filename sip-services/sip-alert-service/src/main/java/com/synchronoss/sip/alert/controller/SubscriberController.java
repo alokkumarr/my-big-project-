@@ -182,6 +182,24 @@ public class SubscriberController {
   }
 
   /**
+   * API to fetch subscribers by subscriber ids.
+   *
+   * @param request Request object
+   * @param response Response object
+   * @param subscriberIds List of Subscriber IDs
+   * @return Subscriber details
+   */
+  @RequestMapping(value = "/getSubscribersById", method = RequestMethod.POST)
+  public List<NotificationSubscriber> getSubscriber(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody List<String> subscriberIds) {
+    List<NotificationSubscriber> subscribers = subscriberService.getSubscribersById(subscriberIds);
+
+    return subscribers;
+  }
+
+  /**
    * API to update a subscriber.
    *
    * @param request Request object
