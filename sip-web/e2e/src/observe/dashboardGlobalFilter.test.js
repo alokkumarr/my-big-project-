@@ -45,7 +45,7 @@ describe('Global filters in dashboard with charts tests: dashboardGlobalFilter.t
       //Delete analysis
       analysesDetails.forEach(function(currentAnalysis) {
         if(currentAnalysis.analysisId){
-          new AnalysisHelper().deleteAnalysis(host, token, currentAnalysis.analysisId);
+          new AnalysisHelper().deleteAnalysis(host, token,protractorConf.config.customerCode, currentAnalysis.analysisId);
         }
       });
       //reset the array

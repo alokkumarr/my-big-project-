@@ -41,6 +41,7 @@ describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
+          protractorConf.config.customerCode,
           analysisId
         );
       }
