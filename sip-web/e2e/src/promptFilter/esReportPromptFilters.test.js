@@ -40,7 +40,6 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

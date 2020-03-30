@@ -42,7 +42,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

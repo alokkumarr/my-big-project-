@@ -41,7 +41,6 @@ describe('Prompt filter tests: chartPromptFilters.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

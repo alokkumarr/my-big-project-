@@ -60,9 +60,7 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
-          id,
-          Constants.CHART
+          id
         );
       });
 

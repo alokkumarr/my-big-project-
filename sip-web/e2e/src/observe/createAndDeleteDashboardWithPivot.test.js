@@ -44,7 +44,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithPivot.tes
       //Delete analysis
       analysesDetails.forEach(function(currentAnalysis) {
         if(currentAnalysis.analysisId){
-          new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
+          new AnalysisHelper().deleteAnalysis(host, token, currentAnalysis.analysisId);
         }
       });
       //reset the array

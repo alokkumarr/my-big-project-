@@ -60,9 +60,7 @@ describe('Executing Publish Functionality from list/Card/Details View for CHARTS
           new AnalysisHelper().deleteAnalysis(
             host,
             token,
-            protractorConf.config.customerCode,
-            currentAnalysis.analysisId,
-            Constants.CHART
+            currentAnalysis.analysisId
           );
         }
       });

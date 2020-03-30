@@ -1,0 +1,50 @@
+{
+  "SEGREGATE_ANALYSIS": {
+    "analysis": {
+      "SEGAL01": {
+        "suites": ["sanity","critical","regression"],
+        "user": "analyst",
+        "chartType": "chart:combo",
+        "analysisType": "Report",
+        "userEmail": "e2e@email.com",
+        "scheduleType": "Hourly",
+        "Hours": "0",
+        "Minutes": "15",
+        "scheduleTimings": "Every 15 minutes",
+        "scheduleRequired": true,
+        "analysisTypeArray" : ["Chart","Report","Pivot"],
+        "description": "Admin should be able to segregate Report Type analysis and Schedule"
+      },
+      "SEGAL02": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "analysisType": "Pivot",
+        "userEmail": "e2e@email.com",
+        "scheduleType": "Hourly",
+        "Hours": "0",
+        "Minutes": "45",
+        "scheduleTimings": "Every 45 minutes",
+        "scheduleRequired": true,
+        "analysisTypeArray" : ["Chart","Report","Pivot"],
+        "description": "Admin should be able to segregate Pivot Type analysis and Schedule"
+      },
+      "SEGAL03": {
+        "suites": ["sanity","critical","regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "scheduleRequired": false,
+        "analysisTypeArray" : ["Chart","Report","Pivot"],
+        "description": "Admin should be able to segregate Chart and Schedule"
+      },
+      "SEGAL04": {
+       "suites": ["regression"],
+       "user": "admin",
+       "chartType": "chart:combo",
+       "scheduleRequired": false,
+        "analysisTypeArray" : ["Chart","Report","Pivot"],
+      "description": "Admin should be able to segregate All Type analysis"
+      }
+    }
+  }
+}

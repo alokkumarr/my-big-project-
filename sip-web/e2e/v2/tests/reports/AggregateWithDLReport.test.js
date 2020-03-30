@@ -42,7 +42,6 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithDLRe
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

@@ -52,9 +52,7 @@ describe('Executing update and delete tests for pivots from pivots/UpdateAndDele
           new AnalysisHelper().deleteAnalysis(
             host,
             token,
-            protractorConf.config.customerCode,
-            currentAnalysis.analysisId,
-            Constants.PIVOT
+            currentAnalysis.analysisId
           );
         }
       });

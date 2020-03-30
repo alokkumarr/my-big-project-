@@ -59,9 +59,7 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
-          id,
-          Constants.CHART
+          id
         );
       });
 

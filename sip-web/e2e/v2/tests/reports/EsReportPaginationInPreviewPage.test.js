@@ -40,7 +40,6 @@ describe('Executing pagination in preview page for reports from reports/EsReport
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

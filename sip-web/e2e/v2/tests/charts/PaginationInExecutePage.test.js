@@ -49,9 +49,7 @@ describe('Executing pagination test for charts in grid view from charts/Paginati
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
-          analysisId,
-          Constants.CHART
+          analysisId
         );
       }
       // Logout by clearing the storage

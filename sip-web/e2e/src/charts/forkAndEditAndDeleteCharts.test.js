@@ -51,7 +51,6 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }
@@ -59,7 +58,6 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           forkedAnalysisId
         );
       }

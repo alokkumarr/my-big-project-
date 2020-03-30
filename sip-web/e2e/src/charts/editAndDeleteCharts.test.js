@@ -52,7 +52,6 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }
@@ -60,7 +59,6 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           editedAnalysisId
         );
       }

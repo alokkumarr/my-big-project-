@@ -48,7 +48,6 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

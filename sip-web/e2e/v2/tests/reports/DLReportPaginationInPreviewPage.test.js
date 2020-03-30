@@ -41,7 +41,6 @@ describe('Executing pagination in execute page for reports from DLReportPaginati
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

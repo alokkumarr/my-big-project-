@@ -41,7 +41,6 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

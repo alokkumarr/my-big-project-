@@ -54,7 +54,6 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }

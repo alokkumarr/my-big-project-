@@ -45,7 +45,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithESReport.
       //Delete analysis
       analysesDetails.forEach(function(currentAnalysis) {
         if(currentAnalysis.analysisId){
-          new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
+          new AnalysisHelper().deleteAnalysis(host, token, currentAnalysis.analysisId);
         }
 
       });

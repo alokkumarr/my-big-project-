@@ -54,7 +54,6 @@ describe('Executing BottomN chart tests from charts/bottomNForCharts.test.js', (
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
-          protractorConf.config.customerCode,
           analysisId
         );
       }
