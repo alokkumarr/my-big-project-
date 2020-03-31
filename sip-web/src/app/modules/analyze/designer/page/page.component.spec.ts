@@ -14,7 +14,6 @@ import {
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DesignerPageComponent } from './page.component';
-import { AnalysisDSL } from '../../models';
 import { DesignerService } from '../designer.service';
 
 class LocationStub {}
@@ -89,70 +88,5 @@ describe('DesignerPageComponent', () => {
 
   it('should read analysis if mode is not new', () => {
     expect(readAnalysisSpy).toHaveBeenCalled();
-  });
-
-  describe('forkIfNecessary', () => {
-    it('should not fork if analysis is in users private category', () => {
-      component.designerMode = 'edit';
-      const analysis = component.forkIfNecessary({
-        type: 'report',
-        category: new JwtServiceStub().userAnalysisCategoryId,
-        id: '2',
-        sipQuery: {}
-      } as AnalysisDSL);
-      expect(analysis.parentAnalysisId).toBeUndefined();
-    });
-
-    it('should not fork if mode is not edit', () => {
-      component.designerMode = 'fork';
-      const analysis = component.forkIfNecessary({
-        type: 'report',
-        category: new JwtServiceStub().userAnalysisCategoryId + '1',
-        id: '2',
-        sipQuery: {}
-      } as AnalysisDSL);
-      expect(analysis.parentAnalysisId).toBeUndefined();
-    });
-
-    it('should fork if mode is edit and analysis is in a public category', () => {
-      component.designerMode = 'edit';
-      const category = new JwtServiceStub().userAnalysisCategoryId + '1';
-      const analysis = component.forkIfNecessary({
-        type: 'report',
-        category,
-        id: '2',
-        sipQuery: {}
-      } as AnalysisDSL);
-      expect(analysis.parentAnalysisId).toEqual('2');
-    });
-
-    it('should add derived metrics to metric artifacts', () => {
-      const artifacts = [{ artifactName: 'abc', columns: [] }];
-      const analysis = {
-        type: 'chart',
-        sipQuery: {
-          artifacts: [
-            {
-              artifactsName: 'abc',
-              fields: [
-                {
-                  columnName: 'def',
-                  expression: 'def',
-                  formula: 'def',
-                  table: 'abc',
-                  type: 'double'
-                }
-              ]
-            }
-          ]
-        }
-      };
-
-      const updatedArtifacts = component.fixArtifactsForSIPQuery(
-        analysis,
-        artifacts
-      );
-      expect(updatedArtifacts[0].columns.length).toBeGreaterThan(0);
-    });
   });
 });

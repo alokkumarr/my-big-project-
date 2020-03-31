@@ -17,9 +17,7 @@ import { JwtService } from 'src/app/common/services';
 export class DesignerSaveComponent implements OnInit {
   @Output() public nameChange: EventEmitter<string> = new EventEmitter();
   @Output() public descriptionChange: EventEmitter<string> = new EventEmitter();
-  @Output() public parentPublishChange: EventEmitter<
-    number
-  > = new EventEmitter();
+  @Output() public categoryChange: EventEmitter<number> = new EventEmitter();
   @Input() public analysis: AnalysisDSL;
   @Input() public designerMode: string;
 
@@ -41,17 +39,21 @@ export class DesignerSaveComponent implements OnInit {
         this.analysis.name,
         [Validators.required, Validators.maxLength(30)],
         this.validatePattern
+      ],
+      category: [
+        (this.analysis.category || this.userSubCategoryId).toString(),
+        [Validators.required]
       ]
     });
 
-    this.checkForParentAnalysis();
+    this.onCategorySelect({
+      value: this.saveForm.get('category').value
+    } as any);
+
+    this.loadAllCategories();
   }
 
-  async checkForParentAnalysis() {
-    if (!this.analysis.parentAnalysisId) {
-      return;
-    }
-
+  async loadAllCategories() {
     try {
       this.categories = await this.analyzeService.getCategories(
         PRIVILEGES.PUBLISH
@@ -92,10 +94,6 @@ export class DesignerSaveComponent implements OnInit {
   }
 
   onCategorySelect({ value }: MatSelectChange) {
-    if (+value === this.userSubCategoryId) {
-      this.parentPublishChange.emit(null);
-    } else {
-      this.parentPublishChange.emit(value);
-    }
+    this.categoryChange.emit(value);
   }
 }

@@ -27,7 +27,7 @@
     [analysis]="data.analysis"
     (descriptionChange)="onSaveDescriptionChange($event)"
     (nameChange)="onNameChange($event)"
-    (parentPublishChange)="setParentPublishOnSave($event)"
+    (categoryChange)="onCategoryChange($event)"
   >
   </designer-save>
 </div>
@@ -62,17 +62,15 @@
       >
         Save & Close
       </button>
-      <ng-container *ngIf="overrideCategoryIdForSave === null">
-        <button
-          *ngSwitchCase="'save'"
-          (click)="save('save')"
-          e2e="dialog-save-analysis"
-          mat-button
-          i18n
-        >
-          Save
-        </button>
-      </ng-container>
+      <button
+        *ngSwitchCase="'save'"
+        (click)="save('save')"
+        e2e="dialog-save-analysis"
+        mat-button
+        i18n
+      >
+        Save
+      </button>
     </div>
     <button mat-button i18n (click)="onBack()" e2e="designer-dialog-cancel">
       Cancel

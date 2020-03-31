@@ -40,7 +40,7 @@
     <mat-form-field>
       <mat-label>Category</mat-label>
       <mat-select
-        [value]="analysis.category"
+        formControlName="category"
         (selectionChange)="onCategorySelect($event)"
       >
         <mat-optgroup
@@ -49,7 +49,7 @@
         >
           <mat-option
             *ngFor="let subCategory of category.children"
-            [value]="subCategory.id"
+            [value]="subCategory.id.toString()"
           >
             {{ subCategory.name }}
           </mat-option>

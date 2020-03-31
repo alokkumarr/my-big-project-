@@ -6,19 +6,16 @@ import {
   EXECUTION_MODES
 } from '../../services/analyze.service';
 import { Store } from '@ngxs/store';
-import { JwtService } from '../../../../common/services/jwt.service';
 import { DesignerSaveEvent, DesignerMode, isDSLAnalysis } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ExecuteService } from '../../services/execute.service';
-import { AnalysisDSL } from '../types';
 import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { DesignerLoadMetric } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
-import { AnalyzeActionsService } from '../../actions';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -58,11 +55,9 @@ export class DesignerPageComponent implements OnInit {
   constructor(
     private locationService: Location,
     private analyzeService: AnalyzeService,
-    private analyzeActionsService: AnalyzeActionsService,
     private dialogService: MatDialog,
     private route: ActivatedRoute,
     private router: Router,
-    private jwtService: JwtService,
     public _executeService: ExecuteService,
     private designerService: DesignerService,
     private store: Store
@@ -95,7 +90,7 @@ export class DesignerPageComponent implements OnInit {
     }
   }
 
-  onSave({ analysis, requestExecution, publishTo }: DesignerSaveEvent) {
+  onSave({ analysis, requestExecution }: DesignerSaveEvent) {
     const navigateBackTo =
       this.designerMode === 'fork' || this.designerMode === 'new'
         ? 'home'
@@ -135,15 +130,6 @@ export class DesignerPageComponent implements OnInit {
               }
             }
           }
-        });
-    } else if (publishTo) {
-      this.analyzeActionsService
-        .publishAnalysis(
-          <AnalysisDSL>{ ...analysis, category: publishTo },
-          (<AnalysisDSL>analysis).category
-        )
-        .then(() => {
-          this.router.navigate(['analyze', publishTo]);
         });
     }
   }
@@ -191,7 +177,7 @@ export class DesignerPageComponent implements OnInit {
               const { artifacts } = this.store.selectSnapshot(
                 state => state.designerState.metric
               );
-              this.analysis = this.forkIfNecessary({
+              this.analysis = {
                 ...analysis,
                 artifacts: this.fixArtifactsForSIPQuery(
                   analysis,
@@ -201,7 +187,7 @@ export class DesignerPageComponent implements OnInit {
                   this.designerMode === 'fork'
                     ? `${analysis.name} Copy`
                     : analysis.name
-              });
+              };
             });
         });
     }
@@ -216,38 +202,5 @@ export class DesignerPageComponent implements OnInit {
       artifacts,
       analysis.sipQuery
     );
-  }
-
-  /**
-   * If analysis is being edited and is from a public category,
-   * fork it to user's private folder and add reference to original analysis.
-   * User doesn't edit public analyses directly.
-   *
-   * This will be later used to overwrite the analysis in public folder
-   * when publishing this new fork.
-   *
-   * @param {*} analysis
-   * @returns
-   * @memberof DesignerPageComponent
-   */
-  forkIfNecessary(analysis: AnalysisDSL) {
-    const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId.toString();
-    const analysisCategoryId = analysis.category.toString() || '';
-    const isFromPublicCategory = userAnalysisCategoryId !== analysisCategoryId;
-    const isInEditMode = this.designerMode === 'edit';
-    if (isInEditMode && isFromPublicCategory) {
-      this.designerMode = 'fork';
-      return {
-        ...analysis,
-        category: userAnalysisCategoryId,
-        parentAnalysisId: analysis.id,
-        parentLastModified: analysis.modifiedTime,
-        parentCategoryId: analysisCategoryId
-      };
-    }
-    /* Analysis is from user's private folder or action is not edit.
-        No special steps needed. for this.
-    */
-    return analysis;
   }
 }

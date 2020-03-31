@@ -849,8 +849,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           if (result) {
             const shouldClose = result.action === 'saveAndClose';
             this.onSave.emit({
-              requestExecution:
-                shouldClose && !result.hasOwnProperty('publishOnSave'),
+              requestExecution: shouldClose,
               analysis:
                 result.analysis.type === 'report'
                   ? this._designerService.generateReportPayload(
