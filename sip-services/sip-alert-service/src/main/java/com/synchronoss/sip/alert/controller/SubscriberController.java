@@ -190,7 +190,7 @@ public class SubscriberController {
    * @return Subscriber details
    */
   @RequestMapping(value = "/getSubscribersById", method = RequestMethod.POST)
-  public List<NotificationSubscriber> getSubscriber(
+  public List<NotificationSubscriber> getSubscribersByIds(
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestBody List<String> subscriberIds) {
