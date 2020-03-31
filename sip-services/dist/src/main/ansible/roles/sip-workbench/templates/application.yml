@@ -93,8 +93,7 @@ workbench:
         lib.path: "{{ saw_workbench_lib_path | default('/opt/bda/saw-workbench-service/lib/') }}"
         stream.base-path:  {{ sip_var_path | default('/var/sip') }}/services/workbench/executor
         rtis-stream-base: {{ sip_var_path | default('/var/sip') }}/streams
-        rtis-appkeys-url: "http://localhost:9501/internal/rtisconfig/appKeys"
-        rtis-config-url: "http://localhost:9501/internal/rtisconfig/config/"
+        rtis-base-url: ${connector}://localhost:9501
 metastore:
     base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"
 

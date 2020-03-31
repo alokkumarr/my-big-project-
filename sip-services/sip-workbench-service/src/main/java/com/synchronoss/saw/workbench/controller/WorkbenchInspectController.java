@@ -40,9 +40,15 @@ import com.mapr.streams.impl.MessageStore;
 import com.synchronoss.sip.utils.RestUtil;
 
 import akka.japi.Option;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
+@Api(value = "The controller provides operations to retrive streams and its contents "
+	    + "synchronoss analytics platform ")
 public class WorkbenchInspectController {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -56,13 +62,14 @@ public class WorkbenchInspectController {
 	@NotNull
 	private String rtisBasePath;
 	
-	@Value("${workbench.rtis-appkeys-url}")
+	@Value("${workbench.rtis-base-url}")
 	@NotNull
-	private String rtisAppkeysUrl;
+	private String rtisUrl;
 	
-	@Value("${workbench.rtis-config-url}")
-	@NotNull
-	private String rtisConfigUrl;
+	
+	public static final String RTIS_CONFIG_URL =  "/internal/rtisconfig/config/";
+	public static final String RTIS_APP_KEYS_URL =  "/internal/rtisconfig/appKeys";
+	
 	
 	
 
@@ -83,6 +90,12 @@ public class WorkbenchInspectController {
 	 * @throws JsonProcessingException exception while parsing json
 	 * @throws Exception exception
 	 */
+	@ApiOperation(value = "Retrives stream details such as name and topic name", nickname = "retrieveStream",
+		      notes = "", response = HttpStatus.class)
+		  @ApiResponses(
+		      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+		          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+		          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
 	@RequestMapping(value = "{project}/streams", method = RequestMethod.GET, 
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -95,8 +108,13 @@ public class WorkbenchInspectController {
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
 		logger.debug("Authroization header.....####" + req.
 				getHeader("Authorization"));
+		
+		logger.debug(" RTIS base url ::"+ this.rtisUrl);
+		String rtisAppkeysUrl = this.rtisUrl + RTIS_APP_KEYS_URL;
+		logger.debug("rtis app key url ::"+ rtisAppkeysUrl);
+		
 		ResponseEntity<Object[]> appKeys = restTemplate.
-				exchange(this.rtisAppkeysUrl,
+				exchange(rtisAppkeysUrl,
 				HttpMethod.GET, entity, Object[].class, new Object[0]);
 		logger.debug(appKeys.toString());
 
@@ -109,9 +127,14 @@ public class WorkbenchInspectController {
 			ObjectNode resultNode = mapper.createObjectNode();
 			JsonNode appKey = objNode.get("app_key");
 			logger.debug("########" + appKey.asText());
-
+			
+			logger.debug("#### rtis base url ::"+ this.rtisUrl);
+			String rtisConfigUrl = this.rtisUrl + RTIS_CONFIG_URL;
+			logger.debug("#### rtis config url ::" + rtisConfigUrl 
+					+ appKey.asText());
+			 
 			ResponseEntity<Object[]> config = restTemplate.exchange(
-					this.rtisConfigUrl 
+				rtisConfigUrl 
 			+ appKey.asText(), HttpMethod.GET, entity,
 					Object[].class, new Object[0]);
 			logger.debug("##### config response ###" + config.toString());
@@ -164,6 +187,12 @@ public class WorkbenchInspectController {
 	 * @return stream content
 	 * @throws IOException 
 	 */
+	@ApiOperation(value = "Retrives stream contents of stream", nickname = "retrieveStreamContents",
+		      notes = "", response = HttpStatus.class)
+    @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
 	@RequestMapping(value = "{project}/streams/{stream}/content/{eventType}", 
 			method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
