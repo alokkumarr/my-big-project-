@@ -326,7 +326,7 @@ public class ElasticSearchQueryBuilder {
       booleanCriteria = filter.getBooleanCriteria();
     }
     for (Filter sipFilter : filter.getFilters()) {
-      if (sipFilter.getFilters() != null) {
+      if (sipFilter.getFilters() != null && !sipFilter.getFilters().isEmpty()) {
         QueryBuilder childQuery = buildFilterQuery(sipFilter);
         if (childQuery != null) {
           switch (booleanCriteria) {
