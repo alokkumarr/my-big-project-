@@ -1,12 +1,17 @@
 package com.synchronoss.sip.alert.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.synchronoss.sip.alert.metadata.AlertsMetadata;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.service.migrationservice.AlertConverter;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +46,9 @@ public class MigrateAlerts {
   }
 
   /**
-   *  Convert Alerts.
+   * Convert Alerts.
    */
-  public void convertAllAlerts() {
+  public void convertAllAlerts() throws Exception {
     List<AlertRuleDetails> alertRuleDetailsList = getAllAlerts();
     if (!CollectionUtils.isEmpty(alertRuleDetailsList)) {
       alertRuleDetailsList.forEach(
@@ -65,13 +70,20 @@ public class MigrateAlerts {
    *
    * @return List of alerts
    */
-  public List<AlertRuleDetails> getAllAlerts() {
-    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-    List<AlertRuleDetails> alertRuleList =
-        connection.runMaprDbQueryWithFilter(null, null, null, null, AlertRuleDetails.class);
-    Long noOfRecords = connection.runMapDbQueryForCount(null);
-    logger.info("number of Alerts definitions that needs migration : {}", noOfRecords);
-    return alertRuleList;
+  public List<AlertRuleDetails> getAllAlerts() throws Exception {
+    AlertsMetadata alertsMetadata = new AlertsMetadata(alertRulesMetadata, basePath);
+    List<AlertRuleDetails> alertsList = new ArrayList<>();
+    List<Document> doc = alertsMetadata.searchAll();
+    if (doc == null) {
+      return null;
+    }
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    for (Document d : doc) {
+      alertsList.add(mapper.readValue(d.asJsonString(), AlertRuleDetails.class));
+    }
+    logger.info("number of Alerts definitions that needs migration : {}", alertsList.size());
+    return alertsList;
   }
 
   /**
@@ -79,7 +91,6 @@ public class MigrateAlerts {
    *
    * @param alertRuleDetails Alert rule details
    * @param alertRuleId Alert rule id
-   *
    * @return Updated alert rule
    */
   public AlertRuleDetails updateAlertRule(AlertRuleDetails alertRuleDetails, String alertRuleId) {
