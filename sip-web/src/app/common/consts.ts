@@ -261,19 +261,19 @@ export const DATE_FORMATS = [
     value: 'MM/dd HH:mm',
     groupInterval: 'minute',
     momentValue: 'MM/DD HH:mm'
-  },
-  {
-    label: '09/01/2017 11:20:36',
-    value: 'MM/dd/yyyy HH:mm:ss',
-    momentValue: 'MM/DD/YYYY HH:mm:ss',
-    groupInterval: 'second'
-  },
-  {
-    label: '09/15/17 11:20:36',
-    value: 'MM/dd/yyyy hh:mm:ss',
-    groupInterval: 'second',
-    momentValue: 'MM/DD/YYYY HH:mm:ss'
   }
+  // {
+  //   label: '09/01/2017 11:20:36',
+  //   value: 'MM/dd/yyyy HH:mm:ss',
+  //   momentValue: 'MM/DD/YYYY HH:mm:ss',
+  //   groupInterval: 'second'
+  // },
+  // {
+  //   label: '09/15/17 11:20:36',
+  //   value: 'MM/dd/yyyy hh:mm:ss',
+  //   groupInterval: 'second',
+  //   momentValue: 'MM/DD/YYYY HH:mm:ss'
+  // }
 ];
 
 export const DATE_FORMATS_OBJ = fpPipe(
