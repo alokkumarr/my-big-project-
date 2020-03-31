@@ -712,7 +712,7 @@ public class DLSparkQueryBuilder {
             flag = false;
           }
         } else {
-          if (!flag) {
+          if (!flag && filterAttribute.getModel() != null) {
             filterQuery.append(booleanCriteria);
           }
           if (filterAttribute.getModel() != null) {
