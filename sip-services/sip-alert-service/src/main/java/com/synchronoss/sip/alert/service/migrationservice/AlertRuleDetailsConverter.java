@@ -26,7 +26,7 @@ import org.springframework.util.CollectionUtils;
 public class AlertRuleDetailsConverter implements AlertConverter {
 
   private static final Logger logger = LoggerFactory.getLogger(AlertRuleDetailsConverter.class);
-  Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  Gson gson = new Gson();
 
   @Autowired private SubscriberService subscriberService;
 
@@ -67,7 +67,7 @@ public class AlertRuleDetailsConverter implements AlertConverter {
       String[] subsId = new String[1];
       emailIds.forEach(
           mail -> {
-            if (!CollectionUtils.isEmpty(emails)) {
+            if (mail != null) {
               if (!emails.containsKey(mail.getAsString())) {
                 NotificationSubscriber notificationSubscriber = new NotificationSubscriber();
                 notificationSubscriber.setChannelType(NotificationChannelType.EMAIL);

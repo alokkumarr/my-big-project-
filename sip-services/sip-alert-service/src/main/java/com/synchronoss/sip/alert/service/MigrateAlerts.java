@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import sncr.bda.base.MaprConnection;
 
 @Service
 public class MigrateAlerts {
@@ -38,13 +37,17 @@ public class MigrateAlerts {
   @NotNull
   private boolean migrationRequired;
 
-  @Autowired private AlertConverter alertConverter;
+  @Autowired
+  private AlertConverter alertConverter;
 
-  Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  Gson gson = new Gson();
 
-  public MigrateAlerts() {}
+  public MigrateAlerts() {
+  }
 
-  /** Convert Alerts. */
+  /**
+   * Convert Alerts.
+   */
   public void convertAllAlerts() throws Exception {
     List<String> alertRuleDetailsList = getAllAlerts();
     if (!CollectionUtils.isEmpty(alertRuleDetailsList)) {
@@ -92,9 +95,9 @@ public class MigrateAlerts {
    */
   public AlertRuleDetails updateAlertRule(AlertRuleDetails alertRuleDetails, String alertRuleId) {
     try {
-      MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-      alertRuleDetails.setAlertRulesSysId(alertRuleId);
-      connection.update(alertRuleId, alertRuleDetails);
+      AlertsMetadata alertsMetadata = new AlertsMetadata(alertRulesMetadata, basePath);
+
+      alertsMetadata.update(alertRuleId, new JsonParser().parse(alertRuleDetails.toString()));
       logger.info("AlertDefinition update : {}", gson.toJson(alertRuleDetails));
     } catch (Exception e) {
       logger.info("Exception occurred while updating AlertDefinition : {}", e.getMessage());
