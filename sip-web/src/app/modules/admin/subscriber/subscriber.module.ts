@@ -9,6 +9,7 @@ import { CommonModuleTs } from 'src/app/common';
 
 @NgModule({
   declarations: [AddSubscriberComponent, ListSubscriberComponent],
+  entryComponents: [AddSubscriberComponent, ListSubscriberComponent],
   imports: [
     CommonModule,
     SubscriberRoutingModule,
