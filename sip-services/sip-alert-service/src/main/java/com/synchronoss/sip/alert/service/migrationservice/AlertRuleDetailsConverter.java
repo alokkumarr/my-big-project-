@@ -28,8 +28,7 @@ public class AlertRuleDetailsConverter implements AlertConverter {
   private static final Logger logger = LoggerFactory.getLogger(AlertRuleDetailsConverter.class);
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-  @Autowired
-  private SubscriberService subscriberService;
+  @Autowired private SubscriberService subscriberService;
 
   private static String CUSTOMER_CODE = "customerCode";
   private static String NOTIFICATION = "notification";
@@ -66,26 +65,27 @@ public class AlertRuleDetailsConverter implements AlertConverter {
     if (emailIds != null && emailIds.size() > 0) {
       String finalCustomerCode = customerCode;
       String[] subsId = new String[1];
-      emailIds.forEach(mail -> {
-        if (!CollectionUtils.isEmpty(emails)) {
-          if (!emails.containsKey(mail.getAsString())) {
-            NotificationSubscriber notificationSubscriber = new NotificationSubscriber();
-            notificationSubscriber.setChannelType(NotificationChannelType.EMAIL);
-            notificationSubscriber.setChannelValue(mail.getAsString());
-            notificationSubscriber.setSubscriberName(mail.getAsString());
-            notificationSubscriber = subscriberService.addSubscriber(notificationSubscriber,
-                finalCustomerCode);
-            subsId[0] = notificationSubscriber.getSubscriberId();
-          } else {
-            subsId[0] = emails.get(mail);
-          }
-          SubscriberDetails subscriberDetails = new SubscriberDetails();
-          subscriberDetails.setSubscriberId(subsId[0]);
-          subscriberDetails
-              .setChannelTypes(Collections.singletonList(NotificationChannelType.EMAIL));
-          subscriberDetailsList.add(subscriberDetails);
-        }
-      });
+      emailIds.forEach(
+          mail -> {
+            if (!CollectionUtils.isEmpty(emails)) {
+              if (!emails.containsKey(mail.getAsString())) {
+                NotificationSubscriber notificationSubscriber = new NotificationSubscriber();
+                notificationSubscriber.setChannelType(NotificationChannelType.EMAIL);
+                notificationSubscriber.setChannelValue(mail.getAsString());
+                notificationSubscriber.setSubscriberName(mail.getAsString());
+                notificationSubscriber =
+                    subscriberService.addSubscriber(notificationSubscriber, finalCustomerCode);
+                subsId[0] = notificationSubscriber.getSubscriberId();
+              } else {
+                subsId[0] = emails.get(mail);
+              }
+              SubscriberDetails subscriberDetails = new SubscriberDetails();
+              subscriberDetails.setSubscriberId(subsId[0]);
+              subscriberDetails.setChannelTypes(
+                  Collections.singletonList(NotificationChannelType.EMAIL));
+              subscriberDetailsList.add(subscriberDetails);
+            }
+          });
     }
 
     ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
@@ -100,6 +100,12 @@ public class AlertRuleDetailsConverter implements AlertConverter {
     return alertRuleDetails;
   }
 
+  /**
+   * Get all subscribers.
+   *
+   * @param oldAlertsDefinition Alert definition from maprdb
+   * @return Map
+   */
   public Map<String, String> getAllSubscribers(JsonObject oldAlertsDefinition) {
     String customerCode = null;
     if (oldAlertsDefinition != null && oldAlertsDefinition.has(CUSTOMER_CODE)) {
@@ -109,9 +115,10 @@ public class AlertRuleDetailsConverter implements AlertConverter {
         subscriberService.getSubscribersByCustomerCode(customerCode);
 
     Map<String, String> emailSubscriber = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    subscribers.forEach(subscriber -> {
-      emailSubscriber.put(subscriber.getChannelValue(), subscriber.getSubscriberId());
-    });
+    subscribers.forEach(
+        subscriber -> {
+          emailSubscriber.put(subscriber.getChannelValue(), subscriber.getSubscriberId());
+        });
     return emailSubscriber;
   }
 }
