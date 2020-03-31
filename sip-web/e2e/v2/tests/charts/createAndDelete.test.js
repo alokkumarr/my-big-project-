@@ -12,7 +12,6 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
-const Constants = require('../../helpers/Constants');
 const users = require('../../helpers/data-generation/users');
 
 describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
