@@ -135,10 +135,16 @@ export const DATE_FORMATS = [
     label: '2017'
   },
   {
+    value: 'MMMM yyyy',
+    momentValue: 'MMMM YYYY',
+    groupInterval: 'month',
+    label: 'September 2017'
+  },
+  {
     value: 'MMM YYYY',
     momentValue: 'MMM YYYY',
     groupInterval: 'month',
-    label: 'September 2017'
+    label: 'Sept 2017'
   },
   {
     value: 'MM YYYY',
