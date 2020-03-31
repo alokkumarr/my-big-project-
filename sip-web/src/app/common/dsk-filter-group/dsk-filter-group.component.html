@@ -190,7 +190,7 @@
             *ngIf="data.showFilterOptions"
           >
             <mat-checkbox
-              *ngIf="!data.isInRuntimeMode && data.supportsGlobalFilters"
+              *ngIf="(!data.isInRuntimeMode && data.supportsGlobalFilters) && showGlobalOption"
               [checked]="filterGroup.booleanQuery[childId].isGlobalFilter"
               (change)="onGlobalCheckboxToggle($event.checked, childId)"
               i18n

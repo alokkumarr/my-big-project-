@@ -72,6 +72,7 @@ export class DskFilterGroupComponent implements OnInit {
   @Input() selfIndex: number; // stores the position inside parent (for removal)
   @Output() onRemoveGroup = new EventEmitter();
   @Output() onChange = new EventEmitter();
+  @Input() showGlobalOption: boolean;
 
   constructor(
     jwtService: JwtService,

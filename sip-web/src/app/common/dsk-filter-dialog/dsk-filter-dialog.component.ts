@@ -28,6 +28,7 @@ export class DskFilterDialogComponent implements OnInit {
   errorMessage;
   filterQuery;
   aggregatedFilters = [];
+  showGlobalOption: boolean;
   debouncedValidator = debounce(this.validateFilterGroup.bind(this), 200);
   constructor(
     private _dialogRef: MatDialogRef<DskFilterDialogComponent>,
@@ -43,6 +44,7 @@ export class DskFilterDialogComponent implements OnInit {
       supportsAggregationFilters: boolean;
     }
   ) {
+    this.showGlobalOption = true;
     this.datasecurityService.clearDSKEligibleFields();
     this.operation = this.data.filterGroup ? 'Update' : 'Add';
     this.dskFilterObject = this.fetch(this.data, this.data.mode);
