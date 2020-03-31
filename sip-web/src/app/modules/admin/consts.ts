@@ -54,7 +54,8 @@ export const AdminMenuData = [
         url: ['/admin/userassignments']
       }
     ]
-  }, {
+  },
+  {
     id: '',
     name: 'Branding Options',
     children: [
@@ -62,6 +63,17 @@ export const AdminMenuData = [
         id: '',
         name: 'Manage Colors & Logos',
         url: ['/admin/branding']
+      }
+    ]
+  },
+  {
+    id: '',
+    name: 'Notifications',
+    children: [
+      {
+        id: '',
+        name: 'Manage Subscribers',
+        url: ['/admin/subscriber']
       }
     ]
   }

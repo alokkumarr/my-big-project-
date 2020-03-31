@@ -1,0 +1,66 @@
+<div style="padding: 0 20px" fxLayout="column">
+  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+    <h1>Manage Subscribers</h1>
+    <search-box style="font-size: 24px;"></search-box>
+    <button mat-raised-button color="primary">+Add New</button>
+  </div>
+  <dx-data-grid
+    [dataSource]="subscribers$ | async"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    [showBorders]="false"
+    [columnAutoWidth]="false"
+    [showColumnLines]="false"
+    [showRowLines]="false"
+    [rowAlternationEnabled]="true"
+  >
+    <dxo-paging [pageSize]="DEFAULT_PAGE_SIZE" [enabled]="true"></dxo-paging>
+    <dxo-pager
+      [allowedPageSizes]="[10, DEFAULT_PAGE_SIZE, 50]"
+      [showPageSizeSelector]="true"
+      [showNavigationButtons]="true"
+      [showInfo]="true"
+      [visible]="enablePaging$ | async"
+    ></dxo-pager>
+
+    <!--
+          ██████╗ ██████╗ ██╗     ██╗   ██╗███╗   ███╗███╗   ██╗███████╗
+         ██╔════╝██╔═══██╗██║     ██║   ██║████╗ ████║████╗  ██║██╔════╝
+         ██║     ██║   ██║██║     ██║   ██║██╔████╔██║██╔██╗ ██║███████╗
+         ██║     ██║   ██║██║     ██║   ██║██║╚██╔╝██║██║╚██╗██║╚════██║
+         ╚██████╗╚██████╔╝███████╗╚██████╔╝██║ ╚═╝ ██║██║ ╚████║███████║
+          ╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═══╝╚══════╝
+    -->
+    <dxi-column
+      caption="Subscriber Name"
+      dataField="subscriberName"
+    ></dxi-column>
+    <dxi-column
+      caption="Notification Channel"
+      dataField="channelType"
+      cellTemplate="channelTypeTemplate"
+    ></dxi-column>
+    <dxi-column caption="Contact" dataField="channelValue"></dxi-column>
+    <dxi-column caption="Actions" cellTemplate="actionsTemplate"></dxi-column>
+
+    <!--
+         ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
+         ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
+            ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗  ███████╗
+            ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝  ╚════██║
+            ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗███████║
+            ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
+    -->
+    <div *dxTemplate="let cell of 'channelTypeTemplate'">
+      {{ cell.data.channelType | titlecase }}
+    </div>
+
+    <div *dxTemplate="let cell of 'actionsTemplate'">
+      <div fxLayout="row">
+        <button mat-icon-button matTooltip="Edit" (click)="edit(cell.data)">
+          <mat-icon fontIcon="icon-edit"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </dx-data-grid>
+</div>
