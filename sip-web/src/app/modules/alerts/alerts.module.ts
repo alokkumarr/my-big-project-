@@ -26,6 +26,7 @@ import {
 import { AlertsState } from './state/alerts.state';
 import { IsAdminGuard } from '../admin/guards';
 import { AlertUnsubscribe } from './components/alert-unsubscribe/alert-unsubscribe.component';
+import { AddSubscriberModule } from '../admin/subscriber/add-subscriber/add-subscriber.module';
 
 const components = [
   AlertsPageComponent,
@@ -48,7 +49,8 @@ const components = [
     CommonModuleTs,
     RouterModule.forChild(routes),
     DxSelectBoxModule,
-    NgxsModule.forFeature([AlertsState])
+    NgxsModule.forFeature([AlertsState]),
+    AddSubscriberModule
   ],
   entryComponents: components,
   providers: [

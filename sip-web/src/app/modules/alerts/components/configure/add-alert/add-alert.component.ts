@@ -41,6 +41,8 @@ import {
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { SubscriberService } from 'src/app/modules/admin/subscriber/subscriber.service';
+import { SIPSubscriber } from 'src/app/modules/admin/subscriber/models/subscriber.model';
 const LAST_STEP_INDEX = 3;
 
 const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
@@ -85,12 +87,16 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   showNotificationEmail = false;
   showOtherThresholdValue = false;
   lookbackPeriodTypes = ['minute', 'hour', 'day', 'week', 'month'];
+  subscribers$: Observable<
+    SIPSubscriber[]
+  > = this.subscriberService.getAllSubscribers();
 
   constructor(
     private _formBuilder: FormBuilder,
     public _configureAlertService: ConfigureAlertService,
     public _notify: ToastService,
-    public _observeService: ObserveService
+    public _observeService: ObserveService,
+    private subscriberService: SubscriberService
   ) {
     this.createAlertForm();
   }
