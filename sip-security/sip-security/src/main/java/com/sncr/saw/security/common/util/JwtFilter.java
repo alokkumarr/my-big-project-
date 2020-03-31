@@ -3,6 +3,7 @@ package com.sncr.saw.security.common.util;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sncr.saw.security.app.service.TicketHelper;
+import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
@@ -31,11 +32,6 @@ public class JwtFilter extends GenericFilterBean {
 
   private static String SIP_AUTH = "/sip-security/auth";
 
-  private final String INVALID_TOKEN = "Token is not valid.";
-  private final String TOKEN_EXPIRED = "Token has expired. Please re-login.";
-  private final String HEADER_ERROR = "Missing or invalid Authorization header.";
-  private final String UNAUTHORISED_USER = "You are not authorized to perform this operation.";
-
   private final String jwtSecretKey;
   private final TicketHelper ticketHelper;
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -57,7 +53,7 @@ public class JwtFilter extends GenericFilterBean {
       final String authHeader = request.getHeader("Authorization");
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
         haveInValidFlow = true;
-        errorMessage = HEADER_ERROR;
+        errorMessage = ErrorMessages.HEADER_ERROR;
       } else {
         final String token = authHeader.substring(7); // The part after Bearer
         Claims claims = null;
@@ -69,13 +65,13 @@ public class JwtFilter extends GenericFilterBean {
           request.setAttribute("claims", claims);
         } catch (final SignatureException e) {
           haveInValidFlow = true;
-          errorMessage = TOKEN_EXPIRED;
+          errorMessage = ErrorMessages.TOKEN_EXPIRED;
         } catch (MalformedJwtException ex) {
           haveInValidFlow = true;
-          errorMessage = TOKEN_EXPIRED;
+          errorMessage = ErrorMessages.TOKEN_EXPIRED;
         } catch (ExpiredJwtException expired) {
           haveInValidFlow = true;
-          errorMessage = TOKEN_EXPIRED;
+          errorMessage = ErrorMessages.TOKEN_EXPIRED;
         }
 
         // This checks the validity of the token. logging out does not need
@@ -88,16 +84,16 @@ public class JwtFilter extends GenericFilterBean {
           Ticket ticket = mapper.convertValue(claimTicket, Ticket.class);
           if (ticket == null) {
             haveInValidFlow = true;
-            errorMessage = INVALID_TOKEN;
+            errorMessage = ErrorMessages.INVALID_TOKEN;
           } else if (!ticket.isValid()) {
             haveInValidFlow = true;
-            errorMessage = TOKEN_EXPIRED;
+            errorMessage = ErrorMessages.TOKEN_EXPIRED;
           } else if (requestURI.startsWith(SIP_AUTH + "/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
             haveInValidFlow = true;
-            errorMessage = UNAUTHORISED_USER;
+            errorMessage = ErrorMessages.unAuthorizedMessage;
           } else if (!(ticket.getTicketId() != null && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
             haveInValidFlow = true;
-            errorMessage = INVALID_TOKEN;
+            errorMessage = ErrorMessages.INVALID_TOKEN;
           }
         }
       }

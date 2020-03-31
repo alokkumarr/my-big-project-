@@ -1,8 +1,8 @@
 package com.sncr.saw.security.app.repository;
 
-import com.sncr.saw.security.app.id3.Id3TokenException;
 import com.sncr.saw.security.app.id3.model.AuthorizationCodeDetails;
 import com.sncr.saw.security.app.id3.model.Id3AuthenticationRequest;
+import com.sncr.saw.security.common.bean.external.response.Id3User;
 
 public interface Id3Repository {
 
@@ -40,4 +40,6 @@ public interface Id3Repository {
    * @return
    */
   boolean onBoardId3client(Id3AuthenticationRequest id3Request);
+
+    Id3User getId3Userdetails(String masterLoginId);
 }

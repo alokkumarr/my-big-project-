@@ -15,6 +15,7 @@ import org.apache.spark.sql.types.StructField;
 import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.explode;
 import sncr.bda.conf.PivotFields;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
 
 public class Pivot {
     private static final Logger logger = Logger.getLogger(Pivot.class);
@@ -325,19 +326,8 @@ public class Pivot {
         StructField[] fields = schema.fields();
         logger.debug("DS fields : "+ fields);
         for(StructField field : fields){
-            dataset = dataset.withColumnRenamed(field.name(), sanitizeFieldName(field.name()));
+            dataset = dataset.withColumnRenamed(field.name(),  NGComponentUtil.getSanitizedFieldName(field.name()));
         }
         return dataset;
-    }
-
-    private String sanitizeFieldName(String fieldName) {
-        logger.debug("sanitizeFieldName - FieldName :"+ fieldName);
-        String invalidCharRegex = "[^a-zA-Z0-9_ ]";
-        if(fieldName != null && !fieldName.trim().isEmpty()){
-            fieldName = fieldName.replaceAll(invalidCharRegex, "").trim()
-                .replaceAll("\\s+", "_").toUpperCase();
-            logger.debug("Converted to :"+fieldName);
-        }
-        return fieldName;
     }
 }
