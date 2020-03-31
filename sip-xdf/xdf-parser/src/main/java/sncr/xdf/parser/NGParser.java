@@ -293,6 +293,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 // This block has been added to support DF in Parser
                 // SIP-7758
                 else {
+                    /**
+                     * If Header exists Then below if block executes otherwise else
+                     */
                     if (headerSize >= 1) {
                         logger.debug("Header present");
                         FileStatus[] files = fs.globStatus(new Path(sourcePath));
@@ -308,12 +311,23 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                             // ... and query content
                             files = fs.globStatus(new Path(sourcePath));
                         }
+                        /**
+                         * If Pivot or flattening or Json fields exist in config
+                         * Then it will go to new ParserAndUnion Files flow
+                         */
                         if(isPivotApplied || isFlatteningEnabled || isSchemaContainsJsonType){
                             retval = parseAndUnionFiles(files, outputDataSetMode);
                         }else{
+                            /**
+                             * If no new config (Pivot, flattening or Json fields) not exist
+                             * It wil lgo to old flow parserFiles
+                             */
                             retval = parseFiles(files, outputDataSetMode);
                         }
                     } else {
+                        /**
+                         * When there is no Header then only this flow executes
+                         */
                         logger.debug("No Header");
                         retval = parse(outputDataSetMode);
                     }
@@ -554,7 +568,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
             throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
         }
-        //Write Consolidated Accepted data
+        /**
+         * Write Consolidated Accepted data
+         * ONLY require now in Files contains header and
+         * No new config exist such as Pivot, Flattening or Json Fields
+         * We are putting all files combined dataset into hashmap for pipeline processing
+         */
         if (this.acceptedDataCollector != null) {
             scala.collection.Seq<Column> outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
