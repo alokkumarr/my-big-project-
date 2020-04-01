@@ -20,7 +20,7 @@ class AnalysisHelper {
    * @param {String} id
    * @returns {Object}
    */
-  deleteAnalysis(host, token, customerCode, id, analysisType = null) {
+  deleteAnalysis(host, token, customerCode, id) {
     // DSL analysis
     const url = `${host}${Constants.API_ROUTES.DSL_ANALYSIS}${id}`;
     return new RestClient().delete(url, token);

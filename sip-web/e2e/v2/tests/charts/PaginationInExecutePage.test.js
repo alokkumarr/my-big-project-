@@ -12,7 +12,6 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
-const Constants = require('../../helpers/Constants');
 const users = require('../../helpers/data-generation/users');
 
 describe('Executing pagination test for charts in grid view from charts/PaginationInExecutePage.test.js', () => {
@@ -50,8 +49,7 @@ describe('Executing pagination test for charts in grid view from charts/Paginati
           host,
           token,
           protractorConf.config.customerCode,
-          analysisId,
-          Constants.CHART
+          analysisId
         );
       }
       // Logout by clearing the storage
