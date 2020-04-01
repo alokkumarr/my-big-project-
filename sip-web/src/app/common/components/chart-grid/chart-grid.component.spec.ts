@@ -45,6 +45,7 @@ class DxDataGridStubComponent {
 }
 
 const analysis = {
+  name: 'Untitled Analysis',
   chartOptions: {
     chartType: 'map',
     xAxis: {
