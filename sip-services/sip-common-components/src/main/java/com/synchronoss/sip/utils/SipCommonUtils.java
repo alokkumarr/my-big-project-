@@ -85,9 +85,9 @@ public class SipCommonUtils {
     } else {
       throw new IllegalArgumentException(
           String.format(
-              "analysisName %s is invalid - character count MUST be greater than or equal to %s and "
-                  + "less than or equal to %s",
-              name,MIN_ANALYSIS_NAME_LENGTH,MAX_ANALYSIS_NAME_LENGTH));
+              "analysisName %s is invalid - character count MUST be greater than or equal to %s and"
+                  + " less than or equal to %s",
+              name, MIN_ANALYSIS_NAME_LENGTH, MAX_ANALYSIS_NAME_LENGTH));
     }
   }
 
