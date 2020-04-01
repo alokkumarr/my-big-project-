@@ -71,7 +71,7 @@ public class SipCommonUtils {
       throw new IllegalArgumentException("analysisName must not be null");
     }
     // validate name length and avoid any invalid specific symbol for file name
-    boolean hasValidLength = name.length() >= 1 && name.length() <= 30;
+    boolean hasValidLength = name.length() >= 1 && name.length() <= 100;
     if (hasValidLength) {
       if (name.matches("[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]")) {
         throw new IllegalArgumentException(
