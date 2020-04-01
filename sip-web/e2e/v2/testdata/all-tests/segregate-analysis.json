@@ -3,7 +3,7 @@
     "analysis": {
       "SEGAL01": {
         "suites": ["sanity","critical","regression"],
-        "user": "analyst",
+        "user": "admin",
         "chartType": "chart:combo",
         "analysisType": "Report",
         "userEmail": "e2e@email.com",
