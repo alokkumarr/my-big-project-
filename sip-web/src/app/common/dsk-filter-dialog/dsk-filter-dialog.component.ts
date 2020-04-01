@@ -91,7 +91,6 @@ export class DskFilterDialogComponent implements OnInit {
       this.data
     );
 
-
     if (this.errorState) {
       this.previewString = '';
     } else {

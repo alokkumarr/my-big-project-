@@ -93,13 +93,13 @@ export class DskFiltersService {
       case 'DSK':
         let condition;
         condition = filter.booleanQuery.length > 0;
-
+        condition = filter.booleanQuery.length > 0;
         return (
           filter.booleanCriteria &&
           condition &&
           filter.booleanQuery.every(child => {
             if ((<DSKFilterGroup>child).booleanCriteria) {
-              return this.isDSKFilterValid(<DSKFilterGroup>child, false, 'DSK');
+              return this.isDSKFilterValid(<DSKFilterGroup>child, false, data);
             }
 
             const field = <DSKFilterField>child;
