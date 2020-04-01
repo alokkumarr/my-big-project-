@@ -11,6 +11,7 @@ import io.prestosql.sql.tree.Execute;
 import io.prestosql.sql.tree.Insert;
 import io.prestosql.sql.tree.Intersect;
 import io.prestosql.sql.tree.Join;
+import io.prestosql.sql.tree.Query;
 import io.prestosql.sql.tree.QueryBody;
 import io.prestosql.sql.tree.QuerySpecification;
 import io.prestosql.sql.tree.Relation;
@@ -18,6 +19,8 @@ import io.prestosql.sql.tree.Select;
 import io.prestosql.sql.tree.Statement;
 import io.prestosql.sql.tree.Table;
 import io.prestosql.sql.tree.Union;
+import io.prestosql.sql.tree.With;
+import io.prestosql.sql.tree.WithQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +36,8 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
   private Object dummyObject = new Object();
   private List<TableDescriptor> tables;
   private int statementIndex = 0;
-  private boolean haveTemptable;
+  private boolean isTemp = false;
+
   /**
    * There are special names, that are not table names but are parsed as tables. These names are
    * collected here and are not included in the tables - names anymore.
@@ -57,8 +61,8 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
    */
   public List<TableDescriptor> getTableList(Statement statement, int inx, boolean isTemp) {
     init();
-    haveTemptable = isTemp;
-    statementIndex = inx;
+    this.isTemp = isTemp;
+    this.statementIndex = inx;
     statement.accept(this, 0);
     return tables;
   }
@@ -68,18 +72,35 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
   protected Object visitCreateTableAsSelect(CreateTableAsSelect create, Integer context) {
     // Process CREATE TABLE statement
     String tn = create.getName().toString();
-    tables.add(new TableDescriptor(tn, haveTemptable, statementIndex, true));
+    tables.add(new TableDescriptor(tn, isTemp, statementIndex, true));
     stType = StatementType.CREATE;
 
     // Process sub-select
+    Query query = create.getQuery();
+    Optional<With> queryWith = query.getWith();
+    if (queryWith.isPresent()) {
+      queryWith.get().accept(this, 0);
+    }
+
     QueryBody queryBody = create.getQuery().getQueryBody();
     queryBody.accept(this, 0);
     return dummyObject;
   }
 
   @Override
-  protected Object visitQueryBody(QueryBody queryBody, Integer context) {
+  protected Object visitWith(With with, Integer context) {
+    List<WithQuery> withQueryList = with.getQueries();
+    if (withQueryList != null && !withQueryList.isEmpty()) {
+      for (WithQuery withQuery : withQueryList) {
+        otherItemNames.add(withQuery.getName().toString());
+        withQuery.getQuery().getQueryBody().accept(this, 0);
+      }
+    }
+    return dummyObject;
+  }
 
+  @Override
+  protected Object visitQueryBody(QueryBody queryBody, Integer context) {
     if (queryBody instanceof QuerySpecification) {
       QuerySpecification plainQuery = (QuerySpecification) queryBody;
       Select select = plainQuery.getSelect();
