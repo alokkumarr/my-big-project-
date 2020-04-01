@@ -53,13 +53,15 @@ export class StreamInspectorComponent implements OnInit, OnDestroy {
         const stream = [];
         const eventType = [];
         forEach(result, item => {
-          cols = union([], keys(item));
-          cols.shift();
-          stream.push(head(item[head(cols)]));
-          eventType.push({
-            stream: head(item[head(cols)]).queue,
-            data: item.eventTypes
-          });
+          if (!isEmpty(item)) {
+            cols = union([], keys(item));
+            cols.shift();
+            stream.push(head(item[head(cols)]));
+            eventType.push({
+              stream: head(item[head(cols)]).queue,
+              data: item.eventTypes
+            });
+          }
         });
         this.streamData$ = of(stream);
         this.eventTypeResult$ = of(eventType);
