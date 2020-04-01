@@ -1,4 +1,4 @@
-<h1 class="report-title" [textContent]="analysis.name"></h1>
+<h1 class="report-title" matTooltipClass="name-tooltip" [matTooltip]="analysis.name" [textContent]="analysis.name.length > 30 ? analysis.name.substring(0,30) + '...' : analysis.name"></h1>
 
 <report-grid-upgraded
   [artifacts]="analysisArtifacts | checkedArtifactColumnFilter"
