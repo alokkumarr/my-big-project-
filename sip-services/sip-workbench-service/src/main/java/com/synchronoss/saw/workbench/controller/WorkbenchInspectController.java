@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Properties;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
-import org.mortbay.log.Log;
+import org.apache.kafka.common.requests.ApiError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,16 @@ import com.mapr.streams.impl.MarlinDocumentStream;
 import com.mapr.streams.impl.MessageStore;
 import com.synchronoss.sip.utils.RestUtil;
 
+import akka.japi.Option;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/internal/workbench/projects/")
+@Api(value = "The controller provides operations to retrive streams and its contents "
+	    + "synchronoss analytics platform ")
 public class WorkbenchInspectController {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -54,13 +62,14 @@ public class WorkbenchInspectController {
 	@NotNull
 	private String rtisBasePath;
 	
-	@Value("${workbench.rtis-appkeys-url}")
+	@Value("${workbench.rtis-base-url}")
 	@NotNull
-	private String rtisAppkeysUrl;
+	private String rtisUrl;
 	
-	@Value("${workbench.rtis-config-url}")
-	@NotNull
-	private String rtisConfigUrl;
+	
+	public static final String RTIS_CONFIG_URL =  "/internal/rtisconfig/config/";
+	public static final String RTIS_APP_KEYS_URL =  "/internal/rtisconfig/appKeys";
+	
 	
 	
 
@@ -81,6 +90,12 @@ public class WorkbenchInspectController {
 	 * @throws JsonProcessingException exception while parsing json
 	 * @throws Exception exception
 	 */
+	@ApiOperation(value = "Retrives stream details such as name and topic name", nickname = "retrieveStream",
+		      notes = "", response = HttpStatus.class)
+		  @ApiResponses(
+		      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+		          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+		          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
 	@RequestMapping(value = "{project}/streams", method = RequestMethod.GET, 
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -93,8 +108,13 @@ public class WorkbenchInspectController {
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
 		logger.debug("Authroization header.....####" + req.
 				getHeader("Authorization"));
+		
+		logger.debug(" RTIS base url ::"+ this.rtisUrl);
+		String rtisAppkeysUrl = this.rtisUrl + RTIS_APP_KEYS_URL;
+		logger.debug("rtis app key url ::"+ rtisAppkeysUrl);
+		
 		ResponseEntity<Object[]> appKeys = restTemplate.
-				exchange(this.rtisAppkeysUrl,
+				exchange(rtisAppkeysUrl,
 				HttpMethod.GET, entity, Object[].class, new Object[0]);
 		logger.debug(appKeys.toString());
 
@@ -107,9 +127,14 @@ public class WorkbenchInspectController {
 			ObjectNode resultNode = mapper.createObjectNode();
 			JsonNode appKey = objNode.get("app_key");
 			logger.debug("########" + appKey.asText());
-
+			
+			logger.debug("#### rtis base url ::"+ this.rtisUrl);
+			String rtisConfigUrl = this.rtisUrl + RTIS_CONFIG_URL;
+			logger.debug("#### rtis config url ::" + rtisConfigUrl 
+					+ appKey.asText());
+			 
 			ResponseEntity<Object[]> config = restTemplate.exchange(
-					this.rtisConfigUrl 
+				rtisConfigUrl 
 			+ appKey.asText(), HttpMethod.GET, entity,
 					Object[].class, new Object[0]);
 			logger.debug("##### config response ###" + config.toString());
@@ -134,12 +159,14 @@ public class WorkbenchInspectController {
 					
 					
 					
-					List<String> eventTypes = this.retriveEventTypes(streamsNames.get(0));
-					ArrayNode eventSNode = mapper.valueToTree(eventTypes);
-					resultNode.putArray("eventTypes").addAll(eventSNode);
-					resultNode.set("stream", jsonNode.get("streams_1"));
+					Optional<List<String>> eventTypes = this.retriveEventTypes(streamsNames.get(0));
+					if(eventTypes.isPresent()) {
+						ArrayNode eventSNode = mapper.valueToTree(eventTypes.get());
+						resultNode.putArray("eventTypes").addAll(eventSNode);
+						resultNode.set("stream", jsonNode.get("streams_1"));
+					} 
 					
-					//resultNode.put("streams_1:", jsonNode.get("streams_1"));
+					
 					
 					
 				}
@@ -158,18 +185,29 @@ public class WorkbenchInspectController {
 	 * @param stream stream name
 	 * @param eventType event type
 	 * @return stream content
+	 * @throws IOException 
 	 */
+	@ApiOperation(value = "Retrives stream contents of stream", nickname = "retrieveStreamContents",
+		      notes = "", response = HttpStatus.class)
+    @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
 	@RequestMapping(value = "{project}/streams/{stream}/content/{eventType}", 
 			method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public Object getStreamContentByEvent(
 			@PathVariable(name = "project", required = true) String project,
 			@PathVariable(name = "stream", required = true) String stream,
-			@PathVariable(name = "eventType", required = true) String eventType) {
+			@PathVariable(name = "eventType", required = true) String eventType) throws IOException {
 		
 			logger.debug("Stream Name :::" + stream);
 			List<JsonNode> entities = new ArrayList<JsonNode>();
 			MarlinDocumentStream docStream = this.retriveStream(stream);
+			if(docStream == null) {
+					    return new ResponseEntity<Object>
+					    ("No stream exists with name "+ stream, HttpStatus.BAD_REQUEST);
+			}
 			ObjectMapper mapper = new ObjectMapper();
 			docStream.forEach(document -> {
 				try {
@@ -216,9 +254,12 @@ public class WorkbenchInspectController {
 	 * @param stream stream name
 	 * @return list of event types
 	 */
-	private List<String> retriveEventTypes(String stream) {
+	private Optional<List<String>> retriveEventTypes(String stream) {
 		   
 			MarlinDocumentStream docStream = this.retriveStream(stream);
+			if(docStream == null) {
+				return Optional.empty();
+			}
 			ObjectMapper mapper = new ObjectMapper();
 			final List<String> eventTypes = new ArrayList<String>();
 			docStream.forEach(document -> {
@@ -238,7 +279,7 @@ public class WorkbenchInspectController {
 					logger.debug("####Event Type ::"+ value);
 					eventTypes.add(value.asText());
 					
-			} catch (IOException exception) {
+			} catch (com.mapr.db.exceptions.TableNotFoundException exception) {
 				logger.error(exception.getMessage());
 			}	catch (Exception exception) {
 				logger.error(exception.getMessage());
@@ -246,8 +287,8 @@ public class WorkbenchInspectController {
 						
 			});
 		
-		return eventTypes.stream().distinct().
-				collect(Collectors.toList());
+		return Optional.of(eventTypes.stream().distinct().
+				collect(Collectors.toList()));
 
 	
 		
@@ -256,20 +297,35 @@ public class WorkbenchInspectController {
 	private MarlinDocumentStream retriveStream(String stream) {
 
 		logger.debug("Stream Name :::" + stream);
-		List<JsonNode> entities = new ArrayList<JsonNode>();
 
 		logger.debug("#####stream name:::" + stream);
 
 		MessageStore store = null;
+		MarlinDocumentStream docStream = null;
+		boolean isStreamExists = false ;
 		try {
+			
 			store = (MessageStore) Streams.getMessageStore(rtisBasePath + "/" + stream);
-		} catch (IOException exception) {
-			logger.error(exception.getMessage());
+			docStream = (MarlinDocumentStream) store.find();
+			isStreamExists = true;
+		} catch (com.mapr.db.exceptions.TableNotFoundException exception) {
+			logger.info("#### no stream exists ####");
+			logger.warn(exception.getMessage());
+		}catch(IOException exception) {
+			logger.warn(exception.getMessage());
+		}catch(java.lang.IllegalArgumentException exception) {
+			logger.warn(exception.getMessage());
+		}catch(Exception exception) {
+			logger.warn(exception.getMessage());
+		}
+		
+		if(isStreamExists) {
+			logger.debug("########Retrived store...." + store);
+		    docStream = (MarlinDocumentStream) store.find();
+			store.close();
 		}
 
-		logger.debug("########Retrived store...." + store);
-		MarlinDocumentStream docStream = (MarlinDocumentStream) store.find();
-		store.close();
+		
 		return docStream;
 
 	}
