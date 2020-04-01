@@ -8,8 +8,11 @@ const logger = require('./logger')(__filename);
 const testSuites = require('./testSuites');
 const Constants = require('../helpers/Constants');
 const path = require('path');
-const DownloadDirectory = path.join(__dirname,'../')+'Downloads';
 /**
+* Directory will be created once the file downloads
+ */
+ const DownloadDirectory = path.join(__dirname,'../')+'Downloads';
+ /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  * maximum time to wait for a page load i.e. when user refresh page/ first time open browser and type saw app url
@@ -91,7 +94,7 @@ exports.config = {
         download: {
           'prompt_for_download': false,
           'directory_upgrade': true,
-          'default_directory': DownloadDirectory
+          'default_directory': DownloadDirectory //Changed the default download path of chrome
         }
       }
     },

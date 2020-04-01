@@ -7,7 +7,6 @@ const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
 const Constants = require('../../helpers/Constants');
 const path = require('path');
-const rimraf = require('rimraf');
 
 const chai = require('chai');
 const assert = chai.assert;
@@ -54,12 +53,7 @@ describe('Executing Segregate Analysis by Type Tests', () => {
           id,
         );
       });
-      logger.warn("Going to delete directory"+DownloadDirectory);
-      rimraf(DownloadDirectory,function(err) {
-        if (err) {
-          return console.error(err);
-        }
-      });
+      executePage.deleteDirectory(DownloadDirectory);
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -124,7 +118,7 @@ describe('Executing Segregate Analysis by Type Tests', () => {
 
         //Delete Analysis
         executePage.verifyAnalysisDetailsAndDelete(reportName,reportDescription);
-        executePage.verifyExportedAnalysis(DownloadDirectory,reportName);
+        executePage.validateDownloadedFile(DownloadDirectory,reportName);
       }).result.testInfo = {
         testId: id,
         data: data,

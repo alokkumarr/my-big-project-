@@ -54,8 +54,7 @@ describe('Executing Publish Functionality from list/Card/Details View for PIVOT 
             host,
             token,
             protractorConf.config.customerCode,
-            currentAnalysis.analysisId,
-            Constants.PIVOT
+            currentAnalysis.analysisId
           );
         }
       });

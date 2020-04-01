@@ -350,7 +350,8 @@ class ExecutePage extends ConfirmationModel {
     commonFunctions.clickOnElement(this._exportButton);
   }
 
-  verifyExportedAnalysis(downloadDirectory,fileName){
+  /*validate the downloaded file in default download directory*/
+  validateDownloadedFile(downloadDirectory,fileName){
     fs.readdir(downloadDirectory,function(err, files) {
       if (err) {
         return err;
@@ -358,6 +359,15 @@ class ExecutePage extends ConfirmationModel {
       files.forEach( function (file) {
         expect(file).toContain(fileName);
       });
+    });
+  }
+
+  /*after validation delete the download folder*/
+  deleteDirectory(directory){
+    rimraf(directory,function(err) {
+      if (err) {
+        return console.error(err);
+      }
     });
   }
 }

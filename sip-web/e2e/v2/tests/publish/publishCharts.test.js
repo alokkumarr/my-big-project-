@@ -61,8 +61,7 @@ describe('Executing Publish Functionality from list/Card/Details View for CHARTS
             host,
             token,
             protractorConf.config.customerCode,
-            currentAnalysis.analysisId,
-            Constants.CHART
+            currentAnalysis.analysisId
           );
         }
       });

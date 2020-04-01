@@ -61,8 +61,7 @@ describe('Executing fork from menu option and delete chart tests from charts/for
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.CHART
+          id
         );
       });
 
