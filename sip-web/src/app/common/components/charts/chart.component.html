@@ -1,0 +1,16 @@
+<div fxLayout="column">
+  <div
+    fxLayout="row wrap"
+    fxLayoutAlign="center center"
+    fxLayoutGap="10px"
+    *ngIf="chartType === 'comparison'"
+  >
+    <mat-checkbox
+      *ngFor="let category of comparisonConfig.categories; let i = index"
+      [checked]="category.checked"
+      (change)="onCategoryToggle($event, i)"
+      >{{ category.name }}</mat-checkbox
+    >
+  </div>
+  <div style="width: 100%;" #container></div>
+</div>

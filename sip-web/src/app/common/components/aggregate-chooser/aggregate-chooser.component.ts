@@ -1,5 +1,6 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as toLower from 'lodash/toLower';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
@@ -127,6 +128,30 @@ export class AggregateChooserComponent implements OnInit {
 
   onAggregateChange(value) {
     this.change.emit(value);
+  }
+
+  clearAggregate() {
+    this.change.emit(null);
+  }
+
+  getAggregateObj() {
+    return AGGREGATE_TYPES_OBJ[toLower(this.aggregate)] || {};
+  }
+
+  /**
+   * Only allow clearing of aggregate on numeric fields. If we
+   * clear aggregates on string fields, we won't get numeric data
+   * for charts.
+   *
+   * @returns
+   * @memberof AggregateChooserComponent
+   */
+  canClearAggregate() {
+    return (
+      this.analysisSubtype === 'scatter' &&
+      NUMBER_TYPES.includes(this.artifactColumn.type) &&
+      this.aggregate
+    );
   }
 
   checkColumn(value, sipQuery: QueryDSL) {

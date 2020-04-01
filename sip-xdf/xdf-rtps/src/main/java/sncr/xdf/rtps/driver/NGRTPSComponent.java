@@ -100,6 +100,7 @@ public class NGRTPSComponent extends AbstractComponent
         NGRTPSComponent component = null;
         int rc= 0;
         Exception exception = null;
+        ComponentConfiguration cfg = null;
 		try {
 			long start_time = System.currentTimeMillis();
 
@@ -136,7 +137,7 @@ public class NGRTPSComponent extends AbstractComponent
 			logger.debug("Config validation completed");
 			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
 					ComponentServices.TransformationMetadata, ComponentServices.Spark, };
-			ComponentConfiguration cfg = NGRTPSComponent.analyzeAndValidate(configAsStr);
+			cfg = NGRTPSComponent.analyzeAndValidate(configAsStr);
 			
 			logger.debug("Analyze and validation completed" + cfg);
 			
@@ -172,7 +173,7 @@ public class NGRTPSComponent extends AbstractComponent
         }catch (Exception ex) {
             exception = ex;
         }
-        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component), rc, exception);
+        rc = NGComponentUtil.handleErrors(Optional.ofNullable(component),Optional.ofNullable(cfg), rc, exception);
         System.exit(rc);
 	}
 

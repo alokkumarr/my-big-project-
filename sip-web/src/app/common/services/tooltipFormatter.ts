@@ -43,9 +43,12 @@ export function getTooltipFormats(fields, chartType) {
 function getXValue(point, fields, chartType) {
   const { x, g } = fields;
   const hasGroupBy = Boolean(g);
-
   if (chartType === 'chart_scale') {
     return point.name || point.x;
+  }
+
+  if (chartType === 'comparison') {
+    return `${point.category} ${get(point, 'series.name')}`;
   }
 
   if (chartType === 'pie') {
@@ -84,11 +87,13 @@ function getFieldLabelWithAggregateFun(field) {
   /* Don't try to apply aggregate to a derived metric */
   if (field.expression) {
     return field.alias || `${field.displayName}`;
-  } else {
+  } else if (field.aggregate) {
     const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
     return (
       field.alias || `${aggregate}(${displayNameWithoutAggregateFor(field)})`
     );
+  } else {
+    return field.alias || `${displayNameWithoutAggregateFor(field)}`;
   }
 }
 
@@ -100,7 +105,9 @@ function getYValueBasedOnAggregate(point) {
     case 'percentagebyrow':
       return round(point.percentage, 2) + '%';
     default:
-      return isUndefined(point.value) ? round(point.y, 2) : round(point.value, 2);
+      return isUndefined(point.value)
+        ? round(point.y, 2)
+        : round(point.value, 2);
   }
 }
 
@@ -127,9 +134,10 @@ export function getTooltipFormatter(fields, chartType) {
       <td><strong>${xLabel}:</strong></td>
       <td>${xValue}</td>
     </tr>`;
-    const yLabel = fields.g
-      ? getFieldLabelWithAggregateFun(fields.y[0])
-      : seriesName;
+    const yLabel =
+      chartType === 'comparison' || fields.g
+        ? getFieldLabelWithAggregateFun(fields.y[0])
+        : seriesName;
     const yString = `<tr>
       <td><strong>${yLabel}:</strong></td>
       <td>${getYValueBasedOnAggregate(point)}</td>

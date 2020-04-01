@@ -21,7 +21,7 @@ import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 import { DEFAULT_COLOR_PICKER_OPTION } from '../../../../../../common/components/custom-color-picker/default-color-picker-options';
-import { CHART_COLORS } from 'src/app/common/consts';
+import { CHART_COLORS, NUMBER_TYPES } from 'src/app/common/consts';
 import { DATA_AXIS } from '../../../consts';
 
 const ALIAS_CHANGE_DELAY = 500;
@@ -61,7 +61,8 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
-  public hasDateInterval = false;
+  public supportsDateInterval = false;
+  public supportsDateFormat = false;
   public isDataField = false;
   public colorPickerConfig = {};
 
@@ -71,7 +72,17 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-    this.hasDateInterval = DATE_TYPES.includes(type);
+
+    this.supportsDateInterval =
+      DATE_TYPES.includes(type) &&
+      (this.analysisType === 'pivot' || this.analysisSubtype === 'comparison');
+
+    this.supportsDateFormat =
+      DATE_TYPES.includes(type) &&
+      this.analysisSubtype !== 'comparison' && // no date formats supported in comparison chart
+      (this.analysisType !== 'pivot' || // all charts
+        this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
+
     this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
     );
@@ -128,6 +139,25 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     return (
       (<ArtifactColumnChart>this.artifactColumn).comboType ||
       (<any>this.artifactColumn).displayType
+    );
+  }
+
+  /**
+   * Even if no aggregate is selected, show the aggregate chooser for numeric types
+   * if it's a scatter chart.
+   *
+   * @returns {boolean}
+   * @memberof DesignerDataOptionFieldComponent
+   */
+  shouldShowAggregate(): boolean {
+    if (this.artifactColumn.expression) {
+      return false;
+    }
+
+    return (
+      (this.analysisSubtype === 'scatter' &&
+        NUMBER_TYPES.includes(this.artifactColumn.type)) ||
+      Boolean(this.artifactColumn.aggregate)
     );
   }
 

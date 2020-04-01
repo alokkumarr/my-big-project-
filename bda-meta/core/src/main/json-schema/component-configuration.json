@@ -26,7 +26,10 @@
     "default": "base",
     "enum": [
       "base",
-      "partition"
+      "partition",
+      "Raw Data Set",
+      "Enriched Data Set",
+      "Aggregated Data Set"
     ]
   },
   "keys" : {
@@ -124,7 +127,21 @@
       "parent": {
         "type": "string"
       },
-      "userdata": {}
+      "userdata" : {
+        "type": "object",
+        "description": "User Data Object",
+        "properties" : {
+          "tags": {
+            "description": "Dataset Tags",
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   },
   "properties" : {
@@ -141,6 +158,11 @@
       "items" : {
         "$ref": "#/OutputDataSet"
       }
+    },
+    "isErrorHandlingEnabled": {
+      "description": "is Error Handling Enabled in component to exit with XDF Error codes.",
+      "type": "boolean",
+      "default" : false
     },
     "project" : {
       "description": "Project/Application name (ID)",
@@ -188,6 +210,23 @@
               },
               "format": {
                 "type": "string"
+              },
+              "isFlatteningEnabled":{
+                "description": "is Flattening Enabled for Struct and Array Columns if it is Json Type field.",
+                "type": "boolean",
+                "default" : false
+              },
+              "sourceIndex":{
+                "description": "CSV File Source Column Index. This require if we want to select only required columns from Source file.",
+                "type": "integer"
+              },
+              "sourceFieldName":{
+                "description": "CSV File Source Column Name. This require if we want to select only required columns from Source file.",
+                "type": "string"
+              },
+              "defaultValue":{
+                "description": "Default Value to the field if source contains NULL value.",
+                "type": "string"
               }
             }
           }
@@ -207,12 +246,46 @@
         "headerSize": {
           "type": "integer"
         },
+        "fieldDefRowNumber": {
+          "description": "Field Names Row Number in CSV File when Header Size is Greater than 1",
+          "type": "integer"
+        },
         "numberOfFiles": {
           "$ref": "#/numberOfFiles"
+        },
+        "isFlatteningEnabled":{
+          "description": "is Flattening Enabled for Struct and Array Columns in Parser Level",
+          "type": "boolean",
+          "default" : false
+        },
+        "pivotFields":{
+          "description": "Pivot Config",
+          "type": "object",
+          "properties": {
+            "groupByColumns": {
+              "description": "Group By Columns",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "pivotColumn": {
+              "description": "Pivot Column",
+              "type" : "string"
+            },
+            "aggregateColumn": {
+              "description": "Aggregate Column",
+              "type" : "string"
+            }
+          }
+        },
+        "allowInconsistentCol": {
+          "type" : "boolean"
         }
       }
     },
-
     "sql" : {
       "description": "SQL script executor specific properties",
       "properties": {

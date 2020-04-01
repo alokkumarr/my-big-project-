@@ -3,19 +3,13 @@
   with_fileglob: ["../rpms/sip-rtps-*.rpm"]
 - name: Install RTPS package
   yum: name=/tmp/sip-rtps.rpm state=present
-  notify:
-    - restart sip-rtps
 - name: Install RTPS configuration file
   template: src=appl.conf dest=/opt/bda/sip-rtps/conf
-  notify:
-    - restart sip-rtps
 - name: Install RTPS stream schema file
   template: src=stream_1-schema.json dest=/opt/bda/sip-rtps/conf
-  notify:
-    - restart sip-rtps
 - name: Create symbolink link to current Spark version
   file:
-    src: /opt/mapr/spark/spark-2.3.2
+    src: /opt/mapr/spark/spark-2.4.4
     dest: /opt/mapr/spark/spark-current
     state: link
 # Workaround: Installing the MapR HBase client gives empty entries in
@@ -26,5 +20,3 @@
   lineinfile:
     path: /opt/mapr/spark/spark-current/conf/spark-env.sh
     line: 'SPARK_SUBMIT_OPTS="$(echo $SPARK_SUBMIT_OPTS | sed -e s/=://g)"'
-- name: Enable RTPS
-  systemd: name=sip-rtps enabled=true state=started

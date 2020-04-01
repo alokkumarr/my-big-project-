@@ -37,6 +37,7 @@ sip-host2
 #sip_epel_yum_url = https://download.fedoraproject.org/pub/epel/$releasever/$basearch
 # Mark EPEL already being provided to avoid adding it to repositories
 #sip_epel_yum_provided = true
+#sip_internal_services_ip_allowed = 0.0.0.0
 
 [saw-web]
 sip-host1
@@ -69,7 +70,7 @@ saw_spark_master_url=yarn
 # the YARN queue
 #saw_spark_yarn_queue_regular=saw-regular
 #saw_spark_yarn_queue_fast=saw-fast
-#saw_spark_yarn_jars=/opt/mapr/spark/spark-2.3.2/jars
+#saw_spark_yarn_jars=/opt/mapr/spark/spark-2.4.4/jars
 #saw_spark_yarn_zips=/opt/saw/service/spark.zip
 #saw_spark_yarn_resource_manager=sip-mapr
 saw_zookeeper_quorum=localhost

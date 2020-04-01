@@ -15,12 +15,11 @@ provided in the environment:
 
 . Install and configure a MapR version 6.1.0 cluster in the environment
 
-. Install and configure Apache Spark version 2.3.2 from the MapR
+. Install and configure a MapR Ecosystem MEP version 6.3.0 in the environment
+
+. Install and configure Apache Spark version 2.4.4 from the MapR
   Ecosystem Pack on the MapR cluster
 
-. Install and configure Apache Livy from the MapR Ecosystem Pack on
-  the MapR cluster, and set `livy.file.upload.max.size = 500000000`
-  and `livy.spark.master` in `livy.conf`
 
 . Provision a MapR user in the MapR cluster (with user ID 500 and
   group ID 5000)
@@ -40,7 +39,7 @@ provided in the environment:
   host is typically common to the entire environment.
 
 . Provision hosts for running SIP (the target host), with 32 GB of
-  memory and CentOS 7.4 as the operating system.  The hosts should be
+  memory and CentOS 7.7 as the operating system.  The hosts should be
   dedicated to SIP and not run other applications.  The hosts should
   have time synchronization enabled.
 
@@ -157,6 +156,7 @@ to the below SIP environment configuration (`sip-config`).
     # saw_spark_yarn_resource_manager is optional parameter if we want to explicitly
     # define the resource manager for saw-executor if not configured in yarn-site.xml.
     saw_spark_yarn_resource_manager=sip-mapr
+    saw_workbench_lib_path=/opt/bda/saw-workbench-service/lib/
 
 Additional parameter added to control large file export from FTP/email dispatch.
 In case of any higher memory/CPU load on (saw-transport service/export service) server,
@@ -1264,6 +1264,9 @@ Run the "onboard-customer" command with all required parameters stated
 above and it will start the process of creating customer and related
 products/components in the system.
 
+If the product code already exists in the system, then the customer is tied to the existing product,
+else new Product will be created and linked to the customer.
+
 The below is one such example to call onboard-customer with its
 required parameters.
 
@@ -1424,6 +1427,27 @@ Example contents (in pretty format):
         "password": "pwd3",
         "location": "/home/ubuntu",
         "type": "ftp"
+    },
+    {
+        "customerName":"UNIQUE_IDENTIFIER3",
+        "alias" : "server1",
+        "host": "server1.customer3.com",
+        "port": 21,
+        "username": "imuser1",
+        "privatekeyFile": "key1.pem",
+        "location": "/home/ubuntu",
+        "type": "sftp"
+    },
+    {
+        "customerName":"UNIQUE_IDENTIFIER4",
+        "alias" : "server1",
+        "host": "server1.customer4.com",
+        "port": 21,
+        "username": "imuser1",
+        "privatekeyFile": "key1.pem",
+        "passPhrase": "Key@123",
+        "location": "/home/ubuntu",
+        "type": "sftp"
     }
   ]
 }
@@ -1436,6 +1460,15 @@ server is required to have unique entry which gets presented to front
 end, this is maintained by means of `alias` entry. *Note* that each
 server entry per customer is required to have a unique alias entry
 which gets presented in front end.
+
+Connection to sftp can be established either using username and password
+combination or username and a private key. All the private keys should be placed
+along side the sip deployment directory under `sftpkeys`. During deployment, all these
+private keys will be placed under `/etc/bda/sftpkeys/` on all the saw nodes with
+permission `664`. In the ftp_details configuration, only private key
+file name needs to be specified using `privatekeyFile`. If the private
+key has an optional pass phrase, that can be specified
+using `passPhrase` parameter.
 
 NOTE: Please make sure to put minified JSON in configuration file.
 

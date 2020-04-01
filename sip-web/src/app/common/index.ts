@@ -53,7 +53,6 @@ import {
   SSOAuthGuard
 } from './guards';
 import { MaterialModule } from '../material.module';
-import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
 import { PivotGridComponent } from './components/pivot-grid/pivot-grid.component';
 import { FieldDetailsComponent } from './components/field-details/field-details.component';
@@ -190,7 +189,6 @@ const DIRECTIVES = [
 ];
 
 const SERVICES = [
-  ChartService,
   ConfigService,
   DxDataGridService,
   DynamicModuleService,

@@ -28,11 +28,15 @@ HighChartsOfflineExporting(Highmaps);
 import { ChartComponent } from './chart.component';
 import { MapChartComponent } from './map-chart.component';
 import { MapChartViewerComponent } from './map-chart-viewer';
+import { MatCheckboxModule } from '@angular/material';
+import { CommonModule } from '@angular/common';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 export const ChartsModule = 'components.charts';
 
 const COMPONENTS = [ChartComponent, MapChartComponent, MapChartViewerComponent];
 @NgModule({
+  imports: [CommonModule, FlexLayoutModule, MatCheckboxModule],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   exports: COMPONENTS

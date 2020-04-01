@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.Map;
@@ -69,9 +68,8 @@ public class SSORequestHandler {
     return null;
   }
 
-  public SSOResponse processId3SSORequest(String token) {
-    logger.info("Request received to process single sign-on with Id3");
-
+  public SSOResponse processId3SipAuthentication(String token) {
+    logger.info("Request received to process with Id3 token");
     SSOResponse ssoResponse = null;
     // Check if the Token is valid
    Id3Claims id3Claims = validateId3IdentityToken.validateToken(token,Id3Claims.Type.ID);

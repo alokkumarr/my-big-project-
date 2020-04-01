@@ -1,5 +1,6 @@
 package com.synchronoss.saw.workbench.service;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+
+import com.synchronoss.saw.workbench.model.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -40,14 +43,9 @@ import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.SAWWorkBenchUtils;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
-import com.synchronoss.saw.workbench.model.DataSet;
-import com.synchronoss.saw.workbench.model.Inspect;
-import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.model.Project.ResultFormat;
-import com.synchronoss.saw.workbench.model.StorageProxy;
 import com.synchronoss.saw.workbench.model.StorageProxy.Storage;
 import com.synchronoss.sip.utils.RestUtil;
-import com.synchronoss.saw.workbench.model.StorageType;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
@@ -58,7 +56,9 @@ import sncr.bda.services.DLMetadata;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
-import com.synchronoss.saw.workbench.model.DSSearchParams;
+import sncr.bda.conf.ProjectMetadata;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -140,7 +140,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         ps.readProjectData(defaultProjectId);
     } catch (Exception e) {
         logger.info("Creating default project: {}", defaultProjectId);
-        ps.createProjectRecord(defaultProjectId, "{}");
+        ps.createProjectRecord(defaultProjectId, "{\"allowableTags\":[\"cloud\",\"iot\"]}");
     }
 
     if (defaultProjectRoot.startsWith(prefix)) {
@@ -381,6 +381,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
               addSearchParamToMap(searchParams, DataSetProperties.Catalog, dsSearchParams.getCatalog());
               addSearchParamToMap(searchParams, DataSetProperties.DataSource, dsSearchParams.getDataSource());
               addSearchParamToMap(searchParams, DataSetProperties.Type, dsSearchParams.getDstype());
+              addSearchParamToMap(searchParams, DataSetProperties.Tags, dsSearchParams.getTags());
           }
           return searchParams;
       }else{
@@ -484,7 +485,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         fields.addPOJO(obj);
       } // end of internal for loop to read storeField
       schema.putArray("fields").addAll(fields);
-      esDataSet = objectMapper.readValue(objectMapper.writeValueAsString(node), DataSet.class);
+      String nodeStr = objectMapper.writeValueAsString(node);
+      String sanitizedNodeStr = SipCommonUtils.sanitizeJson(nodeStr);
+      esDataSet = objectMapper.readValue(sanitizedNodeStr, DataSet.class);
       esDataSet.setStorageType(StorageType.ES.name());
       esDataSet.setJoinEligible(false);
       esDataSet.setRecordCount(Long.parseLong(perAliasResponse.getBody().getCount()));
@@ -514,7 +517,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonNode node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
+    String datasetStr = objectMapper.writeValueAsString(dataSet);
+    String sanitizedDatasetStr = SipCommonUtils.sanitizeJson(datasetStr);
+    JsonNode node = objectMapper.readTree(sanitizedDatasetStr);
     ObjectNode rootNode = (ObjectNode) node;
     Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
@@ -561,7 +566,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     //ArrayNode inputPath = objectMapper.createArrayNode();
     //inputPath.addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
     //systemNode.putArray("inputPath").addAll(inputPath);
-    DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class);
+    String nodeStr = node.toString();
+    String sanitizedNodeStr = SipCommonUtils.sanitizeJson(nodeStr);
+    DataSet dataSetNode = objectMapper.readValue(sanitizedNodeStr, DataSet.class);
     try {
       List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode,
           basePath, id, Action.create, Category.DataSet);
@@ -605,5 +612,35 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     System.out.println("Dataset : " +dataset.getSystem());
     System.out.println(DataSetProperties.UserData.toString());
   }
+
+    @Override
+    public ProjectMetadata getProjectMetadata(String proj) throws Exception {
+        logger.trace("Getting details of a project {} " + proj);
+        ProjectStore ps = new ProjectStore(defaultProjectRoot);
+        JsonElement prj = ps.readProjectData(proj);
+        ProjectMetadata projectMetadata = null;
+        if(prj != null){
+            projectMetadata = new Gson().fromJson(prj, ProjectMetadata.class);
+        }
+        return projectMetadata;
+    }
+
+    @Override
+    public ProjectMetadata[] getAllProjectsMetadata() throws Exception {
+        logger.trace("Getting details of all projects");
+        ProjectStore ps = new ProjectStore(defaultProjectRoot);
+        String[] jsons = ps.readAllProjectsMetadata();
+        logger.debug("projects Metadata Json " + jsons);
+        ProjectMetadata[] projectsMetadata = null;
+        if(jsons != null){
+            projectsMetadata = new ProjectMetadata[jsons.length];
+            int index = 0;
+            for(String json : jsons){
+                projectsMetadata[index] = new Gson().fromJson(json, ProjectMetadata.class);
+                index++;
+            }
+        }
+        return projectsMetadata;
+    }
 
 }

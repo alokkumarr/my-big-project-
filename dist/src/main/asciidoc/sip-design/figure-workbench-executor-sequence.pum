@@ -1,0 +1,21 @@
+== Authentication ==
+
+Client -> "SIP Security Service": Authentication request
+"SIP Security Service" --> Client: Authentication response
+
+== Execution ==
+
+Client -> "SIP Gateway Service": Preview request
+"SIP Gateway Service" -> "SIP Workbench Service": Preview request
+
+
+
+"SIP Workbench Service" -> "Workbench Executor": Preview request
+"Workbench Executor" -> "Apache Spark Session": Execute Spark Read using living spark session
+"Apache Spark Session"-> "Apache Spark": Read dataset 
+"Apache Spark" -> "MapR-FS": Read dataset file
+
+"Apache Spark Session"--> "SIP Workbench Service": Read results
+
+"SIP Workbench Service" --> "SIP Gateway Service": Preview response
+"SIP Gateway Service" --> Client: Preview response

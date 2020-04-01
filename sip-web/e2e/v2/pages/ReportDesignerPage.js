@@ -35,6 +35,7 @@ class ReportDesignerPage extends Designer {
     this._totalRows = element.all(by.xpath(`(//tbody)[2]/tr`));
     this._rowData = (row, col) =>
       element(by.xpath(`(//tbody)[2]/tr[${row}]/td[${col}]`));
+    this._totalFields = element.all(by.css(`[role="columnheader"]`));
   }
 
   clickOnReportFields(tables) {
@@ -119,6 +120,11 @@ class ReportDesignerPage extends Designer {
         expect(this._rowData(i, 1).getText()).toBe(columnData);
       }
     }
+  }
+
+  verifySelectedFieldsCount(count) {
+    browser.sleep(2000); //Need to wait till grid loads
+    expect(this._totalFields.count()).toBe(count);
   }
 }
 module.exports = ReportDesignerPage;

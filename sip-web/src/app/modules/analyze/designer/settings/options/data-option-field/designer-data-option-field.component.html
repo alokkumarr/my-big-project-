@@ -1,5 +1,6 @@
 <mat-expansion-panel
   class="data-option"
+  [expanded]="true"
   [attr.e2e]="'designer-data-option-' + artifactColumn.displayName"
 >
   <mat-expansion-panel-header class="data-option__header">
@@ -26,7 +27,7 @@
     </div>
 
     <div
-      *ngIf="artifactColumn.aggregate"
+      *ngIf="shouldShowAggregate()"
       fxLayout="row"
       fxLayoutAlign="start center"
     >
@@ -79,7 +80,7 @@
     </div>
 
     <div
-      *ngIf="analysisType === 'pivot' && hasDateInterval"
+      *ngIf="supportsDateInterval"
       fxLayout="row"
       fxLayoutAlign="space-around center"
     >
@@ -91,16 +92,7 @@
       >
       </designer-date-interval-selector>
     </div>
-    <div
-      *ngIf="
-        (analysisType !== 'pivot' && hasDateInterval) ||
-        (analysisType === 'pivot' &&
-          hasDateInterval &&
-          asPivotColumn(artifactColumn).groupInterval === 'day')
-      "
-      fxLayout="row"
-      fxLayoutAlign="start center"
-    >
+    <div *ngIf="supportsDateFormat" fxLayout="row" fxLayoutAlign="start center">
       <label fxFlex i18n>Format:</label>
       <designer-date-format-selector
         (change)="change.emit($event)"
@@ -166,7 +158,13 @@
       <pre>{{ artifactColumn.formula }}</pre>
     </div>
 
-    <div *ngIf="isDataField && analysisType === 'chart'">
+    <div
+      *ngIf="
+        isDataField &&
+        analysisType === 'chart' &&
+        analysisSubtype !== 'comparison'
+      "
+    >
       <custom-color-picker
         [config]="colorPickerConfig"
         [bgColor]="artifactColumn.seriesColor || '#ffffff'"
