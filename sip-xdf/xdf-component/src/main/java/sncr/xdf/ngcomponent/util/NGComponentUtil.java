@@ -9,11 +9,22 @@ import sncr.xdf.context.XDFReturnCodes;
 import java.util.Optional;
 import sncr.bda.conf.ComponentConfiguration;
 import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.types.ArrayType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
+import java.util.Arrays;
+import scala.collection.JavaConversions;
+import scala.collection.Seq;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import sncr.xdf.context.NGContext;
+import static org.apache.spark.sql.functions.lit;
 
 public class NGComponentUtil {
 
@@ -326,5 +337,37 @@ public class NGComponentUtil {
                 .replaceAll("\\s+", "_").toUpperCase();
         }
         return inputString;
+    }
+
+    /**
+     *
+     * @param ngctx - NGContext
+     * @return - Timestamp - Return Process Start TimeStamp value
+     *
+     * It takes startTs String from NGContext
+     * Converts into Timestamp type and returns it
+     */
+    public static Timestamp getProcessDt(NGContext ngctx){
+        final String START_TS_FORMAT = "yyyyMMdd-HHmmss";
+        try {
+            return new Timestamp(new SimpleDateFormat(START_TS_FORMAT).parse(ngctx.startTs).getTime());
+        }catch(Exception exception){
+            throw new XDFException(XDFReturnCode.INTERNAL_ERROR, exception);
+        }
+    }
+
+
+    /**
+     *
+     * @param ngctx - NGContext
+     * @param outputDS - Dataset<Row>
+     * @return - Dataset<Row> with 2 additional columns SIP_PROCESS_DT, SIP_BATCH_ID
+     *
+     * This method adds SIP_PROCESS_DT, SIP_BATCH_ID fields to Dataset
+     *
+     */
+    public static Dataset<Row> addDefaultColumns(NGContext ngctx, Dataset<Row> outputDS){
+        outputDS = outputDS.withColumn(AbstractComponent.SIP_PROCESS_DT, lit(NGComponentUtil.getProcessDt(ngctx)));
+        return outputDS.withColumn(AbstractComponent.SIP_BATCH_ID,lit(ngctx.batchID));
     }
 }
