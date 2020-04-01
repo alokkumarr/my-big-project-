@@ -2,8 +2,8 @@
 
 :host {
   display: block;
-  min-width: 100%;
-  min-height: 100%;
+  min-width: 300px;
+  min-height: 200px;
 }
 
 ::ng-deep code {
@@ -17,8 +17,8 @@
 }
 
 ::ng-deep add-attribute-dialog {
-  max-width: 100%;
-  width: 100%;
+  max-width: 860px;
+  width: 860px;
 
   .base-dialog__header {
     padding: 0 0 10px;
