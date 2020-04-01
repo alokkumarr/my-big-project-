@@ -7,6 +7,7 @@ const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
 const Constants = require('../../helpers/Constants');
 const path = require('path');
+const rimraf = require('rimraf');
 
 const chai = require('chai');
 const assert = chai.assert;
@@ -18,7 +19,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ExecutePage = require('../../pages/ExecutePage');
 const users = require('../../helpers/data-generation/users');
 
-describe('Executing Segregate Analysis by Type Tests', () => {
+describe('Executing Export and Download Tests', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
   let host;
@@ -53,7 +54,13 @@ describe('Executing Segregate Analysis by Type Tests', () => {
           id,
         );
       });
-      executePage.deleteDirectory(DownloadDirectory);
+      /*Remove Empty directory*/
+      rimraf(DownloadDirectory, (err) => {
+        if (err) {
+          return console.error(err);
+        }
+        logger.info("Directory deletion successful");
+      });
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -117,8 +124,8 @@ describe('Executing Segregate Analysis by Type Tests', () => {
         executePage.exportAnalysis();
 
         //Delete Analysis
-        executePage.verifyAnalysisDetailsAndDelete(reportName,reportDescription);
         executePage.validateDownloadedFile(DownloadDirectory,reportName);
+        executePage.verifyAnalysisDetailsAndDelete(reportName,reportDescription);
       }).result.testInfo = {
         testId: id,
         data: data,

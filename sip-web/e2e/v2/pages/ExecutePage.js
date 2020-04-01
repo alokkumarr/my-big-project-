@@ -5,6 +5,7 @@ const Utils = require('./utils/Utils');
 const ConfirmationModel = require('./components/ConfirmationModel');
 const Constants = require('../helpers/Constants');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 class ExecutePage extends ConfirmationModel {
   constructor() {
@@ -351,23 +352,15 @@ class ExecutePage extends ConfirmationModel {
   }
 
   /*validate the downloaded file in default download directory*/
-  validateDownloadedFile(downloadDirectory,fileName){
-    fs.readdir(downloadDirectory,function(err, files) {
+  validateDownloadedFile(downloadDirectory,fileName) {
+    /*Read Directory*/
+    fs.readdir(downloadDirectory, function (err, files) {
       if (err) {
         return err;
       }
-      files.forEach( function (file) {
+      files.forEach(function (file) {
         expect(file).toContain(fileName);
       });
-    });
-  }
-
-  /*after validation delete the download folder*/
-  deleteDirectory(directory){
-    rimraf(directory,function(err) {
-      if (err) {
-        return console.error(err);
-      }
     });
   }
 }
