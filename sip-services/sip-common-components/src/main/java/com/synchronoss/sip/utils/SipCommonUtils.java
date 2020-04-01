@@ -24,6 +24,9 @@ public class SipCommonUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SipCommonUtils.class);
   private static final String FEATURE_NAME = "My Analysis";
   private static final String MODULE_FEATURE_NAME = "Drafts";
+  private static final int MIN_ANALYSIS_NAME_LENGTH = 1;
+  private static final int MAX_ANALYSIS_NAME_LENGTH = 100;
+
 
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
@@ -72,7 +75,8 @@ public class SipCommonUtils {
       throw new IllegalArgumentException("analysisName must not be null");
     }
     // validate name length and avoid any invalid specific symbol for file name
-    boolean hasValidLength = name.length() >= 1 && name.length() <= 100;
+    boolean hasValidLength =
+        name.length() >= MIN_ANALYSIS_NAME_LENGTH && name.length() <= MAX_ANALYSIS_NAME_LENGTH;
     if (hasValidLength) {
       if (name.matches("[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]")) {
         throw new IllegalArgumentException(
@@ -81,9 +85,9 @@ public class SipCommonUtils {
     } else {
       throw new IllegalArgumentException(
           String.format(
-              "analysisName %s is invalid - character count MUST be greater than or equal to 1 and "
-                  + "less than or equal to 100",
-              name));
+              "analysisName %s is invalid - character count MUST be greater than or equal to %s and "
+                  + "less than or equal to %s",
+              name,MIN_ANALYSIS_NAME_LENGTH,MAX_ANALYSIS_NAME_LENGTH));
     }
   }
 
