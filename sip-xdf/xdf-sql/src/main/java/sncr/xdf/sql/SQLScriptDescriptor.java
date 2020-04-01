@@ -170,9 +170,33 @@ public class SQLScriptDescriptor {
             int i = 0;
             for(StatementSplitter.Statement stmt : stmtsList) {
                 i++;
-                Statement statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
+
+                // check for temporary tables
+                boolean isTemp = false;
+                String query = null;
+                Statement statement;
+                if (haveTempTable(stmt, "temp")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("temp", "");
+                } else if (haveTempTable(stmt, "TEMP")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("TEMP", "");
+                } else if (stmt.statement().contains("TEMPORARY")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("TEMPORARY", "");
+                } else if (stmt.statement().contains("temporary")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("temporary", "");
+                }
+
+                // create stament for parsing
+                if (isTemp && query != null){
+                    statement = parser.createStatement(query, new ParsingOptions());
+                } else {
+                    statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
+                }
                 stmts.add(statement);
-                List<TableDescriptor> tables = p.getTableList(statement, i);
+                List<TableDescriptor> tables = p.getTableList(statement, i, isTemp);
                 logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
                     + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
                 TableDescriptor targetTable = null;
@@ -280,6 +304,25 @@ public class SQLScriptDescriptor {
                 });
             }
         }
+    }
+
+    /**
+     * Check temporary table exist
+     *
+     * @param stmt
+     * @param temp
+     * @return
+     */
+    private boolean haveTempTable(StatementSplitter.Statement stmt, String temp) {
+        boolean isTemp = false;
+        String[] wordArr = stmt.toString().split("\\s");
+        for (String word : wordArr) {
+            if (temp.equals(word)) {
+                isTemp = true;
+                break;
+            }
+        }
+        return isTemp;
     }
 
     private final static String comment_patterns[] = { "\\-{2,}+.*\\n", "\\-{2,}+.*\\r\\n", "\\-{2,}+.*$", "/\\*(?:.|\\n)*?\\*/", "/\\*(?:.|\\r\\n)*?\\*/" };

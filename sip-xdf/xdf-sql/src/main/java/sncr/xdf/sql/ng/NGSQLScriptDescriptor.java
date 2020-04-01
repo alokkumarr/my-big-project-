@@ -1,6 +1,5 @@
 package sncr.xdf.sql.ng;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import io.prestosql.sql.parser.ParsingOptions;
 import io.prestosql.sql.parser.SqlParser;
@@ -16,7 +15,6 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.sql.*;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -172,9 +170,34 @@ public class NGSQLScriptDescriptor {
             int i = 0;
             for(StatementSplitter.Statement stmt : stmtsList) {
                 i++;
-                Statement statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
+
+                // check for temporary tables
+                boolean isTemp = false;
+                String query = null;
+                Statement statement;
+                if (haveTempTable(stmt, "temp")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("temp", "");
+                } else if (haveTempTable(stmt, "TEMP")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("TEMP", "");
+                } else if (stmt.statement().contains("TEMPORARY")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("TEMPORARY", "");
+                } else if (stmt.statement().contains("temporary")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("temporary", "");
+                }
+
+                // create stament for parsing
+                if (isTemp && query != null){
+                    statement = parser.createStatement(query, new ParsingOptions());
+                } else {
+                    statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
+                }
+
                 stmts.add(statement);
-                List<TableDescriptor> tables = p.getTableList(statement, i);
+                List<TableDescriptor> tables = p.getTableList(statement, i, isTemp);
                 logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
                     + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
                 TableDescriptor targetTable = null;
@@ -282,6 +305,25 @@ public class NGSQLScriptDescriptor {
       }
     }
 
+    /**
+     * Check temporary table exist
+     *
+     * @param stmt
+     * @param temp
+     * @return
+     */
+    private boolean haveTempTable(StatementSplitter.Statement stmt, String temp) {
+        boolean isTemp = false;
+        String[] wordArr = stmt.toString().split("\\s");
+        for (String word : wordArr) {
+            if (temp.equals(word)) {
+                isTemp = true;
+                break;
+            }
+        }
+        return isTemp;
+    }
+
     private final static String comment_patterns[] = { "\\-{2,}+.*\\n", "\\-{2,}+.*\\r\\n", "\\-{2,}+.*$", "/\\*(?:.|\\n)*?\\*/", "/\\*(?:.|\\r\\n)*?\\*/" };
 
     /**
@@ -326,8 +368,10 @@ public class NGSQLScriptDescriptor {
             if (!tn.equalsIgnoreCase(ctx.dataSetName)) {
                 //TODO:: Access by DataSet name or by parameter [name] -- Inputs???
                 logger.trace("Resolving in table: " + tn);
-                if (inputDataObjects.containsKey(tn)) {
-                    Map<String, Object> doProps = inputDataObjects.get(tn);
+                boolean validaInputData = inputDataObjects.keySet().stream().anyMatch(s -> s.equalsIgnoreCase(tn));
+                if (validaInputData) {
+                    String matchedTn = inputDataObjects.keySet().stream().filter(s -> s.equalsIgnoreCase(tn)).findAny().get();
+                    Map<String, Object> doProps = inputDataObjects.get(matchedTn);
                     td.setLocation((String) doProps.get(DataSetProperties.PhysicalLocation.name()));
                     td.format = (String) doProps.get( DataSetProperties.Format.name() );
                     td.mode = (String) doProps.get(DataSetProperties.Mode.name());
@@ -363,15 +407,16 @@ public class NGSQLScriptDescriptor {
 
           //TODO:: Access by DataSet name or by parameter [name] -- Outputs???
           //if (outputs.containsKey(tn)) {
-          if (outputDataObjects.containsKey(tn)) {
-
-            Map<String, Object> oDO = outputDataObjects.get(tn);
-            td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
-            td.format = (String) oDO.get(DataSetProperties.Format.name());
-            td.mode = (String) oDO.get(DataSetProperties.Mode.name());
-            td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
-            td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
-            logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
+            boolean haveValidKey = outputDataObjects.keySet().stream().anyMatch(s -> s.equalsIgnoreCase(tn));
+            if (haveValidKey) {
+                String tempTn = outputDataObjects.keySet().stream().filter(s -> s.equalsIgnoreCase(tn)).findFirst().get();
+                Map<String, Object> oDO = outputDataObjects.get(tempTn);
+                td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
+                td.format = (String) oDO.get(DataSetProperties.Format.name());
+                td.mode = (String) oDO.get(DataSetProperties.Mode.name());
+                td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
+                td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
+                logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
                 tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
           } else {
             throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
