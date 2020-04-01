@@ -56,8 +56,7 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
             host,
             token,
             protractorConf.config.customerCode,
-            currentAnalysis.analysisId,
-            PIVOT
+            currentAnalysis.analysisId
           );
         }
       });
