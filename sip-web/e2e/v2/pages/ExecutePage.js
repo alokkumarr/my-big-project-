@@ -5,7 +5,6 @@ const Utils = require('./utils/Utils');
 const ConfirmationModel = require('./components/ConfirmationModel');
 const Constants = require('../helpers/Constants');
 const fs = require('fs');
-const rimraf = require('rimraf');
 
 class ExecutePage extends ConfirmationModel {
   constructor() {
