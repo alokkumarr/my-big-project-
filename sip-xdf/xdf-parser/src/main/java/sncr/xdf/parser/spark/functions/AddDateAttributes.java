@@ -18,14 +18,17 @@ import scala.collection.JavaConversions;
 public class AddDateAttributes implements Function<Row, Row> {
 
     private static final Logger logger = Logger.getLogger(AddDateAttributes.class);
+    private static final int NUMBER_OF_DATE_ATTRIBUTES = 7;
 
     private final StructType newSchema;
-    private final List<StructField> tsfields;
+    private final List<String> tsfields;
+    private final int noOfNewColumns;
 
-    public AddDateAttributes(List<StructField> tsfields, StructType newSchema)
+    public AddDateAttributes(List<String> tsfields, StructType newSchema)
     {
         this.newSchema = newSchema;
         this.tsfields = tsfields;
+        this.noOfNewColumns = tsfields.size() * NUMBER_OF_DATE_ATTRIBUTES;
     }
 
     /**
@@ -45,18 +48,23 @@ public class AddDateAttributes implements Function<Row, Row> {
         Locale currentLocale = Locale.getDefault();
 
         //Iterating Timestamp field List and calculating New Date Attribute values and adding to Object[]
-        List<Object> dateAttrValues = new ArrayList<>();
-        tsfields.forEach(field -> {
-            int fieldIndex = row.fieldIndex(field.name());
+        Object[] dateAttrValues = new Object[noOfNewColumns];
+        final int[] index = new int[1];
+        index[0]=0;
+        tsfields.forEach(fieldName -> {
+            int fieldIndex = row.fieldIndex(fieldName);
             Timestamp ts = row.getTimestamp(fieldIndex);
-            LocalDateTime dateTime = ts.toLocalDateTime();
-            dateAttrValues.add(dateTime.getYear());
-            dateAttrValues.add(dateTime.getMonth().getDisplayName(TextStyle.FULL, currentLocale));
-            dateAttrValues.add(dateTime.getMonthValue());
-            dateAttrValues.add(dateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, currentLocale));
-            dateAttrValues.add(dateTime.getDayOfMonth());
-            dateAttrValues.add(dateTime.getDayOfYear());
-            dateAttrValues.add(dateTime.getHour());
+            if(ts!=null){
+                LocalDateTime dateTime = ts.toLocalDateTime();
+                dateAttrValues[index[0]]=dateTime.getYear();
+                dateAttrValues[index[0]+1]=dateTime.getMonth().getDisplayName(TextStyle.FULL, currentLocale);
+                dateAttrValues[index[0]+2]=dateTime.getMonthValue();
+                dateAttrValues[index[0]+3]=dateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, currentLocale);
+                dateAttrValues[index[0]+4]=dateTime.getDayOfMonth();
+                dateAttrValues[index[0]+5]=dateTime.getDayOfYear();
+                dateAttrValues[index[0]+6]=dateTime.getHour();
+            }
+            index[0] = index[0]+7;
         });
 
         //Getting Existing Row Values as Object[]
