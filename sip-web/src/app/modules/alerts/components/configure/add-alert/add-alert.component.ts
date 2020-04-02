@@ -90,6 +90,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   subscribers$: Observable<
     SIPSubscriber[]
   > = this.subscriberService.getAllSubscribers();
+  subscriberEmails$ = this.subscribers$.pipe(
+    map(subscribers => subscribers.map(s => s.channelValue))
+  );
 
   constructor(
     private _formBuilder: FormBuilder,

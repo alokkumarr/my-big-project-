@@ -151,6 +151,7 @@
                 [emails]="
                   alertSubscribersFormGroup.controls.notificationEmails.value
                 "
+                [autoCompleteSuggestions]="subscriberEmails$ | async"
               ></email-list>
             </div>
 

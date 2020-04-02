@@ -33,6 +33,7 @@ const SEMICOLON = 186;
 export class EmailListComponent implements ControlValueAccessor {
   @Output() emailsChange = new EventEmitter<string[]>();
   @Input() emails: string[];
+  @Input() autoCompleteSuggestions = [];
 
   public propagateChange: (emails: string[]) => void;
   public emailField = new FormControl('', Validators.pattern(EMAIL_REGEX));
