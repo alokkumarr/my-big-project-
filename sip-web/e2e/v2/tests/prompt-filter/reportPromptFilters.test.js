@@ -60,8 +60,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.REPORT
+          id
         );
       });
 

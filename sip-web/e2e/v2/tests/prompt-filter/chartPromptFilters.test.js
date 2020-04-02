@@ -59,8 +59,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.CHART
+          id
         );
       });
 
