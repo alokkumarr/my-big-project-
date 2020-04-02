@@ -352,47 +352,21 @@ export class DashboardGridComponent
       }
 
       let gFilters = cloneDeep(filterGroup[tile.analysis.semanticId]) || [];
-
       let filters = cloneDeep(tile.origAnalysis.sipQuery.filters);
       if (isEmpty(filters)) {
-        tile.origAnalysis.sipQuery.filters = [{
-          booleanCriteria: "AND",
+        // analysis with no filters
+        filters = [{
+          booleanCriteria: tile.origAnalysis.sipQuery.booleanCriteria,
           filters: gFilters
         }]
-      } else {
+      } else if (filters[0].booleanCriteria) {
+        // analysis with new filter structure
         this.addGlobalValuestoFilters(filters, gFilters);
-      }
-      const sipQuery = { ...tile.origAnalysis.sipQuery,
-          ...{ filters: this.fetchGlobalValues(filters) }
-      };
-      tile.analysis = {
-        ...tile.origAnalysis,
-        ...{ sipQuery },
-        _executeTile: true
-      };
-
-      this.dashboard.splice(id, 1, { ...tile });
-    });
-  }
-
-  fetchGlobalValues(tree) {
-    for (var i in tree) {
-      if (tree[i].model && !tree[i].isAggregationFilter) {
-        tree[i].isGlobalFilter = false;
-        return 1;
-      }
-      if (typeof tree[i] == 'object') this.fetchGlobalValues(tree[i])
-    }
-    return tree;
-  }
-
-  addGlobalValuestoFilters(tree, gFilters) {
-    forEach(tree, a => {
-      if (a.filters) {
-        const globalFilters = cloneDeep(gFilters);
-        a.filters = unionWith(
-          globalFilters,
-          a.filters,
+      } else {
+        // analysis with old structure covering backward compatibility
+        const filtersWithGlobal = unionWith(
+          gFilters,
+          filters,
           (gFilt, filt) =>
             (gFilt.tableName || gFilt.artifactsName) ===
               (filt.tableName || filt.artifactsName) &&
@@ -401,25 +375,79 @@ export class DashboardGridComponent
             gFilt.isGlobalFilter === filt.isGlobalFilter &&
             gFilt.isGlobalFilter
         );
-        forEach(a.filters, filter => {
-          if (filter.filters) {
-            filter.filters = unionWith(
-              globalFilters,
-              filter.filters,
-              (gFilt, filt) =>
-                (gFilt.tableName || gFilt.artifactsName) ===
-                  (filt.tableName || filt.artifactsName) &&
-                gFilt.columnName === filt.columnName &&
-                gFilt.isAggregationFilter === filt.isAggregationFilter &&
-                gFilt.isGlobalFilter === filt.isGlobalFilter &&
-                gFilt.isGlobalFilter
-            );
-            this.addGlobalValuestoFilters(filter.filters, gFilters);
-          }
-        })
-      }
-    })
 
+        filters = cloneDeep([{
+          booleanCriteria: tile.origAnalysis.sipQuery.booleanCriteria,
+          filters: filtersWithGlobal
+        }]);
+      }
+
+      const sipQuery = { ...tile.origAnalysis.sipQuery,
+          ...{ filters: this.fetchGlobalValues(filters) }
+      };
+      tile.analysis = {
+        ...tile.origAnalysis,
+        ...{ sipQuery },
+        _executeTile: true
+      };
+      this.dashboard.splice(id, 1, { ...tile });
+    });
+  }
+
+  fetchGlobalValues(tree) {
+    for (var i in tree) {
+      if (tree[i].model && !tree[i].isAggregationFilter) {
+        tree[i].isGlobalFilter = false;
+      }
+      if (typeof tree[i] == 'object') this.fetchGlobalValues(tree[i])
+    }
+    return tree;
+  }
+
+  addGlobalValuestoFilters(tree, gFilters) {
+    tree[0].filters = unionWith(
+      gFilters,
+      tree[0].filters,
+      (gFilt, filt) =>
+        (gFilt.tableName || gFilt.artifactsName) ===
+          (filt.tableName || filt.artifactsName) &&
+        gFilt.columnName === filt.columnName &&
+        gFilt.isAggregationFilter === filt.isAggregationFilter &&
+        gFilt.isGlobalFilter === filt.isGlobalFilter &&
+        gFilt.isGlobalFilter
+    );
+    // forEach(tree, a => {
+    //   if (a.filters) {
+    //     const globalFilters = cloneDeep(gFilters);
+    //     a.filters = unionWith(
+    //       globalFilters,
+    //       a.filters,
+    //       (gFilt, filt) =>
+    //         (gFilt.tableName || gFilt.artifactsName) ===
+    //           (filt.tableName || filt.artifactsName) &&
+    //         gFilt.columnName === filt.columnName &&
+    //         gFilt.isAggregationFilter === filt.isAggregationFilter &&
+    //         gFilt.isGlobalFilter === filt.isGlobalFilter &&
+    //         gFilt.isGlobalFilter
+    //     );
+    //     forEach(a.filters, filter => {
+    //       if (filter.filters) {
+    //         filter.filters = unionWith(
+    //           globalFilters,
+    //           filter.filters,
+    //           (gFilt, filt) =>
+    //             (gFilt.tableName || gFilt.artifactsName) ===
+    //               (filt.tableName || filt.artifactsName) &&
+    //             gFilt.columnName === filt.columnName &&
+    //             gFilt.isAggregationFilter === filt.isAggregationFilter &&
+    //             gFilt.isGlobalFilter === filt.isGlobalFilter &&
+    //             gFilt.isGlobalFilter
+    //         );
+    //         this.addGlobalValuestoFilters(filter.filters, gFilters);
+    //       }
+    //     })
+    //   }
+    // })
   }
 
   refreshKPIs() {
@@ -458,7 +486,6 @@ export class DashboardGridComponent
     };
 
     const arrangedTiles = this.arrangeTiles(tiles);
-
     forEach(arrangedTiles, tile => {
       if (tile.bullet) {
         tile.updater = new BehaviorSubject({});

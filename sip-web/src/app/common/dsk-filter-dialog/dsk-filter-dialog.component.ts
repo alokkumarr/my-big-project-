@@ -28,6 +28,7 @@ export class DskFilterDialogComponent implements OnInit {
   errorMessage;
   filterQuery;
   aggregatedFilters = [];
+  showGlobalOption: boolean;
   debouncedValidator = debounce(this.validateFilterGroup.bind(this), 200);
   constructor(
     private _dialogRef: MatDialogRef<DskFilterDialogComponent>,
@@ -43,6 +44,7 @@ export class DskFilterDialogComponent implements OnInit {
       supportsAggregationFilters: boolean;
     }
   ) {
+    this.showGlobalOption = true;
     this.datasecurityService.clearDSKEligibleFields();
     this.operation = this.data.filterGroup ? 'Update' : 'Add';
     this.dskFilterObject = this.fetch(this.data, this.data.mode);
@@ -62,17 +64,18 @@ export class DskFilterDialogComponent implements OnInit {
           this.aggregatedFilters = this.data.filters.filter(option => {
             return option.isAggregationFilter === true;
           });
-
           if (this.data.filters[0].filters) {
             return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
           } else {
-            const oldFormatFilters = cloneDeep(this.data.filters);
+            const oldFormatFilters = this.data.filters.filter(option => {
+              return option.isAggregationFilter !== true;
+            });
             this.data.filters = [];
             this.data.filters.push({
               booleanCriteria: this.data.booleanCriteria,
-              filters: oldFormatFilters
+              booleanQuery: oldFormatFilters
             })
-            return this.changeIndexToNames(this.data.filters, 'fiters', 'booleanQuery');
+            return this.data.filters[0];
           }
         }
       case 'DSK':
@@ -87,7 +90,6 @@ export class DskFilterDialogComponent implements OnInit {
       true,
       this.data
     );
-
 
     if (this.errorState) {
       this.previewString = '';

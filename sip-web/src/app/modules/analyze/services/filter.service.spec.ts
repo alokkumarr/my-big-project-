@@ -6,6 +6,9 @@ import * as every from 'lodash/every';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
 import { FilterService } from './filter.service';
+import { AnalyzeService } from './analyze.service';
+import { JwtService } from './../../../common/services/jwt.service';
+import { ToastService } from './../../../common/services/toastMessage.service';
 
 class AnalyzeDialogServiceStub {
   getRequestParams() {
@@ -57,6 +60,9 @@ describe('Filter Service', () => {
       imports: [HttpClientTestingModule],
       providers: [
         FilterService,
+        AnalyzeService,
+        JwtService,
+        ToastService,
         {
           provide: AnalyzeDialogService,
           useValue: new AnalyzeDialogServiceStub()

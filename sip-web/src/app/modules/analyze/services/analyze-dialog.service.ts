@@ -139,6 +139,7 @@ export class AnalyzeDialogService {
       analysisType: analysis.type,
       supportsAggregationFilters,
       isInRuntimeMode: true,
+      booleanCriteria: analysis.sipQuery.booleanCriteria,
       showFilterOptions: false,
       analysisReportType: reportType,
       designerPage,

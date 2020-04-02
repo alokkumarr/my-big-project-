@@ -1074,6 +1074,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         break;
       case 'filterRemove':
+        console.log(event);
+        this._store.dispatch(new DesignerUpdateFilters(event.data));
         break;
       case 'joins':
         this._store.dispatch(new DesignerJoinsArray(event.data));
@@ -1189,6 +1191,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'dateInterval':
       case 'aggregate':
       case 'filter':
+        console.log(event.data);
+        if (!isUndefined(event.data))
+          this._store.dispatch(new DesignerUpdateFilters(event.data.data));
       case 'format':
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();

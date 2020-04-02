@@ -160,11 +160,11 @@
               *ngIf="(!data.isInRuntimeMode && !filterGroup.booleanQuery[childId].isRuntimeFilter)
                 || (data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter)"
             >
-              <div *ngIf="!filterGroup.booleanQuery[childId].isGlobalFilter">
+              <div *ngIf="!filterGroup.booleanQuery[childId].isGlobalFilter || data.isInRuntimeMode">
                 <designer-string-filter
                   *ngSwitchCase="'string'"
                   (filterModelChange)="onFilterModelChange($event, childId)"
-                  [filterModel]="filterGroup.booleanQuery[childId].model || {}"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
                 >
                 </designer-string-filter>
                 <designer-date-filter
@@ -190,7 +190,7 @@
             *ngIf="data.showFilterOptions"
           >
             <mat-checkbox
-              *ngIf="!data.isInRuntimeMode && data.supportsGlobalFilters"
+              *ngIf="(!data.isInRuntimeMode && data.supportsGlobalFilters) && showGlobalOption"
               [checked]="filterGroup.booleanQuery[childId].isGlobalFilter"
               (change)="onGlobalCheckboxToggle($event.checked, childId)"
               i18n
