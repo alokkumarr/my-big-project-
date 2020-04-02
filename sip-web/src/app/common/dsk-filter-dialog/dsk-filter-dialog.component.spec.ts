@@ -2,13 +2,13 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DskFilterDialogComponent } from './dsk-filter-dialog.component';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
-import { DataSecurityService } from '../datasecurity.service';
+import { DskFiltersService } from './../services/dsk-filters.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { MaterialModule } from 'src/app/material.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
-const DataSecurityServiceStub: Partial<DataSecurityService> = {
+const DskFiltersServiceStub: Partial<DskFiltersService> = {
   getFiltersFor: group => of(null),
   clearDSKEligibleFields: () => {}
 };
@@ -21,7 +21,7 @@ describe('DskFilterDialogComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DskFilterDialogComponent],
       providers: [
-        { provide: DataSecurityService, useValue: DataSecurityServiceStub },
+        { provide: DskFiltersService, useValue: DskFiltersServiceStub },
         {
           provide: MAT_DIALOG_DATA,
           useValue: { groupSelected: { secGroupSysId: 1 } }

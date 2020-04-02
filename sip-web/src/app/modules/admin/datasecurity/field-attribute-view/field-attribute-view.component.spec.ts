@@ -3,18 +3,11 @@ import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import 'hammerjs';
 import { MaterialModule } from '../../../../material.module';
 import { FieldAttributeViewComponent } from './field-attribute-view.component';
-import { DataSecurityService } from '../datasecurity.service';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
-
-/* Stubs */
-const DataSecurityServiceStub = {
-  getSecurityAttributes: () => {
-    return new Promise(res => res({ data: {} }));
-  }
-};
+import { DskFiltersService } from '../../../../common/services/dsk-filters.service';
 
 @Component({
   selector: 'field-attribute-view',
@@ -30,7 +23,7 @@ describe('field attribute component', () => {
       declarations: [FieldAttributeViewComponent, FieldAttributeStubComponent],
       providers: [
         DxDataGridService,
-        { provide: DataSecurityService, useValue: DataSecurityServiceStub }
+        DskFiltersService
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
     })
