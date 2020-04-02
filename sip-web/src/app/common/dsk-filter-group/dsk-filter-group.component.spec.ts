@@ -22,6 +22,8 @@ const JwtServiceStub: Partial<JwtService> = {
   productId: ''
 };
 
+const filterStub = { booleanCriteria: 'AND', booleanQuery: [] };
+
 describe('DskFilterGroupComponent', () => {
   let component: DskFilterGroupComponent;
   let fixture: ComponentFixture<DskFilterGroupComponent>;
@@ -50,10 +52,7 @@ describe('DskFilterGroupComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DskFilterGroupComponent);
     component = fixture.componentInstance;
+    component.filters = filterStub as any;
     fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 });
