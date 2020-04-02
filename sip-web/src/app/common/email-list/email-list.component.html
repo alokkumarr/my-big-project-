@@ -13,6 +13,7 @@
       ></mat-icon>
     </mat-chip>
     <input
+      (click)="openAutocomplete()"
       class="email__chip"
       placeholder="Emails separate by ';'"
       type="text"
@@ -27,7 +28,7 @@
   </mat-chip-list>
   <mat-autocomplete
     #auto="matAutocomplete"
-    (optionSelected)="addEmailIfCorrect($event.option.value)"
+    (optionSelected)="addEmail($event.option.value)"
   >
     <mat-option *ngFor="let email of autoCompleteSuggestions" [value]="email">
       {{ email }}

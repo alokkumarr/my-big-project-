@@ -8,7 +8,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatStepper } from '@angular/material';
+import { MatStepper, MatDialog } from '@angular/material';
 import * as fpGet from 'lodash/fp/get';
 import * as includes from 'lodash/includes';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -43,6 +43,7 @@ import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { SubscriberService } from 'src/app/modules/admin/subscriber/subscriber.service';
 import { SIPSubscriber } from 'src/app/modules/admin/subscriber/models/subscriber.model';
+import { AddSubscriberComponent } from 'src/app/modules/admin/subscriber/add-subscriber/add-subscriber.component';
 const LAST_STEP_INDEX = 3;
 
 const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
@@ -99,7 +100,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     public _configureAlertService: ConfigureAlertService,
     public _notify: ToastService,
     public _observeService: ObserveService,
-    private subscriberService: SubscriberService
+    private subscriberService: SubscriberService,
+    private dialog: MatDialog
   ) {
     this.createAlertForm();
   }
@@ -626,6 +628,20 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.notifyOnAction(data);
       });
     this.subscriptions.push(updateSubscriber);
+  }
+
+  addSubscriber() {
+    const dialogRef = this.dialog.open(AddSubscriberComponent, {
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(value => {
+      if (value) {
+        this.subscribers$ = this.subscriberService.getAllSubscribers();
+        this.subscriberEmails$ = this.subscribers$.pipe(
+          map(subscribers => subscribers.map(s => s.channelValue))
+        );
+      }
+    });
   }
 
   notifyOnAction(data) {

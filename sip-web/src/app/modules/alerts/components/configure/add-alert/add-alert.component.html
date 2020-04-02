@@ -151,6 +151,7 @@
                 [emails]="
                   alertSubscribersFormGroup.controls.notificationEmails.value
                 "
+                [allowCustomInput]="false"
                 [autoCompleteSuggestions]="subscriberEmails$ | async"
               ></email-list>
             </div>
@@ -161,7 +162,13 @@
               fxLayoutGap="36px"
               class="padtop10"
             >
-              <button color="primary" mat-button e2e="addNewSubscriber">
+              <button
+                *ngIf="showNotificationEmail"
+                color="primary"
+                mat-button
+                e2e="addNewSubscriber"
+                (click)="addSubscriber()"
+              >
                 + Subscriber
               </button>
               <button
