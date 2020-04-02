@@ -124,6 +124,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
      */
     private Boolean isSkipFieldsEnabled = false;
 
+	private FileStatus[] files;
+
     private static final String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
@@ -206,7 +208,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 FileSystem fs = HFileOperations.getFileSystem();
                 logger.debug("Input Source Path = " + sourcePath);
                 Path inputPath = new Path(sourcePath);
-                FileStatus[] files = fs.globStatus(inputPath);
+                files = fs.globStatus(inputPath);
                 if(files != null && files.length == 1 && files[0].isDirectory()){
                     logger.debug("Files length = 1 and is a directory");
                     // If so - we have to process all the files inside - create the mask
@@ -299,7 +301,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                      */
                     if (headerSize >= 1) {
                         logger.debug("Header present");
-                        FileStatus[] files = fs.globStatus(new Path(sourcePath));
+                        //files = fs.globStatus(new Path(sourcePath));
 
                         if (files != null) {
                             logger.debug("Total number of files in the directory = " + files.length);
@@ -310,7 +312,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                             // If so - we have to process all the files inside - create the mask
                             sourcePath += Path.SEPARATOR + "*";
                             // ... and query content
-                            files = fs.globStatus(new Path(sourcePath));
+                            //files = fs.globStatus(new Path(sourcePath));
                         }
                         /**
                          * If Pivot or flattening or Json fields exist in config
@@ -332,6 +334,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         logger.debug("No Header");
                         retval = parse(outputDataSetMode);
                     }
+                    
                 }
             }catch (Exception e) {
                 logger.error("Exception in parser module: ",e);
@@ -461,9 +464,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if (!this.isRealTime) {
 
             logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
+            logger.debug("####files length at beginning of archive ####"+ files.length);
 
             try {
-                FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
+            	
+            	//archieval should be only processed files. Should not do fresh glob search.
 
                 if (files != null && files.length != 0) {
                     // Create archive directory

@@ -134,7 +134,6 @@ public interface WithDLBatchWriter {
                             String p = file.getPath().getParent().toString().substring(i + lp.getName().length());
                             WithDLBatchWriterHelper.logger.debug("Add partition to result set: " + p);
                             partitions.add(p);
-                           ;
                             // Update file counter for reporting purposes
                             ctx.globalFileCount++;
                         }
