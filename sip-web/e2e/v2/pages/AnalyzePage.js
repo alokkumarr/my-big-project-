@@ -80,7 +80,7 @@ class AnalyzePage extends CreateAnalysisModel {
         by.xpath(`//a[text()='${reportName}']/following::td[2]`));
     this._scheduledTimingsInCardView = reportName =>
       element(
-        by.xpath(`//a[text()='${reportName}']/followiclickOnActionLinkByAnalysisNameng::mat-card-subtitle/span[2]`));
+        by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
     this._analysisTypeDropdown = element(
       by.css(`[role="listbox"]`)
     );
