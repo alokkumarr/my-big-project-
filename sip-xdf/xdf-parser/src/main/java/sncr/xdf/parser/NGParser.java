@@ -53,6 +53,9 @@ import org.apache.spark.sql.Encoders;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
+import java.util.stream.Collectors;
+import sncr.xdf.parser.spark.functions.AddDateAttributes;
+import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 
 import static org.apache.spark.sql.functions.from_json;
 import static org.apache.spark.sql.functions.input_file_name;
@@ -361,6 +364,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
             inputDataset = addDefaultColumns(inputDataset);
+            inputDataset = addDateAttributeCols(inputDataset);
             inputDataset = pivotOrFlattenDataset(inputDataset);
             commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
             collectAcceptedData(inputDataset);
@@ -383,6 +387,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
             inputDataset = addDefaultColumns(inputDataset);
+            inputDataset = addDateAttributeCols(inputDataset);
             inputDataset = pivotOrFlattenDataset(inputDataset);
             commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
             collectAcceptedData(inputDataset);
@@ -397,6 +402,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
             }
             inputDataFrame = addDefaultColumns(inputDataFrame);
+            inputDataFrame = addDateAttributeCols(inputDataFrame);
             inputDataFrame = pivotOrFlattenDataset(inputDataFrame);
             commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
             collectAcceptedData(inputDataFrame);
@@ -549,6 +555,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
         outputDataset = addDefaultColumns(outputDataset);
+        outputDataset = addDateAttributeCols(outputDataset);
 
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
         outputDataset = convertJsonStringColToStruct(outputDataset, ngctx.componentConfiguration.getParser().getFields());
@@ -640,6 +647,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
             df = addDefaultColumns(df);
+            df = addDateAttributeCols(df);
             logger.debug("Output rdd length = " + recCounter.value() + "\n");
             logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
             logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
@@ -697,6 +705,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> localDataFrame = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
         localDataFrame = addDefaultColumns(localDataFrame);
+        localDataFrame = addDateAttributeCols(localDataFrame);
         logger.debug("Output rdd length in data frame = " + recCounter.value() +"\n");
         logger.debug("Rejected rdd length in data frame = " + errCounter.value() +"\n");
         logger.debug("Dest dir for file in data frame = " + destDir +"\n");
@@ -754,6 +763,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         Dataset<Row> outputDS = convertRddToDS(outputRdd);
         outputDS = addDefaultColumns(outputDS);
+        outputDS = addDateAttributeCols(outputDS);
         outputDS = convertJsonStringColToStruct(outputDS, ngctx.componentConfiguration.getParser().getFields());
         Dataset<Row> pivotDS = pivotOrFlattenDataset(outputDS);
         logger.debug("************************************** Dest dir for rdd = " + tempDir + "\n");
@@ -783,7 +793,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     /**
      *
-     * @param rdd - Dataset<Row> - Dataset from Json File
+     * @param rdd - Dataset<Row> - Dataset from File
      * @return - Dataset<Row> - Returns Dataset after adding SIP_PROCESS_DT, SIP_FILE_NAME, SIP_BATCH_ID columns
      *
      * It takes Raw Dataset of Row
@@ -800,6 +810,69 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         fileDS = NGComponentUtil.addDefaultColumns(ngctx,fileDS);
 
         return fileDS;
+    }
+
+    /**
+     *
+     * @param dataset - Dataset<Row> - Dataset of Rows
+     * @return - Dataset<Row> - Returns Dataset after adding extra Date Attribute columns
+     *
+     * It takes Dataset of Rows and checks for timestamp type fields
+     * Then it adds Date Attribute columns for each timestamp field to the Rows
+     * Returns Dataset<Row>
+     *
+     */
+    private Dataset<Row> addDateAttributeCols(Dataset<Row> dataset){
+
+        final StructType schema = dataset.schema();
+        final List<StructField> tsfields = Arrays.stream(schema.fields())
+            //We are Taking only Timestamp fields
+            .filter(structField -> structField.dataType() instanceof TimestampType)
+            .collect(Collectors.toList());
+
+        //Gets new schema after adding new Date attributes of Timestamp fields to Existing Schema.
+        final StructType newSchema = getSchemaWithDateAttr(schema, tsfields);
+        logger.debug("New Schema with Date Attributes : "+ newSchema);
+
+        JavaRDD<Row> rdd = dataset.toJavaRDD().map(new AddDateAttributes(tsfields, newSchema));
+        return this.ctx.sparkSession.createDataset(rdd.rdd(),RowEncoder.apply(newSchema));
+    }
+
+    /**
+     *
+     * @param schema - StructType - Dataset Schema
+     * @param tsfields - List<StructField> -  Timestamp Fields List
+     * @return - StructType - Returns new schema with Date Attributes
+     *
+     * This method adds Date attributes of Timestamp fields to Existing Schema
+     * Returns New schema.
+     */
+    private StructType getSchemaWithDateAttr(StructType schema, List<StructField> tsfields){
+
+        //Date Attribute Column Postfixes
+        final String YEAR_POSTFIX = "_YEAR";
+        final String MONTH_POSTFIX = "_MONTH";
+        final String MONTH_NUM_POSTFIX = "_MONTH_NUM";
+        final String DAY_OF_WEEK_POSTFIX = "_DAY_OF_WEEK";
+        final String DAY_OF_MONTH_POSTFIX = "_DAY_OF_MONTH";
+        final String DAY_OF_YAER_POSTFIX = "_DAY_OF_YAER";
+        final String HOUR_OF_DAY_POSTFIX = "_HOUR_OF_DAY";
+
+        //Iterating Timestamp field List and adding New Date Attribute Fields to list
+        List<StructField> newFieldsList = new ArrayList<>();
+        tsfields.forEach(field -> {
+            newFieldsList.add(new StructField(field.name() + YEAR_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(field.name() + MONTH_POSTFIX, DataTypes.StringType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(field.name() + MONTH_NUM_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(field.name() + DAY_OF_WEEK_POSTFIX, DataTypes.StringType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(field.name() + DAY_OF_MONTH_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(field.name() + DAY_OF_YAER_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(field.name() + HOUR_OF_DAY_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+        });
+
+        //Creating New schema by adding new Fields
+        //Return new schema
+        return new StructType(ArrayUtils.addAll(schema.fields(), newFieldsList.toArray(new StructField[0])));
     }
 
     private boolean collectAcceptedData(Dataset<Row> outpuDS) {
