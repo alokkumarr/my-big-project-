@@ -51,8 +51,7 @@ describe('Executing create and delete geolocation analysis tests from geolocatio
           host,
           token,
           protractorConf.config.customerCode,
-          analysisId,
-          Constants.CHART
+          analysisId
         );
       }
       // Logout by clearing the storage

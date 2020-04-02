@@ -1,7 +1,4 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DxDataGridService } from './../../../../../common/services/dxDataGrid.service';
 import { Router } from '@angular/router';
 import { RtisService } from './../../../services/rtis.service';
@@ -42,7 +39,9 @@ export class AppkeysViewComponent implements OnInit {
     fetchAppKeys.then(response => {
       // Need to Pick the first available event url in the appkey array of
       // objects to display in list of all appkeys screen.
-      this.custEventUrl = isEmpty(response) ? '' : find(response, 'eventUrl').eventUrl;
+      this.custEventUrl = isEmpty(response)
+        ? ''
+        : find(response || response[0], 'eventUrl');
       this.appKeys = response;
     });
   }
@@ -54,25 +53,29 @@ export class AppkeysViewComponent implements OnInit {
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
     };
-    return this._dialog.open(DeleteDialogComponent, {
-      width: 'auto',
-      height: 'auto',
-      autoFocus: false,
-      data
-    } as MatDialogConfig)
-    .afterClosed().subscribe((result) => {
-      if (result) {
-        const DeleteAppKeys = this._rtisService.deleteAppKey(appKeyData.app_key);
-        DeleteAppKeys.then(response => {
-          if (response) {
-            this.fetchKeysForGrid();
-            this.notify.info('App Key Deleted Successfully', '', {
-              hideDelay: 9000
-            });
-          }
-        });
-      }
-    });
+    return this._dialog
+      .open(DeleteDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const DeleteAppKeys = this._rtisService.deleteAppKey(
+            appKeyData.app_key
+          );
+          DeleteAppKeys.then(response => {
+            if (response) {
+              this.fetchKeysForGrid();
+              this.notify.info('App Key Deleted Successfully', '', {
+                hideDelay: 9000
+              });
+            }
+          });
+        }
+      });
   }
 
   getGridConfig() {

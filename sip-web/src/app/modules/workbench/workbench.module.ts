@@ -27,6 +27,10 @@ import { DatasetDetailViewComponent } from './components/dataset-detailedView/da
 import { NewRegistrationComponent } from './components/rtis/new-form-registration/new-form-registration.component';
 import { AppkeysViewComponent } from './components/rtis/appkeys-view/appkeys-view.component';
 import {
+  StreamInspectorComponent,
+  StreamReaderGridComponent
+} from './components/stream-inspector';
+import {
   CreateSemanticComponent,
   ValidateSemanticComponent,
   SemanticDetailsDialogComponent,
@@ -112,7 +116,9 @@ const COMPONENTS = [
   NewRegistrationComponent,
   AppkeysViewComponent,
   DatasetFilterComponent,
-  DatasetStringFilterComponent
+  DatasetStringFilterComponent,
+  StreamInspectorComponent,
+  StreamReaderGridComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];

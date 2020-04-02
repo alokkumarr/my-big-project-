@@ -208,10 +208,17 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         StructType st = new StructType();
         StructField[] sf = new StructField[outputSchema.size()+3];
         OutputSchema[] osa = outputSchema.toArray(new OutputSchema[0]);
+        boolean isFilenameFieldNotExistInSchema = true;
         for (int i = 0; i < osa.length; i++) {
             logger.trace(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType()) ));
             sf[i] = new StructField(osa[i].getName(), getType(osa[i].getType()), true, Metadata.empty());
             st = st.add(sf[i]);
+            if(isFilenameFieldNotExistInSchema && SIP_FILE_NAME.equalsIgnoreCase(osa[i].getName().trim())){
+                isFilenameFieldNotExistInSchema = false;
+            }
+        }
+        if(isFilenameFieldNotExistInSchema){
+            st = st.add( new StructField(SIP_FILE_NAME, DataTypes.StringType, true, Metadata.empty()));
         }
         st = st.add( new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty()));
         st = st.add( new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty()));
