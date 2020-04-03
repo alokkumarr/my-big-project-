@@ -78,7 +78,12 @@ public class NGJobExecutor {
             logger.debug("Step 0: Remove comments: " + script);
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
-            scriptDescriptor.parseSQLScript();
+            boolean isPrestoParserLib = this.parent.getNgctx().componentConfiguration.getSql().isPrestoParserLib();
+            if (isPrestoParserLib) {
+               scriptDescriptor.prestoParseSQLScript();
+            } else {
+                scriptDescriptor.parseSQLScript();
+            }
 
             if (parent.getNgctx().inputDataSets.size() > 0) {
                 scriptDescriptor.resolveTableNames();
@@ -94,9 +99,16 @@ public class NGJobExecutor {
 
             HFileOperations.exists(tempDir);
 
-            List<Statement> statements = scriptDescriptor.getParsedStatements();
+            int statementSize;
+            List<Statement> statements = scriptDescriptor.getPrestoParsedStatements();
+            if (statements != null && statements.size() > 0){
+                statementSize = statements.size();
+            } else {
+                statementSize = scriptDescriptor.getParsedStatements() != null && scriptDescriptor.getParsedStatements().getStatements().size() > 0
+                    ? scriptDescriptor.getParsedStatements().getStatements().size() : 0;
+            }
 
-            for (int i = 0; i < statements.size(); i++) {
+            for (int i = 0; i < statementSize; i++) {
 
                 SQLDescriptor descriptor = scriptDescriptor.getSQLDescriptor(i);
 

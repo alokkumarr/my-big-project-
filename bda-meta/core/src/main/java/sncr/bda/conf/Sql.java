@@ -32,6 +32,14 @@ public class Sql {
     private String scriptLocation;
 
     /**
+     * Presto SQL Parser.
+     *
+     */
+    @SerializedName("prestoParserLib")
+    @Expose
+    private boolean prestoParserLib;
+
+    /**
      * No args constructor for use in serialization
      * 
      */
@@ -91,6 +99,24 @@ public class Sql {
      */
     public void setScriptLocation(String scriptLocation) {
         this.scriptLocation = scriptLocation;
+    }
+
+  /**
+   * Getter Presto SQL library config
+   *
+   * @return boolean
+   */
+    public boolean isPrestoParserLib() {
+        return prestoParserLib;
+    }
+
+  /**
+   * Setter Presto SQL library config
+   *
+   * @param  boolean
+   */
+    public void setPrestoParserLib(boolean prestoParserLib) {
+        this.prestoParserLib = prestoParserLib;
     }
 
     /**
