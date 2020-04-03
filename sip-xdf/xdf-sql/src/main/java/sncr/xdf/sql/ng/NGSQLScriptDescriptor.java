@@ -151,7 +151,7 @@ public class NGSQLScriptDescriptor {
      */
     public void parseSQLScript(){
         try{
-            logger.info("Step 4: Parse JSQL SQL Script");
+            logger.trace("Step 4: Parse JSQL SQL Script");
             if (script == null ) {
                 logger.error("Internal error: Script was not pre-processed!");
                 return;
