@@ -101,7 +101,6 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
 
         chartDesignerPage.clickOnFilterButton();
         chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
-        //chartDesignerPage.clickOnAddFilterButtonByTableName();
         chartDesignerPage.clickOnColumnInput();
         chartDesignerPage.clickOnColumnDropDown(filter.columnName);
 
