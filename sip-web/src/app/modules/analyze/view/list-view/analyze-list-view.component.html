@@ -31,8 +31,10 @@
 
     <div *dxTemplate="let cell of 'linkCellTemplate'">
       <a
-        [innerHtml]="cell.text | highlight: searchTerm"
+        [innerHtml]="cell.text.length > 30 ? cell.text.substring(0,30) + '...' : cell.text | highlight: searchTerm"
         (click)="navigate(cell.data)"
+        [matTooltip]="cell.text"
+        matTooltipClass="name-tooltip"
       >
       </a>
 

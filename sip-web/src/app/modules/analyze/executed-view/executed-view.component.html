@@ -97,8 +97,8 @@
           </button>
           <div fxLayout="column" fxLayoutAlign="center center">
             <div *ngIf="analysis">
-              <span class="analysis__title" e2e="analysis__title">{{
-                analysis.name
+              <span class="analysis__title" e2e="analysis__title" matTooltipClass="name-tooltip" [matTooltip]="analysis.name">{{
+                analysis.name.length > 30 ? analysis.name.substring(0,30) + '...' : analysis.name
               }}</span>
               <label *ngIf="isExecuting" class="execution-tag" i18n
                 >Executing</label

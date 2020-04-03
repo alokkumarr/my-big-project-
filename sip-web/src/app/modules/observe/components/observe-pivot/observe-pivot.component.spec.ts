@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { MaterialModule } from '../../../../material.module';
 import 'hammerjs';
 import { ObservePivotComponent } from './observe-pivot.component';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
@@ -12,6 +13,7 @@ const AnalyzeServiceStub = {
 };
 
 const analysisStub = {
+  name: 'Untitled Analysis',
   artifacts: [{ columns: [] }],
   sipQuery: {
     artifacts: [{ artifactsName: 'abc', fields: [] }],
@@ -31,7 +33,7 @@ describe('Observe Pivot Component', () => {
   let fixture: ComponentFixture<ObservePivotComponent>;
   beforeEach(done => {
     TestBed.configureTestingModule({
-      imports: [],
+      imports: [MaterialModule],
       declarations: [ObservePivotComponent, PivotGridStubComponent],
       providers: [{ provide: AnalyzeService, useValue: AnalyzeServiceStub }]
     })
