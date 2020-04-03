@@ -37,7 +37,7 @@ public class Sql {
      */
     @SerializedName("disablePrestoParser")
     @Expose
-    private boolean disablePrestoParser;
+    private Boolean disablePrestoParser = Boolean.FALSE;
 
     /**
      * No args constructor for use in serialization
