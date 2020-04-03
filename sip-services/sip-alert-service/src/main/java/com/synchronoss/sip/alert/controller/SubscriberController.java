@@ -214,7 +214,11 @@ public class SubscriberController {
       HttpServletResponse response,
       @PathVariable("subscriberid") String subscriberId,
       @RequestBody NotificationSubscriber subscriber) {
-    return subscriberService.updateSubscriber(subscriberId, subscriber);
+    Ticket ticket = SipCommonUtils.getTicket(request);
+
+    String customerCode = ticket.getCustCode();
+
+    return subscriberService.updateSubscriber(subscriberId, subscriber, customerCode);
   }
 
   /**

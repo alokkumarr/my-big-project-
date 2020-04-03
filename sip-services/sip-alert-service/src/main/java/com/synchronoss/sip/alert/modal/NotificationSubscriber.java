@@ -38,7 +38,7 @@ public class NotificationSubscriber {
   private String customerCode;
 
   @JsonProperty("active")
-  private Boolean active;
+  private Boolean active = Boolean.TRUE;
 
   @JsonProperty("createdTime")
   private Date createdTime;

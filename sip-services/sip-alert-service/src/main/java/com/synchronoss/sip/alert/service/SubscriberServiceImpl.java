@@ -144,9 +144,10 @@ public class SubscriberServiceImpl implements SubscriberService {
 
   @Override
   public NotificationSubscriber updateSubscriber(
-      String subscriberId, NotificationSubscriber subscriber) {
+      String subscriberId, NotificationSubscriber subscriber, String customerCode) {
     subscriber.setId(subscriberId);
     subscriber.setSubscriberId(subscriberId);
+    subscriber.setCustomerCode(customerCode);
 
     subscriber.setModifiedTime(new Date());
     notificationSubscriberRepository.save(subscriber);

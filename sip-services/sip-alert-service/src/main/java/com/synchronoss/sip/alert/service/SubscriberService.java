@@ -28,7 +28,8 @@ public interface SubscriberService {
 
   List<NotificationSubscriber> getAllSubscribers();
 
-  NotificationSubscriber updateSubscriber(String subscriberId, NotificationSubscriber subscriber);
+  NotificationSubscriber updateSubscriber(
+      String subscriberId, NotificationSubscriber subscriber, String customerCode);
 
   void deleteSubscriber(String subscriberId);
 
