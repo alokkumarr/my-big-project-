@@ -4,6 +4,7 @@ import io.prestosql.sql.tree.Statement;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import sncr.bda.conf.Sql;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
@@ -69,7 +70,13 @@ public class JobExecutor {
             logger.debug("Step 0: Remove comments: " + script);
             script = SQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
-            scriptDescriptor.parseSQLScript();
+            Sql configSql = this.ctx.componentConfiguration.getSql();
+            boolean isPrestoParserLib =  configSql != null ? configSql.isPrestoParserLib() : false;
+            if (isPrestoParserLib) {
+                scriptDescriptor.prestoParseSQLScript();
+            } else {
+                scriptDescriptor.parseSQLScript();
+            }
             scriptDescriptor.resolveTableNames();
             scriptDescriptor.resultIntegrityCheck();
 
@@ -79,9 +86,16 @@ public class JobExecutor {
             }
             HFileOperations.createDir(tempDir);
 
-            List<Statement> statements = scriptDescriptor.getParsedStatements();
+            int statementSize;
+            List<Statement> statements = scriptDescriptor.getPrestoStatements();
+            if (statements != null && statements.size() > 0){
+                statementSize = statements.size();
+            } else {
+                statementSize = scriptDescriptor.getParsedStatements() != null && scriptDescriptor.getParsedStatements().getStatements().size() > 0
+                    ? scriptDescriptor.getParsedStatements().getStatements().size() : 0;
+            }
 
-            for (int i = 0; i < statements.size(); i++) {
+            for (int i = 0; i < statementSize; i++) {
 
                 SQLDescriptor descriptor = scriptDescriptor.getSQLDescriptor(i);
                 if (descriptor.statementType == StatementType.UNKNOWN) continue;
@@ -90,7 +104,7 @@ public class JobExecutor {
                     try {
                         SQLExecutor executor = new SQLExecutor(ctx,descriptor, availableDataframes);
                         rc = executor.run(scriptDescriptor);
-                        descriptor.result =(rc != 0)?"failed":"success";
+                        descriptor.result =(rc != 0) ? "failed" : "success";
                         if (rc != 0){
                             logger.error("Could not execute SQL statement: " + i );
                             return -1;

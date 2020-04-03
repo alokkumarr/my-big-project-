@@ -5,6 +5,9 @@ import io.prestosql.sql.parser.ParsingOptions;
 import io.prestosql.sql.parser.SqlParser;
 import io.prestosql.sql.parser.StatementSplitter;
 import io.prestosql.sql.tree.Statement;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statements;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import sncr.bda.conf.Input;
@@ -40,7 +43,8 @@ public class SQLScriptDescriptor {
 
     private static final Logger logger = Logger.getLogger(SQLScriptDescriptor.class);
 
-    private List<Statement> stmts = new ArrayList<>();
+    private Statements stmts;
+    private List<Statement> statementList = new ArrayList<>();
     private List<SQLDescriptor> statementDescriptors = new ArrayList<>();
     private Map<String, TableDescriptor> scriptWideTableMap = new HashMap<>();
 
@@ -142,7 +146,6 @@ public class SQLScriptDescriptor {
         }
     }
 
-
     /**
      * The method does the job,
      * it extracts recognizable SQL statements and builds SQL Script descriptors
@@ -150,13 +153,129 @@ public class SQLScriptDescriptor {
      */
     public void parseSQLScript(){
         try{
-            logger.debug("Step 4: Parse SQL Script");
+            logger.debug("Step 4: Parse JSQL SQL Script");
             if (script == null ) {
                 logger.error("Internal error: Script was not pre-processed!");
                 return;
             }
 
-            //stmts = CCJSqlParserUtil.parseStatements(script);
+            stmts = CCJSqlParserUtil.parseStatements(script);
+
+            logger.debug("SQL Statements = " + stmts);
+
+            // We have array of statements - check the table names
+            // Since same table names will be mentioned multiple times in multiple
+            // statements we have to support "grand" list and maintain precedence of the flags
+
+            SqlScriptParser p = new SqlScriptParser();
+            int i = 0;
+            for(net.sf.jsqlparser.statement.Statement stmt : stmts.getStatements()) {
+                i++;
+                List<TableDescriptor> tables = p.getTableList(stmt, i);
+                logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
+                    + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
+                TableDescriptor targetTable = null;
+                for(TableDescriptor td : tables){
+                    logger.trace("Try table: " + td.toString());
+                    if (td.isTargetTable) targetTable = td;
+                    TableDescriptor existingTd = scriptWideTableMap.get(td.tableName);
+                    if(existingTd == null){
+                        // Table not in the list - just put it there
+                        td.asReference.add(i);
+                        scriptWideTableMap.put(td.tableName, td);
+                    } else {
+                        if (existingTd.isTargetTable && td.isTargetTable && !existingTd.isInDropStatement && !td.isInDropStatement)
+                            throw new XDFException(XDFReturnCode.INVALID_DATA_SOURCES, td.tableName);
+                        existingTd.asReference.add(i);
+                    }
+
+                } // <-- for(tableDescriptor..)
+
+                SQLDescriptor sqlDesc = new SQLDescriptor();
+                logger.trace("Qualify statement as: " + p.stType.toString());
+//TODO:: Assume that statement is processMap select statement, generate correct name: add processed data object
+                switch (p.stType) {
+
+                    case SELECT:
+                        logger.error("SELECT statement is not supported anymore, please use CREATE [TEMPORARY] TABLE AS statement");
+                        throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE);
+
+                    case CREATE:
+
+                        if (targetTable == null) {
+                            throw new XDFException(XDFReturnCode.INCORRECT_SQL, " Target table was not found in table register.");
+                        }
+                        else {
+                            sqlDesc.statementType = StatementType.CREATE;
+                            sqlDesc.isTemporaryTable = targetTable.isTempTable;
+                            if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
+                            String s = stmt.toString().toLowerCase();
+                            int pos = -1;
+
+                            /**
+                             * Fix for SIP-7744.  To avoid
+                             * splitting queries which has key word 'WITH'
+                             * any where in middle. Using trim to be
+                             * safe with leading empty spaces
+                             */
+                            if(s.trim().startsWith("with")) {
+                                pos = s.indexOf("with");
+                            }
+                            // pos = s.indexOf("with");
+                            if(pos < 0)
+                                pos = s.indexOf("select");
+                            if (pos < 0)
+                                throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not find SELECT clause for statement: " + stmt.toString());
+                            sqlDesc.SQL = stmt.toString().substring(pos);
+                            sqlDesc.tableDescriptor = targetTable;
+                        }
+                        break;
+
+                    case DROP_TABLE:
+                        if (targetTable == null)
+                            throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not determine target table for drop statement");
+                        sqlDesc.statementType = StatementType.DROP_TABLE;
+                        sqlDesc.tableDescriptor = targetTable;
+                        sqlDesc.targetTableName = targetTable.tableName;
+                        sqlDesc.SQL = stmt.toString();
+
+                        break;
+                    default:
+                        throw new XDFException(XDFReturnCode.UNSUPPORTED_SQL_STATEMENT_TYPE);
+                }
+                sqlDesc.index = i;
+                sqlDesc.targetTableName = targetTable.tableName;
+                sqlDesc.transactionalLocation = transactionalLocation;
+                sqlDesc.targetTransactionalLocation = sqlDesc.transactionalLocation + Path.SEPARATOR + sqlDesc.targetTableName;
+                sqlDesc.targetTableMode = targetTable.mode;
+                sqlDesc.targetTableFormat = targetTable.format;
+
+                //TODO:: Format and Mode to SQL descriptor ???
+
+                statementDescriptors.add(sqlDesc);
+                logger.trace("SQL Statement descriptor: \n" + sqlDesc + "\n");
+            }
+            logger.debug("Table list: \n" + scriptWideTableMap );
+        } catch(JSQLParserException e){
+            throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
+        }
+        return;
+    }
+
+
+    /**
+     * The method does the job,
+     * it extracts recognizable SQL statements and builds SQL Script descriptors
+     * that will be info source for SQL Executor calls
+     */
+    public void prestoParseSQLScript(){
+        try{
+            logger.debug("Step 4: Parse Presto SQL Script");
+            if (script == null ) {
+                logger.error("Internal error: Script was not pre-processed!");
+                return;
+            }
+
             StatementSplitter splitter = new StatementSplitter(script, ImmutableSet.of(";"));
             List<StatementSplitter.Statement> stmtsList = splitter.getCompleteStatements();
             logger.debug("SQL Statements = " + stmtsList);
@@ -195,7 +314,7 @@ public class SQLScriptDescriptor {
                 } else {
                     statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
                 }
-                stmts.add(statement);
+                statementList.add(statement);
                 List<TableDescriptor> tables = p.getTableList(statement, i, isTemp);
                 logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
                     + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
@@ -215,11 +334,11 @@ public class SQLScriptDescriptor {
                         existingTd.asReference.add(i);
                     }
 
-                } // <-- for(tableDescriptor..)
+                }
 
                 SQLDescriptor sqlDesc = new SQLDescriptor();
                 logger.trace("Qualify statement as: " + p.stType.toString());
-//TODO:: Assume that statement is processMap select statement, generate correct name: add processed data object
+
                 switch (p.stType) {
 
                     case SELECT:
@@ -247,12 +366,12 @@ public class SQLScriptDescriptor {
                         if(s.trim().startsWith("with")) {
                         	pos = s.indexOf("with");
                         }
-                       // pos = s.indexOf("with");
+
                         if(pos < 0)
                             pos = s.indexOf("select");
                         if (pos < 0)
                             throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not find SELECT clause for statement: " + stmt.toString());
-                        sqlDesc.SQL = stmt.toString().substring(pos);
+                        sqlDesc.SQL = stmt.toString().substring(pos).replaceAll(";", "");
                         sqlDesc.tableDescriptor = targetTable;
                     }
                     break;
@@ -275,8 +394,6 @@ public class SQLScriptDescriptor {
                 sqlDesc.targetTransactionalLocation = sqlDesc.transactionalLocation + Path.SEPARATOR + sqlDesc.targetTableName;
                 sqlDesc.targetTableMode = targetTable.mode;
                 sqlDesc.targetTableFormat = targetTable.format;
-
-                //TODO:: Format and Mode to SQL descriptor ???
 
                 statementDescriptors.add(sqlDesc);
                 logger.trace("SQL Statement descriptor: \n" + sqlDesc + "\n");
@@ -420,7 +537,12 @@ public class SQLScriptDescriptor {
 
     public Map<String, TableDescriptor> getScriptWideTableMap(){  return scriptWideTableMap; }
 
-    public List<Statement> getParsedStatements() {
+    public List<Statement> getPrestoStatements() {
+        return statementList;
+    }
+
+    public Statements getParsedStatements() {
         return stmts;
     }
+
 }
