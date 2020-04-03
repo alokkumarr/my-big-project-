@@ -1,0 +1,115 @@
+{
+  "EXPORT_ANALYSIS": {
+    "download": {
+      "EXP01": {
+        "suites": ["sanity","critical","regression"],
+        "user": "userOne",
+        "generateAnalysis": "report",
+        "analysisType": "Report",
+        "description": "Admin should be able to Export Report and Download"
+      },
+      "EXP02": {
+        "suites": ["sanity","critical","regression"],
+        "user": "admin",
+        "generateAnalysis": "pivot",
+        "analysisType": "Pivot",
+        "description": "Admin should be able to Export Pivot and Download"
+      },
+      "EXP03": {
+        "suites": ["sanity","critical","regression"],
+        "user": "userOne",
+        "generateAnalysis": "esReport",
+        "analysisType": "esReport",
+        "description": "Admin should be able to Export Pivot and Download"
+      },
+      "EXP04": {
+        "suites": ["sanity","critical","regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Charts and Download"
+      },
+      "EXP05": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Column Chart and Download"
+      },
+      "EXP06": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Bar Chart and Download"
+      },
+      "EXP07": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Stack Chart and Download"
+      },
+      "EXP08": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Line Chart and Download"
+      },
+      "EXP09": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Area Chart and Download"
+      },
+      "EXP10": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Scatter Chart and Download"
+      },
+      "EXP11": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Bubble Chart and Download"
+      },
+      "EXP12": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Pie Chart and Download"
+      },
+      "EXP13": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export Tss-Pline Chart and Download"
+      },
+      "EXP14": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "generateAnalysis": "chart",
+        "analysisType": "Chart",
+        "description": "Admin should be able to Export TsPane chart and Download"
+      }
+    }
+  }
+}

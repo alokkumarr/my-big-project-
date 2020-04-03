@@ -223,8 +223,7 @@ export class WorkbenchService {
       })
     );
   }
-  
-  
+
   retrievePreview(name: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/previews/${name}`;
     return this.http.get(endpoint).pipe(
@@ -317,6 +316,24 @@ export class WorkbenchService {
   /** GET list of allowable tags for all projects from the server */
   getAllProjectsAllowableTagList(): Observable<any> {
     const endpoint = `${this.api}/internal/workbench/projects/all/metadata`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
+  getListOfStreams(): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/workbench/projects/${userProject}/streams`;
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
+  }
+
+  getListOfTopics(name, type): Observable<any> {
+    const endpoint = `${
+      this.api
+    }/internal/workbench/projects/${userProject}/streams/${name}/content/${type}`;
     return this.http
       .get(endpoint)
       .pipe(catchError(this.handleError('data', [])));

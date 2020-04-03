@@ -108,3 +108,9 @@ gridster.dashboard-gridster {
     }
   }
 }
+
+::ng-deep .name-tooltip  {
+  word-break: break-all !important;
+  white-space: normal !important;
+}
+

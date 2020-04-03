@@ -31,7 +31,8 @@
       "
     ></mat-icon>
     <div>
-      <strong class="analysis-name" [textContent]="analysis.name"></strong>
+      <strong class="analysis-name" [textContent]="analysis.name" [matTooltip]="analysis.name"
+      matTooltipClass="name-tooltip"></strong>
       <p class="analysis-description" [textContent]="analysis.description"></p>
       <div class="card-base">
         <small

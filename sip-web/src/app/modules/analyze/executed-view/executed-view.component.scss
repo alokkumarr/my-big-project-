@@ -134,3 +134,8 @@ filter-chips-u {
 .executed-chart-analysis {
   height: calc(100vh - 270px) !important;
 }
+
+::ng-deep .name-tooltip  {
+  word-break: break-all !important;
+  white-space: normal !important;
+}

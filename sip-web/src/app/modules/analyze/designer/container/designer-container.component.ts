@@ -107,14 +107,17 @@ import {
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
-import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
+import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from '../../consts';
 import { MatDialog } from '@angular/material';
 import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
 import { findDuplicateColumns } from 'src/app/common/components/report-grid/report-grid.component';
+import {
+  isRequestValid,
+  InvalidAnswer
+} from 'src/app/common/analysis-execution-validator';
 import { FilterService } from '../../services/filter.service';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
-
 @Component({
   selector: 'designer-container',
   templateUrl: './designer-container.component.html',
@@ -252,13 +255,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         return;
       }
       this.analysis = analysis;
-      // const sqlBuilder = this._designerService.getSqlBuilder(
-      //   this.analysis,
-      //   this.booleanCriteria,
-      //   this.filters,
-      //   this.sorts
-      // );
-      // set(this.analysis, 'sqlBuilder', sqlBuilder);
     });
   }
 
@@ -830,9 +826,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysisForPreview = isDSLAnalysis(this.analysis)
           ? this._store.selectSnapshot(state => state.designerState.analysis)
           : this.analysis;
-        this._analyzeDialogService.openPreviewDialog(
-          <Analysis | AnalysisDSL>analysisForPreview
-        );
+        this._analyzeDialogService.openPreviewDialog(<
+          | Analysis
+          | AnalysisDSL>analysisForPreview);
         break;
       case 'description':
         this._analyzeDialogService
@@ -855,8 +851,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
                   ? this._designerService.generateReportPayload(
                       cloneDeep(result.analysis)
                     )
-                  : result.analysis,
-              publishTo: result.publishOnSave
+                  : result.analysis
             });
 
             if (!shouldClose) {
@@ -906,9 +901,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         })
       );
     } else if (['new', 'fork'].includes(this.designerMode)) {
-      (<Analysis>(
-        this.analysis
-      )).categoryId = this._jwtService.userAnalysisCategoryId;
+      (<Analysis>this
+        .analysis).categoryId = this._jwtService.userAnalysisCategoryId;
     }
 
     const analysisForSave = isDSLAnalysis(this.analysis)
@@ -1439,6 +1433,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const sipQuery = this._store.selectSnapshot(
           state => state.designerState.analysis.sipQuery
         );
+
         const fields = get(sipQuery, 'artifacts.0.fields');
         const requestCondition = [
           find(fields || [], field => field.area === 'y'),
@@ -1447,7 +1442,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             ? [find(fields || [], field => field.area === 'x')]
             : [])
         ];
-        return every(requestCondition, Boolean);
+
+        const answer = isRequestValid(sipQuery, this.analysis.type);
+
+        if (!answer.willRequestBeValid) {
+          const { warning: { title, msg } } = answer as InvalidAnswer;
+          this._analyzeDialogService.openWarningDialog(title, msg);
+        }
+        return every(requestCondition, Boolean) && answer.willRequestBeValid;
       case 'report':
         const duplicateColumns = findDuplicateColumns(
           this._store.selectSnapshot(

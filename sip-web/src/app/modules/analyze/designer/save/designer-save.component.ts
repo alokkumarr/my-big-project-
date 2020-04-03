@@ -37,7 +37,7 @@ export class DesignerSaveComponent implements OnInit {
     this.saveForm = this.fb.group({
       name: [
         this.analysis.name,
-        [Validators.required, Validators.maxLength(30)],
+        [Validators.required, Validators.maxLength(100)],
         this.validatePattern
       ],
       category: [
@@ -64,6 +64,9 @@ export class DesignerSaveComponent implements OnInit {
   }
 
   displayErrorMessage(state) {
+    if (state === 'nameLength') {
+      return `* Name cannot be empty or exceed ${100} characters.`;
+    }
     return entityNameErrorMessage(state);
   }
 

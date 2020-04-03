@@ -9,6 +9,7 @@ import {
 import { BehaviorSubject } from 'rxjs';
 import { ChartGridComponent, dataFieldToHuman } from './chart-grid.component';
 import { UChartModule } from '../../components/charts';
+import { MaterialModule } from 'src/app/material.module';
 import { ChartService } from '../../services';
 import { HeaderProgressService } from './../../../common/services';
 import {
@@ -45,6 +46,7 @@ class DxDataGridStubComponent {
 }
 
 const analysis = {
+  name: 'Untitled Analysis',
   chartOptions: {
     chartType: 'map',
     xAxis: {
@@ -120,7 +122,7 @@ describe('Chart Grid Component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [UChartModule],
+      imports: [UChartModule, MaterialModule],
       providers: [
         { provide: ChartService, useClass: ChartStubService },
         { provide: HeaderProgressService, useClass: HeaderProgressStubService }

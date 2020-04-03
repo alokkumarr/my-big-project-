@@ -79,6 +79,9 @@ public abstract class AbstractComponent implements WithContext{
     protected static boolean persistMode = true;
     protected DLBatchReader reader;
     private Map<Integer, String> errors = new HashMap<>();
+    public static final String SIP_PROCESS_DT = "SIP_PROCESS_DT";
+    public static final String SIP_FILE_NAME = "SIP_FILE_NAME";
+    public static final String SIP_BATCH_ID = "SIP_BATCH_ID";
 
     /**
      * The constructor is to be used when component is running with different services than NGContext has.

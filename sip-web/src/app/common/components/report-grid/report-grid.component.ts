@@ -34,7 +34,8 @@ import * as isEqual from 'lodash/isEqual';
 import {
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
-  ES_REPORTS_DATE_FORMATS
+  DATE_FORMATS,
+  DATE_FORMATS_OBJ
 } from '../../consts';
 
 import {
@@ -48,6 +49,7 @@ import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.comp
 
 import { flattenReportData } from '../../../common/utils/dataFlattener';
 import { ArtifactDSL, AnalysisDSL } from 'src/app/models';
+import moment from 'moment';
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -472,9 +474,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       {
         format: payload.format || payload.dateFormat,
         type,
-        ...(this.analysis.type === 'esReport'
-          ? { availableFormats: ES_REPORTS_DATE_FORMATS }
-          : {})
+        availableFormats: DATE_FORMATS
       },
       format => {
         changeColumnProp('format', format);
@@ -538,7 +538,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
         const format = isNumberType
           ? { formatter: getFormatter(preprocessedFormat) }
-          : column.format || column.dateFormat;
+          : this.getDateFormat(column.format || column.dateFormat);
         const field: ReportGridField = {
           caption: column.alias || column.displayName,
           dataField: this.getDataField(column),
@@ -566,6 +566,17 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         return field;
       })
     )(artifacts);
+  }
+
+  getDateFormat(format) {
+    if (!format) {
+      return format;
+    }
+    const momentFormat = DATE_FORMATS_OBJ[format].momentValue;
+    return {
+      formatter: value =>
+        moment.utc(value, 'yyyy-MM-dd hh:mm:ss').format(momentFormat)
+    };
   }
 
   preprocessFormatIfNeeded(format, type, aggregate) {

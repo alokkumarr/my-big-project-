@@ -7,7 +7,12 @@ const SuiteSetup = require('../helpers/SuiteSetup');
 const logger = require('./logger')(__filename);
 const testSuites = require('./testSuites');
 const Constants = require('../helpers/Constants');
+const path = require('path');
 /**
+* Directory will be created once the file downloads
+ */
+ const DownloadDirectory = path.join(__dirname,'../')+'Downloads';
+ /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  * maximum time to wait for a page load i.e. when user refresh page/ first time open browser and type saw app url
@@ -84,7 +89,14 @@ exports.config = {
         '--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
-      ]
+      ],
+      prefs: {
+        download: {
+          'prompt_for_download': false,
+          'directory_upgrade': true,
+          'default_directory': DownloadDirectory //Changed the default download path of chrome
+        }
+      }
     },
     'moz:firefoxOptions': {
       args: ['--headless']
