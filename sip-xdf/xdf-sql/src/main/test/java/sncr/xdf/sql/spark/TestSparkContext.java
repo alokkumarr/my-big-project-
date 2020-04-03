@@ -5,7 +5,8 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 
 /**
- * Created by skbm0001 on 20/2/2018.
+ * @author alok.kumarr
+ * @since 3.6.0
  */
 public class TestSparkContext implements ISparkContext {
     private SparkSession sparkSession;
