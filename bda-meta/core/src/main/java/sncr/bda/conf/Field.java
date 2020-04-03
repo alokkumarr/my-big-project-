@@ -44,6 +44,10 @@ public class Field {
     @Expose
     private boolean isFlatteningEnabled = false;
 
+    @SerializedName("suppressDateAttrCols")
+    @Expose
+    private boolean suppressDateAttrCols = false;
+
 	/**
 	 * No args constructor for use in serialization
 	 *
@@ -70,7 +74,8 @@ public class Field {
                  Integer sourceIndex,
                  String sourceFieldName,
                  String defaultValue,
-                 boolean isFlatteningEnabled) {
+                 boolean isFlatteningEnabled,
+                 boolean suppressDateAttrCols ) {
         this.name = name;
         this.type = type;
         this.format = format;
@@ -80,6 +85,7 @@ public class Field {
         this.sourceFieldName = sourceFieldName;
         this.defaultValue = defaultValue;
         this.isFlatteningEnabled = isFlatteningEnabled;
+        this.suppressDateAttrCols = suppressDateAttrCols;
     }
 
     /**
@@ -223,6 +229,19 @@ public class Field {
         return this;
     }
 
+    public boolean isSuppressDateAttrCols() {
+        return suppressDateAttrCols;
+    }
+
+    public void setSuppressDateAttrCols(boolean suppressDateAttrCols) {
+        this.suppressDateAttrCols = suppressDateAttrCols;
+    }
+
+    public Field withSuppressDateAttrCols(boolean suppressDateAttrCols) {
+        this.suppressDateAttrCols = suppressDateAttrCols;
+        return this;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -241,6 +260,7 @@ public class Field {
             .append(sourceFieldName)
             .append(defaultValue)
             .append(isFlatteningEnabled)
+            .append(suppressDateAttrCols)
             .toHashCode();
     }
 
@@ -263,6 +283,7 @@ public class Field {
             .append(sourceFieldName, rhs.sourceFieldName)
             .append(defaultValue, rhs.defaultValue)
             .append(isFlatteningEnabled, rhs.isFlatteningEnabled)
+            .append(suppressDateAttrCols, rhs.suppressDateAttrCols)
             .isEquals();
     }
 }

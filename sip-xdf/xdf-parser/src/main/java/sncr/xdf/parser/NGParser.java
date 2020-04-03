@@ -116,6 +116,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private boolean isSchemaContainsJsonType;
     private DataSetHelper datasetHelper = null;
     private Flattener flattner = null;
+    private Set<String> suppressDateAttrFields = null;
     /**
      * fieldDefaultValuesMap - Contains all Parser Config Field Names as Keys and Tuple2 as value
      * Tuple2 contains key as Field index from source.
@@ -824,20 +825,25 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
      */
     private Dataset<Row> addDateAttributeCols(Dataset<Row> dataset){
 
-        final StructType schema = dataset.schema();
-        final List<String> tsfields = Arrays.stream(schema.fields())
-            //We are Taking only Timestamp fields
-            .filter(structField -> structField.dataType() instanceof TimestampType)
-            .map(structField -> structField.name())
-            .collect(Collectors.toList());
+        boolean isSuppressDateAttrCols = ngctx.componentConfiguration.getParser().isSuppressDateAttrCols();
+        logger.debug("Parser level suppressDateAttrCols : "+ isSuppressDateAttrCols);
+        if(!isSuppressDateAttrCols){
+            final StructType schema = dataset.schema();
+            final List<String> tsfields = Arrays.stream(schema.fields())
+                //We are Taking only Timestamp fields
+                //and which are not in suppressDateAttrFields
+                .filter(structField -> structField.dataType() instanceof TimestampType && !suppressDateAttrFields.contains(structField.name()))
+                .map(structField -> structField.name())
+                .collect(Collectors.toList());
 
-        if(tsfields != null && !tsfields.isEmpty()){
-            logger.debug(tsfields.size() +" Timestamp fields exist in dataset.");
-            //Gets new schema after adding new Date attributes of Timestamp fields to Existing Schema.
-            final StructType newSchema = getSchemaWithDateAttr(schema, tsfields);
-            logger.debug("New Schema with Date Attributes : "+ newSchema);
-            JavaRDD<Row> rdd = dataset.toJavaRDD().map(new AddDateAttributes(tsfields, newSchema));
-            dataset = this.ctx.sparkSession.createDataset(rdd.rdd(),RowEncoder.apply(newSchema));
+            if(tsfields != null && !tsfields.isEmpty()){
+                logger.debug(tsfields.size() +" Timestamp fields exist in dataset.");
+                //Gets new schema after adding new Date attributes of Timestamp fields to Existing Schema.
+                final StructType newSchema = getSchemaWithDateAttr(schema, tsfields);
+                logger.debug("New Schema with Date Attributes : "+ newSchema);
+                JavaRDD<Row> rdd = dataset.toJavaRDD().map(new AddDateAttributes(tsfields, newSchema));
+                dataset = this.ctx.sparkSession.createDataset(rdd.rdd(),RowEncoder.apply(newSchema));
+            }
         }
         return dataset;
     }
@@ -859,7 +865,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         final String MONTH_NUM_POSTFIX = "_MONTH_NUM";
         final String DAY_OF_WEEK_POSTFIX = "_DAY_OF_WEEK";
         final String DAY_OF_MONTH_POSTFIX = "_DAY_OF_MONTH";
-        final String DAY_OF_YAER_POSTFIX = "_DAY_OF_YAER";
+        final String DAY_OF_YEAR_POSTFIX = "_DAY_OF_YEAR";
         final String HOUR_OF_DAY_POSTFIX = "_HOUR_OF_DAY";
 
         //Iterating Timestamp field List and adding New Date Attribute Fields to list
@@ -870,7 +876,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             newFieldsList.add(new StructField(fieldName + MONTH_NUM_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
             newFieldsList.add(new StructField(fieldName + DAY_OF_WEEK_POSTFIX, DataTypes.StringType, true, Metadata.empty()));
             newFieldsList.add(new StructField(fieldName + DAY_OF_MONTH_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
-            newFieldsList.add(new StructField(fieldName + DAY_OF_YAER_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(fieldName + DAY_OF_YEAR_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
             newFieldsList.add(new StructField(fieldName + HOUR_OF_DAY_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
         });
 
@@ -1118,6 +1124,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         isIndexConfigNotExists[0] = true;
         final int[] index = new int[1];
         fieldDefaultValuesMap = new HashMap<>();
+        suppressDateAttrFields = new HashSet<>();
         index[0] = 0;
         //configFields contains only fields which provided in Parser Config.
         configFields.forEach(field -> {
@@ -1137,6 +1144,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
              * Tuple2 contains value as default value provided in Field config after converting into spark DataType object
              */
             fieldDefaultValuesMap.put(field.getName(), new Tuple2<>(fieldIndex, defaultValObj));
+            if(field.isSuppressDateAttrCols()){
+                suppressDateAttrFields.add(field.getName());
+            }
             index[0] = index[0]+1;
         });
         isSkipFieldsEnabled = skipFieldsEnabled[0];
