@@ -2,7 +2,9 @@
   <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
     <h1>Manage Subscribers</h1>
     <search-box style="font-size: 24px;"></search-box>
-    <button mat-raised-button color="primary">+Add New</button>
+    <button (click)="addSubscriber()" mat-raised-button color="primary">
+      +Add New
+    </button>
   </div>
   <dx-data-grid
     [dataSource]="subscribers$ | async"

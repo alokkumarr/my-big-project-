@@ -59,4 +59,10 @@ export class SubscriberService {
 
     return of(subscriber);
   }
+
+  saveSubscriber(subscriber: SIPSubscriber): Observable<SIPSubscriber> {
+    return subscriber.id === null
+      ? this.createSubscriber(subscriber)
+      : this.updateSubscriber(subscriber);
+  }
 }

@@ -3,7 +3,8 @@ import {
   Input,
   Output,
   EventEmitter,
-  forwardRef
+  forwardRef,
+  ViewChild
 } from '@angular/core';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import {
@@ -15,6 +16,7 @@ import {
 import * as reject from 'lodash/reject';
 import * as invoke from 'lodash/invoke';
 import { EMAIL_REGEX } from '../consts';
+import { MatAutocompleteTrigger } from '@angular/material';
 
 const SEMICOLON = 186;
 
@@ -33,6 +35,11 @@ const SEMICOLON = 186;
 export class EmailListComponent implements ControlValueAccessor {
   @Output() emailsChange = new EventEmitter<string[]>();
   @Input() emails: string[];
+  @Input() autoCompleteSuggestions = [];
+  @Input() allowCustomInput = true;
+
+  @ViewChild(MatAutocompleteTrigger, { static: false })
+  autoCompleteTrigger: MatAutocompleteTrigger;
 
   public propagateChange: (emails: string[]) => void;
   public emailField = new FormControl('', Validators.pattern(EMAIL_REGEX));
@@ -53,7 +60,7 @@ export class EmailListComponent implements ControlValueAccessor {
   addEmail(email) {
     const trimmed = (email || '').trim();
     // Reset the input value
-    this.emailField.setValue('');
+    this.emailField.reset();
     const newEmails = [...this.emails, trimmed];
     invoke(this, 'propagateChange', newEmails);
     this.emailsChange.emit(newEmails);
@@ -64,6 +71,12 @@ export class EmailListComponent implements ControlValueAccessor {
     const isValidEmail = !this.emailField.hasError('pattern');
     if (isInputNonEmpty && isValidEmail) {
       this.addEmail(email);
+    }
+  }
+
+  openAutocomplete() {
+    if (this.autoCompleteSuggestions && this.autoCompleteSuggestions.length) {
+      this.autoCompleteTrigger.openPanel();
     }
   }
 

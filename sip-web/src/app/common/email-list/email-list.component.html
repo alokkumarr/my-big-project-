@@ -13,17 +13,27 @@
       ></mat-icon>
     </mat-chip>
     <input
+      (click)="openAutocomplete()"
       class="email__chip"
       placeholder="Emails separate by ';'"
       type="text"
       [formControl]="emailField"
       [matChipInputFor]="chipList"
+      [matAutocomplete]="auto"
       [matChipInputSeparatorKeyCodes]="separatorKeys"
       [matChipInputAddOnBlur]="true"
       (matChipInputTokenEnd)="addEmailIfCorrect($event.value)"
       [attr.e2e]="'email-list-input'"
     />
   </mat-chip-list>
+  <mat-autocomplete
+    #auto="matAutocomplete"
+    (optionSelected)="addEmail($event.option.value)"
+  >
+    <mat-option *ngFor="let email of autoCompleteSuggestions" [value]="email">
+      {{ email }}
+    </mat-option>
+  </mat-autocomplete>
 </mat-form-field>
 <mat-error *ngIf="emailField?.errors?.pattern">
   <strong>Invalid</strong> email!
