@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import sncr.bda.conf.Sql;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
@@ -78,8 +79,9 @@ public class NGJobExecutor {
             logger.debug("Step 0: Remove comments: " + script);
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
-            boolean isPrestoParserLib = this.parent.getNgctx().componentConfiguration.getSql().isPrestoParserLib();
-            if (isPrestoParserLib) {
+            Sql sqlConfig = this.parent.getNgctx().componentConfiguration.getSql();
+            boolean disablePrestoParser = sqlConfig != null ? sqlConfig.isDisablePrestoParser() : false;
+            if (!disablePrestoParser) {
                scriptDescriptor.prestoParseSQLScript();
             } else {
                 scriptDescriptor.parseSQLScript();
