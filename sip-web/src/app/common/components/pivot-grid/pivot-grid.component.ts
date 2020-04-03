@@ -31,8 +31,8 @@ import {
   NUMBER_TYPES,
   FLOAT_TYPES,
   DATE_INTERVALS_OBJ,
-  PIVOT_DATE_FORMATS_OBJ,
-  DEFAULT_PIVOT_DATE_FORMAT
+  DATE_FORMATS_OBJ,
+  DEFAULT_DATE_FORMAT
 } from '../../consts';
 import { getFormatter } from '../../utils/numberFormatter';
 import { displayNameWithoutAggregateFor } from '../../services/tooltipFormatter';
@@ -219,7 +219,7 @@ export class PivotGridComponent implements OnDestroy {
             unset(cloned, 'format');
             break;
           case 'all':
-            momentFormat = DEFAULT_PIVOT_DATE_FORMAT.momentValue;
+            momentFormat = DEFAULT_DATE_FORMAT.momentValue;
             cloned.format = {
               formatter: this.getFormatter(momentFormat)
             };
@@ -299,11 +299,11 @@ export class PivotGridComponent implements OnDestroy {
   }
 
   getMomentFormat(format: string) {
-    const formatObj = PIVOT_DATE_FORMATS_OBJ[format];
+    const formatObj = DATE_FORMATS_OBJ[format];
     return formatObj
       ? formatObj.momentValue
       : isEmpty(format)
-      ? DEFAULT_PIVOT_DATE_FORMAT.momentValue
+      ? DEFAULT_DATE_FORMAT.momentValue
       : format.replace(/d/g, 'D').replace(/y/g, 'Y');
   }
 

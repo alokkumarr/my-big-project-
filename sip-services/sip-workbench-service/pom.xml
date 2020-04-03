@@ -34,10 +34,10 @@
 		<common.io>2.6</common.io>
 		<mapr.core.version>6.1.0</mapr.core.version>
 		<scala.major.version>2.11</scala.major.version>
-		   <jackson.core.version>2.9.6</jackson.core.version>
+		<jackson.core.version>2.9.6</jackson.core.version>
 		<mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
-		 <Json4s.latestVersion>3.5.3</Json4s.latestVersion>
-		 <spark.mapr.version>2.4.4.0-mapr-630</spark.mapr.version>
+		<Json4s.latestVersion>3.5.3</Json4s.latestVersion>
+		<spark.mapr.version>2.4.4.0-mapr-630</spark.mapr.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -54,7 +54,7 @@
 			<groupId>com.mapr.hadoop</groupId>
 			<artifactId>maprfs</artifactId>
 			<version>${mapr.core.version}-mapr</version>
-			
+
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -175,7 +175,7 @@
 			<artifactId>commons-io</artifactId>
 			<version>${common.io}</version>
 		</dependency>
-		
+
 
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
@@ -235,12 +235,42 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-           		<groupId>org.apache.spark</groupId>
+			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-yarn_2.11</artifactId>
 			<version>${spark.mapr.version}</version>
 			<scope>provided</scope>
-		
-		
+
+
+		</dependency>
+		<dependency>
+
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+			<version>1.1.1-mapr-1808</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mapr.streams</groupId>
+			<artifactId>mapr-streams</artifactId>
+			<version>6.1.0-mapr</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka_2.12</artifactId>
+			<version>${kafka.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-streams</artifactId>
+			<version>${kafka.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>connect-api</artifactId>
+			<version>${kafka.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mapr.hadoop</groupId>
@@ -337,7 +367,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				
+
 				<configuration>
 					<classifier>exec</classifier>
 					<!-- The spring-boot-start-test dependency adds JUnit in the compile 
@@ -352,16 +382,16 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.0.0</version>
-				
+
 				<configuration>
-				<archive>
-      				<manifest>
-        				<mainClass>com.synchronoss.saw.workbench.SAWWorkBenchServiceApplication</mainClass>
-      					</manifest>
-   				 </archive>
+					<archive>
+						<manifest>
+							<mainClass>com.synchronoss.saw.workbench.SAWWorkBenchServiceApplication</mainClass>
+						</manifest>
+					</archive>
 					<tarLongFileMode>posix</tarLongFileMode>
 					<outputDirectory>${project.basedir}/target</outputDirectory>
-					
+
 					<!-- Assembly plugin 3: Build Jar with dependencies -->
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -374,17 +404,17 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-					<descriptors>
-						<descriptor>${project.basedir}/assembly.xml</descriptor>
-					</descriptors>
-					
-					</configuration>
+							<descriptors>
+								<descriptor>${project.basedir}/assembly.xml</descriptor>
+							</descriptors>
+
+						</configuration>
 					</execution>
-					
+
 				</executions>
 			</plugin>
-			
-			
+
+
 			<plugin>
 				<groupId>de.dentrassi.maven</groupId>
 				<artifactId>rpm</artifactId>
@@ -407,7 +437,7 @@
 									<name>/opt/bda/saw-workbench-service/conf</name>
 									<directory>true</directory>
 								</entry>
-								
+
 								<entry>
 									<name>/opt/bda/saw-workbench-service/lib</name>
 									<collect>

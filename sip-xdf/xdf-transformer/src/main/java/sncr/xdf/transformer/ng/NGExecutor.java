@@ -17,6 +17,10 @@ import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.context.NGContext;
+import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.util.NGComponentUtil;
+import org.apache.spark.sql.types.DataTypes;
+import static org.apache.spark.sql.functions.lit;
 
 import java.util.*;
 
@@ -116,7 +120,7 @@ public abstract class NGExecutor {
     }
 
     protected void createFinalDS(Dataset<Row> ds) throws Exception {
-        ds.schema();
+        ds = addDefaultColumns(ds);
         Column trRes = ds.col(TRANSFORMATION_RESULT);
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
         Column trRC = ds.col(RECORD_COUNTER);
@@ -131,19 +135,19 @@ public abstract class NGExecutor {
         logger.debug("Rejected DS: " + failedTransformationsCount.value());
 
         writeResults(outputResult, outDataSetName, tempLoc);
-        
+
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
         	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        
+
 
     }
 
 
     protected void createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
 
-        ds.schema();
+        ds = addDefaultColumns(ds);
         //getOutputDatasetDetails();
         Column trRes = ds.col(TRANSFORMATION_RESULT);
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
@@ -172,4 +176,26 @@ public abstract class NGExecutor {
         }
     }
 
+
+    /**
+     *
+     * @param rdd - Dataset<Row> - Dataset
+     * @return - Dataset<Row> - Returns Dataset after adding SIP_PROCESS_DT, SIP_FILE_NAME, SIP_BATCH_ID columns
+     *
+     * It takes Dataset of Row
+     * Then it adds SIP_PROCESS_DT, SIP_FILE_NAME, SIP_BATCH_ID columns
+     * Returns Dataset<Row>
+     *
+     */
+    private Dataset<Row> addDefaultColumns(Dataset<Row> dataset){
+        //Adding SIP_FILE_NAME column with value
+        if(!Arrays.asList(dataset.schema().fieldNames()).contains(AbstractComponent.SIP_FILE_NAME)){
+            dataset = dataset.withColumn(SIP_FILE_NAME, lit(null).cast(DataTypes.StringType));
+        }
+        //Adding SIP_PROCESS_DT column with Value
+        //Adding SIP_BATCH_ID column with Value
+        dataset = NGComponentUtil.addDefaultColumns(parent.getNgctx(),dataset);
+
+        return dataset;
+    }
 }
