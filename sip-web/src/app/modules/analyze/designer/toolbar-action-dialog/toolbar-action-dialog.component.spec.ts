@@ -90,4 +90,16 @@ describe('Designer Chart Component', () => {
   it('should exist', () => {
     expect(fixture.componentInstance).not.toBeNull;
   });
+
+  describe('onCategoryChange', () => {
+    it('should apply category to analysis', () => {
+      component.data = dataStub;
+      expect(component.data.analysis.category).toEqual(
+        dataStub.analysis.category
+      );
+      const newCategory = '123';
+      component.onCategoryChange(newCategory);
+      expect(component.data.analysis.category).toEqual(newCategory);
+    });
+  });
 });
