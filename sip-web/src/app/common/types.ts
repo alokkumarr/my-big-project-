@@ -8,7 +8,11 @@ export {
   ArtifactColumnReport,
   SqlBuilderChart,
   AnalysisChartDSL,
-  ChartOptions
+  ChartOptions,
+  QueryDSL,
+  Filter,
+  FilterModel,
+  ArtifactColumnDSL
 } from '../models';
 export interface ConfirmDialogData {
   title: string;

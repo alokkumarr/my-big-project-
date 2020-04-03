@@ -25,7 +25,7 @@ describe('entity name validation', () => {
     // should fail for length validation
     // disabled state is set to true.
     expect(checkAnalysisNameChar).toEqual(
-      '* Name cannot be empty or exceed 30 characters.'
+      '* Name cannot be empty or exceed 100 characters.'
     );
   });
 
