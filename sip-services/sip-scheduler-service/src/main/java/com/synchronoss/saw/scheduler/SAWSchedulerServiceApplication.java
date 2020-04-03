@@ -15,7 +15,12 @@ import org.springframework.context.event.EventListener;
 import info.faljse.SDNotify.SDNotify;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.synchronoss.saw.scheduler", "com.synchronoss.sip.utils"})
+@ComponentScan(
+    basePackages = {
+      "com.synchronoss.saw.scheduler",
+      "com.synchronoss.sip.utils",
+      "com.synchronoss.bda.sip.config"
+    })
 public class SAWSchedulerServiceApplication extends SpringBootServletInitializer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SAWSchedulerServiceApplication.class);

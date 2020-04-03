@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost:3306/saw_scheduler
     username: root
-    password: root
+    password: NfEYrk8RxyjW077rOUy0rw==
     driver-class-name: org.mariadb.jdbc.Driver
     max-active: 103
     testOnBorrow: true
@@ -33,9 +33,9 @@ server:
     key-store: /Users/spau0004/Desktop/keystore/keystore.jks
     key-alias: sipcert
     key-store-password: sip@123
-    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
-    trust-store-password: sip@123  
-    
+    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
+    trust-store-password: sip@123
+
 management:
 #  server:
 #    ssl:
