@@ -77,6 +77,7 @@ public class NGJobExecutor {
             logger.debug(String.format("Temp dir: %s %n", tempDir ));
             NGSQLScriptDescriptor scriptDescriptor = new NGSQLScriptDescriptor(parent.getNgctx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
             logger.debug("Step 0: Remove comments: " + script);
+
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
             Sql sqlConfig = this.parent.getNgctx().componentConfiguration.getSql();
