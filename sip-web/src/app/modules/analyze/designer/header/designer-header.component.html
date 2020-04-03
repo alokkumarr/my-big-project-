@@ -19,8 +19,8 @@
         [ngClass.lt-md]="{ header__name__small: true, header__name: false }"
         [ngClass.gt-md]="{ header__name__small: false, header__name: true }"
       >
-        <strong class="e2e-designer-title">
-          {{ analysis.name | titlecase }}
+        <strong class="e2e-designer-title" matTooltipClass="name-tooltip" [matTooltip]="analysis.name">
+          {{ analysis.name.length > 30 ? analysis.name.substring(0,30) + '...' : analysis.name | titlecase }}
         </strong>
         <label i18n *ngIf="isInDraftMode">Draft</label>
       </div>
