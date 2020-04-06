@@ -19,8 +19,8 @@ public class SubscriberIT extends BaseIT {
   }
 
   /**
-   * Sample subscriber data
-   *
+   * Sample subscriber data.
+   * <p>
    * {
    *    "id": "2308b207-4433-45bf-ba11-6f07135d5e06",
    *    "subscriberId": "2308b207-4433-45bf-ba11-6f07135d5e06",
@@ -31,6 +31,7 @@ public class SubscriberIT extends BaseIT {
    *    "active": true,
    *    "createdTime": 1585563227248
    * }
+   * </p>
    */
   @Test
   public void testCreateAndgetSubscriber() {
