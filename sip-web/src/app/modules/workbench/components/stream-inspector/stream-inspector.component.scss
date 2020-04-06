@@ -1,0 +1,28 @@
+:host {
+  .input-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 9vh;
+  }
+
+  .stream-inspector-title {
+    color: #5c6670;
+    font-size: 24px;
+  }
+
+  mat-toolbar {
+    background-color: white !important;
+  }
+
+  .input-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 13vh;
+  }
+  .margin20 {
+    width: 45%;
+    margin: 2.5em;
+  }
+}

@@ -15,7 +15,7 @@
         *ngIf="saveForm.hasError('required', ['name'])"
         >This field is required
       </mat-error>
-      <mat-error *ngIf="saveForm.value.name.length > 30" i18n>
+      <mat-error *ngIf="saveForm.value.name.length > 100" i18n>
         <strong> {{displayErrorMessage('nameLength')}}
         </strong>
       </mat-error>

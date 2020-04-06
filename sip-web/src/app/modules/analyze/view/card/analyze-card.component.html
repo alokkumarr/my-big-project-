@@ -31,7 +31,8 @@
       <mat-card-title>
         <a
           [matTooltip]="analysis.name"
-          [innerHtml]="analysis.name | highlight: highlightTerm"
+          matTooltipClass="name-tooltip"
+          [innerHtml]="analysis.name.length > 30 ? analysis.name.substring(0,30) + '...' : analysis.name | highlight: highlightTerm"
           routerLink="../analysis/{{ analysis.id }}/executed"
           [queryParams]="{ isDSL: !!analysis.sipQuery }"
           e2e="analysis-name"

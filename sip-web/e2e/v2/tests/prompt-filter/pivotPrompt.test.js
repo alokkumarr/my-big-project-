@@ -59,8 +59,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.PIVOT
+          id
         );
       });
 

@@ -59,8 +59,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.ES_REPORT
+          id
         );
       });
 
