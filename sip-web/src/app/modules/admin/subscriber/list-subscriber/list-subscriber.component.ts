@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { SIPSubscriber } from '../models/subscriber.model';
 import { Observable } from 'rxjs';
 import { SubscriberService } from '../subscriber.service';
-import { MatDialog } from '@angular/material/dialog';
-import { map } from 'rxjs/operators';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { map, first } from 'rxjs/operators';
 import { AddSubscriberComponent } from '../add-subscriber/add-subscriber.component';
+import { ConfirmDialogComponent } from 'src/app/common/components/confirm-dialog';
+import { ConfirmDialogData } from 'src/app/common/types';
 
 @Component({
   selector: 'list-subscriber',
@@ -49,6 +51,34 @@ export class ListSubscriberComponent implements OnInit {
         return;
       }
       this.subscribers$ = this.allSubscribers();
+    });
+  }
+
+  delete(subscriberId: string) {
+    this.openDeleteDialog()
+      .afterClosed()
+      .subscribe(isDeleteSuccess => {
+        if (!isDeleteSuccess) {
+          return;
+        }
+        this.subscriberService
+          .deleteSubscriber(subscriberId)
+          .pipe(first())
+          .subscribe(() => {
+            this.subscribers$ = this.allSubscribers();
+          });
+      });
+  }
+
+  openDeleteDialog(): MatDialogRef<ConfirmDialogComponent> {
+    return this.dialog.open(ConfirmDialogComponent, {
+      data: <ConfirmDialogData>{
+        title: 'Delete',
+        content: 'Are you sure you want to delete this subscriber?',
+        positiveActionLabel: 'Delete',
+        negativeActionLabel: 'Cancel',
+        primaryColor: 'warn'
+      }
     });
   }
 

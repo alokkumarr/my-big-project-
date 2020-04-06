@@ -1,68 +1,49 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-// import { HttpClient } from '@angular/common/http';
-// import AppConfig from '../../../../../appConfig';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import AppConfig from '../../../../../appConfig';
 
-import {
-  SIPSubscriber,
-  SubscriberChannelType
-} from './models/subscriber.model';
+import * as isNil from 'lodash/isNil';
 
-// const apiUrl = AppConfig.api.url;
+import { SIPSubscriber } from './models/subscriber.model';
+
+const apiUrl = AppConfig.api.url;
 
 @Injectable({
   providedIn: 'root'
 })
 export class SubscriberService {
-  constructor(/* private http: HttpClient */) {}
+  constructor(private http: HttpClient) {}
 
   getSubscriber(id: string): Observable<SIPSubscriber> {
-    // return this.http.get<SIPSubscriber>(apiUrl + `/subscribers/${id}`);
-
-    return of({
-      id,
-      subscriberName: 'Test Subscriber ' + id,
-      channelType: SubscriberChannelType.EMAIL,
-      channelValue: `subscriber${id}@synchronoss.com`
-    });
+    return this.http.get<SIPSubscriber>(apiUrl + `/subscribers/${id}`);
   }
 
   getAllSubscribers(): Observable<SIPSubscriber[]> {
-    // return this.http.get<SIPSubscriber[]>(apiUrl + `/subscribers`);
-
-    const subscribers = [...Array(50).keys()].map(id => ({
-      id: String(id),
-      subscriberName: 'Test Subscriber ' + id,
-      channelType: SubscriberChannelType.EMAIL,
-      channelValue: `subscriber${id}@synchronoss.com`
-    }));
-    return of(subscribers);
+    return this.http.get<SIPSubscriber[]>(apiUrl + `/subscribers/`);
   }
 
   createSubscriber(
     subscriber: Partial<SIPSubscriber>
   ): Observable<SIPSubscriber> {
-    // return this.http.post<SIPSubscriber>(apiUrl + `/subscribers`, subscriber);
-
-    const id = Date.now().toString();
-    return of({
-      id,
-      subscriberName: 'Test Subscriber ' + id,
-      channelType: SubscriberChannelType.EMAIL,
-      channelValue: `subscriber${id}@synchronoss.com`
-    });
+    return this.http.post<SIPSubscriber>(apiUrl + `/subscribers/`, subscriber);
   }
 
   updateSubscriber(subscriber: SIPSubscriber): Observable<SIPSubscriber> {
-    // const {id, ...updateData} = subscriber;
-    // return this.http.put<SIPSubscriber>(apiUrl + `/subscribers/${id}`, updateData);
-
-    return of(subscriber);
+    const { id, ...updateData } = subscriber;
+    return this.http.put<SIPSubscriber>(
+      apiUrl + `/subscribers/${id}`,
+      updateData
+    );
   }
 
   saveSubscriber(subscriber: SIPSubscriber): Observable<SIPSubscriber> {
-    return subscriber.id === null
+    return isNil(subscriber.id)
       ? this.createSubscriber(subscriber)
       : this.updateSubscriber(subscriber);
+  }
+
+  deleteSubscriber(subscriberId: string): Observable<null> {
+    return this.http.delete<null>(apiUrl + `/subscribers/${subscriberId}`);
   }
 }

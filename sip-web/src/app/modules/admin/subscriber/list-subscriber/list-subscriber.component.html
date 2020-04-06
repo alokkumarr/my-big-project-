@@ -1,4 +1,4 @@
-<div style="padding: 0 20px" fxLayout="column">
+<div style="padding: 0 20px;" fxLayout="column">
   <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
     <h1>Manage Subscribers</h1>
     <search-box style="font-size: 24px;"></search-box>
@@ -61,6 +61,14 @@
       <div fxLayout="row">
         <button mat-icon-button matTooltip="Edit" (click)="edit(cell.data)">
           <mat-icon fontIcon="icon-edit"></mat-icon>
+        </button>
+
+        <button
+          mat-icon-button
+          matTooltip="Delete"
+          (click)="delete(cell.data.id)"
+        >
+          <mat-icon fontIcon="icon-trash"></mat-icon>
         </button>
       </div>
     </div>

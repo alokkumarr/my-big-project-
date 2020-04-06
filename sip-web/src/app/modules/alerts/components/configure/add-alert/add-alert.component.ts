@@ -634,12 +634,17 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(AddSubscriberComponent, {
       data: {}
     });
-    dialogRef.afterClosed().subscribe(value => {
-      if (value) {
+    dialogRef.afterClosed().subscribe(subscriber => {
+      if (subscriber) {
         this.subscribers$ = this.subscriberService.getAllSubscribers();
         this.subscriberEmails$ = this.subscribers$.pipe(
           map(subscribers => subscribers.map(s => s.channelValue))
         );
+        const emails = this.alertSubscribersFormGroup.get('notificationEmails')
+          .value;
+        this.alertSubscribersFormGroup
+          .get('notificationEmails')
+          .setValue([...emails, subscriber.channelValue]);
       }
     });
   }
