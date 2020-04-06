@@ -67,12 +67,6 @@ class FilterDialog {
     commonFunctions.waitFor.elementToBePresent(this._tableArtifacts);
   }
 
-  clickOnAddFilterButtonByTableName() {
-    commonFunctions.clickOnElement(this._addFilter);
-    commonFunctions.clickOnElement(this._selectFilterField);
-    commonFunctions.waitFor.elementToBePresent(this._tableArtifacts);
-  }
-
   clickOnColumnInput() {
     commonFunctions.clickOnElement(this._filterColumnDropDown);
   }
@@ -96,7 +90,6 @@ class FilterDialog {
     commonFunctions.clickOnElement(this._stringOperatorDropDownItem(operator));
     if (operator === 'Is in' || operator === 'Is not in') {
       commonFunctions.fillInput(this._filterStringIsInIsNotInInput, value);
-      //this._allFilterButton.click();
     } else {
       commonFunctions.fillInput(this._filterStringInput, value);
     }
@@ -120,12 +113,11 @@ class FilterDialog {
   }
 
   verifySelectFieldValue(value) {
-    //expect(this._selectedFilterField.getAttribute('value')).toEqual(value);
     commonFunctions.waitFor.elementToBePresent(this._selectedFilterField(value));
   }
 
   fillFilterOptions(fieldType, operator, value) {
-    // Scenario for datses
+    // Scenario for date
     if (fieldType === 'date') {
       this.selectPreset(value);
     }
