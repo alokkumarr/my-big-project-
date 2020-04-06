@@ -72,9 +72,6 @@ export interface AnalysisBaseDSL {
   modifiedTime?: string;
   module: string;
   name: string;
-  parentAnalysisId?: string; // todo
-  parentCategoryId?: string | number; // todo
-  parentLastModified?: number; // todo
   projectCode: string;
   query?: string;
   queryManual?: string;

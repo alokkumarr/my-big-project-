@@ -158,6 +158,7 @@ export interface DesignerChangeEvent {
 export interface DesignerSaveEvent {
   requestExecution: boolean;
   analysis: Analysis | AnalysisDSL;
+  publishTo?: string;
 }
 
 export interface DesignerStateModel {
