@@ -18,23 +18,22 @@ public class SubscriberIT extends BaseIT {
     updateSubscriberData = getJsonObject("json/subscribers/subscriber-update-data.json");
   }
 
+  /**
+   * Sample subscriber data
+   *
+   * {
+   *    "id": "2308b207-4433-45bf-ba11-6f07135d5e06",
+   *    "subscriberId": "2308b207-4433-45bf-ba11-6f07135d5e06",
+   *    "subscriberName": "Sunil",
+   *    "channelType": "email",
+   *    "channelValue": "sunilkumar.bm@synchronoss.com",
+   *    "customerCode": "SYNCHRONOSS",
+   *    "active": true,
+   *    "createdTime": 1585563227248
+   * }
+   */
   @Test
   public void testCreateAndgetSubscriber() {
-
-    /**
-     * Sample subscriber data
-     *
-     * {
-     *    "id": "2308b207-4433-45bf-ba11-6f07135d5e06",
-     *    "subscriberId": "2308b207-4433-45bf-ba11-6f07135d5e06",
-     *    "subscriberName": "Sunil",
-     *    "channelType": "email",
-     *    "channelValue": "sunilkumar.bm@synchronoss.com",
-     *    "customerCode": "SYNCHRONOSS",
-     *    "active": true,
-     *    "createdTime": 1585563227248
-     * }
-     */
 
     String subscriberName = subscriberData.path("subscriberName").asText();
     // Create Subscriber
