@@ -121,36 +121,11 @@
         <form [formGroup]="alertSubscribersFormGroup">
           <ng-template matStepLabel>Select subscribers</ng-template>
           <div fxLayout="column" fxLayoutAlign="space-around center">
-            <mat-form-field appearance="outline">
-              <mat-label>Notification</mat-label>
-              <mat-select
-                formControlName="notification"
-                required
-                multiple
-                e2e="notification"
-              >
-                <mat-option
-                  *ngFor="let notification of notifications$ | async"
-                  [value]="notification.value"
-                  [disabled]="!notification.enabled"
-                  [attr.e2e]="notification.label"
-                  >{{ notification.label }}</mat-option
-                >
-              </mat-select>
-              <mat-error>This field is required</mat-error>
-            </mat-form-field>
-
-            <div
-              *ngIf="showNotificationEmail"
-              fxLayout="column"
-              style="width: 80%;"
-            >
-              <label i18n>Email</label>
+            <div fxLayout="column" style="width: 80%;">
+              <label i18n>Emails</label>
               <email-list
-                formControlName="notificationEmails"
-                [emails]="
-                  alertSubscribersFormGroup.controls.notificationEmails.value
-                "
+                formControlName="subscribers"
+                [emails]="alertSubscribersFormGroup.controls.subscribers.value"
                 [allowCustomInput]="false"
                 [autoCompleteSuggestions]="subscriberEmails$ | async"
               ></email-list>
@@ -163,7 +138,6 @@
               class="padtop10"
             >
               <button
-                *ngIf="showNotificationEmail"
                 color="primary"
                 mat-button
                 e2e="addNewSubscriber"
