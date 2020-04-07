@@ -86,6 +86,10 @@ public class Parser {
     @Expose
     private boolean allowInconsistentCol;
 
+    @SerializedName("suppressDateAttrCols")
+    @Expose
+    private boolean suppressDateAttrCols = false;
+
     /**
      * No args constructor for use in serialization
      */
@@ -122,7 +126,8 @@ public class Parser {
         boolean isFlatteningEnabled,
         PivotFields pivotFields,
         Alert alerts,
-        boolean allowInconsistentCol) {
+        boolean allowInconsistentCol,
+        boolean suppressDateAttrCols) {
         this.file = file;
         this.fields = fields;
         this.lineSeparator = lineSeparator;
@@ -137,6 +142,7 @@ public class Parser {
         this.pivotFields = pivotFields;
         this.alerts = alerts;
         this.allowInconsistentCol = allowInconsistentCol;
+        this.suppressDateAttrCols = suppressDateAttrCols;
     }
 
     /**
@@ -417,7 +423,18 @@ public class Parser {
         return this;
     }
 
+    public boolean isSuppressDateAttrCols() {
+        return suppressDateAttrCols;
+    }
 
+    public void setSuppressDateAttrCols(boolean suppressDateAttrCols) {
+        this.suppressDateAttrCols = suppressDateAttrCols;
+    }
+
+    public Parser withSuppressDateAttrCols(boolean suppressDateAttrCols) {
+        this.suppressDateAttrCols = suppressDateAttrCols;
+        return this;
+    }
 
     @Override
     public String toString() {
@@ -443,6 +460,7 @@ public class Parser {
             .append(pivotFields)
             .append(alerts)
             .append(allowInconsistentCol)
+            .append(suppressDateAttrCols)
             .toHashCode();
     }
 
@@ -472,6 +490,7 @@ public class Parser {
             .append(pivotFields, rhs.pivotFields)
             .append(alerts, rhs.alerts)
             .append(allowInconsistentCol, this.allowInconsistentCol)
+            .append(suppressDateAttrCols, rhs.suppressDateAttrCols)
             .isEquals();
     }
 }

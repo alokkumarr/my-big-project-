@@ -1,59 +1,79 @@
-<header [ngSwitch]="data.action"
-        class="dialog__header">
+<header [ngSwitch]="data.action" class="dialog__header">
   <strong *ngSwitchCase="'sort'" i18n>Sort</strong>
   <strong *ngSwitchCase="'description'" i18n>Description</strong>
   <strong *ngSwitchCase="'save'" i18n>Save</strong>
-  <mat-progress-bar [style.visibility]="showProgress ? 'visible' : 'hidden'"
-                    mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar
+    [style.visibility]="showProgress ? 'visible' : 'hidden'"
+    mode="indeterminate"
+  ></mat-progress-bar>
 </header>
-<div [ngSwitch]="data.action"
-     class="dialog__content">
-  <designer-sort *ngSwitchCase="'sort'"
-                  (sortsChange)="onSortsChange($event)"
-                  [sorts]="data.sorts"
-                  [artifacts]="data.artifacts">
+<div [ngSwitch]="data.action" class="dialog__content">
+  <designer-sort
+    *ngSwitchCase="'sort'"
+    (sortsChange)="onSortsChange($event)"
+    [sorts]="data.sorts"
+    [artifacts]="data.artifacts"
+  >
   </designer-sort>
-  <designer-description *ngSwitchCase="'description'"
-                        (descriptionChange)="onDescriptionChange($event)"
-                        [description]="data.description">
+  <designer-description
+    *ngSwitchCase="'description'"
+    (descriptionChange)="onDescriptionChange($event)"
+    [description]="data.description"
+  >
   </designer-description>
-  <designer-save *ngSwitchCase="'save'"
-                 (nameChange)="onNameChange($event)"
-                 [designerMode]="data.designerMode"
-                 (descriptionChange)="onSaveDescriptionChange($event)"
-                 [analysis]="data.analysis">
+  <designer-save
+    *ngSwitchCase="'save'"
+    [designerMode]="data.designerMode"
+    [analysis]="data.analysis"
+    (descriptionChange)="onSaveDescriptionChange($event)"
+    (nameChange)="onNameChange($event)"
+    (categoryChange)="onCategoryChange($event)"
+  >
   </designer-save>
 </div>
-<div class="dialog__actions"
-     fxLayout="column"
-     fxLayoutAlign="start start">
-
-  <div fxLayout="row"
-       fxLayoutAlign="start center">
+<div class="dialog__actions" fxLayout="column" fxLayoutAlign="start start">
+  <div fxLayout="row" fxLayoutAlign="start center">
     <div [ngSwitch]="data.action">
-        <button *ngSwitchCase="'sort'"
-                (click)="onOk()"
-                mat-raised-button color="primary" i18n>
-          Apply Sort
-        </button>
-        <button *ngSwitchCase="'description'"
-                (click)="onOk()"
-                mat-raised-button color="primary" i18n>
-          Save Description
-        </button>
-        <button *ngSwitchCase="'save'"
-                (click)="save('saveAndClose')"
-                e2e="save-dialog-save-analysis"
-                mat-raised-button color="primary" i18n>
-          Save & Close
-        </button>
-        <button *ngSwitchCase="'save'"
-                (click)="save('save')"
-                e2e="dialog-save-analysis"
-                mat-button i18n>
-          Save
-        </button>
+      <button
+        *ngSwitchCase="'sort'"
+        (click)="onOk()"
+        mat-raised-button
+        color="primary"
+        i18n
+      >
+        Apply Sort
+      </button>
+      <button
+        *ngSwitchCase="'description'"
+        (click)="onOk()"
+        mat-raised-button
+        color="primary"
+        i18n
+      >
+        Save Description
+      </button>
+      <button
+        *ngSwitchCase="'save'"
+        (click)="save('saveAndClose')"
+        e2e="save-dialog-save-analysis"
+        mat-raised-button
+        color="primary"
+        i18n
+      >
+        Save & Close
+      </button>
+      <button
+        *ngSwitchCase="'save'"
+        (click)="save('save')"
+        e2e="dialog-save-analysis"
+        mat-button
+        i18n
+      >
+        Save
+      </button>
     </div>
-    <button mat-button i18n (click)="onBack()" e2e="designer-dialog-cancel">Cancel</button>
+    <button mat-button i18n (click)="onBack()" e2e="designer-dialog-cancel">
+      Cancel
+    </button>
   </div>
 </div>
