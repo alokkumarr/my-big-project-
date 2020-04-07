@@ -1,8 +1,12 @@
 package sncr.xdf.sql.ng;
 
+import com.google.common.collect.ImmutableSet;
+import io.prestosql.sql.parser.ParsingOptions;
+import io.prestosql.sql.parser.SqlParser;
+import io.prestosql.sql.parser.StatementSplitter;
+import io.prestosql.sql.tree.Statement;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
@@ -40,6 +44,7 @@ public class NGSQLScriptDescriptor {
     private static final Logger logger = Logger.getLogger(NGSQLScriptDescriptor.class);
 
     private Statements stmts;
+    private List<Statement> statementList = new ArrayList<>();
     private List<SQLDescriptor> statementDescriptors = new ArrayList<>();
     private Map<String, TableDescriptor> scriptWideTableMap = new HashMap<>();
 
@@ -111,7 +116,7 @@ public class NGSQLScriptDescriptor {
             Matcher m = r.matcher(a_script);
 
             int position = 0;
-//Should be only one iteration
+            //Should be only one iteration
             while (m.find(position)  ) {
 
                 if(parameterValues == null || parameterValues.isEmpty())
@@ -133,14 +138,11 @@ public class NGSQLScriptDescriptor {
                         script = script.replace(varExpression, parameterValues.get(key));
                     }
                 }
-//              else
-// Should not be else
                 position = m.end();
             }
             m.reset();
         }
     }
-
 
     /**
      * The method does the job,
@@ -149,7 +151,7 @@ public class NGSQLScriptDescriptor {
      */
     public void parseSQLScript(){
         try{
-            logger.debug("Step 4: Parse SQL Script");
+            logger.trace("Step 4: Parse JSQL SQL Script");
             if (script == null ) {
                 logger.error("Internal error: Script was not pre-processed!");
                 return;
@@ -163,7 +165,7 @@ public class NGSQLScriptDescriptor {
 
             SqlScriptParser p = new SqlScriptParser();
             int i = 0;
-            for(Statement stmt : stmts.getStatements()) {
+            for(net.sf.jsqlparser.statement.Statement stmt : stmts.getStatements()) {
                 i++;
                 List<TableDescriptor> tables = p.getTableList(stmt, i);
                 logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
@@ -187,7 +189,7 @@ public class NGSQLScriptDescriptor {
 
                 SQLDescriptor sqlDesc = new SQLDescriptor();
                 logger.trace("Qualify statement as: " + p.stType.toString());
-//TODO:: Assume that statement is processMap select statement, generate correct name: add processed data object
+                //TODO:: Assume that statement is processMap select statement, generate correct name: add processed data object
                 switch (p.stType) {
 
                     case SELECT:
@@ -221,7 +223,7 @@ public class NGSQLScriptDescriptor {
                             logger.debug(" \n" + "SQL is :  "  + sqlDesc.SQL  + " \n");
                             sqlDesc.tableDescriptor = targetTable;
                         }
-                    break;
+                        break;
 
                     case DROP_TABLE:
                         if (targetTable == null)
@@ -231,7 +233,7 @@ public class NGSQLScriptDescriptor {
                         sqlDesc.targetTableName = targetTable.tableName;
                         sqlDesc.SQL = stmt.toString();
 
-                    break;
+                        break;
                     default:
                         throw new XDFException(XDFReturnCode.UNSUPPORTED_SQL_STATEMENT_TYPE);
                 }
@@ -252,6 +254,179 @@ public class NGSQLScriptDescriptor {
             throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
         }
         return;
+    }
+
+    /**
+     * The method does the job to parse SQL statment and build the table descriptor,
+     * it extracts recognizable SQL statements and builds SQL Script descriptors
+     * that will be info source for SQL Executor calls
+     */
+    public void prestoParseSQLScript(){
+        try{
+            logger.debug("Step 4: Parse Preso SQL Script");
+            if (script == null ) {
+                logger.error("Internal error: Script was not pre-processed!");
+                return;
+            }
+
+            StatementSplitter splitter = new StatementSplitter(script, ImmutableSet.of(";"));
+            List<StatementSplitter.Statement> stmtsList = splitter.getCompleteStatements();
+            logger.debug("SQL Statements = " + stmtsList);
+
+            // We have array of statements - check the table names
+            // Since same table names will be mentioned multiple times in multiple
+            // statements we have to support "grand" list and maintain precedence of the flags
+
+            SqlParser parser = new SqlParser();
+            PrestoSQLParser p = new PrestoSQLParser();
+            int i = 0;
+            for(StatementSplitter.Statement stmt : stmtsList) {
+                i++;
+
+                // check for temporary tables
+                boolean isTemp = false;
+                String query = null;
+                Statement statement;
+                if (haveTempTable(stmt, "temp")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("temp", "");
+                } else if (haveTempTable(stmt, "TEMP")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("TEMP", "");
+                } else if (stmt.statement().contains("TEMPORARY")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("TEMPORARY", "");
+                } else if (stmt.statement().contains("temporary")){
+                    isTemp = true;
+                    query = stmt.statement().replaceFirst("temporary", "");
+                }
+
+                // create stament for parsing
+                if (isTemp && query != null){
+                    statement = parser.createStatement(query, new ParsingOptions());
+                } else {
+                    statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
+                }
+
+                statementList.add(statement);
+                List<TableDescriptor> tables = p.getTableList(statement, i, isTemp);
+                logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
+                    + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
+                TableDescriptor targetTable = null;
+                updateTableName(tables);
+                for(TableDescriptor td : tables){
+                    logger.trace("Try table: " + td.toString());
+                    if (td.isTargetTable) targetTable = td;
+                    TableDescriptor existingTd = scriptWideTableMap.get(td.tableName);
+                    if(existingTd == null){
+                        // Table not in the list - just put it there
+                        td.asReference.add(i);
+                        scriptWideTableMap.put(td.tableName, td);
+                    } else {
+                        if (existingTd.isTargetTable && td.isTargetTable && !existingTd.isInDropStatement && !td.isInDropStatement)
+                            throw new XDFException(XDFReturnCode.INVALID_DATA_SOURCES, td.tableName);
+                        existingTd.asReference.add(i);
+                    }
+
+                }
+
+                SQLDescriptor sqlDesc = new SQLDescriptor();
+                logger.trace("Qualify statement as: " + p.stType.toString());
+                switch (p.stType) {
+                    case SELECT:
+                        logger.error("SELECT statement is not supported anymore, please use CREATE [TEMPORARY] TABLE AS statement");
+                        throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE);
+
+                    case CREATE:
+                        if (targetTable == null) {
+                            throw new XDFException(XDFReturnCode.INCORRECT_SQL, " Target table was not found in table register.");
+                        } else {
+                            sqlDesc.statementType = StatementType.CREATE;
+                            sqlDesc.isTemporaryTable = targetTable.isTempTable;
+                            if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
+                            String s = stmt.toString().toLowerCase();
+                            int pos = -1;
+
+                            Pattern pattern = Pattern.compile(withRegex, Pattern.CASE_INSENSITIVE);
+                            Matcher matcher = pattern.matcher(s.trim());
+                            while(matcher.find()) {
+                                pos = matcher.start();
+                            }
+
+                            if(pos < 0) {
+                                pos = s.indexOf("select");
+                            }
+                            if (pos < 0)
+                                throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not find SELECT clause for statement: " + stmt.toString());
+                            sqlDesc.SQL = stmt.toString().substring(pos).replaceAll(";","");;
+                            logger.debug(" \n" + "SQL is :  "  + sqlDesc.SQL  + " \n");
+                            sqlDesc.tableDescriptor = targetTable;
+                        }
+                    break;
+
+                    case DROP_TABLE:
+                        if (targetTable == null)
+                            throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not determine target table for drop statement");
+                        sqlDesc.statementType = StatementType.DROP_TABLE;
+                        sqlDesc.tableDescriptor = targetTable;
+                        sqlDesc.targetTableName = targetTable.tableName;
+                        sqlDesc.SQL = stmt.toString();
+                    break;
+                    default:
+                        throw new XDFException(XDFReturnCode.UNSUPPORTED_SQL_STATEMENT_TYPE);
+                }
+                sqlDesc.index = i;
+                sqlDesc.targetTableName = targetTable.tableName;
+                sqlDesc.transactionalLocation = transactionalLocation;
+                sqlDesc.targetTransactionalLocation = sqlDesc.transactionalLocation + Path.SEPARATOR;
+                sqlDesc.targetTableMode = targetTable.mode;
+                sqlDesc.targetTableFormat = targetTable.format;
+
+                statementDescriptors.add(sqlDesc);
+                logger.trace("SQL Statement descriptor: \n" + sqlDesc + "\n");
+            }
+            logger.debug("Table list: \n" + scriptWideTableMap );
+        } catch(Exception e){
+            throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
+        }
+        return;
+    }
+
+    /**
+     * Update the table name match with the configured table name.
+     *
+     * @param tables
+     */
+    private void updateTableName(List<TableDescriptor> tables) {
+      if (tables != null && !tables.isEmpty()){
+        for (TableDescriptor td : tables){
+          logger.trace("table name start :" + td.toString());
+          outputDataObjects.keySet().forEach(key -> {
+            if (key != null && key.equalsIgnoreCase(td.tableName)){
+              td.tableName = key;
+            }
+          });
+        }
+      }
+    }
+
+    /**
+     * Check temporary table exist
+     *
+     * @param stmt
+     * @param temp
+     * @return
+     */
+    private boolean haveTempTable(StatementSplitter.Statement stmt, String temp) {
+        boolean isTemp = false;
+        String[] wordArr = stmt.toString().split("\\s");
+        for (String word : wordArr) {
+            if (temp.equals(word)) {
+                isTemp = true;
+                break;
+            }
+        }
+        return isTemp;
     }
 
     private final static String comment_patterns[] = { "\\-{2,}+.*\\n", "\\-{2,}+.*\\r\\n", "\\-{2,}+.*$", "/\\*(?:.|\\n)*?\\*/", "/\\*(?:.|\\r\\n)*?\\*/" };
@@ -282,8 +457,6 @@ public class NGSQLScriptDescriptor {
     }
 
 
-
-
     /**
      * The method matches referential table names with provided data sources
      * as follow:
@@ -296,10 +469,11 @@ public class NGSQLScriptDescriptor {
             if (td.isTargetTable ^ td.isInDropStatement) continue;
 
             if (!tn.equalsIgnoreCase(ctx.dataSetName)) {
-                //TODO:: Access by DataSet name or by parameter [name] -- Inputs???
                 logger.trace("Resolving in table: " + tn);
-                if (inputDataObjects.containsKey(tn)) {
-                    Map<String, Object> doProps = inputDataObjects.get(tn);
+                boolean validaInputData = inputDataObjects.keySet().stream().anyMatch(s -> s.equalsIgnoreCase(tn));
+                if (validaInputData) {
+                    String matchedTn = inputDataObjects.keySet().stream().filter(s -> s.equalsIgnoreCase(tn)).findAny().get();
+                    Map<String, Object> doProps = inputDataObjects.get(matchedTn);
                     td.setLocation((String) doProps.get(DataSetProperties.PhysicalLocation.name()));
                     td.format = (String) doProps.get( DataSetProperties.Format.name() );
                     td.mode = (String) doProps.get(DataSetProperties.Mode.name());
@@ -329,35 +503,34 @@ public class NGSQLScriptDescriptor {
                 continue;
             }
 
-            logger.debug("TD = " + td + ". Is temp table " + td.isTempTable);
+          logger.debug("TD = " + td + ". Is temp table " + td.isTempTable);
 
-            logger.trace("Resolving out table: " + tn);
+          logger.trace("Resolving out table: " + tn);
 
-            //TODO:: Access by DataSet name or by parameter [name] -- Outputs???
-            //if (outputs.containsKey(tn)) {
-            if (outputDataObjects.containsKey(tn)) {
-
-                Map<String, Object> oDO = outputDataObjects.get(tn);
+            boolean haveValidKey = outputDataObjects.keySet().stream().anyMatch(s -> s.equalsIgnoreCase(tn));
+            if (haveValidKey) {
+                String tempTn = outputDataObjects.keySet().stream().filter(s -> s.equalsIgnoreCase(tn)).findFirst().get();
+                Map<String, Object> oDO = outputDataObjects.get(tempTn);
                 td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
                 td.format = (String) oDO.get(DataSetProperties.Format.name());
                 td.mode = (String) oDO.get(DataSetProperties.Mode.name());
                 td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
                 td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
                 logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
-                    tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
-            } else {
-                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
-            }
+                tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
+          } else {
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
+          }
         }
     }
 
     public Map<String, TableDescriptor> getScriptWideTableMap(){  return scriptWideTableMap; }
 
+    public List<Statement> getPrestoParsedStatements() {
+        return statementList;
+    }
+
     public Statements getParsedStatements() {
         return stmts;
     }
-
-
-
-
 }

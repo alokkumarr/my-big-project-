@@ -32,6 +32,14 @@ public class Sql {
     private String scriptLocation;
 
     /**
+     * Disabled Presto SQL Parser.
+     *
+     */
+    @SerializedName("disablePrestoParser")
+    @Expose
+    private Boolean disablePrestoParser = Boolean.FALSE;
+
+    /**
      * No args constructor for use in serialization
      * 
      */
@@ -91,6 +99,24 @@ public class Sql {
      */
     public void setScriptLocation(String scriptLocation) {
         this.scriptLocation = scriptLocation;
+    }
+
+  /**
+   * Getter Presto SQL library config
+   *
+   * @return boolean
+   */
+    public boolean isDisablePrestoParser() {
+        return disablePrestoParser;
+    }
+
+  /**
+   * Setter Presto SQL library config
+   *
+   * @param  boolean
+   */
+    public void setDisablePrestoParser(boolean disablePrestoParser) {
+        this.disablePrestoParser = disablePrestoParser;
     }
 
     /**
