@@ -4,10 +4,9 @@ const commonFunctions = require('../utils/commonFunctions');
 
 class FilterDialog {
   constructor() {
-    this._addFilter = tableName =>
-      element(by.css(`[e2e="filter-add-btn-${tableName}"]`));
+    this._addFilter = element(by.css(`[class="mat-icon notranslate material-icons icon-plus2 mat-icon-no-color"]`))
     this._filterColumnDropDown = element(
-      by.css('input[e2e="filter-autocomplete-input"]')
+      by.css('[e2e="filter-columns"]')
     );
     this._columnNameDropDownItem = columnName =>
       element(
@@ -15,7 +14,7 @@ class FilterDialog {
       );
     // Date
     this._filterPresetDropDown = element(
-      by.xpath('//span[contains(text(),"Custom")]')
+      by.css('[e2e="filter-date-preset"]')
     );
     this._presetDropDownItem = presetName =>
       element(by.xpath(`//mat-option[contains(text(),"${presetName}")]`));
@@ -42,26 +41,36 @@ class FilterDialog {
     this._filterStringIsInIsNotInInput = element(
       by.xpath(`//input[@e2e="designer-filter-string-input"]`)
     );
-    this._applyFiltersBtn = element(by.css(`button[e2e="apply-filter-btn"]`));
+    this._applyFiltersBtn = element(by.css(`button[e2e="save-attributes-btn"]`));
 
     this._promptCheckBox = element(
       by.css(`mat-checkbox[e2e="filter-dialog-prompt-checkbox"]`)
     );
     this._filterDialogText = element(
-      by.css(`strong[e2e="filter-dialog-header-text"]`)
+      by.xpath(`//strong[contains(text(),'Filter')]`)
     );
 
     this._cancleFilterPromptBtn = element(
-      by.css(`button[e2e="designer-dialog-cancel"]`)
+      by.xpath(`//span[text()='Cancel']`)
     );
-    this._selectedFilterField = element(
-      by.css(`[e2e="filter-autocomplete-input"]`)
+    this._selectedFilterField = value =>element(
+      by.xpath(`//*[@class="mat-select-value"]/following::span[text()='${value}']`)
     );
     this._allFilterButton=element(by.xpath(`//button[contains(*,'All')]`));
+    this._selectFilterField = value => element(by.css(`[e2e="add-${value}"]`));
+    this._tableArtifacts = element(by.css(`mat-select[e2e="filter-artifacts"]`));
   }
 
-  clickOnAddFilterButtonByTableName(tableName) {
-    commonFunctions.clickOnElement(this._addFilter(tableName));
+  clickOnAddFilterButtonByField(fieldName) {
+    commonFunctions.clickOnElement(this._addFilter);
+    commonFunctions.clickOnElement(this._selectFilterField(fieldName));
+    commonFunctions.waitFor.elementToBePresent(this._tableArtifacts);
+  }
+
+  clickOnAddFilterButtonByTableName() {
+    commonFunctions.clickOnElement(this._addFilter);
+    commonFunctions.clickOnElement(this._selectFilterField);
+    commonFunctions.waitFor.elementToBePresent(this._tableArtifacts);
   }
 
   clickOnColumnInput() {
@@ -87,7 +96,7 @@ class FilterDialog {
     commonFunctions.clickOnElement(this._stringOperatorDropDownItem(operator));
     if (operator === 'Is in' || operator === 'Is not in') {
       commonFunctions.fillInput(this._filterStringIsInIsNotInInput, value);
-      this._allFilterButton.click();
+      //this._allFilterButton.click();
     } else {
       commonFunctions.fillInput(this._filterStringInput, value);
     }
@@ -111,11 +120,12 @@ class FilterDialog {
   }
 
   verifySelectFieldValue(value) {
-    expect(this._selectedFilterField.getAttribute('value')).toEqual(value);
+    //expect(this._selectedFilterField.getAttribute('value')).toEqual(value);
+    commonFunctions.waitFor.elementToBePresent(this._selectedFilterField(value));
   }
 
   fillFilterOptions(fieldType, operator, value) {
-    // Scenario for dates
+    // Scenario for datses
     if (fieldType === 'date') {
       this.selectPreset(value);
     }

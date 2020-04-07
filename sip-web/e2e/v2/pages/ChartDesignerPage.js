@@ -169,7 +169,7 @@ class ChartsDesignerPage extends Designer {
    * filters: array of string
    */
   validateAppliedFilters(analysisType, filters) {
-    browser.sleep(1000);
+    browser.sleep(2000);
     if (analysisType === Constants.CHART || analysisType === Constants.PIVOT) {
       this.verifyAppliedFilters(filters);
     } else if (

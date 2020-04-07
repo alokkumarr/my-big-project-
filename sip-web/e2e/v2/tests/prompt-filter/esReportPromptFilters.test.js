@@ -26,6 +26,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
   const subCategoryName = subCategories.createAnalysis.name;
   const savedCategory = 'My Analysis';
   const savedSubCategory = 'DRAFTS';
+  const fieldName = 'field';
 
   let host;
   let token;
@@ -122,12 +123,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           executePage.clickOnEditLink();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
-          if (analysisType === Constants.REPORT) {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('SALES');
-          } else {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('sample');
-          }
-
+          chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
           chartDesignerPage.clickOnColumnInput();
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
