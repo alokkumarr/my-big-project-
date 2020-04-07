@@ -84,6 +84,7 @@ public class Id3RepositoryImpl implements Id3Repository {
                 return ps;
             },
             keyHolder);
+        authorizationCodeDetails.setCustomerCode(id3ClientDetails.getCustomerCode());
         authorizationCodeDetails.setTicketDetailsId(keyHolder.getKey().longValue());
         authorizationCodeDetails.setValidUpto(System.currentTimeMillis() + 2 * 60 * 1000);
         return Jwts.builder()

@@ -1,31 +1,37 @@
 package com.sncr.saw.security.app.controller;
 
+import com.sncr.saw.security.app.controller.SecurityController.LoginResponse;
 import com.sncr.saw.security.app.id3.model.AuthorizationCodeDetails;
 import com.sncr.saw.security.app.id3.model.Id3AuthenticationRequest;
 import com.sncr.saw.security.app.id3.model.Id3Claims;
 import com.sncr.saw.security.app.id3.service.ValidateId3IdentityToken;
 import com.sncr.saw.security.app.repository.Id3Repository;
+import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
+import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Map;
 
 @RestController
 @Api(
@@ -45,13 +51,18 @@ import java.util.Map;
           message = "Unsupported Type. Representation not supported for the resource")
     })
 public class SipId3Controller {
-
   private final ValidateId3IdentityToken validateId3IdentityToken;
 
   private final Id3Repository id3Repository;
   private final SSORequestHandler ssoRequestHandler;
   private static final String CACHE_CONTROL = "Cache-Control";
   private static final String BEARER = "Bearer";
+  private static final String MALFORMED_TOKEN = "Request not valid,"
+      + " Id3 Token may be Malformed or already expired";
+  private static final String PRIVATE = "private";
+
+  @Autowired
+  private TicketHelper tHelper;
 
   @Autowired
   public SipId3Controller(
@@ -77,13 +88,12 @@ public class SipId3Controller {
       HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    response.setHeader(CACHE_CONTROL, "private");
+    response.setHeader(CACHE_CONTROL, PRIVATE);
     String idToken = token.replace(BEARER, "").trim();
     SSOResponse ssoResponse = ssoRequestHandler.processId3SipAuthentication(idToken);
     if (ssoResponse == null)
       response.sendError(
-          HttpStatus.UNAUTHORIZED.value(),
-          "Request not valid, Id3 Token may be Malformed or already expired");
+          HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
     return ssoResponse;
   }
 
@@ -106,7 +116,7 @@ public class SipId3Controller {
       HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    response.setHeader(CACHE_CONTROL, "private");
+    response.setHeader(CACHE_CONTROL, PRIVATE);
     String authorizationCode = token.replace(BEARER, "").trim();
     SSOResponse ssoResponse = null;
     AuthorizationCodeDetails authorizationCodeDetails =
@@ -117,8 +127,7 @@ public class SipId3Controller {
     }
     if (ssoResponse == null)
       response.sendError(
-          HttpStatus.UNAUTHORIZED.value(),
-          "Request not valid, Id3 Token may be Malformed or already expired");
+          HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
     return ssoResponse;
   }
 
@@ -165,5 +174,47 @@ public class SipId3Controller {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
       }
     }
+  }
+
+  /**
+   * This method reads the Id3 identity token and invalidates the SIP token.
+   *
+   * @param token
+   * @param request
+   * @param response
+   * @return
+   * @throws IOException
+   */
+  @GetMapping(value = "/logout")
+  public SSOResponse sipTokenInvalidatorForId3(
+      @RequestHeader("Authorization") String token,
+      HttpServletRequest request,
+      HttpServletResponse response)
+      throws IOException {
+    response.setHeader(CACHE_CONTROL, PRIVATE);
+    String idToken = token.replace(BEARER, "").trim();
+    SSOResponse ssoResponse = ssoRequestHandler.processId3SipAuthentication(idToken);
+    if (ssoResponse == null) {
+      response.sendError(
+          HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
+      return ssoResponse;
+    }
+    Ticket ticket = TokenParser.retrieveTicket(ssoResponse.getaToken());
+    boolean valid = false;
+    valid = ticket != null && ticket.getValidUpto() != null && ticket.getValidUpto() > new Date()
+        .getTime();
+    if (!valid) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      ssoResponse.setValidity(Boolean.FALSE);
+      ssoResponse.setMessage("Token has expired");
+    }
+    try {
+      ssoResponse.setMessage(tHelper.logout(ticket.getTicketId()));
+      ssoResponse.setValidity(Boolean.TRUE);
+    } catch (DataAccessException de) {
+      ssoResponse.setValidity(Boolean.FALSE);
+      ssoResponse.setMessage("Error occurred while logging out! Contact ADMIN!!");
+    }
+    return ssoResponse;
   }
 }
