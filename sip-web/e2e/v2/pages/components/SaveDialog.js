@@ -29,6 +29,7 @@ class SaveDialog extends FilterDialog {
 
   clickOnSaveAndCloseDialogButton(landingPageAfterSave = null) {
     commonFunctions.clickOnElement(this._saveAndCloseButton);
+    browser.sleep(2000); //need to add else menu button will not be visible
     if (landingPageAfterSave) {
       commonFunctions.waitFor.pageToBeReady(landingPageAfterSave);
     } else {
