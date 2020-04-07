@@ -1,0 +1,91 @@
+<div
+  [ngClass]="{'boolean-criteria-header': data.mode === 'DSK' , 'analyze-criteria-header': data.mode === 'ANALYZE' }"
+  fxLayout="row"
+  fxLayoutAlign="space-between center"
+>
+</div>
+
+<div
+  class="dsk-query-child"
+  *ngFor="let child of filterGroup.booleanQuery; let childId = index"
+  [ngClass]="{ 'dsk-query-child__group': child['booleanCriteria'] }"
+>
+  <filter-prompt-layout
+    [filterGroup]="child"
+    [selfIndex]="childId"
+    [data]="data"
+    (onChange)="onChange.emit(this.filterGroup)"
+    *ngIf="child['booleanCriteria']; else attributeFields"
+  >{{childId}}</filter-prompt-layout>
+
+  <ng-template #attributeFields>
+    <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center">
+
+      <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center"
+        *ngIf="data.mode === 'ANALYZE' && !filterGroup.booleanQuery[childId].isAggregationFilter"
+      >
+        <div class="input-fields" fxLayout="row"
+        *ngIf="(data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter) || !data.isInRuntimeMode"
+        >
+          <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+              <mat-label>Artifacts</mat-label>
+              <mat-select
+                          [value]="filterGroup.booleanQuery[childId].artifactsName" [attr.e2e]="'filter-artifacts'"
+                          [disabled]="data.isInRuntimeMode">
+                <mat-option *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn"
+                            [value]="artifact.artifactName">
+                  {{ artifact.artifactName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+              <mat-label> Columns
+                <span
+                *ngIf="!filterGroup.booleanQuery[childId].isOptional && data.isInRuntimeMode"
+                class="mandatory-asterisk"
+                style="color:red"
+                >*</span>
+              </mat-label>
+              <mat-select (selectionChange)="columnsSelect($event.value, childId)"
+                          [value]="filterGroup.booleanQuery[childId].columnName"
+                          [disabled]="data.isInRuntimeMode"
+                          [attr.e2e]="'filter-columns'">
+                <mat-option *ngFor="let column of fetchColumns(childId);"
+                            [value]="column.columnName">
+                  {{ column.displayName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div [ngSwitch]="TYPE_MAP[fetchType(childId)]"
+              *ngIf="(!data.isInRuntimeMode && !filterGroup.booleanQuery[childId].isRuntimeFilter)
+                || (data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter)"
+            >
+              <div *ngIf="!filterGroup.booleanQuery[childId].isGlobalFilter || data.isInRuntimeMode">
+                <designer-string-filter
+                  *ngSwitchCase="'string'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-string-filter>
+                <designer-date-filter
+                  *ngSwitchCase="'date'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-date-filter>
+                <designer-number-filter
+                  *ngSwitchCase="'number'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-number-filter>
+              </div>
+
+            </div>
+          </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

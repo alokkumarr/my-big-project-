@@ -42,6 +42,7 @@ export class DskFilterDialogComponent implements OnInit {
       booleanCriteria;
       artifacts;
       supportsAggregationFilters: boolean;
+      isInRuntimeMode;
     }
   ) {
     this.showGlobalOption = true;

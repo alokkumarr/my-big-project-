@@ -39,6 +39,7 @@ import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipF
 import { getFilterDisplayName } from './../../../consts';
 import { PerfectScrollbarComponent } from 'ngx-perfect-scrollbar';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
+import { DskFiltersService } from '../../../../../common/services/dsk-filters.service';
 
 @Component({
   selector: 'designer-selected-fields',
@@ -49,7 +50,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   @ViewChildren(PerfectScrollbarComponent) scrollbars;
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  public previewString;
   @Output() removeFilter = new EventEmitter();
+  @Output() filterClick = new EventEmitter();
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   filters;
@@ -59,6 +62,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       return;
     }
     this.filters = filters;
+    this.previewString = this.datasecurityService.generatePreview(
+      this.changeIndexToNames(filters, 'booleanQuery', 'filters'), 'ANALYZE'
+    );
     this.flattenedfilters = this.analyzeService.flattenAndFetchFiltersChips(filters, []);
   }
 
@@ -83,7 +89,8 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   constructor(
     private _dndPubsub: DndPubsubService,
     private _store: Store,
-    private analyzeService: AnalyzeService
+    private analyzeService: AnalyzeService,
+    private datasecurityService: DskFiltersService
   ) {
     this._changeSettingsDebounced = debounce(
       this._changeSettingsDebounced,
@@ -287,7 +294,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
         this.filters = cloneDeep(this.filters.filter(option => {
           return option.uuid !== filter.uuid;
         }));
-        console.log(this.filters);
         this.removeFilter.emit({subject: 'filters', data: this.filters});
       } else {
         this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
@@ -303,5 +309,16 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       this.removeFilter.emit({subject: 'filters', data: this.filters});
     }
 
+  }
+
+  changeIndexToNames(dskObject, source, target) {
+    const convertToString = JSON.stringify(dskObject);
+    const replaceIndex = convertToString.replace(/"filters":/g, '"booleanQuery":');
+    const convertToJson = JSON.parse(replaceIndex);
+    return convertToJson[0];
+  }
+
+  openFilterDialog() {
+    this.filterClick.emit();
   }
 }

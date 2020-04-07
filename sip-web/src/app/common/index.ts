@@ -94,6 +94,7 @@ import { DskFilterGroupComponent } from './dsk-filter-group/dsk-filter-group.com
 import { DskFilterDialogComponent } from './dsk-filter-dialog/dsk-filter-dialog.component';
 import { DskFilterGroupViewComponent } from './dsk-filter-group-view/dsk-filter-group-view.component';
 import { DskFiltersService } from './services/dsk-filters.service';
+import { FilterPromptLayout } from './components/filter-prompt-layout/filter-prompt-layout.component';
 
 import { DesignerFilterRowComponent } from './../modules/analyze/designer/filter/row';
 import { DesignerStringFilterComponent } from './../modules/analyze/designer/filter/string';
@@ -197,7 +198,8 @@ const COMPONENTS = [
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent,
   FilterChipsComponent,
-  AggregatedFiltersComponent
+  AggregatedFiltersComponent,
+  FilterPromptLayout
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];

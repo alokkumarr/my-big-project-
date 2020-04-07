@@ -5,6 +5,7 @@ import { AnalyzeService } from '../../../services/analyze.service';
 import * as cloneDeep from 'lodash/cloneDeep';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
+import { DskFiltersService } from './../../../../../common/services/dsk-filters.service';
 
 @Component({
   selector: 'filter-chips-u',
@@ -15,6 +16,7 @@ export class FilterChipsComponent {
   @Output() remove: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Output() removeAll: EventEmitter<null> = new EventEmitter();
   private filters;
+  @Output() onFilterClick = new EventEmitter();
   @Input('filters') set _filters(value) {
     this.filters = value;
     this.refreshFilters();
@@ -32,9 +34,11 @@ export class FilterChipsComponent {
 
   public nameMap;
   public flattenedFilters = [];
+  public previewString;
 
   constructor(
-    private analyzeService: AnalyzeService
+    private analyzeService: AnalyzeService,
+    private datasecurityService: DskFiltersService
   ) {}
 
   getDisplayName(filter: Filter) {
@@ -53,7 +57,6 @@ export class FilterChipsComponent {
         this.filters = cloneDeep(this.filters.filter(option => {
           return option.uuid !== filter.uuid;
         }));
-        console.log(this.filters);
         this.remove.emit({subject: 'filters', data: this.filters});
       } else {
         this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
@@ -81,5 +84,19 @@ export class FilterChipsComponent {
     this.flattenedFilters = cloneDeep(
       this.analyzeService.flattenAndFetchFiltersChips(this.filters, [])
     );
+    this.previewString = this.datasecurityService.generatePreview(
+      this.changeIndexToNames(this.filters, 'booleanQuery', 'filters'), 'ANALYZE'
+    );
+  }
+
+  changeIndexToNames(dskObject, source, target) {
+    const convertToString = JSON.stringify(dskObject);
+    const replaceIndex = convertToString.replace(/"filters":/g, '"booleanQuery":');
+    const convertToJson = JSON.parse(replaceIndex);
+    return convertToJson[0];
+  }
+
+  openFilterPopUp() {
+    this.onFilterClick.emit();
   }
 }

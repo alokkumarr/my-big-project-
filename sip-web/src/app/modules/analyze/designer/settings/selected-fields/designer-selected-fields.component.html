@@ -82,7 +82,17 @@
     }"
     fxFlex="90"
   >
-    <mat-chip-list e2e="designer-applied-filters" class="selected-fields__list">
+  <div style="margin: 7px;font-size: 12px;cursor: pointer;" (click)="openFilterDialog()">
+      <code
+      [innerHTML]="
+        previewString ||
+        'Filters might be missing or invalid. Please add fields below or check for errors.'
+      "
+      >
+      </code>
+  </div>
+
+    <!-- <mat-chip-list e2e="designer-applied-filters" class="selected-fields__list">
       <mat-chip
         *ngFor="let filter of flattenedfilters; let i = index"
         class="selected-fields__item"
@@ -93,6 +103,15 @@
         {{ getDisplayNameForFilter(filter) }}
         <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
       </mat-chip>
-    </mat-chip-list>
+    </mat-chip-list> -->
   </perfect-scrollbar>
 </div>
+
+
+<!-- <code
+[innerHTML]="
+  previewString ||
+  'Filters might be missing or invalid. Please add fields below or check for errors.'
+"
+>
+</code> -->

@@ -26,6 +26,7 @@
     [chartTitle]="chartTitle"
     [sipQuery]="analysis.sipQuery"
     [designerState]="designerState"
+    (requestAction)="onToolbarAction($event)"
   >
   </single-table-designer-layout>
 
@@ -40,6 +41,7 @@
     [sorts]="sorts"
     [filters]="dslFilters$ | async"
     [designerState]="designerState"
+    (requestAction)="onToolbarAction($event)"
   >
   </multi-table-designer-layout>
 </div>

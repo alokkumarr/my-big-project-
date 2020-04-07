@@ -66,6 +66,7 @@
           [analysisType]="analysisType"
           [analysisSubtype]="analysisSubtype"
           [filters]="filters"
+          (filterClick)="requestAction.emit('filter')"
           class="designer__selected-fields__container"
         >
         </designer-selected-fields>
