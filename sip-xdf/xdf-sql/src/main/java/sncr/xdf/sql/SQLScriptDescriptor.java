@@ -59,6 +59,8 @@ public class SQLScriptDescriptor {
         return statementDescriptors;
     }
 
+    private static final String LATERAL_VIEW = "lateral view.*$";
+
     public SQLScriptDescriptor(Context ctx,
                                String tempDir,
                                Map<String, Map<String, Object>>  inputDOs,
@@ -310,7 +312,7 @@ public class SQLScriptDescriptor {
                 }
 
                 // create statement for parsing
-                Statement statement = parser.createStatement(query.replaceAll("lateral view.*$", ""), new ParsingOptions());
+                Statement statement = parser.createStatement(query.replaceAll(LATERAL_VIEW, ""), new ParsingOptions());
 
                 statementList.add(statement);
                 List<TableDescriptor> tables = p.getTableList(statement, i, isTemp);

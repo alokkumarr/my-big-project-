@@ -51,6 +51,8 @@ public class NGSQLScriptDescriptor {
     private Map<String, Map<String, Object>> inputDataObjects;
     private Map<String, Map<String, Object>> outputDataObjects;
 
+    private static final String LATERAL_VIEW = "lateral view.*$";
+
     public SQLDescriptor getSQLDescriptor(int inx){
         return statementDescriptors.get(inx);
     }
@@ -302,7 +304,7 @@ public class NGSQLScriptDescriptor {
                 }
 
                 // create statement for parsing
-                Statement statement = parser.createStatement(query.replaceAll("lateral view.*$", ""), new ParsingOptions());
+                Statement statement = parser.createStatement(query.replaceAll(LATERAL_VIEW, ""), new ParsingOptions());
 
                 statementList.add(statement);
                 List<TableDescriptor> tables = p.getTableList(statement, i, isTemp);
