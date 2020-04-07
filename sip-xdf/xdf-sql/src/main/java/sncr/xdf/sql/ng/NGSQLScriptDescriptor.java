@@ -276,7 +276,6 @@ public class NGSQLScriptDescriptor {
             // We have array of statements - check the table names
             // Since same table names will be mentioned multiple times in multiple
             // statements we have to support "grand" list and maintain precedence of the flags
-
             SqlParser parser = new SqlParser();
             PrestoSQLParser p = new PrestoSQLParser();
             int i = 0;
@@ -285,28 +284,25 @@ public class NGSQLScriptDescriptor {
 
                 // check for temporary tables
                 boolean isTemp = false;
-                String query = null;
-                Statement statement;
+                String query;
                 if (haveTempTable(stmt, "temp")){
                     isTemp = true;
-                    query = stmt.statement().replaceFirst("temp", "");
+                    query = getParsableQuery(stmt, "temp");
                 } else if (haveTempTable(stmt, "TEMP")){
                     isTemp = true;
-                    query = stmt.statement().replaceFirst("TEMP", "");
-                } else if (stmt.statement().contains("TEMPORARY")){
+                    query = getParsableQuery(stmt, "TEMP");
+                } else if (haveTempTable(stmt, "TEMPORARY")){
                     isTemp = true;
-                    query = stmt.statement().replaceFirst("TEMPORARY", "");
-                } else if (stmt.statement().contains("temporary")){
+                    query = getParsableQuery(stmt, "TEMPORARY");
+                } else if (haveTempTable(stmt, "temporary")){
                     isTemp = true;
-                    query = stmt.statement().replaceFirst("temporary", "");
+                    query = getParsableQuery(stmt, "temporary");
+                } else {
+                    query = stmt.statement();
                 }
 
-                // create stament for parsing
-                if (isTemp && query != null){
-                    statement = parser.createStatement(query, new ParsingOptions());
-                } else {
-                    statement = parser.createStatement(stmt.statement().replaceAll("lateral view.*$", ""), new ParsingOptions());
-                }
+                // create statement for parsing
+                Statement statement = parser.createStatement(query.replaceAll("lateral view.*$", ""), new ParsingOptions());
 
                 statementList.add(statement);
                 List<TableDescriptor> tables = p.getTableList(statement, i, isTemp);
@@ -390,6 +386,17 @@ public class NGSQLScriptDescriptor {
             throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
         }
         return;
+    }
+
+    /**
+     * Build the sanitized query for presto parse
+     *
+     * @param stmt
+     * @param temp
+     * @return sanitized query
+     */
+    private String getParsableQuery(StatementSplitter.Statement stmt, String temp) {
+       return stmt.statement().replaceFirst(temp, "");
     }
 
     /**

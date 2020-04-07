@@ -72,10 +72,10 @@ public class JobExecutor {
             scriptDescriptor.preProcessSQLScript(script);
             Sql configSql = this.ctx.componentConfiguration.getSql();
             boolean isDisablePrestoParser =  configSql != null ? configSql.isDisablePrestoParser() : false;
-            if (!isDisablePrestoParser) {
-                scriptDescriptor.prestoParseSQLScript();
-            } else {
+            if (isDisablePrestoParser) {
                 scriptDescriptor.parseSQLScript();
+            } else {
+                scriptDescriptor.prestoParseSQLScript();
             }
             scriptDescriptor.resolveTableNames();
             scriptDescriptor.resultIntegrityCheck();

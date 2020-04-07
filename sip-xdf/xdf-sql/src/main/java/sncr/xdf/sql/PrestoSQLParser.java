@@ -33,7 +33,7 @@ import java.util.Optional;
 public class PrestoSQLParser extends AstVisitor<Object, Integer> {
 
   private static final String NOT_SUPPORTED_YET = "XDF Spark SQL does not support this statement";
-  private Object dummyObject = new Object();
+  private static final Integer NODE_CONTEXT_INDEX = 0;
   private List<TableDescriptor> tables;
   private int statementIndex = 0;
   private boolean isTemp = false;
@@ -63,7 +63,7 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     init();
     this.isTemp = isTemp;
     this.statementIndex = inx;
-    statement.accept(this, 0);
+    statement.accept(this, NODE_CONTEXT_INDEX);
     return tables;
   }
 
@@ -79,12 +79,12 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     Query query = create.getQuery();
     Optional<With> queryWith = query.getWith();
     if (queryWith.isPresent()) {
-      queryWith.get().accept(this, 0);
+      queryWith.get().accept(this, NODE_CONTEXT_INDEX);
     }
 
     QueryBody queryBody = create.getQuery().getQueryBody();
-    queryBody.accept(this, 0);
-    return dummyObject;
+    queryBody.accept(this, NODE_CONTEXT_INDEX);
+    return queryBody;
   }
 
   @Override
@@ -93,10 +93,10 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     if (withQueryList != null && !withQueryList.isEmpty()) {
       for (WithQuery withQuery : withQueryList) {
         otherItemNames.add(withQuery.getName().toString());
-        withQuery.getQuery().getQueryBody().accept(this, 0);
+        withQuery.getQuery().getQueryBody().accept(this, NODE_CONTEXT_INDEX);
       }
     }
-    return dummyObject;
+    return withQueryList;
   }
 
   @Override
@@ -105,7 +105,7 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
       QuerySpecification plainQuery = (QuerySpecification) queryBody;
       Select select = plainQuery.getSelect();
       if (select != null) {
-        select.accept(this, 0);
+        select.accept(this, NODE_CONTEXT_INDEX);
       }
 
       Optional<Relation> from = plainQuery.getFrom();
@@ -115,7 +115,7 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     }
 
     stType = (stType == StatementType.UNKNOWN) ? StatementType.SELECT : stType;
-    return dummyObject;
+    return queryBody;
   }
 
 
@@ -124,10 +124,10 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     List<Relation> relationList = except.getRelations();
     if (relationList != null && !relationList.isEmpty()) {
       for (Relation relation : relationList) {
-        relation.accept(this, 0);
+        relation.accept(this, NODE_CONTEXT_INDEX);
       }
     }
-    return dummyObject;
+    return except;
   }
 
   @Override
@@ -135,10 +135,10 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     List<Relation> relationList = union.getRelations();
     if (relationList != null && !relationList.isEmpty()) {
       for (Relation relation : relationList) {
-        relation.accept(this, 0);
+        relation.accept(this, NODE_CONTEXT_INDEX);
       }
     }
-    return dummyObject;
+    return union;
   }
 
   @Override
@@ -146,38 +146,38 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     List<Relation> relationList = intersect.getRelations();
     if (relationList != null && !relationList.isEmpty()) {
       for (Relation relation : relationList) {
-        relation.accept(this, 0);
+        relation.accept(this, NODE_CONTEXT_INDEX);
       }
     }
-    return dummyObject;
+    return intersect;
   }
 
   @Override
   protected Object visitJoin(Join join, Integer context) {
     if (join.getRight() != null) {
-      join.getRight().accept(this, 0);
+      join.getRight().accept(this, NODE_CONTEXT_INDEX);
     }
     if (join.getLeft() != null) {
-      join.getLeft().accept(this, 0);
+      join.getLeft().accept(this, NODE_CONTEXT_INDEX);
     }
-    return dummyObject;
+    return join;
   }
 
   @Override
   protected Object visitRelation(Relation relation, Integer context) {
-    relation.accept(this, 0);
-    return dummyObject;
+    relation.accept(this, NODE_CONTEXT_INDEX);
+    return relation;
   }
 
   @Override
   protected Object visitAliasedRelation(AliasedRelation aliasedRelation, Integer context) {
-    aliasedRelation.getRelation().accept(this, 0);
-    return dummyObject;
+    aliasedRelation.getRelation().accept(this, NODE_CONTEXT_INDEX);
+    return aliasedRelation;
   }
 
   @Override
   protected Object visitSelect(Select select, Integer context) {
-    return dummyObject;
+    return select;
   }
 
   @Override
@@ -187,7 +187,7 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
         && !tables.contains(tableWholeName)) {
       tables.add(new TableDescriptor(tableWholeName, false, statementIndex, false));
     }
-    return dummyObject;
+    return tableName;
   }
 
   @Override
@@ -195,7 +195,7 @@ public class PrestoSQLParser extends AstVisitor<Object, Integer> {
     stType = StatementType.DROP_TABLE;
     String tn = drop.getTableName().toString();
     tables.add(new TableDescriptor(tn, statementIndex, true));
-    return dummyObject;
+    return drop;
   }
 
   @Override

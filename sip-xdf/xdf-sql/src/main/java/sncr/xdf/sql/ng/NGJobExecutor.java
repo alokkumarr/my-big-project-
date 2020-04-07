@@ -82,10 +82,10 @@ public class NGJobExecutor {
             scriptDescriptor.preProcessSQLScript(script);
             Sql sqlConfig = this.parent.getNgctx().componentConfiguration.getSql();
             boolean disablePrestoParser = sqlConfig != null ? sqlConfig.isDisablePrestoParser() : false;
-            if (!disablePrestoParser) {
-               scriptDescriptor.prestoParseSQLScript();
+            if (disablePrestoParser) {
+               scriptDescriptor.parseSQLScript();
             } else {
-                scriptDescriptor.parseSQLScript();
+                scriptDescriptor.prestoParseSQLScript();
             }
 
             if (parent.getNgctx().inputDataSets.size() > 0) {
