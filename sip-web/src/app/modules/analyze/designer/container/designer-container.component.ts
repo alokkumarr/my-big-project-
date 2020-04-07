@@ -822,9 +822,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysisForPreview = isDSLAnalysis(this.analysis)
           ? this._store.selectSnapshot(state => state.designerState.analysis)
           : this.analysis;
-        this._analyzeDialogService.openPreviewDialog(
-          <Analysis | AnalysisDSL>analysisForPreview
-        );
+        this._analyzeDialogService.openPreviewDialog(<
+          | Analysis
+          | AnalysisDSL>analysisForPreview);
         break;
       case 'description':
         this._analyzeDialogService
@@ -897,9 +897,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         })
       );
     } else if (['new', 'fork'].includes(this.designerMode)) {
-      (<Analysis>(
-        this.analysis
-      )).categoryId = this._jwtService.userAnalysisCategoryId;
+      (<Analysis>this
+        .analysis).categoryId = this._jwtService.userAnalysisCategoryId;
     }
 
     const analysisForSave = isDSLAnalysis(this.analysis)
@@ -1087,21 +1086,28 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'submitQuery':
         this.changeToQueryModePermanently();
-        this._store.dispatch(new DesignerUpdateQueryFilters(this.queryRunTimeFilters));
-        const analysis = this._store.selectSnapshot(state => state.designerState.analysis);
-        this.filterService.getRuntimeFilterValuesIfAvailable(analysis, 'preview', true).then(
-          model => {
+        this._store.dispatch(
+          new DesignerUpdateQueryFilters(this.queryRunTimeFilters)
+        );
+        const analysis = this._store.selectSnapshot(
+          state => state.designerState.analysis
+        );
+        this.filterService
+          .getRuntimeFilterValuesIfAvailable(analysis, 'preview', true)
+          .then(model => {
             if (isUndefined(model)) {
               this.areMinRequirmentsMet = false;
             } else {
-              this._store.dispatch(new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters')));
+              this._store.dispatch(
+                new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters'))
+              );
               this.queryRunTimeFilters = get(model, 'sipQuery.filters');
-              this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+              this.designerState =
+                DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
               this.areMinRequirmentsMet = this.canRequestData();
               this.requestDataIfPossible();
             }
-          }
-        )
+          });
         break;
       case 'filter':
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -1442,9 +1448,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const answer = isRequestValid(sipQuery, this.analysis.type);
 
         if (!answer.willRequestBeValid) {
-          const {
-            warning: { title, msg }
-          } = answer as InvalidAnswer;
+          const { warning: { title, msg } } = answer as InvalidAnswer;
           this._analyzeDialogService.openWarningDialog(title, msg);
         }
         return every(requestCondition, Boolean) && answer.willRequestBeValid;

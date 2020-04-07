@@ -81,12 +81,13 @@ export type DesignerToolbarAciton =
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;
+  designerMode?: 'new' | 'fork' | 'edit';
   artifacts?: Artifact[] | ArtifactDSL[];
   sorts?: Sort[];
   filters?: Filter[];
   booleanCriteria?: string;
   description?: string;
-  analysis?: Analysis;
+  analysis?: AnalysisDSL;
 }
 
 export interface IToolbarActionResult {
@@ -94,8 +95,9 @@ export interface IToolbarActionResult {
   description?: string;
   filters?: Filter[];
   booleanCriteria?: string;
-  analysis?: Analysis;
+  analysis?: AnalysisDSL;
   action?: string;
+  publishOnSave?: string;
 }
 
 export interface IAnalysisMethod {
