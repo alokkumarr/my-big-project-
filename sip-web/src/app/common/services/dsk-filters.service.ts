@@ -114,6 +114,7 @@ export class DskFiltersService {
 
       case 'ANALYZE':
         const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
+
         let areValid = true;
 
         forEach(
@@ -206,6 +207,9 @@ export class DskFiltersService {
   }
 
   generatePreview(filterGroup: DSKFilterGroup, mode: string): string {
+    if (isUndefined(filterGroup)) {
+      return '';
+    }
     const pStart = '<strong class="parens">(</strong>';
     const pEnd = '<strong class="parens">)</strong>';
     return filterGroup.booleanQuery

@@ -1,4 +1,4 @@
-<header class="base-dialog__header">
+<header class="base-dialog__header" [attr.e2e]="'filter-dialog-header-text'">
   <span [ngSwitch]="data.mode">
     <strong *ngSwitchCase="'ANALYZE'">
       Filter
@@ -13,8 +13,25 @@
     <div class="errors" *ngIf="errorState">
       <span [innerHtml]="errorMessage"></span>
     </div>
+    <h3> Filters </h3>
+    <dsk-filter-group
+      *ngIf="(!data.isInRuntimeMode && data.mode === 'ANALYZE') || data.mode === 'DSK'"
+      [data]="data"
+      [filterGroup]="dskFilterObject"
+      [showGlobalOption]="showGlobalOption"
+      (onChange)="updateFilter($event)"
+    ></dsk-filter-group>
 
-    <mat-accordion style="margin-bottom: 10px;">
+    <filter-prompt-layout
+      *ngIf="data.isInRuntimeMode"
+      [data]="data"
+      [filterGroup]="dskFilterObject"
+      [showGlobalOption]="showGlobalOption"
+      (onChange)="updateFilter($event)"
+    >
+    </filter-prompt-layout>
+
+    <mat-accordion style="margin-top: 10px;">
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
@@ -31,12 +48,6 @@
         </code>
       </mat-expansion-panel>
     </mat-accordion>
-    <dsk-filter-group
-      [data]="data"
-      [filterGroup]="dskFilterObject"
-      [showGlobalOption]="showGlobalOption"
-      (onChange)="updateFilter($event)"
-    ></dsk-filter-group>
   </div>
 
   <div class="analyze-aggregate-filters" *ngIf="data.mode === 'ANALYZE' && data.supportsAggregationFilters">
@@ -78,5 +89,5 @@
   >
     {{ data.mode === 'ANALYZE' ? 'Apply Filters' : 'Save'}}
   </button>
-  <button mat-button mat-dialog-close i18n>Cancel</button>
+  <button [attr.e2e]="'designer-dialog-cancel'" mat-button mat-dialog-close i18n>Cancel</button>
 </div>

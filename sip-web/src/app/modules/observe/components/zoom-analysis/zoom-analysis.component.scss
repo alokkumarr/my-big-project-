@@ -1,3 +1,5 @@
+@import 'src/themes/base/colors';
+
 :host {
   .dialog-container {
     height: calc(100vh - 110px) !important;
@@ -10,4 +12,14 @@
 
 .observe-map-analysis {
   min-height: 75%;
+}
+
+::ng-deep code {
+  .bool-op {
+    color: $primary-blue-b2;
+  }
+
+  .operator {
+    color: $secondary-orange;
+  }
 }

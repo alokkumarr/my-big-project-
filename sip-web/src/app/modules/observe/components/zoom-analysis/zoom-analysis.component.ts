@@ -20,6 +20,7 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { isDSLAnalysis } from 'src/app/common/types';
+import { DskFiltersService } from '../../../../common/services/dsk-filters.service';
 
 let initialChartHeight = 0;
 @Component({
@@ -30,6 +31,7 @@ let initialChartHeight = 0;
 export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscriptions: Subscription[] = [];
   public analysisData: Array<any>;
+  public previewString;
   public nameMap;
   @Select(state => state.common.metrics) metrics$: Observable<{
     [metricId: string]: any;
@@ -39,6 +41,10 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
       const queryBuilder = isDSLAnalysis(this.data.analysis)
         ? this.data.analysis.sipQuery
         : this.data.analysis.sqlBuilder;
+        this.previewString = this.datasecurityService.generatePreview(
+          this.changeIndexToNames(queryBuilder.filters, 'booleanQuery', 'filters'), 'ANALYZE'
+        );
+
       return isDSLAnalysis(this.data.analysis)
         ? this.generateDSLDateFilters(queryBuilder.filters)
         : queryBuilder.filters;
@@ -58,6 +64,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,
     private analyzeService: AnalyzeService,
+    private datasecurityService: DskFiltersService,
     @Inject(MAT_DIALOG_DATA) public data
   ) {}
 
@@ -130,5 +137,12 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
   refreshTile(e) {
     return;
+  }
+
+  changeIndexToNames(dskObject, source, target) {
+    const convertToString = JSON.stringify(dskObject);
+    const replaceIndex = convertToString.replace(/"filters":/g, '"booleanQuery":');
+    const convertToJson = JSON.parse(replaceIndex);
+    return convertToJson[0];
   }
 }

@@ -5,11 +5,12 @@ import { BehaviorSubject } from 'rxjs';
 
 import * as get from 'lodash/get';
 
-import { Artifact, DesignerChangeEvent, Sort } from '../../types';
+import { Artifact, DesignerChangeEvent, Sort, DesignerToolbarAciton } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
 import { QueryDSL, ArtifactColumn } from 'src/app/models';
 import { DesignerService } from '../../designer.service';
+
 
 // the delay needed to animate opening and closing the sidemenus
 const SIDEMENU_ANIMATION_TIME = 300;
@@ -35,6 +36,8 @@ export class SingleTableDesignerLayoutComponent {
       this.sipQuery
     );
   }
+  @Output()
+  requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
 
   @Input('sipQuery') set setSipQuery(sipQuery: QueryDSL) {
     this.sipQuery = sipQuery;
@@ -115,7 +118,6 @@ export class SingleTableDesignerLayoutComponent {
   }
 
   onRemoveFilter(filters) {
-    console.log(filters);
     this.change.emit({ subject: 'filter', data: filters });
   }
 

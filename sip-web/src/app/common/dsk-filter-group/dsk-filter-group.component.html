@@ -20,6 +20,7 @@
       popperApplyClass="new-child-popper"
       popperTrigger="click"
       [popperHideOnClickOutside]="true"
+      [attr.e2e]="'add-new-filter'"
       popperPlacement="right"
       *ngIf="(data.mode === 'ANALYZE' && !data.isInRuntimeMode) || data.mode === 'DSK'"
     >
