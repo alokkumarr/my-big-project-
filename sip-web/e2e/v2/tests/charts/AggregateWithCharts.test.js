@@ -70,7 +70,6 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
         const chartDescription = `e2e chart description ${now}`;
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
-        browser.sleep(5000);
         const analyzePage = new AnalyzePage();
         analyzePage.clickOnAddAnalysisButton();
         analyzePage.clickOnChartType(data.chartType);
