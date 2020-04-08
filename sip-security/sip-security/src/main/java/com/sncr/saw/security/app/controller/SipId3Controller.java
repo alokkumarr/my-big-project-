@@ -55,7 +55,6 @@ public class SipId3Controller {
 
   private final Id3Repository id3Repository;
   private final SSORequestHandler ssoRequestHandler;
-  private static final String CACHE_CONTROL = HttpHeaders.CACHE_CONTROL;
   private static final String BEARER = "Bearer";
   private static final String MALFORMED_TOKEN = "Request not valid,"
       + " Id3 Token may be Malformed or already expired";
@@ -89,7 +88,7 @@ public class SipId3Controller {
       HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    response.setHeader(CACHE_CONTROL, PRIVATE);
+    response.setHeader(HttpHeaders.CACHE_CONTROL, PRIVATE);
     String idToken = token.replace(BEARER, "").trim();
     SSOResponse ssoResponse = ssoRequestHandler.processId3SipAuthentication(idToken);
     if (ssoResponse == null)
@@ -117,7 +116,7 @@ public class SipId3Controller {
       HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    response.setHeader(CACHE_CONTROL, PRIVATE);
+    response.setHeader(HttpHeaders.CACHE_CONTROL, PRIVATE);
     String authorizationCode = token.replace(BEARER, "").trim();
     SSOResponse ssoResponse = null;
     AuthorizationCodeDetails authorizationCodeDetails =
@@ -151,7 +150,7 @@ public class SipId3Controller {
       HttpServletResponse response) {
     if (!request.getMethod().equalsIgnoreCase(HttpMethod.OPTIONS.toString())) {
       Map<String, String> map = params.toSingleValueMap();
-      response.setHeader(CACHE_CONTROL, "no-store,must-revalidate, max-age=0");
+      response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store,must-revalidate, max-age=0");
       String authorizationCode;
       String domain = map.get("domainName");
       String clientId = map.get("clientId");
@@ -192,7 +191,7 @@ public class SipId3Controller {
       HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    response.setHeader(CACHE_CONTROL, PRIVATE);
+    response.setHeader(HttpHeaders.CACHE_CONTROL, PRIVATE);
     String idToken = token.replace(BEARER, "").trim();
     SSOResponse ssoResponse = ssoRequestHandler.processId3SipAuthentication(idToken);
     if (ssoResponse == null) {
