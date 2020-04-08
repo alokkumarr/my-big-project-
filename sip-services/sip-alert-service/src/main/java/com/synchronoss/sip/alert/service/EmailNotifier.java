@@ -148,14 +148,7 @@ public class EmailNotifier implements Notifier {
     moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
     subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
 
-    // TODO : Remove this iteration of each subscriber to read value and
-    //  call single instance instead.
     Set<String> recipients = new HashSet<>();
-//    alertRulesDetails.getSubscribers().forEach(s -> {
-//      NotificationSubscriber subscriber = subscriberService.getSubscriber(s);
-//      recipients.add(subscriber.getChannelValue());
-//    });
-
     List<NotificationSubscriber> subscriberList = subscriberService
         .getSubscribersById(alertRulesDetails.getSubscribers());
     subscriberList.forEach(subs -> {
