@@ -110,7 +110,14 @@ describe('Executing fork form Menu and Delete for pivots from pivots/UpdateAndDe
         chartDesignerPage.clickOnSave();
         chartDesignerPage.enterAnalysisName(forkedName);
         chartDesignerPage.enterAnalysisDescription(forkedDescription);
+        chartDesignerPage.clickAndSelectCategory(subCategoryName);
         chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+
+        //
+        commonFunctions.goToHome();
+        header.openCategoryMenu();
+        header.selectCategory(categoryName);
+        header.selectSubCategory(subCategoryName);
         analyzePage.clickOnAnalysisLink(forkedName);
 
         const executePage = new ExecutePage();

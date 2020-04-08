@@ -69,7 +69,7 @@ const CRITICAL = [
   'admin/create-user.test.js',
   'analyze/segregateAnalysis.test.js',
   'export/analysisExportAndDownload.test.js',
-  'pivots/forkAndDeleteFromMenu.js.js'
+  'pivots/forkAndDeleteFromMenu.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];
