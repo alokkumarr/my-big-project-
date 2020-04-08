@@ -1,6 +1,5 @@
 package com.sncr.saw.security.app.controller;
 
-import com.sncr.saw.security.app.controller.SecurityController.LoginResponse;
 import com.sncr.saw.security.app.id3.model.AuthorizationCodeDetails;
 import com.sncr.saw.security.app.id3.model.Id3AuthenticationRequest;
 import com.sncr.saw.security.app.id3.model.Id3Claims;
@@ -22,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -55,11 +55,12 @@ public class SipId3Controller {
 
   private final Id3Repository id3Repository;
   private final SSORequestHandler ssoRequestHandler;
-  private static final String CACHE_CONTROL = "Cache-Control";
+  private static final String CACHE_CONTROL = HttpHeaders.CACHE_CONTROL;
   private static final String BEARER = "Bearer";
   private static final String MALFORMED_TOKEN = "Request not valid,"
       + " Id3 Token may be Malformed or already expired";
   private static final String PRIVATE = "private";
+  private static final String TOKEN_EXPIRED = "Token has expired";
 
   @Autowired
   private TicketHelper tHelper;
@@ -201,12 +202,13 @@ public class SipId3Controller {
     }
     Ticket ticket = TokenParser.retrieveTicket(ssoResponse.getaToken());
     boolean valid = false;
-    valid = ticket != null && ticket.getValidUpto() != null && ticket.getValidUpto() > new Date()
-        .getTime();
+    valid =
+        (ticket != null) && (ticket.getValidUpto() != null) && (ticket.getValidUpto() > new Date()
+            .getTime());
     if (!valid) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ssoResponse.setValidity(Boolean.FALSE);
-      ssoResponse.setMessage("Token has expired");
+      ssoResponse.setMessage(TOKEN_EXPIRED);
     }
     try {
       ssoResponse.setMessage(tHelper.logout(ticket.getTicketId()));
