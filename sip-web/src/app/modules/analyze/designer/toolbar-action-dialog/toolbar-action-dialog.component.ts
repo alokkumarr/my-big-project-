@@ -4,7 +4,6 @@ import * as cloneDeep from 'lodash/cloneDeep';
 
 import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
-import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
 import { validateEntityName } from './../../../../common/validators/field-name-rule.validator';
 
@@ -69,6 +68,10 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     this.data.analysis.name = name;
   }
 
+  onCategoryChange(categoryId) {
+    this.data.analysis.category = categoryId;
+  }
+
   onOk() {
     const result: IToolbarActionResult = {};
     /* prettier-ignore */
@@ -93,7 +96,7 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
         this.data.analysis.id = response.id;
 
         if (response.type === 'report') {
-          (this.data.analysis as AnalysisReport).query = response.query;
+          this.data.analysis.query = response.query;
         }
         const result: IToolbarActionResult = {
           analysis: this.data.analysis,
