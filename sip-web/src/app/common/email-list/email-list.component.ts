@@ -4,7 +4,8 @@ import {
   Output,
   EventEmitter,
   forwardRef,
-  ViewChild
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import {
@@ -38,6 +39,9 @@ export class EmailListComponent implements ControlValueAccessor {
   @Input() autoCompleteSuggestions = [];
   @Input() allowCustomInput = true;
 
+  @ViewChild('emailInput', { static: false }) emailInput: ElementRef<
+    HTMLInputElement
+  >;
   @ViewChild(MatAutocompleteTrigger, { static: false })
   autoCompleteTrigger: MatAutocompleteTrigger;
 
@@ -57,10 +61,17 @@ export class EmailListComponent implements ControlValueAccessor {
 
   registerOnTouched() {}
 
+  resetInput() {
+    if (this.emailInput) {
+      this.emailInput.nativeElement.value = '';
+    }
+    this.emailField.setValue('');
+  }
+
   addEmail(email) {
     const trimmed = (email || '').trim();
     // Reset the input value
-    this.emailField.reset();
+    this.resetInput();
     const newEmails = [...this.emails, trimmed];
     invoke(this, 'propagateChange', newEmails);
     this.emailsChange.emit(newEmails);
@@ -77,6 +88,12 @@ export class EmailListComponent implements ControlValueAccessor {
   openAutocomplete() {
     if (this.autoCompleteSuggestions && this.autoCompleteSuggestions.length) {
       this.autoCompleteTrigger.openPanel();
+    }
+  }
+
+  onTextEntered() {
+    if (!this.allowCustomInput) {
+      this.resetInput();
     }
   }
 

@@ -14,8 +14,10 @@
     </mat-chip>
     <input
       (click)="openAutocomplete()"
+      (change)="onTextEntered()"
       class="email__chip"
       placeholder="Emails separate by ';'"
+      #emailInput
       type="text"
       [formControl]="emailField"
       [matChipInputFor]="chipList"
