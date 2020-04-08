@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import sncr.bda.base.MaprConnection;
 
@@ -63,8 +64,7 @@ public class AlertNotifier {
     try {
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
-        Notification notification = alertRule.getNotification();
-        if (notification != null && notification.getEmail() != null) {
+        if (!CollectionUtils.isEmpty(alertRule.getSubscribers())) {
           emailNotifier.setAlertRule(alertRule);
           emailNotifier.setAlertTriggerSysId(alertTriggerSysId);
           notifier = emailNotifier;

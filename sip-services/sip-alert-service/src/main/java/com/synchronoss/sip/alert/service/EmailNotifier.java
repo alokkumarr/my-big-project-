@@ -151,15 +151,23 @@ public class EmailNotifier implements Notifier {
     // TODO : Remove this iteration of each subscriber to read value and
     //  call single instance instead.
     Set<String> recipients = new HashSet<>();
-    alertRulesDetails.getSubscribers().forEach(s -> {
-      NotificationSubscriber subscriber = subscriberService.getSubscriber(s);
-      recipients.add(subscriber.getChannelValue());
+//    alertRulesDetails.getSubscribers().forEach(s -> {
+//      NotificationSubscriber subscriber = subscriberService.getSubscriber(s);
+//      recipients.add(subscriber.getChannelValue());
+//    });
+
+    List<NotificationSubscriber> subscriberList = subscriberService
+        .getSubscribersById(alertRulesDetails.getSubscribers());
+    subscriberList.forEach(subs -> {
+      recipients.add(subs.getChannelValue());
     });
 
     List<String> recipientsList =
         getActiveSubscribers(
             recipients,
             alertRulesDetails.getAlertRulesSysId());
+    logger.trace("Final Recipients : {}, alertSysId {}", recipientsList,
+        alertRulesDetails.getAlertRulesSysId());
     try {
       if (recipientsList != null && recipientsList.size() > 0) {
         // String recipients = String.join(",", recipientsList);
@@ -238,7 +246,7 @@ public class EmailNotifier implements Notifier {
     try {
       mailRequestBody = objectMapper.writeValueAsString(mailRequestPayload);
     } catch (JsonProcessingException e) {
-      logger.error("Error occured while parsing the request body of mail API" + e);
+      logger.error("Error occured while parsing the request body of mail API {}", e);
       return false;
     }
     HttpHeaders requestHeaders = new HttpHeaders();
@@ -249,6 +257,8 @@ public class EmailNotifier implements Notifier {
     ResponseEntity<JsonNode> aliasResponse =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
     JsonNode response = (JsonNode) aliasResponse.getBody();
+    logger.info("Alert id : {}, email sent : {}", alertRulesDetails.getAlertRulesSysId(),
+        response.has("emailSent") ? response.get("emailSent").asBoolean() : false);
     return response.has("emailSent") ? response.get("emailSent").asBoolean() : false;
   }
 
@@ -264,7 +274,8 @@ public class EmailNotifier implements Notifier {
   public String prepareMailBody(
       AlertRuleDetails alertRulesDetails, String body, String alertLink, String subscriberToken) {
     logger.debug("prepare mail body starts here :" + body);
-    if (alertRulesDetails.getNotification().getEmail().getTemplate() != null) {
+    if (alertRulesDetails.getNotification() != null
+        && alertRulesDetails.getNotification().getEmail().getTemplate() != null) {
       // override the Body template if its configured for specific alerts.
       body = alertRulesDetails.getNotification().getEmail().getTemplate();
     }
