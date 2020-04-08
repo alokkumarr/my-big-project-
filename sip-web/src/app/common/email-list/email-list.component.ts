@@ -18,6 +18,8 @@ import * as reject from 'lodash/reject';
 import * as invoke from 'lodash/invoke';
 import { EMAIL_REGEX } from '../consts';
 import { MatAutocompleteTrigger } from '@angular/material';
+import { Observable, merge, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 const SEMICOLON = 186;
 
@@ -39,6 +41,8 @@ export class EmailListComponent implements ControlValueAccessor {
   @Input() autoCompleteSuggestions = [];
   @Input() allowCustomInput = true;
 
+  filteredSuggestions: Observable<string[]>;
+
   @ViewChild('emailInput', { static: false }) emailInput: ElementRef<
     HTMLInputElement
   >;
@@ -49,7 +53,29 @@ export class EmailListComponent implements ControlValueAccessor {
   public emailField = new FormControl('', Validators.pattern(EMAIL_REGEX));
   separatorKeys = [ENTER, COMMA, SEMICOLON];
 
-  constructor() {}
+  constructor() {
+    this.filteredSuggestions = merge(
+      of(this.filter(null)),
+      this.emailField.valueChanges.pipe(
+        map((email: string) => this.filter(email))
+      )
+    );
+  }
+
+  private filter(email: string) {
+    if (!email) {
+      return this.autoCompleteSuggestions.filter(
+        suggestion => !this.emails.includes(suggestion)
+      );
+    }
+    const filterValue = email.toLowerCase();
+
+    return this.autoCompleteSuggestions.filter(
+      suggestion =>
+        suggestion.toLowerCase().indexOf(filterValue) === 0 &&
+        !this.emails.includes(suggestion)
+    );
+  }
 
   writeValue(emails: string[]) {
     this.emails = emails;

@@ -32,11 +32,23 @@
     #auto="matAutocomplete"
     (optionSelected)="addEmail($event.option.value)"
   >
-    <mat-option *ngFor="let email of autoCompleteSuggestions" [value]="email">
+    <mat-option
+      *ngFor="let email of filteredSuggestions | async"
+      [value]="email"
+    >
       {{ email }}
     </mat-option>
   </mat-autocomplete>
 </mat-form-field>
 <mat-error *ngIf="emailField?.errors?.pattern">
   <strong>Invalid</strong> email!
+</mat-error>
+<mat-error
+  *ngIf="
+    autoCompleteSuggestions &&
+    autoCompleteSuggestions.length === 0 &&
+    !allowCustomInput
+  "
+>
+  No subscribers present. <strong>Add subscribers</strong> from below.
 </mat-error>
