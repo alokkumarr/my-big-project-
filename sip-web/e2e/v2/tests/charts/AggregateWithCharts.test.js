@@ -70,7 +70,7 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
         const chartDescription = `e2e chart description ${now}`;
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
-
+        browser.sleep(5000);
         const analyzePage = new AnalyzePage();
         analyzePage.clickOnAddAnalysisButton();
         analyzePage.clickOnChartType(data.chartType);
@@ -94,8 +94,12 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
         }
         chartDesignerPage.clickOnDataOptionsTab();
         chartDesignerPage.clickOnDataOptions(dataOption);
-        chartDesignerPage.clickOnSelectAndChooseAggregate(selectedAggregate); // Open the aggregate-chooser component.
-        chartDesignerPage.clickOnSelectAndChooseAggregate(data.aggregate.value); // Select the aggregate form the list.
+        if(data.chartType === 'chart:scatter') {
+        chartDesignerPage.clickAndChooseAggregateForScatterChart(data.aggregate.value);
+        }else {
+          chartDesignerPage.clickOnSelectAndChooseAggregate(selectedAggregate); // Open the aggregate-chooser component.
+          chartDesignerPage.clickOnSelectAndChooseAggregate(data.aggregate.value); // Select the aggregate form the list.
+        }
 
         // Save the analysis
         chartDesignerPage.clickOnSave();
