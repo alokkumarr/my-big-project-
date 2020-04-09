@@ -94,9 +94,10 @@
         fxLayout="row"
         [(ngModel)]="limitByAxis"
         (change)="onLimitByAxisChange()"
+        style="margin: 15px;"
       >
         <mat-radio-button value="dimension">Dimension</mat-radio-button>
-        <mat-radio-button value="groupBy">Group By</mat-radio-button>
+        <mat-radio-button style="padding-left: 15px;" value="groupBy">Group By</mat-radio-button>
       </mat-radio-group>
     </div>
 

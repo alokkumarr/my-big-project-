@@ -78,7 +78,6 @@ import {
   COMPARISON_CHART_DATE_INTERVALS,
   COMPARISON_CHART_DATE_INTERVALS_OBJ
 } from 'src/app/common/consts';
-import { chartOptions } from 'src/app/common/components/charts/default-chart-options';
 
 // setAutoFreeze(false);
 

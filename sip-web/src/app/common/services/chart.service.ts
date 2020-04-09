@@ -338,7 +338,6 @@ export class ChartService {
   }
 
   splitToSeriesAndCategories(parsedData, fields, { sorts }, chartType) {
-    console.log(chartType);
     const categories = {};
     const isHighStock = chartType.substring(0, 2) === 'ts';
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
