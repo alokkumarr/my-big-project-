@@ -30,6 +30,8 @@ import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.es.kpi.GlobalFilterDataQueryBuilder;
 import com.synchronoss.saw.es.kpi.KPIDataQueryBuilder;
 import com.synchronoss.saw.model.Aggregate;
+import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.ChartOptions.LimitByAxis;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Store;
@@ -94,7 +96,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private static final String METASTORE = "services/metadata";
   public static final String CUSTOMER_CODE = "customerCode";
   public static final String REPORT = "REPORT";
-
+  private static final String CHART = "CHART";
 
   @Value("${schema.file}")
   private String schemaFile;
@@ -632,6 +634,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               sipQueryFromSemantic);
     } else {
       response = new ExecuteAnalysisResponse();
+      if (CHART.equalsIgnoreCase(analysis.getType())) {
+        sipQuery = reOrderFieldsByLimitByAxis(sipQuery,analysis.getChartOptions().getLimitByAxis());
+      }
       List<Object> objList = executeESQueries(sipQuery, size, dskAttribute);
       response.setExecutionId(executionId);
       response.setData(objList);
@@ -659,6 +664,33 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           "Response returned back to scheduler {}", objectMapper.writeValueAsString(response));
     }
     return response;
+  }
+
+  /**
+   * This Method is used to reoder the fields of sipquery for chart top/bottom functionality based
+   * on the limitByAxis value .
+   *
+   * @param sipQuery SipQuery.
+   * @return Analysis
+   */
+  private SipQuery reOrderFieldsByLimitByAxis(SipQuery sipQuery, LimitByAxis limitByAxis) {
+    if (limitByAxis != null) {
+      List<Artifact> artifacts = sipQuery.getArtifacts();
+      if (!CollectionUtils.isEmpty(artifacts)) {
+        // getting only first field because  charts contain only  one artifact
+        List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+        fields.stream()
+            .forEach(
+                field -> {
+                  if (field
+                      .getArea()
+                      .equalsIgnoreCase(LimitByAxis.axisEnumMap.get(limitByAxis))) {
+                    Collections.swap(fields, fields.indexOf(field), 0);
+                  }
+                });
+      }
+    }
+    return sipQuery;
   }
 
   private SipDskAttribute updateDskAttribute(
