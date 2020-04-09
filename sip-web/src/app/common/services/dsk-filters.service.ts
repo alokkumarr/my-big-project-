@@ -244,7 +244,7 @@ export class DskFiltersService {
 
               return `${field.columnName.split('.keyword')[0]} <span class="operator">${
                 field.model.operator || ''
-              }</span> [${[values]}]`;
+              }</span> <span [attr.e2e]="'ffilter-model-value'">[${[values]}]</span>`;
 
             case 'date':
             const datevalues =  get(field, 'model.preset');
@@ -254,7 +254,7 @@ export class DskFiltersService {
 
               if (get(field, 'model.preset') == 'NA') {
                 return `${field.columnName} <span class="operator"> BTW
-                </span> [ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]`;
+                </span> <span [attr.e2e]="'ffilter-model-value'">[ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]</span>`;
               } else {
                 return `${field.columnName} = <span class="operator">${
                   get(field, 'model.preset') || ''
@@ -264,11 +264,11 @@ export class DskFiltersService {
               if (field.model.operator === 'BTW') {
                 return `${field.columnName} <span class="operator">${
                   field.model.operator
-                }</span> [${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]`;
+                }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
               } else {
                 return `${field.columnName} <span class="operator">${
                   field.model.operator || ''
-                }</span> [${[get(field, 'model.value')]}]`;
+                }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
               }
           }
         }
