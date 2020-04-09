@@ -60,6 +60,7 @@ import {
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
   DesignerCheckAggregateFilterSupport,
+  DesignerUpdateAnalysisChartLimitByOptions,
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
@@ -77,6 +78,7 @@ import {
   COMPARISON_CHART_DATE_INTERVALS,
   COMPARISON_CHART_DATE_INTERVALS_OBJ
 } from 'src/app/common/consts';
+import { chartOptions } from 'src/app/common/components/charts/default-chart-options';
 
 // setAutoFreeze(false);
 
@@ -91,6 +93,7 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   chartTitle: null,
   chartType: null,
   isInverted: false,
+  limitByAxis: '',
   legend: {
     align: '',
     layout: ''
@@ -1053,6 +1056,22 @@ export class DesignerState {
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartLimitByOptions)
+  updateLimitByAxisOptions(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { limitByAxis } : DesignerUpdateAnalysisChartLimitByOptions
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, limitByAxis: limitByAxis }
+      }
     });
   }
 

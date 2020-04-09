@@ -104,6 +104,7 @@ import {
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
   DesignerCheckAggregateFilterSupport,
+  DesignerUpdateAnalysisChartLimitByOptions,
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
@@ -908,7 +909,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const analysisForSave = isDSLAnalysis(this.analysis)
       ? this._store.selectSnapshot(state => state.designerState.analysis)
       : this.analysis;
-
+    console.log(analysisForSave);
     return this._analyzeDialogService
       .openSaveDialog(
         <Analysis | AnalysisDSL>analysisForSave,
@@ -1313,6 +1314,18 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.resetAnalysis();
         });
+        break;
+      case 'limitByAxis':
+        console.log(event);
+        this._store.dispatch(
+          new DesignerUpdateAnalysisChartLimitByOptions(
+            event.data.limitByAxis
+          )
+        )
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        console.log(this.auxSettings);
+        console.log(this._store.selectSnapshot(state => state.designerState.analysis));
+        this.requestDataIfPossible();
         break;
     }
   }

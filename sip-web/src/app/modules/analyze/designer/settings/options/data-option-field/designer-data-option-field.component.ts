@@ -7,6 +7,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
+import * as forEach from 'lodash/forEach';
 import { Store } from '@ngxs/store';
 
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
@@ -56,8 +57,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       fpFilter(artifact => artifact.area === 'y')
     )(sipQuery.artifacts);
     this.fieldCount = fields.length;
+    this.isGroupByPresent = fpFilter(({ area }) => {
+      return area === 'g';
+    })(this.sipQuery.artifacts[0].fields).length > 0;
   }
   public typeIcon: string;
+  public isGroupByPresent: boolean;
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
@@ -65,6 +70,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public supportsDateFormat = false;
   public isDataField = false;
   public colorPickerConfig = {};
+  public limitByAxis: string;
 
   constructor(private _store: Store) {
     this.onAliasChange = debounce(this.onAliasChange, ALIAS_CHANGE_DELAY);
@@ -72,7 +78,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-
+    this.limitByAxis = 'dimension';
     this.supportsDateInterval =
       DATE_TYPES.includes(type) &&
       (this.analysisType === 'pivot' || this.analysisSubtype === 'comparison');
@@ -189,5 +195,43 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         data: { artifact: this.artifactColumn }
       });
     }
+  }
+
+  onLimitByAxisChange() {
+    console.log(this.limitByAxis);
+    console.log(this.sipQuery.artifacts[0].fields);
+    let yfields = fpFilter(({ area }) => {
+      return area === 'y';
+    })(this.sipQuery.artifacts[0].fields);
+
+    let xfields = fpFilter(({ area }) => {
+      return area === 'x';
+    })(this.sipQuery.artifacts[0].fields);
+
+    let gfields = fpFilter(({ area }) => {
+      return area === 'g';
+    })(this.sipQuery.artifacts[0].fields);
+    let fields = cloneDeep(yfields);
+    if (this.limitByAxis === 'dimension') {
+      forEach(xfields, x => {
+        fields.push(x);
+      })
+
+      forEach(gfields, g => {
+        fields.push(g);
+      })
+    } else {
+      forEach(gfields, g => {
+        fields.push(g);
+      })
+
+      forEach(xfields, x => {
+        fields.push(x);
+      })
+    }
+
+    console.log(fields);
+    this.sipQuery.artifacts[0].fields = fields;
+    this.change.emit({ subject: 'limitByAxis', data: { limitByAxis: this.limitByAxis } });
   }
 }
