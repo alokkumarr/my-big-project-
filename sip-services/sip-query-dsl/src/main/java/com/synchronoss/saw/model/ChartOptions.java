@@ -1,7 +1,12 @@
 package com.synchronoss.saw.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -28,6 +33,9 @@ public class ChartOptions {
 
   @JsonProperty("yAxis")
   Axis yAxis;
+
+  @JsonProperty("limitByAxis")
+  private LimitByAxis limitByAxis;
 
   @JsonProperty("isInverted")
   public Boolean isInverted() {
@@ -99,6 +107,57 @@ public class ChartOptions {
     this.yAxis = yAxis;
   }
 
+  @JsonProperty("limitByAxis")
+  public LimitByAxis getLimitByAxis() {
+    return limitByAxis;
+  }
+
+  @JsonProperty("limitByAxis")
+  public void setLimitByAxis(LimitByAxis limitByAxis) {
+    this.limitByAxis = limitByAxis;
+  }
+
+  public enum LimitByAxis {
+    DIMENSION("dimension"),
+    GROUPBY("groupBy");
+    private static final Map<String, LimitByAxis> CONSTANTS = new HashMap<>();
+    public static EnumMap<LimitByAxis, String> axisEnumMap = new EnumMap<>(LimitByAxis.class);
+
+    static {
+      for (LimitByAxis c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+        axisEnumMap.put(DIMENSION, "x");
+        axisEnumMap.put(GROUPBY, "g");
+    }
+
+    private final String value;
+
+    private LimitByAxis(String value) {
+      this.value = value;
+    }
+
+    @JsonCreator
+    public static LimitByAxis fromValue(String value) {
+      LimitByAxis constant = CONSTANTS.get(value);
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value;
+    }
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -109,6 +168,7 @@ public class ChartOptions {
       .append("labelOptions", labelOptions)
       .append("xAxis", xAxis)
       .append("yAxis", yAxis)
+      .append("limitByAxis", limitByAxis)
       .toString();
   }
 
@@ -122,6 +182,7 @@ public class ChartOptions {
         .append(labelOptions)
         .append(xAxis)
         .append(yAxis)
+        .append(limitByAxis)
         .toHashCode();
   }
 
@@ -143,6 +204,7 @@ public class ChartOptions {
         .append(labelOptions, rhs.labelOptions)
         .append(xAxis, rhs.xAxis)
         .append(yAxis, rhs.yAxis)
+        .append(limitByAxis,rhs.limitByAxis)
         .isEquals();
   }
 }
