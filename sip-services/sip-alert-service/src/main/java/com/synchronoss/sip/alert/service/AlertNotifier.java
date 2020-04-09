@@ -7,9 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.sip.alert.modal.AlertNotificationLog;
 import com.synchronoss.sip.alert.modal.AlertResult;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
+import com.synchronoss.sip.alert.modal.ModuleName;
+import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.Notification;
 import com.synchronoss.sip.utils.RestUtil;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -36,6 +40,9 @@ public class AlertNotifier {
 
   @Autowired
   EmailNotifier emailNotifier;
+
+  @Autowired
+  SubscriberService subscriberService;
 
   @Value("${sip.service.metastore.base}")
   @NotNull
@@ -64,14 +71,23 @@ public class AlertNotifier {
     try {
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
-        if (!CollectionUtils.isEmpty(alertRule.getSubscribers())) {
+        ModuleSubscriberMappingPayload payload =
+            subscriberService
+                .fetchSubscribersForModule(alertRule.getAlertRulesSysId(), ModuleName.ALERT);
+        List<String> subscriberList = new ArrayList<>();
+        payload.getSubscribers().forEach(subscriberDetails -> {
+          subscriberList.add(subscriberDetails.getSubscriberId());
+        });
+        alertRule.setSubscribers(subscriberList);
+
+        if (!CollectionUtils.isEmpty(subscriberList)) {
           emailNotifier.setAlertRule(alertRule);
           emailNotifier.setAlertTriggerSysId(alertTriggerSysId);
           notifier = emailNotifier;
           notifier.notify("email");
         } else {
           String msg =
-              "Notification mechanism is not configured for alertRule :"
+              "No subscribers configured for alertRule :"
                   + alertRule.getAlertRuleName();
           logger.error(msg);
           notificationLog.setNotifiedStatus(false);

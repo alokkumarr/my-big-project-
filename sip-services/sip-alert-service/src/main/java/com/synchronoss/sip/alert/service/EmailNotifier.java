@@ -133,25 +133,12 @@ public class EmailNotifier implements Notifier {
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
 
-    List<SubscriberDetails> subscriberDetailsList = new ArrayList<>();
-    alertRulesDetails.getSubscribers().forEach(s -> {
-      SubscriberDetails subscriberDetails = new SubscriberDetails();
-      subscriberDetails.setSubscriberId(s);
-      subscriberDetails.setChannelTypes(Collections.singletonList(NotificationChannelType.EMAIL));
-      subscriberDetailsList.add(subscriberDetails);
-    });
-
-    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
-        new ModuleSubscriberMappingPayload();
-    moduleSubscriberMappingPayload.setModuleId(alertRulesDetails.getAlertRulesSysId());
-    moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
-    moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
-    subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
+    // TODO : Read from MariaDB the list of subs associated with this alert.
 
     Set<String> recipients = new HashSet<>();
-    List<NotificationSubscriber> subscriberList = subscriberService
+    List<NotificationSubscriber> notificationSubscriberList = subscriberService
         .getSubscribersById(alertRulesDetails.getSubscribers());
-    subscriberList.forEach(subs -> {
+    notificationSubscriberList.forEach(subs -> {
       recipients.add(subs.getChannelValue());
     });
 
