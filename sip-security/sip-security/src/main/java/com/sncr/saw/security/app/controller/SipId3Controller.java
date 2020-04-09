@@ -193,13 +193,35 @@ public class SipId3Controller {
       throws IOException {
     response.setHeader(HttpHeaders.CACHE_CONTROL, PRIVATE);
     String idToken = token.replace(BEARER, "").trim();
-    SSOResponse ssoResponse = ssoRequestHandler.processId3SipAuthentication(idToken);
-    if (ssoResponse == null) {
+    SSOResponse ssoResponse = new SSOResponse();
+    Id3Claims id3Claims =
+        validateId3IdentityToken.validateToken(idToken, Id3Claims.Type.ID);
+    String sipAuthCode = null;
+    if (id3Claims != null) {
+      AuthorizationCodeDetails authorizationCodeDetails = new AuthorizationCodeDetails();
+      authorizationCodeDetails.setMasterLoginId(id3Claims.getMasterLoginId());
+      authorizationCodeDetails.setId3ClientId(id3Claims.getClientId());
+      authorizationCodeDetails.setId3DomainName(id3Claims.getDomainName());
+      sipAuthCode = id3Repository.obtainAuthorizationCode(authorizationCodeDetails);
+    } else {
       response.sendError(
           HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
+      ssoResponse.setValidity(Boolean.FALSE);
+      ssoResponse.setMessage(MALFORMED_TOKEN);
       return ssoResponse;
     }
-    Ticket ticket = TokenParser.retrieveTicket(ssoResponse.getaToken());
+
+    Ticket ticket = null;
+    try {
+      ticket = TokenParser.retrieveTicket(sipAuthCode);
+    } catch (Exception e) {
+      response.sendError(
+          HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
+      ssoResponse.setValidity(Boolean.FALSE);
+      ssoResponse.setMessage("Unable to fetch SIP token.");
+      return ssoResponse;
+    }
+
     boolean valid = false;
     valid =
         (ticket != null) && (ticket.getValidUpto() != null) && (ticket.getValidUpto() > new Date()
