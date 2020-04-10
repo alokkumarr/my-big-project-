@@ -16,6 +16,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as isUndefined from 'lodash/isUndefined';
+import * as fpFilter from 'lodash/fp/filter';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
@@ -200,7 +201,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       }
       this.columns = this.artifacts2Columns(artifact);
     }
-    this.data = flattenReportData(data, this.analysis);
+    this.data = transformDateFields(
+      flattenReportData(data, this.analysis),
+      this.columns
+    );
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -539,10 +543,12 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         const format = isNumberType
           ? { formatter: getFormatter(preprocessedFormat) }
           : this.getDateFormat(column.format || column.dateFormat);
+
+        const dataType = isNumberType ? 'number' : type;
         const field: ReportGridField = {
           caption: column.alias || column.displayName,
           dataField: this.getDataField(column),
-          dataType: isNumberType ? 'number' : type,
+          dataType,
           type,
           visibleIndex: column.visibleIndex,
           visible: isUndefined(column.visible) ? true : column.visible,
@@ -572,10 +578,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (!format) {
       return format;
     }
-    const momentFormat = DATE_FORMATS_OBJ[format].momentValue;
+    const { momentValue, momentFormatFrombackend } = DATE_FORMATS_OBJ[format];
     return {
-      formatter: value =>
-        moment.utc(value, 'yyyy-MM-dd hh:mm:ss').format(momentFormat)
+      formatter: value => {
+        const formatted = moment
+          .utc(value)
+          .format(momentFormatFrombackend || momentValue);
+        return formatted;
+      }
     };
   }
 
@@ -630,4 +640,23 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     });
   }
+}
+
+function transformDateFields(data, fields: ReportGridField[]) {
+  const columnNames = fpPipe(
+    fpFilter(field => DATE_TYPES.includes(field.type)),
+    fpMap(field => field.dataField)
+  )(fields);
+
+  if (isEmpty(columnNames)) {
+    return data;
+  }
+
+  forEach(data, dataPoint => {
+    forEach(columnNames, columnName => {
+      const date = moment.utc(dataPoint[columnName], 'YYYY-MM-DD hh:mm:ss');
+      dataPoint[columnName] = date;
+    });
+  });
+  return data;
 }
