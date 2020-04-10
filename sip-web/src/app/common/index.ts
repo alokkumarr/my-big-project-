@@ -115,6 +115,7 @@ import {
   CookiesService
 } from './services';
 import { ShowPasswordDirective } from './directives/show-password.directive';
+import { MatSelectSearchComponent } from './components/mat-select-search/mat-select-search.component';
 
 const MODULES = [
   CommonModuleAngular4,
@@ -161,6 +162,7 @@ const COMPONENTS = [
   JsPlumbCanvasComponent,
   JsPlumbTableComponent,
   JsPlumbJoinLabelComponent,
+  MatSelectSearchComponent,
   JoinDialogComponent,
   DateFormatDialogComponent,
   AliasRenameDialogComponent,

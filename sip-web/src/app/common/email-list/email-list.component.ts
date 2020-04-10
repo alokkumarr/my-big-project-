@@ -5,7 +5,9 @@ import {
   EventEmitter,
   forwardRef,
   ViewChild,
-  ElementRef
+  ElementRef,
+  OnDestroy,
+  OnInit
 } from '@angular/core';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import {
@@ -17,9 +19,8 @@ import {
 import * as reject from 'lodash/reject';
 import * as invoke from 'lodash/invoke';
 import { EMAIL_REGEX } from '../consts';
-import { MatAutocompleteTrigger } from '@angular/material';
-import { Observable, merge, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+import { ReplaySubject, Subject } from 'rxjs';
 
 const SEMICOLON = 186;
 
@@ -35,50 +36,87 @@ const SEMICOLON = 186;
     }
   ]
 })
-export class EmailListComponent implements ControlValueAccessor {
+export class EmailListComponent
+  implements ControlValueAccessor, OnInit, OnDestroy {
   @Output() emailsChange = new EventEmitter<string[]>();
   @Input() emails: string[];
-  @Input() autoCompleteSuggestions = [];
-  @Input() allowCustomInput = true;
 
-  filteredSuggestions: Observable<string[]>;
+  autoCompleteSuggestions = [];
+  @Input('autoCompleteSuggestions') set _autoCompleteSuggestions(value) {
+    this.autoCompleteSuggestions = value;
+    this.filterEmails();
+  }
+
+  @Input() allowCustomInput = true;
 
   @ViewChild('emailInput', { static: false }) emailInput: ElementRef<
     HTMLInputElement
   >;
-  @ViewChild(MatAutocompleteTrigger, { static: false })
-  autoCompleteTrigger: MatAutocompleteTrigger;
 
   public propagateChange: (emails: string[]) => void;
   public emailField = new FormControl('', Validators.pattern(EMAIL_REGEX));
+
+  public multiEmailField = new FormControl();
+  public emailSearchCtrl = new FormControl();
+  public filteredEmails$: ReplaySubject<string[]> = new ReplaySubject<string[]>(
+    1
+  );
+
+  private onDestroy = new Subject<void>();
   separatorKeys = [ENTER, COMMA, SEMICOLON];
 
-  constructor() {
-    this.filteredSuggestions = merge(
-      of(this.filter(null)),
-      this.emailField.valueChanges.pipe(
-        map((email: string) => this.filter(email))
-      )
-    );
+  constructor() {}
+
+  ngOnInit() {
+    this.multiEmailField.setValue(this.emails);
+    const initialEmails = this.autoCompleteSuggestions
+      ? this.autoCompleteSuggestions.slice()
+      : [];
+    this.filteredEmails$.next(initialEmails);
+    this.emailSearchCtrl.valueChanges
+      .pipe(takeUntil(this.onDestroy))
+      .subscribe(() => {
+        this.filterEmails();
+      });
+
+    this.multiEmailField.valueChanges
+      .pipe(takeUntil(this.onDestroy))
+      .subscribe(value => {
+        console.log('hello');
+        this.emailsChange.emit(value);
+      });
   }
 
-  private filter(email: string) {
-    if (!email) {
-      return this.autoCompleteSuggestions.filter(
-        suggestion => !this.emails.includes(suggestion)
-      );
-    }
-    const filterValue = email.toLowerCase();
+  ngOnDestroy() {
+    this.onDestroy.next();
+    this.onDestroy.complete();
+  }
 
-    return this.autoCompleteSuggestions.filter(
-      suggestion =>
-        suggestion.toLowerCase().indexOf(filterValue) === 0 &&
-        !this.emails.includes(suggestion)
+  private filterEmails() {
+    if (!this.autoCompleteSuggestions) {
+      return;
+    }
+
+    // get the search keyword
+    let search = this.emailSearchCtrl.value;
+    if (!search) {
+      this.filteredEmails$.next(this.autoCompleteSuggestions.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+
+    // filter the email
+    this.filteredEmails$.next(
+      this.autoCompleteSuggestions.filter(
+        email => email.toLowerCase().indexOf(search) > -1
+      )
     );
   }
 
   writeValue(emails: string[]) {
     this.emails = emails;
+    this.multiEmailField.setValue(this.emails, { emitEvent: false });
   }
 
   registerOnChange(fn) {
@@ -108,18 +146,6 @@ export class EmailListComponent implements ControlValueAccessor {
     const isValidEmail = !this.emailField.hasError('pattern');
     if (isInputNonEmpty && isValidEmail) {
       this.addEmail(email);
-    }
-  }
-
-  openAutocomplete() {
-    if (this.autoCompleteSuggestions && this.autoCompleteSuggestions.length) {
-      this.autoCompleteTrigger.openPanel();
-    }
-  }
-
-  onTextEntered() {
-    if (!this.allowCustomInput) {
-      this.resetInput();
     }
   }
 
