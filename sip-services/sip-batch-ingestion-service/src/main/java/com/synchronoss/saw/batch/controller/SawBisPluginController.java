@@ -30,6 +30,7 @@ import java.util.concurrent.Executor;
 
 import javax.validation.Valid;
 
+import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,31 +127,9 @@ public class SawBisPluginController {
     return JSON.toJSONString(sipConnService.connectChannel(channelId));
   }
 
-  /**
-   * This end-point to test connectivity for channel.
-   */
-
-  @ApiOperation(value = "To test connectivity for channel without an entity present on the system",
-      nickname = "sftpActionBis", notes = "", response = HttpStatus.class)
-  @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
-          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
-  @RequestMapping(value = "/channels/test", method = RequestMethod.POST,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public String connectImmediateChannel(@ApiParam(value = "Payload to test connectivity",
-      required = true) @Valid @RequestBody BisConnectionTestPayload payload) {
-
-    SipPluginContract sipConnService = factory.getInstance(
-        payload.getChannelType().toString());
-    return JSON.toJSONString(sipConnService.immediateConnectChannel(payload));
-  }
-
   /** This end-point to test connectivity for channel. */
   @ApiOperation(
-      value = "To test connectivity for channel",
+      value = "To test connectivity for channel without an entity present on the system",
       nickname = "sftpActionBis",
       notes = "",
       response = HttpStatus.class)
@@ -158,38 +137,42 @@ public class SawBisPluginController {
       value = {
         @ApiResponse(code = 200, message = "Request has been succeeded without any error"),
         @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
+        @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")
       })
   @RequestMapping(
-      value = "/channels/{channelId}/test",
+      value = "/channels/test",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public String connectImmediateChannelWithId(
-      @PathVariable("channelId") Long channelId,
-      @ApiParam(value = "Payload to test connectivity", required = true)
-      @Valid @RequestBody BisConnectionTestPayload payload) {
+  public String connectImmediateChannel(
+      @ApiParam(value = "Payload to test connectivity", required = true) @Valid @RequestBody
+          BisConnectionTestPayload payload,
+      @QueryParam("channelId") Optional<Long> channelId) {
+    logger.debug("Channel ID = ", channelId);
 
     String channelType = payload.getChannelType().toString();
 
-    SipPluginContract sipConnService = factory.getInstance(channelType);
+    SipPluginContract sipConnService = factory.getInstance(payload.getChannelType().toString());
 
-    if (channelType.equalsIgnoreCase("sftp")) {
-      try {
-        SftpServiceImpl sftpService = (SftpServiceImpl) sipConnService;
+    if (channelId.isPresent()) {
+      Long channelIdVal = channelId.get();
 
-        return JSON.toJSONString(
-            sftpService.immediateConnectChannelWithChannelId(payload, channelId));
-      } catch (IOException exception) {
-        logger.error("IO Error occurred", exception);
-        return "Error occurred: " + exception.getMessage();
-      } catch (Exception exception) {
-        logger.error("Error occurred", exception);
-        return "Error occurred: " + exception.getMessage();
+      if (channelType.equalsIgnoreCase("sftp")) {
+        try {
+          SftpServiceImpl sftpService = (SftpServiceImpl) sipConnService;
+
+          return JSON.toJSONString(
+              sftpService.immediateConnectChannelWithChannelId(payload, channelIdVal));
+        } catch (IOException exception) {
+          logger.error("IO Error occurred", exception);
+          return "Error occurred: " + exception.getMessage();
+        } catch (Exception exception) {
+          logger.error("Error occurred", exception);
+          return "Error occurred: " + exception.getMessage();
+        }
       }
     }
-
     return JSON.toJSONString(sipConnService.immediateConnectChannel(payload));
   }
 
