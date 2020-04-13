@@ -3,6 +3,7 @@ import { Filter, Artifact, DesignerChangeEvent } from '../../types';
 import { getFilterDisplayName } from './../../../../analyze/consts';
 import { AnalyzeService } from '../../../services/analyze.service';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as get from 'lodash/get';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
 import { DskFiltersService } from './../../../../../common/services/dsk-filters.service';
@@ -35,7 +36,7 @@ export class FilterChipsComponent {
   public nameMap;
   public flattenedFilters = [];
   public previewString;
-
+  public aggregatePreview;
   constructor(
     private analyzeService: AnalyzeService,
     private datasecurityService: DskFiltersService
@@ -87,6 +88,22 @@ export class FilterChipsComponent {
     this.previewString = this.datasecurityService.generatePreview(
       this.changeIndexToNames(this.filters, 'booleanQuery', 'filters'), 'ANALYZE'
     );
+
+    const aggregatedFilters = this.filters.filter(option => {
+      return option.isAggregationFilter === true;
+    });
+
+    this.aggregatePreview = aggregatedFilters.map(field => {
+      if (field.model.operator === 'BTW') {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+          field.model.operator
+        }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
+      } else {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+          field.model.operator || ''
+        }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
+      }
+    })
   }
 
   changeIndexToNames(dskObject, source, target) {

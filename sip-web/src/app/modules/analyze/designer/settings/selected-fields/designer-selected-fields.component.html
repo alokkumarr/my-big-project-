@@ -82,14 +82,22 @@
     }"
     fxFlex="90"
   >
-  <div style="margin: 7px;font-size: 12px;cursor: pointer;" (click)="openFilterDialog()">
+  <div style="margin: 7px;font-size: 12px;" (click)="openFilterDialog()">
       <code
+      class="highlight-expression"
       [innerHTML]="
         previewString ||
         'Filters might be missing or invalid. Please add fields below or check for errors.'
       "
       >
       </code>
+
+      <code
+      class="highlight-expression"
+      [innerHTML]="aggregatePreview"
+      style="margin-left: 50px;"
+      >
+    </code>
   </div>
 
     <!-- <mat-chip-list e2e="designer-applied-filters" class="selected-fields__list">

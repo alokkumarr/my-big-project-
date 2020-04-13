@@ -16,6 +16,7 @@ import * as findIndex from 'lodash/findIndex';
 import * as debounce from 'lodash/debounce';
 import * as has from 'lodash/has';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as get from 'lodash/get';
 import * as reduce from 'lodash/reduce';
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
@@ -51,6 +52,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   public previewString;
+  public aggregatePreview;
   @Output() removeFilter = new EventEmitter();
   @Output() filterClick = new EventEmitter();
   @Input() analysisType: string;
@@ -65,6 +67,22 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     this.previewString = this.datasecurityService.generatePreview(
       this.changeIndexToNames(filters, 'booleanQuery', 'filters'), 'ANALYZE'
     );
+
+    const aggregatedFilters = this.filters.filter(option => {
+      return option.isAggregationFilter === true;
+    });
+
+    this.aggregatePreview = aggregatedFilters.map(field => {
+      if (field.model.operator === 'BTW') {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+          field.model.operator
+        }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
+      } else {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+          field.model.operator || ''
+        }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
+      }
+    })
     this.flattenedfilters = this.analyzeService.flattenAndFetchFiltersChips(filters, []);
   }
 

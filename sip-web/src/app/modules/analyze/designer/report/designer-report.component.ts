@@ -62,7 +62,7 @@ export class DesignerReportComponent {
 
   onRemoveFilterAll() {
     this.filters.splice(0, this.filters.length);
-    this.change.emit({ subject: 'filterRemove' });
+    this.change.emit({ subject: 'filterRemove', data: [] });
   }
 
   onFiltersClick() {

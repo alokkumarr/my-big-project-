@@ -22,14 +22,22 @@
       *ngIf="(filterCount$ | async) > 0"
     >
     <div style="font-size: 15px;">
-        <span class="filter-counter" i18n>
-          Filters:
-        </span>
+        <mat-icon
+          class="icon-filter"
+          style="font-size: 12px;"
+          color="primary"
+          fonticon="icon-filter">
+        </mat-icon>
         <code
         [innerHTML]="
           previewString ||
           'Filters might be missing or invalid. Please add fields below or check for errors.'
         "
+        >
+      </code>
+      <code
+        [innerHTML]="aggregatePreview"
+        style="margin-left: 50px;"
         >
       </code>
       </div>

@@ -31,47 +31,91 @@
     >
     </filter-prompt-layout>
 
+    <div class="analyze-aggregate-filters" *ngIf="data.mode === 'ANALYZE' && data.supportsAggregationFilters">
+        <h3> Aggregated Filters </h3>
+        <div class="filter__table-name">
+          {{ data.artifacts[0].artifactName }}
+        </div>
+        <mat-divider></mat-divider>
+        <aggregated-filters
+          [data]="data"
+          *ngFor="let agfilter of aggregatedFilters; let i = index;trackBy: filterRowTrackBy"
+          (removeRequest)="removeAggrFilter(i)"
+          (filterChange)="onFilterChange($event)"
+          [filter]='agfilter'
+        >
+        </aggregated-filters>
+        <button
+          mat-icon-button
+          [attr.e2e]="'aggregate-filter-add-btn-'"
+          (click)="addaggregateFilter()"
+          *ngIf="!data.isInRuntimeMode"
+        >
+          <mat-icon fontIcon="icon-plus"></mat-icon>
+        </button>
+      </div>
+
     <mat-accordion style="margin-top: 10px;">
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
             Preview Expression
+            <mat-divider></mat-divider>
           </mat-panel-title>
         </mat-expansion-panel-header>
+        <div fxLayout="row">
+          <div style="width: 79%">
+              <code
+              [innerHTML]="
+                previewString ||
+                'Filters might be missing or invalid. Please add fields below or check for errors.'
+              "
+              >
+            </code>
 
-        <code
-          [innerHTML]="
-            previewString ||
-            'Filters might be missing or invalid. Please add fields below or check for errors.'
-          "
-          >{{
-        </code>
+            <code
+              [innerHTML]="fetchAggregatedFilters(aggregatedFilters)"
+              *ngIf="previewString && data.mode === 'ANALYZE'"
+              style="margin-left: 50px;"
+              >
+            </code>
+          </div>
+          <div fxLayout="column"
+          *ngIf="data.mode === 'ANALYZE'"
+          >
+          <div fxLayout="row" style="margin-bottom: 2px;">
+            <div class="index-box-boolean">
+
+            </div>
+            <div class="condition-type">
+              Boolean Creteria
+            </div>
+          </div>
+
+
+          <div fxLayout="row" style="margin-bottom: 2px;">
+            <div class="index-box-operator">
+
+            </div>
+            <div class="condition-type">
+              Operator
+            </div>
+          </div>
+
+
+            <div fxLayout="row" style="margin-bottom: 2px;">
+              <div class="index-box-prompt">
+
+              </div>
+              <div class="condition-type">
+                Prompt Filter
+              </div>
+            </div>
+          </div>
+        </div>
+
       </mat-expansion-panel>
     </mat-accordion>
-  </div>
-
-  <div class="analyze-aggregate-filters" *ngIf="data.mode === 'ANALYZE' && data.supportsAggregationFilters">
-    <h3> Aggregated Filters </h3>
-    <div class="filter__table-name">
-      {{ data.artifacts[0].artifactName }}
-    </div>
-    <mat-divider></mat-divider>
-    <aggregated-filters
-      [data]="data"
-      *ngFor="let agfilter of aggregatedFilters; let i = index;trackBy: filterRowTrackBy"
-      (removeRequest)="removeAggrFilter(i)"
-      (filterChange)="onFilterChange($event)"
-      [filter]='agfilter'
-    >
-    </aggregated-filters>
-    <button
-      mat-icon-button
-      [attr.e2e]="'aggregate-filter-add-btn-'"
-      (click)="addaggregateFilter()"
-      *ngIf="!data.isInRuntimeMode"
-    >
-      <mat-icon fontIcon="icon-plus"></mat-icon>
-    </button>
   </div>
 </div>
 

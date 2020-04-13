@@ -11,6 +11,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Select } from '@ngxs/store';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
+import * as get from 'lodash/get';
 
 import { Filter } from './../../../analyze/types';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
@@ -32,6 +33,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscriptions: Subscription[] = [];
   public analysisData: Array<any>;
   public previewString;
+  public aggregatePreview;
   public nameMap;
   @Select(state => state.common.metrics) metrics$: Observable<{
     [metricId: string]: any;
@@ -44,6 +46,23 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
         this.previewString = this.datasecurityService.generatePreview(
           this.changeIndexToNames(queryBuilder.filters, 'booleanQuery', 'filters'), 'ANALYZE'
         );
+
+        const aggregatedFilters = queryBuilder.filters.filter(option => {
+          return option.isAggregationFilter === true;
+        });
+
+        this.aggregatePreview = aggregatedFilters.map(field => {
+          if (field.model.operator === 'BTW') {
+            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+              field.model.operator
+            }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
+          } else {
+            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+              field.model.operator || ''
+            }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
+          }
+        })
+
 
       return isDSLAnalysis(this.data.analysis)
         ? this.generateDSLDateFilters(queryBuilder.filters)
