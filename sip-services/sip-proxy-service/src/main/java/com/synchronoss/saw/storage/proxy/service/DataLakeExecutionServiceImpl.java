@@ -9,6 +9,8 @@ import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -238,7 +240,8 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           .forEach(
               (element) -> {
                 try {
-                  JsonNode jsonNode = mapper.readTree(element);
+                  String sanitizedElement  = SipCommonUtils.sanitizeJson(element);
+                  JsonNode jsonNode = mapper.readTree(sanitizedElement);
                   data.add((jsonNode));
                 } catch (Exception e) {
                   logger.error("error occured while parsing element to json node");

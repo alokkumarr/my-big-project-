@@ -38,6 +38,7 @@ import com.mapr.streams.Streams;
 import com.mapr.streams.impl.MarlinDocumentStream;
 import com.mapr.streams.impl.MessageStore;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 
 import akka.japi.Option;
 import io.swagger.annotations.Api;
@@ -120,7 +121,8 @@ public class WorkbenchInspectController {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(appKeys.getBody());
-		JsonNode objects = mapper.readTree(json);
+		String sanitizedJson = SipCommonUtils.sanitizeJson(json);		
+		JsonNode objects = mapper.readTree(sanitizedJson);
 		List<JsonNode> entities = new ArrayList<JsonNode>();
 
 		for (final JsonNode objNode : objects) {
@@ -139,8 +141,9 @@ public class WorkbenchInspectController {
 					Object[].class, new Object[0]);
 			logger.debug("##### config response ###" + config.toString());
 			String configJson = mapper.writeValueAsString(config.getBody());
-			logger.debug("#####config response ::" + configJson);
-			JsonNode configObjects = mapper.readTree(configJson);
+			String sanitizedConfig = SipCommonUtils.sanitizeJson(configJson);
+			logger.debug("#####config response ::" + sanitizedConfig);
+			JsonNode configObjects = mapper.readTree(sanitizedConfig);
 			if (configObjects.isArray()) {	
 				logger.debug("Is array @####");
 				for (JsonNode jsonNode : configObjects) {
