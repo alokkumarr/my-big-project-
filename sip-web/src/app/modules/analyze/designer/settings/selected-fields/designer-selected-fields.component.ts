@@ -73,6 +73,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     });
 
     this.aggregatePreview = aggregatedFilters.map(field => {
+      if (!field.model) {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span></span>`;
+      }
       if (field.model.operator === 'BTW') {
         return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
           field.model.operator

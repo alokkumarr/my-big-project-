@@ -12,7 +12,9 @@ import { Select } from '@ngxs/store';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 import * as get from 'lodash/get';
-
+import * as isUndefined from 'lodash/isUndefined';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as concat from 'lodash/concat';
 import { Filter } from './../../../analyze/types';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import {
@@ -40,6 +42,21 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   }>;
   filters$ = this.metrics$.pipe(
     map(() => {
+
+      if (isUndefined(get(this.data.analysis.sipQuery.filters[0], 'filters'))) {
+        const aggregatedFilters = this.data.analysis.sipQuery.filters.filter(option => {
+          return option.isAggregationFilter === true;
+        });
+        const oldFormatFilters = cloneDeep(this.data.analysis.sipQuery.filters);
+        this.data.analysis.sipQuery.filters = [];
+        const normalFilters = [{
+          booleanCriteria: get(this.data.analysis.sipQuery, 'sipQuery.booleanCriteria'),
+          filters: oldFormatFilters
+        }]
+
+        this.data.analysis.sipQuery.filters = concat(normalFilters, aggregatedFilters);
+      }
+
       const queryBuilder = isDSLAnalysis(this.data.analysis)
         ? this.data.analysis.sipQuery
         : this.data.analysis.sqlBuilder;
@@ -52,6 +69,9 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
         });
 
         this.aggregatePreview = aggregatedFilters.map(field => {
+          if (!field.model) {
+            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span></span>`;
+          }
           if (field.model.operator === 'BTW') {
             return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
               field.model.operator

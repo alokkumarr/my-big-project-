@@ -19,6 +19,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as forOwn from 'lodash/forOwn';
+import * as concat from 'lodash/concat';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as omit from 'lodash/omit';
@@ -135,7 +136,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     map$(analysis => analysis.sipQuery.sorts)
   );
   dslFilters$: Observable<Filter[]> = this.dslAnalysis$.pipe(
-    map$(analysis => analysis.sipQuery.filters)
+    map$(analysis => this.fetchFilters(analysis.sipQuery))
   );
 
   sipQuery$: Observable<QueryDSL> = this.dslAnalysis$.pipe(
@@ -382,6 +383,21 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(this.analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
+
+      if (isUndefined(get(this.filters[0], 'filters'))) {
+        const aggregatedFilters = this.filters.filter(option => {
+          return option.isAggregationFilter === true;
+        });
+        const oldFormatFilters = cloneDeep(this.filters);
+        this.filters = [];
+        const normalFilters = [{
+          booleanCriteria: queryBuilder.booleanCriteria,
+          filters: oldFormatFilters
+        }]
+
+        this.filters = concat(normalFilters, aggregatedFilters);
+      }
+
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
     this.isInQueryMode = this._store.selectSnapshot(
       DesignerState
@@ -391,6 +407,27 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
     this.addDefaultSorts();
     this.areMinRequirmentsMet = this.canRequestData();
+  }
+
+  fetchFilters(sipQuery) {
+    if (isUndefined(get(sipQuery.filters[0], 'filters'))) {
+      const aggregatedFilters = sipQuery.filters.filter(option => {
+        return option.isAggregationFilter === true;
+      });
+
+      const oldFormatFilters = cloneDeep(sipQuery.filters);
+      sipQuery.filters = [];
+      const normalFilters = [{
+        booleanCriteria: sipQuery.booleanCriteria,
+        filters: oldFormatFilters
+      }]
+
+      sipQuery.filters = concat(normalFilters, aggregatedFilters);
+      return sipQuery.filters;
+    } else {
+      return sipQuery.filters;
+    }
+
   }
 
   initAuxSettings() {

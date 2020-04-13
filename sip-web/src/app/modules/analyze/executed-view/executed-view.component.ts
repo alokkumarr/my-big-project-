@@ -12,7 +12,9 @@ import * as get from 'lodash/get';
 import * as values from 'lodash/values';
 import * as find from 'lodash/find';
 import * as isUndefined from 'lodash/isUndefined';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as moment from 'moment';
+import * as concat from 'lodash/concat';
 import {
   Subscription,
   Subject,
@@ -47,7 +49,7 @@ import { AnalyzeActionsService } from '../actions';
 
 import { Analysis, AnalysisDSL } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
-import { isDSLAnalysis, Filter } from '../designer/types';
+import { isDSLAnalysis } from '../designer/types';
 import { CUSTOM_DATE_PRESET_VALUE } from './../consts';
 
 const browser = get(
@@ -84,7 +86,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
   actionBus$: Subject<Object> = new Subject<Object>();
-  public filters: Filter[] = [];
+  public filters = [];
 
   @ViewChild('detailsSidenav', { static: true }) detailsSidenav: MatSidenav;
   @ViewChild('mapView', { static: false }) mapView: ElementRef;
@@ -123,6 +125,19 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
+    if (isUndefined(get(this.filters[0], 'filters'))) {
+      const aggregatedFilters = this.filters.filter(option => {
+        return option.isAggregationFilter === true;
+      });
+      const oldFormatFilters = cloneDeep(this.filters);
+      this.filters = [];
+      const normalFilters = [{
+        booleanCriteria: queryBuilder.booleanCriteria,
+        filters: oldFormatFilters
+      }]
+
+      this.filters = concat(normalFilters, aggregatedFilters);
+    }
   }
 
   generateDSLDateFilters(filters) {
@@ -560,6 +575,19 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
               })
         };
         this.filters = get(this.executedAnalysis, 'sipQuery.filters');
+        if (isUndefined(get(this.filters[0], 'filters'))) {
+          const aggregatedFilters = this.filters.filter(option => {
+            return option.isAggregationFilter === true;
+          });
+          const oldFormatFilters = cloneDeep(this.filters);
+          this.filters = [];
+          const normalFilters = [{
+            booleanCriteria: get(this.executedAnalysis, 'sipQuery.booleanCriteria'),
+            filters: oldFormatFilters
+          }]
+
+          this.filters = concat(normalFilters, aggregatedFilters);
+        }
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = this.utcToLocal(executeResponse.executedAt);
         this.data = this.flattenData(

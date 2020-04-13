@@ -11,6 +11,8 @@
 >
 </designer-header>
 
+{{layoutConfiguration}}
+
 <div *ngIf="analysis" [ngSwitch]="layoutConfiguration" class="designer__main">
   <single-table-designer-layout
     *ngSwitchCase="'single'"
