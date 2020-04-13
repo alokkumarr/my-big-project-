@@ -24,8 +24,6 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-  const savedCategory = 'My Analysis';
-  const savedSubCategory = 'DRAFTS';
   const fieldName = 'field';
 
   let host;
@@ -140,7 +138,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
           chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
+            (data.fieldName).toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveAndCloseDialogButton();
@@ -148,8 +146,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           // From analysis detail/view page
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnAnalysisLink(name);
           chartDesignerPage.shouldFilterDialogPresent();
@@ -175,8 +173,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           // VerifyPromptFromListView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('list');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();
@@ -193,8 +191,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();

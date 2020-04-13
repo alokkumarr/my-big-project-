@@ -24,8 +24,6 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing reportPromptFilters tests from reportPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-  const savedCategory = 'My Analysis';
-  const savedSubCategory = 'DRAFTS';
   const fieldName = 'field';
 
   let analysisId;
@@ -85,12 +83,13 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
             assert.isNotNull(token, 'token cannot be null');
           }
           let currentTime = new Date().getTime();
-          const filters = [
-            {
-              field: data.fieldName,
-              displayedValue: data.displayedValue // This week
-            }
-          ];
+          /*const filters = [
+            (data.fieldName).toString().toLowerCase(),
+              data.displayOperator,
+              data.displayedValue
+            // This week
+          ];*/
+
           let name = `e2e ${currentTime}`;
           let description =
             'Description:' +
@@ -119,9 +118,11 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           header.selectSubCategory(subCategoryName);
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
+          const reportDesignerPage = new ReportDesignerPage();
           const executePage = new ExecutePage();
-
           executePage.clickOnEditLink();
+          reportDesignerPage.refreshAnalysis();
+
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
           chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
@@ -129,8 +130,10 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
+          reportDesignerPage.refreshAnalysis();
+
           chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
+            (data.fieldName).toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveAndCloseDialogButton();
@@ -138,8 +141,8 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           // From analysis detail/view page
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnAnalysisLink(name);
           executePage.clickOnActionLink();
@@ -152,10 +155,9 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
             data.operator,
             data.value
           );
-
           chartDesignerPage.clickOnApplyFilterButton();
           header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters, Constants.REPORT);
+          executePage.verifyAppliedFilter(data.validateFilters, Constants.REPORT);
           //get analysis id from current url
           browser.getCurrentUrl().then(url => {
             editedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
@@ -163,8 +165,8 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           // VerifyPromptFromListView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('list');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();
@@ -177,12 +179,12 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           );
           chartDesignerPage.clickOnApplyFilterButton();
           //header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters, Constants.REPORT);
+          executePage.verifyAppliedFilter(data.validateFilters, Constants.REPORT);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();
@@ -195,7 +197,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           );
           chartDesignerPage.clickOnApplyFilterButton();
           //header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters, Constants.REPORT);
+          executePage.verifyAppliedFilter(data.validateFilters, Constants.REPORT);
         } catch (e) {
           console.error(e);
         }

@@ -67,7 +67,7 @@ const CRITICAL = [
   'publish/publishReports.test.js',
   'publish/publishCharts.test.js',
   'admin/create-user.test.js',
-  'aggregateFilters/newAggregateFilter.test.js',
+  'aggregateFilters/newAggregateFilterES.test.js',
   'analyze/segregateAnalysis.test.js',
   'export/analysisExportAndDownload.test.js'
 ];

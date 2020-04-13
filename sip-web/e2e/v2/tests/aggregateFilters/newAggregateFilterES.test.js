@@ -4,6 +4,7 @@ const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const dataSets = require('../../helpers/data-generation/datasets');
 const commonFunctions = require('../../pages/utils/commonFunctions');
+const Constants = require('../../helpers/Constants');
 
 let AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
@@ -78,9 +79,15 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithESRe
         // Verify that all the columns are displayed
         reportDesignerPage.verifyDisplayedColumns(tables);
         // Apply aggregation
+        reportDesignerPage.refreshAnalysis();
         reportDesignerPage.applyAggregate(data.aggregate);
+        reportDesignerPage.refreshAnalysis();
         reportDesignerPage.applyNewAggregateFilter(data.aggregatePopup);
-        reportDesignerPage.verifyAppliedAggregateFilter(data.expectedAggregateValue);
+        const executePage = new ExecutePage();
+
+        executePage.verifyAppliedFilter(data.expectedAggregate, Constants.REPORT);
+        //reportDesignerPage.verifyAppliedAggregateFilter(data.expectedAggregateValue);
+        reportDesignerPage.refreshAnalysis();
         if(data.removeAggregate) {
           reportDesignerPage.removeAggregateAndVerify(data.expectedAggregateValue);
         }
@@ -98,7 +105,6 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithESRe
         analyzePage.goToView('card');
         // Go to detail page and very details
         analyzePage.clickOnAnalysisLink(reportName);
-        const executePage = new ExecutePage();
         // Verify the aggregations displayed in execute page
         executePage.aggregationVerification(data.aggregate.value);
         // Delete the report

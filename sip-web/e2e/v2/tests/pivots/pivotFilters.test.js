@@ -48,7 +48,7 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
         logger.info(`Executing test case with id: ${id}`);
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
-        browser.sleep(2000);
+
         const analyzePage = new AnalyzePage();
         analyzePage.clickOnAddAnalysisButton();
         analyzePage.clickOnAnalysisType(analysisType);
@@ -82,9 +82,7 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
 
         // Scenario for group intervals
         if (data.groupIntervalSpecified) {
-          //chartDesignerPage.clickOnDataOptions(dateFieldName);
           browser.sleep(2000);
-
           // select the group by interval value e.g. year/month day etc
           chartDesignerPage.clickOnGroupBySelector();
           chartDesignerPage.clickOnGroupByOption(data.groupInterval);
