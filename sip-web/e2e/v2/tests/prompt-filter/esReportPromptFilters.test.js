@@ -24,8 +24,6 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-  const savedCategory = 'My Analysis';
-  const savedSubCategory = 'DRAFTS';
   const fieldName = 'field';
 
   let host;
@@ -84,12 +82,6 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
             assert.isNotNull(token, 'token cannot be null');
           }
           let currentTime = new Date().getTime();
-          const filters = [
-            {
-              field: data.fieldName,
-              displayedValue: data.displayedValue // This week
-            }
-          ];
           let name = `e2e ${currentTime}`;
           let description =
             'Description:' +
@@ -119,8 +111,9 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
-
+          const reportDesignerPage = new ReportDesignerPage();
           executePage.clickOnEditLink();
+          reportDesignerPage.refreshAnalysis();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
           chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
@@ -129,7 +122,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
           chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
+            (data.fieldName).toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveAndCloseDialogButton();
@@ -137,8 +130,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           // From analysis detail/view page
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnAnalysisLink(name);
           chartDesignerPage.shouldFilterDialogPresent();
@@ -164,8 +157,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           // VerifyPromptFromListView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('list');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();
@@ -182,8 +175,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();

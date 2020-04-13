@@ -61,6 +61,10 @@ class ReportDesignerPage extends Designer {
     );
     this._betOperatorFirstValue = element(by.xpath(`(//input[@type="number"])[1]`));
     this._betOperatorSecondValue = element(by.xpath(`(//input[@type="number"])[2]`));
+    this._refreshData = element(
+      by.xpath(`//span[text()='Refresh Data']`
+      )
+    );
   }
 
   clickOnReportFields(tables) {
@@ -201,8 +205,12 @@ class ReportDesignerPage extends Designer {
         this._aggregateOperatorValue,aggregateFilters.operatorValue
       );
     }
-    commonFunctions.clickOnElement(this._previewExpression);
     commonFunctions.clickOnElement(this._applyAggregateFilter);
+    browser.sleep(2000); //Need to wait till result grid refresh with new filters
+  }
+
+  refreshAnalysis() {
+    commonFunctions.clickOnElement(this._refreshData);
   }
 }
 module.exports = ReportDesignerPage;

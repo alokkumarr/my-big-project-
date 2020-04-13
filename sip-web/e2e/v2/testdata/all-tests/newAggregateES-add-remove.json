@@ -8,7 +8,6 @@
         "user": "admin",
         "description": "Admin should be able to use aggregation filters in report using STRING(CNT = 0)",
         "removeAggregate": false,
-        "expectedAggregateValue": "CNT(String): Equal to 0",
         "aggregate": {
           "designerLabel": "Count",
           "value": "Count",
@@ -19,6 +18,11 @@
           "designerLabel": "Count",
           "operator": "Equal to",
           "operatorValue": "0"
+        },
+        "expectedAggregate": {
+          "fieldName": "string",
+          "displayOperator": "EQ",
+          "displayedValue": "0"
         },
         "tables": [
           {
@@ -50,6 +54,11 @@
           "operator": "Greater than",
           "operatorValue": "1"
         },
+        "expectedAggregate": {
+          "fieldName": "string",
+          "displayOperator": "GT",
+          "displayedValue": "1"
+        },
         "tables": [
           {
             "name": "sample",
@@ -65,7 +74,7 @@
       },
       "NEWAGG03": {
         "suites": [
-          "regression"
+          "sanity","critical","regression"
         ],
         "user": "admin",
         "description": "Admin should be able to use aggregation filters in report using STATE(CNT <= 5)",
@@ -81,6 +90,11 @@
           "designerLabel": "Count",
           "operator": "Less than or equal to",
           "operatorValue": "5"
+        },
+        "expectedAggregate": {
+          "fieldName": "COUNTY",
+          "displayOperator": "LTE",
+          "displayedValue": "5"
         },
         "tables": [
           {
@@ -114,6 +128,11 @@
           "operator": "Not equal to",
           "operatorValue": "10"
         },
+        "expectedAggregate": {
+          "fieldName": "COUNTY",
+          "displayOperator": "NEQ",
+          "displayedValue": "10"
+        },
         "tables": [
           {
             "name": "sample",
@@ -130,7 +149,7 @@
       },
       "NEWAGG05": {
         "suites": [
-          "regression"
+          "sanity","critical","regression"
         ],
         "user": "admin",
         "description": "Admin should be able to use aggregation filters in report using DATE(CNT > 25)",
@@ -146,6 +165,11 @@
           "designerLabel": "Count",
           "operator": "Less than",
           "operatorValue": "25"
+        },
+        "expectedAggregate": {
+          "fieldName": "date",
+          "displayOperator": "LT",
+          "displayedValue": "25"
         },
         "tables": [
           {
@@ -179,6 +203,11 @@
           "operator": "Greater than or equal to",
           "operatorValue": "10"
         },
+        "expectedAggregate": {
+          "fieldName": "date",
+          "displayOperator": "GTE",
+          "displayedValue": "10"
+        },
         "tables": [
           {
             "name": "sample",
@@ -194,7 +223,7 @@
       },
       "NEWAGG07": {
         "suites": [
-          "regression"
+          "sanity","critical","regression"
         ],
         "user": "admin",
         "description": "Admin should be able to use aggregation filters in report using LONG(SUM = 0)",
@@ -210,6 +239,11 @@
           "designerLabel": "Sum",
           "operator": "Equal to",
           "operatorValue": "0"
+        },
+        "expectedAggregate": {
+          "fieldName": "long",
+          "displayOperator": "EQ",
+          "displayedValue": "0"
         },
         "tables": [
           {
@@ -241,6 +275,11 @@
           "operator": " Greater than ",
           "operatorValue": "20"
         },
+        "expectedAggregate": {
+          "fieldName": "long",
+          "displayOperator": "GT",
+          "displayedValue": "20"
+        },
         "tables": [
           {
             "name": "sample",
@@ -270,6 +309,11 @@
           "designerLabel": "Mininum",
           "operator": "Greater than or equal to",
           "operatorValue": "-1"
+        },
+        "expectedAggregate": {
+          "fieldName": "long",
+          "displayOperator": "GTE",
+          "displayedValue": "-1"
         },
         "tables": [
           {
@@ -301,6 +345,11 @@
           "operator": "Not equal to",
           "operatorValue": "-10"
         },
+        "expectedAggregate": {
+          "fieldName": "long",
+          "displayOperator": "NEQ",
+          "displayedValue": "-10"
+        },
         "tables": [
           {
             "name": "sample",
@@ -314,7 +363,7 @@
       },
       "NEWAGG11": {
         "suites": [
-          "regression"
+          "sanity","critical","regression"
         ],
         "user": "admin",
         "description": "Admin should be able to use aggregation filters in report using FLOAT(MAX != 300)",
@@ -330,6 +379,11 @@
           "designerLabel": "Maximum",
           "operator": "Not equal to",
           "operatorValue": "300"
+        },
+        "expectedAggregate": {
+          "fieldName": "float",
+          "displayOperator": "NEQ",
+          "displayedValue": "300"
         },
         "tables": [
           {
@@ -361,6 +415,11 @@
           "operator": "Greater than or equal to",
           "operatorValue": "10"
         },
+        "expectedAggregate": {
+          "fieldName": "float",
+          "displayOperator": "GTE",
+          "displayedValue": "10"
+        },
         "tables": [
           {
             "name": "sample",
@@ -390,6 +449,11 @@
           "designerLabel": "Count",
           "operator": "Equal to",
           "operatorValue": "10"
+        },
+        "expectedAggregate": {
+          "fieldName": "float",
+          "displayOperator": "EQ",
+          "displayedValue": "10"
         },
         "tables": [
           {
@@ -421,6 +485,11 @@
           "operator": "Less than",
           "operatorValue": "0"
         },
+        "expectedAggregate": {
+          "fieldName": "float",
+          "displayOperator": "LT",
+          "displayedValue": "0"
+        },
         "tables": [
           {
             "name": "sample",
@@ -434,7 +503,7 @@
       },
       "NEWAGG15": {
         "suites": [
-          "regression"
+          "sanity","critical","regression"
         ],
         "user": "admin",
         "description": "Admin should be able to use aggregation filters in report using Integer(MAX!= 100)",
@@ -450,6 +519,11 @@
           "designerLabel": "Maximum",
           "operator": "Not equal to",
           "operatorValue": "100"
+        },
+        "expectedAggregate": {
+          "fieldName": "integer",
+          "displayOperator": "NEQ",
+          "displayedValue": "100"
         },
         "tables": [
           {
@@ -481,6 +555,11 @@
           "operator": "Greater than or equal to",
           "operatorValue": "1000"
         },
+        "expectedAggregate": {
+          "fieldName": "integer",
+          "displayOperator": "GTE",
+          "displayedValue": "1000"
+        },
         "tables": [
           {
             "name": "sample",
@@ -510,6 +589,11 @@
           "designerLabel": "Distinct Count",
           "operator": "Less than",
           "operatorValue": "1000"
+        },
+        "expectedAggregate": {
+          "fieldName": "integer",
+          "displayOperator": "LT",
+          "displayedValue": "1000"
         },
         "tables": [
           {
@@ -541,6 +625,11 @@
           "operator": "Less than or equal to",
           "operatorValue": "0"
         },
+        "expectedAggregate": {
+          "fieldName": "integer",
+          "displayOperator": "LTE",
+          "displayedValue": "0"
+        },
         "tables": [
           {
             "name": "sample",
@@ -570,6 +659,11 @@
           "designerLabel": "Maximum",
           "operator": "Greater than or equal to",
           "operatorValue": "10"
+        },
+        "expectedAggregate": {
+          "fieldName": "double",
+          "displayOperator": "GTE",
+          "displayedValue": "10"
         },
         "tables": [
           {
@@ -601,6 +695,11 @@
           "operator": "Greater than",
           "operatorValue": "100"
         },
+        "expectedAggregate": {
+          "fieldName": "double",
+          "displayOperator": "GT",
+          "displayedValue": "100"
+        },
         "tables": [
           {
             "name": "sample",
@@ -631,6 +730,11 @@
           "operator": "Not equal to",
           "operatorValue": "0"
         },
+        "expectedAggregate": {
+          "fieldName": "double",
+          "displayOperator": "NEQ",
+          "displayedValue": "0"
+        },
         "tables": [
           {
             "name": "sample",
@@ -660,6 +764,11 @@
           "designerLabel": "Average",
           "operator": "Less than",
           "operatorValue": "-1"
+        },
+        "expectedAggregate": {
+          "fieldName": "double",
+          "displayOperator": "LT",
+          "displayedValue": "-1"
         },
         "tables": [
           {
@@ -692,6 +801,11 @@
           "firstValue": "0",
           "secondValue": "1"
         },
+        "expectedAggregate": {
+          "fieldName": "date",
+          "displayOperator": "BTW",
+          "displayedValue": "0 and 1"
+        },
         "tables": [
           {
             "name": "sample",
@@ -722,6 +836,11 @@
           "operator": "Between",
           "firstValue": "10",
           "secondValue": "20"
+        },
+        "expectedAggregate": {
+          "fieldName": "float",
+          "displayOperator": "BTW",
+          "displayedValue": "10 and 20"
         },
         "tables": [
           {
@@ -754,6 +873,11 @@
           "firstValue": "-1",
           "secondValue": "-2"
         },
+        "expectedAggregate": {
+          "fieldName": "integer",
+          "displayOperator": "BTW",
+          "displayedValue": "-1 and -2"
+        },
         "tables": [
           {
             "name": "sample",
@@ -784,6 +908,11 @@
           "operator": "Between",
           "firstValue": "-1",
           "secondValue": "1"
+        },
+        "expectedAggregate": {
+          "fieldName": "double",
+          "displayOperator": "BTW",
+          "displayedValue": "-1 and 1"
         },
         "tables": [
           {
@@ -816,6 +945,11 @@
           "firstValue": "100",
           "secondValue": "200"
         },
+        "expectedAggregate": {
+          "fieldName": "long",
+          "displayOperator": "BTW",
+          "displayedValue": "100 and 200"
+        },
         "tables": [
           {
             "name": "sample",
@@ -846,6 +980,11 @@
           "operator": "Between",
           "firstValue": "5",
           "secondValue": "7"
+        },
+        "expectedAggregate": {
+          "fieldName": "state",
+          "displayOperator": "BTW",
+          "displayedValue": "5 and 7"
         },
         "tables": [
           {
@@ -878,6 +1017,11 @@
           "firstValue": "0",
           "secondValue": "1000"
         },
+        "expectedAggregate": {
+          "fieldName": "string",
+          "displayOperator": "BTW",
+          "displayedValue": "0 and 1000"
+        },
         "tables": [
           {
             "name": "sample",
@@ -908,6 +1052,11 @@
           "operator": "Between",
           "firstValue": "0",
           "secondValue": "1000"
+        },
+        "expectedAggregate": {
+          "fieldName": "string",
+          "displayOperator": "BTW",
+          "displayedValue": "0 and 1000"
         },
         "tables": [
           {

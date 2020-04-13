@@ -29,8 +29,16 @@ class ExecutePage extends ConfirmationModel {
     this._executeButton = element(
       by.css(`button[e2e="actions-menu-selector-execute"]`)
     );
-    this._selectedFilter = value =>
-      element(by.css(`[e2e="filters-execute-${value}"]`));
+    this._selectedDateFilter = (field,option) =>
+    element(by.xpath(
+    `//*[@class='prompt-filter' and text()='${field}']/following::*[text()='${option}']`
+    )
+    );
+    this._selectedFilter = (field,operator,value) =>
+    element(by.xpath(
+    `//*[text()='${field}']/following::span[text()='${operator}']/following::span[text()='[${value}]']`
+    )
+    );
     this._reportColumnChooser = element(by.css(`[title="Column Chooser"]`));
     this._pivotData = element(
       by.xpath(`//pivot-grid[contains(@class,'executed-view-pivot')]`)
@@ -163,6 +171,7 @@ class ExecutePage extends ConfirmationModel {
     }, () => {
       this._editAnalysis.isDisplayed().then(() => {
         commonFunctions.clickOnElement(this._editAnalysis);
+        browser.sleep(30000);
       });
     });
     commonFunctions.waitFor.pageToBeReady(/edit/);
@@ -190,18 +199,22 @@ class ExecutePage extends ConfirmationModel {
     } else if (Constants.PIVOT === analysisType) {
       commonFunctions.waitFor.elementToBeVisible(this._pivotData);
     } else if (
-      Constants.REPORT === analysisType ||
       Constants.ES_REPORT === analysisType
     ) {
       commonFunctions.waitFor.elementToBeVisible(this._reportColumnChooser);
     }
 
-    filters.forEach(filter => {
-      const value = `${filter.field}: ${filter.displayedValue}`;
-      browser.sleep(1500); // Some how this need to be added
-      commonFunctions.waitFor.elementToBePresent(this._selectedFilter(value));
-      commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
-    });
+    if(filters.fieldName === "date") {
+     browser.sleep(1500); // Some how this need to be added
+     commonFunctions.waitFor.elementToBePresent(this._selectedDateFilter(filters.fieldName,filters.displayedValue));
+     commonFunctions.waitFor.elementToBeVisible(this._selectedDateFilter(filters.fieldName,filters.displayedValue));
+    }else {
+    browser.sleep(1500); // Some how this need to be added
+    commonFunctions.waitFor.elementToBePresent(this._selectedFilter(
+    filters.fieldName, filters.displayOperator,filters.displayedValue));
+    commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(
+    filters.fieldName, filters.displayOperator,filters.displayedValue));
+    }
   }
 
   aggregationVerification(aggregation) {
