@@ -9,6 +9,7 @@ import * as flatten from 'lodash/flatten';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+
 import { Observable, of } from 'rxjs';
 import {
   DSKFilterGroup,
@@ -206,7 +207,7 @@ export class DskFiltersService {
       .toPromise();
   }
 
-  generatePreview(filterGroup: DSKFilterGroup, mode: string): string {
+  generatePreview(filterGroup, mode: string): string {
     if (isUndefined(filterGroup)) {
       return '';
     }
@@ -228,47 +229,47 @@ export class DskFiltersService {
           if (isUndefined(values)) {
             return '';
           }
-          return `${field.columnName} <span class="operator">${
+          return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
             field.model.operator
           }</span> [${mode === 'DSK' ? values.join(', ') : values}]`;
         } else {
           const values =  get(field, 'model.modelValues');
           if (!field.model) {
-            return `${field.columnName.split('.keyword')[0]}`;
+            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span></span>`;
           }
           switch (field.type) {
             case 'string':
               if (isUndefined(values)) {
-                return `${field.columnName.split('.keyword')[0]}`;
+                return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span>`;
               }
 
-              return `${field.columnName.split('.keyword')[0]} <span class="operator">${
+              return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
                 field.model.operator || ''
-              }</span> [${[values]}]`;
+              }</span> <span [attr.e2e]="'ffilter-model-value'">[${[values]}]</span>`;
 
             case 'date':
             const datevalues =  get(field, 'model.preset');
               if (isUndefined(datevalues)) {
-                return `${field.columnName}`;
+                return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span>`;
               }
 
               if (get(field, 'model.preset') == 'NA') {
-                return `${field.columnName} <span class="operator"> BTW
-                </span> [ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]`;
+                return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator"> BTW
+                </span> <span [attr.e2e]="'ffilter-model-value'">[ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]</span>`;
               } else {
-                return `${field.columnName} = <span class="operator">${
+                return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> = <span class="operator">${
                   get(field, 'model.preset') || ''
                 }</span>`;
               }
             default:
               if (field.model.operator === 'BTW') {
-                return `${field.columnName} <span class="operator">${
+                return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
                   field.model.operator
-                }</span> [${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]`;
+                }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
               } else {
-                return `${field.columnName} <span class="operator">${
+                return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
                   field.model.operator || ''
-                }</span> [${[get(field, 'model.value')]}]`;
+                }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
               }
           }
         }

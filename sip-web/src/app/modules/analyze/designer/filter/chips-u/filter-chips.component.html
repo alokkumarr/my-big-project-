@@ -1,19 +1,47 @@
 <div
-  fxLayout="row"
-  fxLayoutAlign="start center"
   *ngIf="flattenedFilters.length > 0"
   class="filter-chips"
+  fxLayout="row"
 >
-  <div style="font-size: 15px;cursor: pointer;" (click)="openFilterPopUp()">
-    <span class="filter-counter" i18n>
-      Filters:
-    </span>
+  <div fxLayout="row" fxLayoutAlign="start center" class="filter-expression">
+    <mat-icon
+      class="icon-filter"
+      style="font-size: 22px;"
+      fonticon="icon-filter"
+      (click)="openFilterPopUp()">
+    </mat-icon>
+
     <code
-    [innerHTML]="
-      previewString ||
-      'Filters might be missing or invalid. Please add fields below or check for errors.'
-    "
-    >
-  </code>
+      [innerHTML]="
+        previewString ||
+        'Filters might be missing or invalid. Please add fields below or check for errors.'
+      "
+       (click)="openFilterPopUp()"
+       [ngClass]="!readonly
+              ? 'highlight-expression'
+              : ''
+          "
+       >
+    </code>
+    <code
+      [innerHTML]="aggregatePreview"
+      style="margin-left: 50px;"
+      (click)="openFilterPopUp()"
+      [ngClass]="!readonly
+              ? 'highlight-expression'
+              : ''
+          "
+      >
+    </code>
+  </div>
+
+  <div
+    fxLayoutAlign="end"
+    *ngIf="!readonly"
+    fontIcon="icon-remove"
+    class="clear-all"
+    (click)="onRemoveAll()"
+  >
+    Clear All
   </div>
 </div>

@@ -114,4 +114,13 @@
   .operator {
     color: $secondary-orange;
   }
+
+  .prompt-filter {
+    color: #7f0055;
+  }
+}
+
+.highlight-expression:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }
