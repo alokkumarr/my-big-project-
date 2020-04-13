@@ -12,6 +12,7 @@ import com.sncr.saw.security.common.bean.external.response.Id3User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.security.SecureRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,12 @@ public class Id3RepositoryImpl implements Id3Repository {
      */
     @Override
     public String obtainAuthorizationCode(AuthorizationCodeDetails authorizationCodeDetails) {
-        String sipTicketId = UUID.randomUUID().toString();
+        SecureRandom random = new SecureRandom();
+        String sipTicketId = Thread.currentThread().getId()
+            + "_"
+            + System.currentTimeMillis()
+            + "_"
+            + random.nextInt(Integer.MAX_VALUE);
         authorizationCodeDetails.setSipTicketId(sipTicketId);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         Id3ClientDetails id3ClientDetails =

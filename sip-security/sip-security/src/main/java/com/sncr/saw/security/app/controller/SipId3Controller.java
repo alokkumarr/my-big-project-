@@ -5,10 +5,10 @@ import com.sncr.saw.security.app.id3.model.Id3AuthenticationRequest;
 import com.sncr.saw.security.app.id3.model.Id3Claims;
 import com.sncr.saw.security.app.id3.service.ValidateId3IdentityToken;
 import com.sncr.saw.security.app.repository.Id3Repository;
+import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
-import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +28,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -51,6 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
           message = "Unsupported Type. Representation not supported for the resource")
     })
 public class SipId3Controller {
+  private static final Logger logger = LoggerFactory.getLogger(SipId3Controller.class);
   private final ValidateId3IdentityToken validateId3IdentityToken;
 
   private final Id3Repository id3Repository;
@@ -63,6 +65,8 @@ public class SipId3Controller {
 
   @Autowired
   private TicketHelper tHelper;
+
+  @Autowired public UserRepository userRepository;
 
   @Autowired
   public SipId3Controller(
@@ -123,7 +127,8 @@ public class SipId3Controller {
         id3Repository.validateAuthorizationCode(authorizationCode, id3AuthenticationRequest);
     if (authorizationCodeDetails.getMasterLoginId() != null && authorizationCodeDetails.isValid()) {
       ssoResponse =
-          ssoRequestHandler.createSAWToken(authorizationCodeDetails.getMasterLoginId(), true);
+          ssoRequestHandler.createSAWToken(authorizationCodeDetails.getMasterLoginId(),
+              true, authorizationCodeDetails.getSipTicketId());
     }
     if (ssoResponse == null)
       response.sendError(
@@ -180,61 +185,58 @@ public class SipId3Controller {
    * This method reads the Id3 identity token and invalidates the SIP token.
    *
    * @param token
+   * @param params
    * @param request
    * @param response
    * @return
    * @throws IOException
    */
-  @GetMapping(value = "/logout")
+  @PostMapping(value = "/logout", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public SSOResponse sipTokenInvalidatorForId3(
       @RequestHeader("Authorization") String token,
+      @RequestBody MultiValueMap<String, String> params,
       HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
+    final String SIP_TICKET_ID = "sipTicketId";
     response.setHeader(HttpHeaders.CACHE_CONTROL, PRIVATE);
     String idToken = token.replace(BEARER, "").trim();
     SSOResponse ssoResponse = new SSOResponse();
+    Map<String, String> map = params.toSingleValueMap();
+    String sipTicketId = null;
     Id3Claims id3Claims =
         validateId3IdentityToken.validateToken(idToken, Id3Claims.Type.ID);
-    String sipAuthCode = null;
-    if (id3Claims != null) {
-      AuthorizationCodeDetails authorizationCodeDetails = new AuthorizationCodeDetails();
-      authorizationCodeDetails.setMasterLoginId(id3Claims.getMasterLoginId());
-      authorizationCodeDetails.setId3ClientId(id3Claims.getClientId());
-      authorizationCodeDetails.setId3DomainName(id3Claims.getDomainName());
-      sipAuthCode = id3Repository.obtainAuthorizationCode(authorizationCodeDetails);
-    } else {
+
+    if (id3Claims == null) {
+      logger.error("id3Claims is null");
       response.sendError(
           HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
-      ssoResponse.setValidity(Boolean.FALSE);
-      ssoResponse.setMessage(MALFORMED_TOKEN);
+      return ssoResponse;
+    } else if (!map.containsKey(SIP_TICKET_ID) && map.get(SIP_TICKET_ID) == null) {
+      response.sendError(
+          HttpStatus.BAD_REQUEST.value(), "sipTicketId is mandatory");
       return ssoResponse;
     }
 
-    Ticket ticket = null;
     try {
-      ticket = TokenParser.retrieveTicket(sipAuthCode);
-    } catch (Exception e) {
-      response.sendError(
-          HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
-      ssoResponse.setValidity(Boolean.FALSE);
-      ssoResponse.setMessage("Unable to fetch SIP token.");
-      return ssoResponse;
-    }
-
-    boolean valid = false;
-    valid =
-        (ticket != null) && (ticket.getValidUpto() != null) && (ticket.getValidUpto() > new Date()
-            .getTime());
-    if (!valid) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      ssoResponse.setValidity(Boolean.FALSE);
-      ssoResponse.setMessage(TOKEN_EXPIRED);
-    }
-    try {
-      ssoResponse.setMessage(tHelper.logout(ticket.getTicketId()));
+      sipTicketId = map.get(SIP_TICKET_ID).trim();
+      Ticket ticket = userRepository.getTicketDetails(sipTicketId);
+      if (ticket == null || ticket.getMasterLoginId() == null) {
+        response.sendError(
+            HttpStatus.BAD_REQUEST.value(), "Invalid SipTicketId !!");
+        return ssoResponse;
+      }
+      Boolean validity =
+          ticket.getValidUpto() != null ? (ticket.getValidUpto() > (new Date().getTime()))
+              && ticket.isValid() : false;
+      if (!validity) {
+        response.sendError(HttpStatus.UNAUTHORIZED.value(), "ticket already expired!!");
+        return ssoResponse;
+      }
+      ssoResponse.setMessage(tHelper.logout(sipTicketId));
       ssoResponse.setValidity(Boolean.TRUE);
     } catch (DataAccessException de) {
+      logger.error("unable to logout {}", de.getMessage());
       ssoResponse.setValidity(Boolean.FALSE);
       ssoResponse.setMessage("Error occurred while logging out! Contact ADMIN!!");
     }

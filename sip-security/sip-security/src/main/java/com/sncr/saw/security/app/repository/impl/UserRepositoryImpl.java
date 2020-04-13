@@ -795,7 +795,7 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
 	public Ticket getTicketDetails(String ticketId) {
 		Ticket ticket = null;
-		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID FROM TICKET WHERE TICKET_ID=?";
+		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID, VALID_UPTO, VALID_INDICATOR FROM TICKET WHERE TICKET_ID=?";
 		try {
       ticket = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, ticketId), new UserRepositoryImpl.TicketDetailExtractor());
 		} catch (DataAccessException de) {
@@ -1094,6 +1094,8 @@ public class UserRepositoryImpl implements UserRepository {
 				ticket.setRoleType(RoleType.valueOf(rs.getString("ROLE_TYPE")));
 				ticket.setUserFullName(rs.getString("USER_NAME"));
 				ticket.setWindowId(rs.getString("WINDOW_ID"));
+				ticket.setValidUpto(rs.getLong("VALID_UPTO"));
+				ticket.setValid(rs.getBoolean("VALID_INDICATOR"));
 			}
 			return ticket;
 		}
