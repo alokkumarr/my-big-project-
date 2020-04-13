@@ -635,7 +635,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     } else {
       response = new ExecuteAnalysisResponse();
       if (CHART.equalsIgnoreCase(analysis.getType())) {
-        sipQuery = reOrderFieldsByLimitByAxis(sipQuery,analysis.getChartOptions().getLimitByAxis());
+        LimitByAxis limitByAxis = analysis.getChartOptions().getLimitByAxis();
+        if (limitByAxis != null) {
+          sipQuery = reOrderFieldsByLimitByAxis(sipQuery, limitByAxis);
+        }
       }
       List<Object> objList = executeESQueries(sipQuery, size, dskAttribute);
       response.setExecutionId(executionId);
@@ -674,21 +677,18 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @return Analysis
    */
   private SipQuery reOrderFieldsByLimitByAxis(SipQuery sipQuery, LimitByAxis limitByAxis) {
-    if (limitByAxis != null) {
-      List<Artifact> artifacts = sipQuery.getArtifacts();
-      if (!CollectionUtils.isEmpty(artifacts)) {
-        // getting only first field because  charts contain only  one artifact
-        List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
-        fields.stream()
-            .forEach(
-                field -> {
-                  if (field
-                      .getArea()
-                      .equalsIgnoreCase(LimitByAxis.axisEnumMap.get(limitByAxis))) {
-                    Collections.swap(fields, fields.indexOf(field), 0);
-                  }
-                });
-      }
+    List<Artifact> artifacts = sipQuery.getArtifacts();
+    if (!CollectionUtils.isEmpty(artifacts)) {
+      // getting only first field because  charts contain only  one artifact
+      List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+      fields.stream()
+          .forEach(
+              field -> {
+                if (field.getArea().equalsIgnoreCase(LimitByAxis.axisEnumMap.get(limitByAxis))) {
+                  Collections.swap(fields, fields.indexOf(field), 0);
+                }
+              });
+      sipQuery.getArtifacts().get(0).setFields(fields);
     }
     return sipQuery;
   }
