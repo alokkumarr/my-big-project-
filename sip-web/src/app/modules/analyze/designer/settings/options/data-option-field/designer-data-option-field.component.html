@@ -80,6 +80,28 @@
     </div>
 
     <div
+      *ngIf="
+        analysisType === 'chart' &&
+        asChartColumn(artifactColumn).area === 'y' &&
+        isGroupByPresent &&
+        fieldCount < 2
+      "
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label> Limit Axis By: </label>
+      <mat-radio-group
+        fxLayout="row"
+        [(ngModel)]="limitByAxis"
+        (change)="onLimitByAxisChange()"
+        style="margin: 15px;"
+      >
+        <mat-radio-button value="dimension">Dimension</mat-radio-button>
+        <mat-radio-button style="padding-left: 15px;" value="groupBy">Group By</mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <div
       *ngIf="supportsDateInterval"
       fxLayout="row"
       fxLayoutAlign="space-around center"

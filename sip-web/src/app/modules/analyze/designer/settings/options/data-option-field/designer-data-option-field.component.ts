@@ -49,6 +49,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   @Input() artifactColumn: ArtifactColumn;
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
+  @Input() limitByAxis;
   @Input('sipQuery') set setSipQuery(sipQuery: QueryDSL) {
     this.sipQuery = sipQuery;
     const fields = fpPipe(
@@ -56,8 +57,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       fpFilter(artifact => artifact.area === 'y')
     )(sipQuery.artifacts);
     this.fieldCount = fields.length;
+    this.isGroupByPresent = fpFilter(({ area }) => {
+      return area === 'g';
+    })(this.sipQuery.artifacts[0].fields).length > 0;
   }
   public typeIcon: string;
+  public isGroupByPresent: boolean;
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
@@ -72,7 +77,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-
     this.supportsDateInterval =
       DATE_TYPES.includes(type) &&
       (this.analysisType === 'pivot' || this.analysisSubtype === 'comparison');
@@ -189,5 +193,9 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         data: { artifact: this.artifactColumn }
       });
     }
+  }
+
+  onLimitByAxisChange() {
+    this.change.emit({ subject: 'limitByAxis', data: { limitByAxis: this.limitByAxis } });
   }
 }
