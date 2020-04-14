@@ -1000,16 +1000,19 @@ export class DesignerState {
     analysis.sipQuery.joins.forEach(join => {
       const DSLCriteria = [];
       join.criteria.forEach(dslCRT => {
-        DSLCriteria.push({
-          tableName: dslCRT.joinCondition['left'].artifactsName,
-          columnName: dslCRT.joinCondition['left'].columnName,
-          side: 'left'
-        });
-        DSLCriteria.push({
-          tableName: dslCRT.joinCondition['right'].artifactsName,
-          columnName: dslCRT.joinCondition['right'].columnName,
-          side: 'right'
-        });
+        if (!isEmpty(dslCRT)) {
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['left'].artifactsName,
+            columnName: dslCRT.joinCondition['left'].columnName,
+            side: 'left'
+          });
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['right'].artifactsName,
+            columnName: dslCRT.joinCondition['right'].columnName,
+            side: 'right'
+          });
+        }
+
       });
       const dslJoin = {
         type: join.join,
