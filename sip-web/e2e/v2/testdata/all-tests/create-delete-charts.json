@@ -110,25 +110,25 @@
         "description": "Admin should be able to create and delete pie charts"
       },
       "CHART019": {
-        "suites": ["regression"],
+        "suites": ["regression1"],
         "user": "userOne",
         "chartType": "chart:tsspline",
         "description": "User should be able to create and delete tsspline charts"
       },
       "CHART020": {
-        "suites": ["regression"],
+        "suites": ["regression1"],
         "user": "admin",
         "chartType": "chart:tsspline",
         "description": "Admin should be able to create and delete tsspline charts"
       },
       "CHART021": {
-        "suites": ["regression"],
+        "suites": ["regression1"],
         "user": "userOne",
         "chartType": "chart:tsPane",
         "description": "User should be able to create and delete tsPane charts"
       },
       "CHART022": {
-        "suites": ["regression"],
+        "suites": ["regression1"],
         "user": "admin",
         "chartType": "chart:tsPane",
         "description": "Admin should be able to create and delete tsPane charts"
