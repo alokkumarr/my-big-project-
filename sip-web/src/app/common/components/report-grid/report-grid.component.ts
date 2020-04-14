@@ -217,7 +217,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         load: options =>
           this.dataLoader(options).then(value => {
             return {
-              data: flattenReportData(value.data, this.analysis),
+              data: transformDateFields(
+                flattenReportData(value.data, this.analysis),
+                this.columns
+              ),
               totalCount: value.totalCount
             };
           })
