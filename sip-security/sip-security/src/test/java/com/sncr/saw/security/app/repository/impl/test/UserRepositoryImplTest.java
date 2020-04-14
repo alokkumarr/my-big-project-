@@ -334,6 +334,7 @@ public class UserRepositoryImplTest {
 		nssoProperties.setRefreshTokenValidityMins("20");
 		nssoProperties.setSsoSecretKey("M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=");
 		nssoProperties.setJwtSecretKey("nsU7HaMHVylzf+v1tclfEVVyui7595L3/4zdhcBz/K4=");
+		nssoProperties.setEncryptionKey("20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4");
 		nssoProperties.setValidityMins("10");
 		TicketHelper ticketHelper = new TicketHelperImpl(userRepositoryDAO);
 		SSORequestHandler ssoRequestHandler = new SSORequestHandler(nssoProperties, ticketHelper);
