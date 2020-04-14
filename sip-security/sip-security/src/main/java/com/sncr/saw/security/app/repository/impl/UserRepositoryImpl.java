@@ -32,6 +32,8 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.constants.ErrorMessages;
+import com.sncr.saw.security.common.util.AdvancedEncryptionUtil;
+import com.sncr.saw.security.common.util.AdvancedEncryptionUtil.CannotPerformOperationException;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
@@ -71,9 +73,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -122,7 +126,11 @@ public class UserRepositoryImpl implements UserRepository {
     logger.debug("lockingTime : {} ",lockingTime);
     logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
-    password = Ccode.cencode(password).trim();
+    try {
+		password = AdvancedEncryptionUtil.createHash(password);
+	} catch (CannotPerformOperationException e1) {
+		logger.error("Error in encrypting password entered by user ");
+	}
     String pwd = password;
     String sql =
         "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS "
@@ -306,6 +314,49 @@ public class UserRepositoryImpl implements UserRepository {
 
 		return message;
 	}
+	
+	@Override
+	public void migratePwdsEncryption() {
+		logger.debug("###Beginning of migration ####");
+		String sql = "SELECT U.USER_SYS_ID, U.ENCRYPTED_PASSWORD FROM USERS U" + " WHERE U.PWD_MIGRATED = 0" ;
+		
+		
+		List<UserDetails> users = jdbcTemplate.query(sql, new RowMapper<UserDetails>() {
+			public UserDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+				UserDetails userDetails = new UserDetails();
+				userDetails.setUserId(rs.getLong(1));
+				userDetails.setPassword(rs.getString(2));
+				return userDetails;
+			}
+		});
+		logger.debug("###Retrived users  count ::####"+ users.size());
+		String updateSql = "UPDATE USERS U  SET  U.ENCRYPTED_PASSWORD = ?, U.PWD_MIGRATED = 1" ;
+		int[][] updateCounts = jdbcTemplate.batchUpdate(updateSql,users,10,
+	            new ParameterizedPreparedStatementSetter<UserDetails>() {
+	                 
+					@Override
+					public void setValues(PreparedStatement ps, UserDetails user) throws SQLException {
+						String existingPwd  =  user.getPassword();
+						logger.debug("Existing password ::"+ existingPwd);
+						String actualPwd = Ccode.cdecode(existingPwd);
+						logger.debug("Existing decoded password ::"+ existingPwd);
+						String hashedPwd = null;
+						try {
+							hashedPwd = AdvancedEncryptionUtil.createHash(actualPwd);
+							logger.debug("new encrypted password ::"+ existingPwd);
+						} catch (CannotPerformOperationException e) {
+							logger.error("Exception while encrypting pwd for user ::" 
+						    + user.getUserId());
+						}
+						ps.setString(1,hashedPwd);
+	                    
+						
+					}
+	            });
+	         
+	}
+		
+	
 
 	@Override
 	public String changePassword(String loginId, String newPass, String oldPass) {
