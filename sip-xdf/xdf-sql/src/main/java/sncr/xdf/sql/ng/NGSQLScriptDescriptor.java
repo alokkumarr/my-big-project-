@@ -18,10 +18,7 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.sql.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import sncr.xdf.context.XDFReturnCode;
@@ -271,7 +268,7 @@ public class NGSQLScriptDescriptor {
                 return;
             }
 
-            StatementSplitter splitter = new StatementSplitter(script, ImmutableSet.of(";"));
+            StatementSplitter splitter = new StatementSplitter(script, Collections.singleton(";"));
             List<StatementSplitter.Statement> stmtsList = splitter.getCompleteStatements();
             logger.debug("SQL Statements = " + stmtsList);
 
