@@ -16,9 +16,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactoryLocator;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
@@ -36,6 +39,11 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
+
+  @Value("${bis.encryption-key}")
+  private String encryptionKey;
+
+  public final SecretKey secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
 
   @Override
   public SessionFactory<LsEntry> getSessionFactory(Object key) {

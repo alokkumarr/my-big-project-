@@ -31,11 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
@@ -72,6 +75,11 @@ public class SawBisChannelController {
 
   @Autowired
   private BisChannelService bisChannelService;
+
+  @Value("${bis.encryption-key}")
+  private String encryptionKey;
+
+  public final SecretKey secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
 
   private static final Long STATUS_ACTIVE = 1L;
   

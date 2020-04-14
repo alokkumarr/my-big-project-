@@ -110,6 +110,7 @@ bis:
   destination-fs-user: mapr
   duplicate-entry: true
   http-pool-size: 50
+  encryption-key: "Saw12345Saw12345"
  
   
 
