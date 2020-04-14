@@ -5,6 +5,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -169,7 +170,7 @@ public class GatewayController {
             ResponseEntity<String> uploadResponseEntity = null;
             try {
               for (MultipartFile fileItem : uploadfiles){
-                String fileName = fileItem.getOriginalFilename();
+                String fileName = SipCommonUtils.normalizeFileName(fileItem.getOriginalFilename());
                 Path pathToFile = Paths.get(tmpDir + File.separator + fileName);
                 Files.createDirectories(pathToFile.getParent());
                 File incomingTargetFile = new File(tmpDir + File.separator + fileName);

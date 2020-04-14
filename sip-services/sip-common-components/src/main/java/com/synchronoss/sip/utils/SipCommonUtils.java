@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -341,5 +342,15 @@ public class SipCommonUtils {
     String sanitizedString = JsonSanitizer.sanitize(inputJsonString);
 
     return sanitizedString;
+  }
+
+  /**
+   * normalize the filename to eliminate the PathManipulation vulnarabilities.
+   *
+   * @param fileName filename to be normalized
+   * @return normalized filename
+   */
+  public static String normalizeFileName(String fileName) {
+     return FilenameUtils.normalize(fileName);
   }
 }

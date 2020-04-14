@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export.distribution;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,6 +28,7 @@ public class MailSenderUtil {
 						 String attachFile) {
 		logger.debug("User activity started here:" + this.getClass().getName()	+ " MailUtility  method");
 		logger.debug("recipients :" + recipients + " attachFiles " + attachFile);
+        String normalizedattachFile=SipCommonUtils.normalizeFileName(attachFile);
 		try {
 			System.setProperty("java.net.preferIPv4Stack", "true");
 			// create a message
@@ -50,16 +52,16 @@ public class MailSenderUtil {
 			mimemultipart.addBodyPart(mimebodypart);
 
 			// attach FILE
-			if (null != attachFile && !attachFile.isEmpty()) {
+			if (null != normalizedattachFile && !normalizedattachFile.isEmpty()) {
 
 					mimebodypart = new MimeBodyPart();
 
 						FileDataSource filedatasource = new FileDataSource(
-								attachFile);
+                            normalizedattachFile);
 						mimebodypart.setDataHandler(new DataHandler(
 								filedatasource));
 
-					mimebodypart.setFileName(new File(attachFile).getName());
+					mimebodypart.setFileName(new File(normalizedattachFile).getName());
 					mimemultipart.addBodyPart(mimebodypart);
 				}
 			msg.setContent(mimemultipart);
