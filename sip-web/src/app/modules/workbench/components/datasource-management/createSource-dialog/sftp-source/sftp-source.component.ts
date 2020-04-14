@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { isUnique } from 'src/app/common/validators';
 import * as isNil from 'lodash/isNil';
+import * as isEmpty from 'lodash/isEmpty';
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import {
   DetailForm,
@@ -29,8 +30,10 @@ export class SftpSourceComponent implements OnInit, DetailForm {
 
   ngOnInit() {
     this.createForm();
-
+    console.log(this.opType);
     if (isNil(this.channelData.length)) {
+      console.log(this.channelData);
+      this.channelData.password = '';
       this.detailsFormGroup.patchValue(this.channelData);
     }
   }
@@ -57,10 +60,20 @@ export class SftpSourceComponent implements OnInit, DetailForm {
         ])
       ],
       userName: ['', Validators.required],
-      password: ['', Validators.required],
+      password: [''],
       description: [''],
       accessType: ['R', Validators.required]
     });
+
+    this.detailsFormGroup.get('password').setValidators(this.setRequired());
+  }
+
+  setRequired() {
+    if(this.opType === 'create') {
+      return [Validators.required];
+    } else {
+        return [];
+    }
   }
 
   get value(): SFTPChannelMetadata {
@@ -73,11 +86,16 @@ export class SftpSourceComponent implements OnInit, DetailForm {
 
   get testConnectivityValue() {
     const val = this.value;
-    return {
+    const requestBody = {
       hostName: val.hostName,
       password: val.password,
       portNo: val.portNo,
       userName: val.userName
-    };
+    }
+
+    if (this.opType === 'update' && isEmpty(val.password)) {
+      delete requestBody.password
+    }
+    return requestBody;
   }
 }
