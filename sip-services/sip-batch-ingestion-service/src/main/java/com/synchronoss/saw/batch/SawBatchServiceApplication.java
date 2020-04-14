@@ -49,9 +49,7 @@ public class SawBatchServiceApplication {
   private String transferMaxPoolSize;
   @Value("${sip.transfer.queue-capacity}")
   private String transferQueueCapacity;
-  
-  
-  
+
   @Value("${sip.retry.core-pool-size}")
   private String retryCorePoolSize; 
   @Value("${sip.retry.max-pool-size}")
@@ -72,11 +70,10 @@ public class SawBatchServiceApplication {
   /**
    * TomcatServletWebServerFactory has been overridden.
    */
-
   @Bean
   public TomcatServletWebServerFactory tomcatEmbedded() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-    tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
+    tomcat.addConnectorCustomizers(connector -> {
       if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
         ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
       }
@@ -93,7 +90,6 @@ public class SawBatchServiceApplication {
   @EventListener
   public void exitEvent(ExitCodeEvent event) {
     LOG.info("Application exiting : " + event.getExitCode());
-
   }
 
   /**
@@ -102,7 +98,6 @@ public class SawBatchServiceApplication {
    * @param entityManagerFactory entity manager.
    * @return {@link JpaTransactionManager}.
    */
-
   @Bean
   JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
     JpaTransactionManager transactionManager = new JpaTransactionManager();
@@ -147,7 +142,7 @@ public class SawBatchServiceApplication {
   }
   
   /**
-   * Threadpool exeuctor with initial
+   * Threadpool executor with initial
    * configuration for retry threads.
    * @return task executor
    */

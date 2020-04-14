@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.json.JsonSanitizer;
 import com.sncr.saw.security.app.model.response.CustomerBrandResponse;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.CustomerRepository;
@@ -561,11 +562,11 @@ public class SecurityController {
 	 */
 	@RequestMapping(value = "/auth/reCreateTicket", method = RequestMethod.POST)
 	public String reCreateTicket(@RequestBody String ticketId) {
-		logger.info("ReCreating process start for ticket", ticketId, null);
+		logger.info("ReCreating process start for ticket {}", ticketId);
 		Ticket ticket = tHelper.reCreateTicket(ticketId,
 				nSSOProperties.getValidityMins() != null ? Long.parseLong(nSSOProperties.getValidityMins()) : 720);
 		Gson gson = new Gson();
-		return gson.toJson(ticket);
+		return JsonSanitizer.sanitize(gson.toJson(ticket));
 	}
 
 	@SuppressWarnings("unused")

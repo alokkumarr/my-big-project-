@@ -8,7 +8,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -63,6 +62,7 @@ import com.synchronoss.saw.gateway.utils.HeadersRequestTransformer;
 import com.synchronoss.saw.gateway.utils.URLRequestTransformer;
 import com.synchronoss.saw.gateway.utils.UserCustomerMetaData;
 import com.synchronoss.sip.utils.RestUtil;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author spau0004
@@ -104,124 +104,121 @@ public class GatewayController {
   private static final String AUTHORIZATION = HttpHeaders.AUTHORIZATION;
 
   /**
- * @param request
- * @return
-   * @throws Exception 
- */
-  @CrossOrigin(origins = "*")
-@RequestMapping(value = "/{path:^(?!actuator).*$}/**", method = {GET, POST, DELETE, OPTIONS, PUT})
+   *
+   */
+  @CrossOrigin (origins = "*")
+  @RequestMapping (value = "/{path:^(?!actuator).*$}/**", method = {GET, POST, DELETE, OPTIONS, PUT})
   @ResponseBody
   /* Note: Spring Boot Actuator paths are excluded from proxying above
    * to allow downstream health check requests to pass without an
    * authentication token */
-  public ResponseEntity<?> proxyRequest(HttpServletRequest request, HttpServletResponse response,
-      @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles,  @RequestParam(name ="path", required = false) String filePath) throws  Exception {
-  HttpUriRequest proxiedRequest = null;
-    HttpResponse proxiedResponse = null;
-    ResponseEntity<String> responseEntity = null;
-    String header = null;
+  public ResponseEntity<?> proxyRequest(
+    HttpServletRequest request, HttpServletResponse response,
+    @RequestParam (name = "files", required = false) MultipartFile[] uploadfiles,
+    @RequestParam (name = "path", required = false) String filePath) throws Exception {
+
+    HttpUriRequest proxiedRequest;
+    HttpResponse proxiedResponse;
+    ResponseEntity<String> responseEntity;
+    String header;
     logger.trace("Request info : {}", request.getRequestURI());
     logger.trace("filePath info : {}", filePath);
     logger.trace("Accept {}", request.getHeader(ACCEPT));
-    logger.trace("Authorization {}",request.getHeader(AUTHORIZATION));
-    logger.trace("Content-type {}",request.getHeader(CONTENT_TYPE));
-    logger.trace("Host {}",request.getHeader(HOST));
-    logger.trace("Origin {}",request.getHeader(ORIGIN));
-    logger.trace("Referer {}",request.getHeader(REFERER));
-    logger.trace("User-Agent {}",request.getHeader(USER_AGENT));
+    logger.trace("Authorization {}", request.getHeader(AUTHORIZATION));
+    logger.trace("Content-type {}", request.getHeader(CONTENT_TYPE));
+    logger.trace("Host {}", request.getHeader(HOST));
+    logger.trace("Origin {}", request.getHeader(ORIGIN));
+    logger.trace("Referer {}", request.getHeader(REFERER));
+    logger.trace("User-Agent {}", request.getHeader(USER_AGENT));
     try {
-        header = request.getHeader(AUTHORIZATION);
+      header = request.getHeader(AUTHORIZATION);
+    } catch (ArrayIndexOutOfBoundsException ex) {
+      throw new TokenMissingSAWException("Token is missing on the request header.");
     }
-    catch (ArrayIndexOutOfBoundsException ex) {
-     throw new  TokenMissingSAWException("Token is missing on the request header.");
-    }
-    if (header!=null){
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
+    if (header != null) {
+      HttpEntity<?> requestEntity = new HttpEntity<>(setRequestHeader(request));
       RestTemplate restTemplate = restUtil.restTemplate();
-        String url = apiGatewayOtherProperties+"/auth/customer/details";
-        logger.trace("security server URL {}", url);
-        try {
-        ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
-            requestEntity, UserCustomerMetaData.class);
+      String url = apiGatewayOtherProperties + "/auth/customer/details";
+      logger.trace("security server URL {}", url);
+      try {
+        ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST, requestEntity, UserCustomerMetaData.class);
         logger.trace(securityResponse.getStatusCode().getReasonPhrase());
         logger.trace(securityResponse.toString());
-        UserCustomerMetaData userMetadata =(UserCustomerMetaData) securityResponse.getBody();
-         if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
+        UserCustomerMetaData userMetadata = (UserCustomerMetaData)securityResponse.getBody();
+        if (securityResponse.getStatusCode().equals(HttpStatus.OK)) {
           if (!ServletFileUpload.isMultipartContent(request)) {
-          proxiedRequest = createHttpUriRequest(request,userMetadata);  
-          proxiedResponse = httpClient.execute(proxiedRequest);
-          responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity()),
-              makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
-          }
-          else {
+            proxiedRequest = createHttpUriRequest(request, userMetadata);
+            proxiedResponse = httpClient.execute(proxiedRequest);
+            responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity()), makeResponseHeaders(proxiedResponse),
+                                                  HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
+          } else {
             logger.trace("Inside the file upload section....");
-            if(uploadfiles!=null && uploadfiles.length==0){throw new FileUploadException("There are no files to upload");}
-            String uploadURI = request.getRequestURI();
-            if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
-                uploadURI = getServiceUrl(uploadURI, request);
-            } else {
-              uploadURI = getServiceUrl(uploadURI, request);
+            if (uploadfiles == null || uploadfiles.length == 0) {
+              throw new FileUploadException("There are no files to upload");
             }
+            String uploadURI = request.getRequestURI();
+            uploadURI = getServiceUrl(uploadURI, request);
             logger.debug("temp dir : {}", tmpDir);
             Map<String, String> map = new HashMap<>();
-            FileSystemResource requestfile = null;
+            FileSystemResource requestfile;
             List<FileSystemResource> files = new ArrayList<>();
             ResponseEntity<String> uploadResponseEntity = null;
             try {
-              for (MultipartFile fileItem : uploadfiles){
+              for (MultipartFile fileItem : uploadfiles) {
                 String fileName = fileItem.getOriginalFilename();
                 Path pathToFile = Paths.get(tmpDir + File.separator + fileName);
                 Files.createDirectories(pathToFile.getParent());
                 File incomingTargetFile = new File(tmpDir + File.separator + fileName);
-                java.nio.file.Files.copy(fileItem.getInputStream(), incomingTargetFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
+                java.nio.file.Files.copy(fileItem.getInputStream(), incomingTargetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 IOUtils.closeQuietly(fileItem.getInputStream());
                 requestfile = new FileSystemResource(incomingTargetFile);
                 files.add(requestfile);
                 map.put(fileName, requestfile.getPath());
               }
-            logger.trace("Map contains : {}", map);
-            logger.trace("uploadURI : {}", uploadURI);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set(AUTHORIZATION, request.getHeader(AUTHORIZATION));
-            headers.set("directoryPath", filePath);
-            HttpEntity<Object> uploadHttptEntity = new HttpEntity<Object>(map, headers);
-            uploadResponseEntity = restTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
-            logger.debug("uploadResponseEntity {} ", uploadResponseEntity);
+              logger.trace("Map contains : {}", map);
+              logger.trace("uploadURI : {}", uploadURI);
+              HttpHeaders headers = new HttpHeaders();
+              headers.setContentType(MediaType.APPLICATION_JSON);
+              headers.set(AUTHORIZATION, request.getHeader(AUTHORIZATION));
+              headers.set("directoryPath", filePath);
+              HttpEntity<Object> uploadHttptEntity = new HttpEntity<>(map, headers);
+              uploadResponseEntity = restTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
+              logger.debug("uploadResponseEntity {} ", uploadResponseEntity);
             } catch (Exception e) {
-            logger.error("Exception thrown during file upload ", e);
-          }
-            for (FileSystemResource file : files){
-              logger.trace(String.format(
-                  "Filename : %s has been deleted from temp folder after uploading to the destination",
-                  file.getFilename()));
-            file.getFile().delete();}
+              logger.error("Exception thrown during file upload ", e);
+            }
+            for (FileSystemResource file : files) {
+              logger.trace(String.format("Filename : %s has been deleted from temp folder after uploading to the destination", file.getFilename()));
+              file.getFile().delete();
+            }
             String uploadResponse = "";
-            if(uploadResponseEntity != null){
-                uploadResponse = uploadResponseEntity.getBody();
-                logger.trace("uploadResponseEntity response structure {}",  uploadResponse + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
+            if (uploadResponseEntity != null) {
+              if (uploadResponseEntity.getBody() != null) {
+                uploadResponse = HtmlUtils.htmlEscape(uploadResponseEntity.getBody());
+              }
+              logger.trace("uploadResponseEntity response structure {}", uploadResponse + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
             }
             responseEntity = new ResponseEntity<>(uploadResponse, makeResponseHeadersUpload(), HttpStatus.OK);
-            logger.trace("responseEntity response structure {}",  responseEntity.getStatusCodeValue());
+            logger.trace("responseEntity response structure {}", responseEntity.getStatusCodeValue());
             return responseEntity;
           }
-        } else {responseEntity = new ResponseEntity<>("{\"message\":\"Invalid User Credential\"}",makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);}
-      } catch(HttpClientErrorException e) {
-          //SAW-1374: Just keep the message hardcoded itself.
+        } else {
+          responseEntity = new ResponseEntity<>("{\"message\":\"Invalid User Credential\"}", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
+        }
+      } catch (HttpClientErrorException e) {
+        //SAW-1374: Just keep the message hardcoded itself.
         responseEntity = new ResponseEntity<>("{\"message\":\"Invalid Token\"}", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
         logger.info("Invalid Token: {}", responseEntity);
         return responseEntity;
       }
-    }
-    else {
+    } else {
       /* If accessing REST API definition, pass the request through */
       if (request.getRequestURI().endsWith(URLRequestTransformer.API_DOCS_PATH)) {
-          proxiedRequest = createHttpUriRequest(request, new UserCustomerMetaData());
-          proxiedResponse = httpClient.execute(proxiedRequest);
-          return new ResponseEntity<>(read(proxiedResponse.getEntity()),
-              makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
-        }
-        responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
+        proxiedRequest = createHttpUriRequest(request, new UserCustomerMetaData());
+        proxiedResponse = httpClient.execute(proxiedRequest);
+        return new ResponseEntity<>(read(proxiedResponse.getEntity()), makeResponseHeaders(proxiedResponse), HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
+      }
+      responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
     }
     logger.trace("Response {}", responseEntity.getStatusCode());
     return responseEntity;
@@ -245,14 +242,14 @@ public class GatewayController {
   
   private HttpHeaders makeResponseHeadersInvalid() {
         HttpHeaders result = new HttpHeaders();
-        List<String> allowedHeaders = new ArrayList<String>();
+        List<String> allowedHeaders = new ArrayList<>();
         allowedHeaders.add(ORIGIN);
         allowedHeaders.add("X-Requested-With");
         allowedHeaders.add(CONTENT_TYPE);
         allowedHeaders.add(ACCEPT);
         allowedHeaders.add(AUTHORIZATION);
         result.setAccessControlAllowHeaders(allowedHeaders);
-        List<HttpMethod> allowedMethods = new ArrayList<HttpMethod>();
+        List<HttpMethod> allowedMethods = new ArrayList<>();
         allowedMethods.add(HttpMethod.DELETE);
         allowedMethods.add(HttpMethod.POST);
         allowedMethods.add(HttpMethod.GET);
