@@ -47,8 +47,8 @@ public class HFileOperations {
         FileSystem fs;
         InputStream stream;
         try {
-
-            Path path = new Path(fileName);
+            String normalizedFilePath =normalizePath(fileName);
+            Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
             CompressionCodecFactory factory = new CompressionCodecFactory(conf);
@@ -160,7 +160,8 @@ public class HFileOperations {
     public static void deleteEnt(String file) throws Exception {
         FileSystem fs;
         try {
-            Path path = new Path(file);
+            String normalizedFilePath =normalizePath(file);
+            Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
             fs.delete(path, true);
@@ -198,7 +199,8 @@ public class HFileOperations {
     public static void createDir(String s) throws Exception {
         FileSystem fs;
         try {
-            Path path = new Path(s);
+            String normalizedFilePath =normalizePath(s);
+            Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
             //fs.create(path);
