@@ -1,6 +1,8 @@
 package com.synchronoss.sip.utils;
 
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.stream.Collector;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -12,32 +14,12 @@ public class Ccode {
 
   static final byte[] initVector = "RandomInitVector".getBytes();
 
-  // Random bytes
-  static final byte[] key = {
-    0x20,
-    (byte) 0x89,
-    (byte) 0xC3,
-    0x13,
-    (byte) 0xD6,
-    0x29,
-    (byte) 0x9E,
-    (byte) 0x91,
-    0x6C,
-    0x35,
-    (byte) 0xC2,
-    0x4D,
-    0x0A,
-    (byte) 0xB5,
-    0x2C,
-    (byte) 0xD4
-  };
-
   /**
    * This method encrypts the parameter passed.
    * @param password pareter that has to e encoded
    * @return
    */
-  public static String cencode(String password) {
+  public static String cencode(String password,byte []key) {
 
     try {
       IvParameterSpec iv = new IvParameterSpec(initVector);
@@ -59,7 +41,7 @@ public class Ccode {
    * @param encryptedPassword encryptedPassword
    * @return
    */
-  public static String cdecode(String encryptedPassword) {
+  public static String cdecode(String encryptedPassword, byte []key) {
 
     try {
       byte[] encrypted = Base64.getDecoder().decode(encryptedPassword);
@@ -88,13 +70,17 @@ public class Ccode {
     int rc = 0;
     String res = null;
     boolean chkres = false;
-    if (args.length == 1) {
+    if (args.length == 2) {
       String password = args[0];
-      res = cencode(password);
+      String hexKey = args[1];
+      byte []key = convertHexStringToByteArray(hexKey);
+      res = cencode(password, key);
       chkres = true;
-    } else if (args.length == 2) {
+    } else if (args.length == 3) {
       String encryptedPassword = args[0];
-      res = cdecode(encryptedPassword);
+      String hexKey = args[1];
+      byte[] key = convertHexStringToByteArray(hexKey);
+      res = cdecode(encryptedPassword, key);
       chkres = true;
     }
     if (chkres) {
@@ -105,5 +91,26 @@ public class Ccode {
       }
     }
     System.exit(rc);
+  }
+
+  /**
+   * Hex string to byte array.
+   *
+   * @param hexCode Hex code string
+   * @return key in byte array
+   */
+  public static byte[] convertHexStringToByteArray(String hexCode) {
+
+    String[] split = hexCode.split("-");
+
+    Integer[] key =
+        Arrays.stream(split).map(val -> Integer.parseInt(val, 16)).toArray(Integer[]::new);
+
+    byte[] byteArray = new byte[key.length];
+    for (int i = 0; i < key.length; i++) {
+      byteArray[i] = key[i].byteValue();
+    }
+
+    return byteArray;
   }
 }

@@ -1,6 +1,6 @@
 package com.sncr.saw.security.app.properties;
 
-import com.sncr.saw.security.common.util.Ccode;
+import com.synchronoss.sip.utils.Ccode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -42,6 +42,11 @@ public class NSSOProperties {
 
   @Value("${jwt.secret.key}")
   private String jwtSecretKey;
+
+  @Value("${encryption.key}")
+  private String encryptionKey;
+
+  private byte []encryptionKeyBytes;
 
   @Value("${user.lockingTime.mins}")
   private int lockingTime;
@@ -156,12 +161,36 @@ public class NSSOProperties {
    * @return value of jwtSecretKey
    */
   public String getJwtSecretKey() {
-    return Ccode.cencode(jwtSecretKey);
+
+    if (encryptionKeyBytes == null) {
+      encryptionKeyBytes = Ccode.convertHexStringToByteArray(encryptionKey);
+    }
+
+    return Ccode.cencode(jwtSecretKey, encryptionKeyBytes);
   }
 
   /** Sets jwtSecretKey */
   public void setJwtSecretKey(String jwtSecretKey) {
     this.jwtSecretKey = jwtSecretKey;
+  }
+
+  /** Get encryption key */
+  public String getEncryptionKey() {
+    return encryptionKey;
+  }
+
+  /** Sets encryption key */
+  public void setEncryptionKey(String encryptionKey) {
+    this.encryptionKey = encryptionKey;
+
+    if (encryptionKeyBytes == null) {
+      encryptionKeyBytes = Ccode.convertHexStringToByteArray(encryptionKey);
+    }
+  }
+
+  /** Get encryptionKeyBytes */
+  public byte[] getEncryptionKeyBytes() {
+    return encryptionKeyBytes;
   }
 
   /** Gets Account LockTime in mins when maximum invalid limit reaches */

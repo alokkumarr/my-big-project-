@@ -17,6 +17,11 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
   @Value("${spring.datasource.username}")
   private String username;
 
+  @Value("${encryption.key}")
+  private String encryptionKey;
+
+  private byte[] encryptionKeyBytes;
+
   public String getUrl() {
     return this.url;
   }
@@ -27,16 +32,21 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
 
   @Override
   public String getPassword() {
-    return base64Decode(password);
+    if (encryptionKeyBytes == null) {
+      encryptionKeyBytes = Ccode.convertHexStringToByteArray(encryptionKey);
+    }
+
+    return base64Decode(password, encryptionKeyBytes);
   }
 
   /**
    * This method is used for decrypting the encrypted parameter.
    *
    * @param token parameter that is encrypted
+   * @param encryptionKeyBytes Encryption key
    * @return
    */
-  public static String base64Decode(String token) {
-    return Ccode.cdecode(token);
+  public static String base64Decode(String token, byte[] encryptionKeyBytes) {
+    return Ccode.cdecode(token, encryptionKeyBytes);
   }
 }
