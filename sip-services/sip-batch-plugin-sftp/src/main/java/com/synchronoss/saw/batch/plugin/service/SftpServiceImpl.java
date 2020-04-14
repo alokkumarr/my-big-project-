@@ -26,7 +26,6 @@ import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.IntegrationUtils;
-import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,8 +49,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
@@ -142,8 +139,6 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Value("${bis.encryption-key}")
   private String encryptionKey;
-
-  public final SecretKey secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
   
   public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
   

@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch;
 
+import com.synchronoss.saw.batch.service.migration.KeyMigration;
 import info.faljse.SDNotify.SDNotify;
 import javax.persistence.EntityManagerFactory;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
@@ -64,6 +65,8 @@ public class SawBatchServiceApplication {
   @Value("${sip.retry.queue-capacity}")
   private String retryQueueCapacity;
 
+  @Autowired private KeyMigration keyMigration;
+
   /**
    * This is the entry method of the class.
    */
@@ -93,6 +96,7 @@ public class SawBatchServiceApplication {
   public void onApplicationEvent(ApplicationReadyEvent event) {
     LOG.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
+    keyMigration.migrate();
   }
 
   @EventListener

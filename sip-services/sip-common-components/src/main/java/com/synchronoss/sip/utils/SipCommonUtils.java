@@ -345,7 +345,8 @@ public class SipCommonUtils {
   }
 
   /**
-   * Decrypts a given encrypted string.
+   * Decrypts a given encrypted string. This method can be removed from codeBase once migration ran
+   * in all ENVIRONMENTS.
    *
    * @param secretKey for encryption
    * @param encryptedPassword Password to be decrypted

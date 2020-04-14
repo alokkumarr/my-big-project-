@@ -16,7 +16,6 @@ import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.service.BisChannelService;
-
 import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
@@ -24,7 +23,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,8 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,8 +75,6 @@ public class SawBisChannelController {
 
   @Value("${bis.encryption-key}")
   private String encryptionKey;
-
-  public final SecretKey secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
 
   private static final Long STATUS_ACTIVE = 1L;
   

@@ -127,3 +127,4 @@ bis:
   destination-fs-user: mapr
   duplicate-entry: {{ sip_bis_duplicate_entry  | default('true') }}
   http-pool-size: 50
+  encryption-key: "Saw12345Saw12345"
