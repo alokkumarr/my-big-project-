@@ -113,6 +113,10 @@ describe('Executing update and delete tests for pivots from pivots/UpdateAndDele
         chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
 
         // Verify analysis displayed in list and card view
+        commonFunctions.goToHome();
+        header.openCategoryMenu();
+        header.selectCategory(categoryName);
+        header.selectSubCategory(subCategoryName);
         analyzePage.goToView('list');
         analyzePage.verifyElementPresent(
           analyzePage._analysisTitleLink(updatedName),

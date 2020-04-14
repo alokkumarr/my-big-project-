@@ -81,9 +81,7 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
 
         // Scenario for group intervals
         if (data.groupIntervalSpecified) {
-          chartDesignerPage.clickOnDataOptions(dateFieldName);
           browser.sleep(2000);
-
           // select the group by interval value e.g. year/month day etc
           chartDesignerPage.clickOnGroupBySelector();
           chartDesignerPage.clickOnGroupByOption(data.groupInterval);
@@ -91,7 +89,6 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
 
         // Scenario for aggregate functions
         if (data.aggregateFunction) {
-          chartDesignerPage.clickOnDataOptions(numberFieldNameDataOption);
           browser.sleep(2000); // Needed to avoid element not loaded/active
           chartDesignerPage.clickOnAggregateOption('sum');
           browser.sleep(1000);
