@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.dto.BisChannelDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
+import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.List;
 import javax.crypto.SecretKey;
@@ -49,7 +50,10 @@ public class EncryptionKeyMigration implements KeyMigration {
 
         if (rootNode.has("password")) {
           String secretPhrase = rootNode.get("password").asText();
+          logger.info("Old Encryption : {}", secretPhrase);
           secretPhrase = this.decryptPassword(secretPhrase);
+          secretPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
+          logger.info("New Encryption : {}", secretPhrase);
           rootNode.put("password", secretPhrase);
         }
         bisChannelDto = new BisChannelDto();
