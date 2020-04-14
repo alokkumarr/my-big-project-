@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
@@ -79,7 +78,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String hostname = rootNode.get("hostName").asText();
         defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
         String portNumber = rootNode.get("portNo").asText();
-        String password = SipCommonUtils.decryptPassword(rootNode.get("password").asText());
+        String password = SipCommonUtils.decryptPassword(secretKey, rootNode.get("password").asText());
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         String userName = rootNode.get("userName").asText();        

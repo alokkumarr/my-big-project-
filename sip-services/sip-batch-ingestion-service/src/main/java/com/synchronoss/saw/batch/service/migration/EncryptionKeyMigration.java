@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.dto.BisChannelDto;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
-import com.synchronoss.saw.batch.utils.SipObfuscation;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -75,9 +75,7 @@ public class EncryptionKeyMigration implements KeyMigration {
   private String decryptPassword(String encryptedPassword) throws Exception {
     String decryptedPassword = null;
 
-    SipObfuscation obfuscator = new SipObfuscation(secretKey);
-    decryptedPassword = obfuscator.decrypt(encryptedPassword);
-
+    decryptedPassword = SipCommonUtils.decryptPassword(secretKey, encryptedPassword);
     return decryptedPassword;
   }
 }

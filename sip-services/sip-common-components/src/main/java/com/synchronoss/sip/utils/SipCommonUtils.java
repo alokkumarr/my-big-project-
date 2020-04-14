@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -346,14 +347,15 @@ public class SipCommonUtils {
   /**
    * Encrypts a given string.
    *
+   * @param secretKey for encryption
    * @param password Password to be encrypted
    * @return Encrypted password
    * @throws Exception In case of any error
    */
-  public static String encryptPassword(String password) throws Exception {
+  public static String encryptPassword(SecretKey secretKey, String password) throws Exception {
     String encryptedPassword = null;
 
-    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    SipObfuscation obfuscator = new SipObfuscation(secretKey);
     encryptedPassword = obfuscator.encrypt(password);
     return encryptedPassword;
   }
@@ -361,14 +363,16 @@ public class SipCommonUtils {
   /**
    * Decrypts a given encrypted string.
    *
+   * @param secretKey for encryption
    * @param encryptedPassword Password to be decrypted
    * @return Decrypted password
    * @throws Exception In case of any error
    */
-  public static String decryptPassword(String encryptedPassword) throws Exception {
+  public static String decryptPassword(SecretKey secretKey, String encryptedPassword)
+      throws Exception {
     String decryptedPassword = null;
 
-    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    SipObfuscation obfuscator = new SipObfuscation(secretKey);
     decryptedPassword = obfuscator.decrypt(encryptedPassword);
 
     return decryptedPassword;

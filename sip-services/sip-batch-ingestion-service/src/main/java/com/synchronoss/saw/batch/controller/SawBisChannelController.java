@@ -130,7 +130,7 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = rootNode.get("password").asText();
-      String passwordPhrase = SipCommonUtils.encryptPassword(secretPhrase);
+      String passwordPhrase = SipCommonUtils.encryptPassword(secretKey, secretPhrase);
       rootNode.put("password", passwordPhrase);
       requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     }
@@ -358,7 +358,7 @@ public class SawBisChannelController {
 
           rootNode.put("password", savedPassword);
         } else {
-          secretPhrase = SipCommonUtils.encryptPassword(passwordNode.asText());
+          secretPhrase = SipCommonUtils.encryptPassword(secretKey, passwordNode.asText());
           rootNode.put("password", secretPhrase);
         }
 
@@ -509,7 +509,7 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = channelMetadata.get("password").asText();
-      String passwordPhrase = SipCommonUtils.encryptPassword(secretPhrase);
+      String passwordPhrase = SipCommonUtils.encryptPassword(secretKey, secretPhrase);
       channelMetadata.put("password", passwordPhrase);
     }
 
