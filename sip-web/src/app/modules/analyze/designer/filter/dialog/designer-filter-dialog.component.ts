@@ -73,7 +73,6 @@ export class DesignerFilterDialogComponent implements OnInit {
       }
 
       if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
-        console.log(filtr);
         filtr.model.modelValues = [];
       }
     });
