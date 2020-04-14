@@ -515,21 +515,21 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
-    logger.debug("security groupId : {}",groupSysId);
+    logger.debug("security groupId : {}", groupSysId);
 
     ObjectNode dskAttValues = mapper.createObjectNode();
-    dskAttValues.put("booleanCriteria","AND");
+    dskAttValues.put("booleanCriteria", "AND");
     ObjectNode dskValues = mapper.createObjectNode();
-    dskValues.put("columnName","string");
+    dskValues.put("columnName", "string");
     ArrayNode values = mapper.createArrayNode();
     values.add("string 1");
     ObjectNode model = mapper.createObjectNode();
-    model.put("operator","ISIN");
-    model.put("values",values);
-    dskValues.put("model",model);
+    model.put("operator", "ISIN");
+    model.put("values", values);
+    dskValues.put("model", model);
     ArrayNode booleanQuery = mapper.createArrayNode();
     booleanQuery.add(dskValues);
-    dskAttValues.put("booleanQuery",booleanQuery);
+    dskAttValues.put("booleanQuery", booleanQuery);
 
     given(spec)
         .header(AUTHORIZATION, "Bearer " + customToken)
@@ -809,21 +809,21 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
-    logger.debug("security groupId : {}",groupSysId);
+    logger.debug("security groupId : {}", groupSysId);
 
     ObjectNode dskAttValues = mapper.createObjectNode();
-    dskAttValues.put("booleanCriteria","AND");
+    dskAttValues.put("booleanCriteria", "AND");
     ObjectNode dskValues = mapper.createObjectNode();
-    dskValues.put("columnName","string");
+    dskValues.put("columnName", "string");
     ArrayNode values = mapper.createArrayNode();
     values.add("string 1");
     ObjectNode model = mapper.createObjectNode();
-    model.put("operator","ISIN");
-    model.put("values",values);
-    dskValues.put("model",model);
+    model.put("operator", "ISIN");
+    model.put("values", values);
+    dskValues.put("model", model);
     ArrayNode booleanQuery = mapper.createArrayNode();
     booleanQuery.add(dskValues);
-    dskAttValues.put("booleanQuery",booleanQuery);
+    dskAttValues.put("booleanQuery", booleanQuery);
     given(spec)
         .header(AUTHORIZATION, "Bearer " + customToken)
         .contentType(ContentType.JSON)
@@ -1844,14 +1844,13 @@ public class SipDslIT extends BaseIT {
     Assert.assertEquals(dataNode.get(0).get("integer"), 100);
 
     ObjectNode sipQuery = (ObjectNode) analysis.get("sipQuery");
-    sipQuery.put("query", "select * from sales"
-        + " where integer = ? and string = ? and date = ?");
+    sipQuery.put("query", "select * from sales" + " where integer = ? and string = ? and date = ?");
     analysis.put("sipQuery", sipQuery);
 
-    /** Negative Test Case :
-     * If number of wild card filters in query doesn't match with
-     * the number of run time filters passed for execution. **/
-
+    /**
+     * Negative Test Case : If number of wild card filters in query doesn't match with the number of
+     * run time filters passed for execution. *
+     */
     given(spec)
         .header(AUTHORIZATION, "Bearer " + token)
         .body(analysis)
@@ -1860,5 +1859,31 @@ public class SipDslIT extends BaseIT {
         .then()
         .assertThat()
         .statusCode(HttpStatus.BAD_REQUEST.value());
+  }
+
+  /** Integration test to run the elastic-search query with storage proxy service. */
+  @Test
+  public void testStorageProxyEsSearch() {
+    ObjectNode payload = getJsonObject("json/Storage-proxy/payload.json");
+    Response response =
+        given(spec)
+            .header(AUTHORIZATION, "Bearer " + token)
+            .body(payload)
+            .when()
+            .post("/sip/services/internal/proxy/storage")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .response();
+    Integer noOfRecords =
+        response
+            .getBody()
+            .as(ObjectNode.class)
+            .get("aggregationData")
+            .get("categories")
+            .get("doc_count")
+            .asInt();
+    assertTrue(noOfRecords == 1);
   }
 }
