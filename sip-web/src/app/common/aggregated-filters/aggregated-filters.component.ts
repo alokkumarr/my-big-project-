@@ -49,6 +49,12 @@ export class AggregatedFiltersComponent implements OnInit {
 
   ngOnInit() {
     this.filter.artifactsName = get(this.data, 'artifacts[0].artifactName') || get(this.data, 'artifacts[0].artifactsName');
+
+    if (this.data.isInRuntimeMode) {
+      this.filter.aggregate = '';
+      delete this.filter.model;
+    }
+
     this.cols = this.data.artifacts[0].columns;
   }
 
