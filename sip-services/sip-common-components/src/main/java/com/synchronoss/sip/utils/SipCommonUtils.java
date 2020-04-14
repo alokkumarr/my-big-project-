@@ -345,22 +345,6 @@ public class SipCommonUtils {
   }
 
   /**
-   * Encrypts a given string.
-   *
-   * @param secretKey for encryption
-   * @param password Password to be encrypted
-   * @return Encrypted password
-   * @throws Exception In case of any error
-   */
-  public static String encryptPassword(SecretKey secretKey, String password) throws Exception {
-    String encryptedPassword = null;
-
-    SipObfuscation obfuscator = new SipObfuscation(secretKey);
-    encryptedPassword = obfuscator.encrypt(password);
-    return encryptedPassword;
-  }
-
-  /**
    * Decrypts a given encrypted string.
    *
    * @param secretKey for encryption

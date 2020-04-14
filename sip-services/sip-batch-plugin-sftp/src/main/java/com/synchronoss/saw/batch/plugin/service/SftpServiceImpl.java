@@ -24,6 +24,7 @@ import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
+import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.IntegrationUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
@@ -452,7 +453,7 @@ public class SftpServiceImpl extends SipPluginContract {
         ObjectNode node = (ObjectNode) om.readTree(channelMetadata);
 
         String channelPassword = node.get("password").asText();
-        String decryptedPassword = SipCommonUtils.decryptPassword(secretKey, channelPassword);
+        String decryptedPassword = Ccode.cdecode(channelPassword, encryptionKey.getBytes());
 
         payload.setPassword(decryptedPassword);
         return immediateConnectChannel(payload);

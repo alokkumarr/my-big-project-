@@ -17,6 +17,7 @@ import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.service.BisChannelService;
 
+import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -130,7 +131,7 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = rootNode.get("password").asText();
-      String passwordPhrase = SipCommonUtils.encryptPassword(secretKey, secretPhrase);
+      String passwordPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
       rootNode.put("password", passwordPhrase);
       requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     }
@@ -358,7 +359,7 @@ public class SawBisChannelController {
 
           rootNode.put("password", savedPassword);
         } else {
-          secretPhrase = SipCommonUtils.encryptPassword(secretKey, passwordNode.asText());
+          secretPhrase = Ccode.cencode(passwordNode.asText(), encryptionKey.getBytes());
           rootNode.put("password", secretPhrase);
         }
 
@@ -509,7 +510,7 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = channelMetadata.get("password").asText();
-      String passwordPhrase = SipCommonUtils.encryptPassword(secretKey, secretPhrase);
+      String passwordPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
       channelMetadata.put("password", passwordPhrase);
     }
 

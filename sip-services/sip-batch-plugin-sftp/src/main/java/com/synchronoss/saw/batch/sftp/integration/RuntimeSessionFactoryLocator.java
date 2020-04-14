@@ -9,6 +9,7 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
+import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import java.util.HashMap;
@@ -78,7 +79,8 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String hostname = rootNode.get("hostName").asText();
         defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
         String portNumber = rootNode.get("portNo").asText();
-        String password = SipCommonUtils.decryptPassword(secretKey, rootNode.get("password").asText());
+        String password = Ccode
+            .cdecode(rootNode.get("password").asText(), encryptionKey.getBytes());
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         String userName = rootNode.get("userName").asText();        
