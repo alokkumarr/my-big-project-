@@ -30,9 +30,7 @@ export class SftpSourceComponent implements OnInit, DetailForm {
 
   ngOnInit() {
     this.createForm();
-    console.log(this.opType);
     if (isNil(this.channelData.length)) {
-      console.log(this.channelData);
       this.channelData.password = '';
       this.detailsFormGroup.patchValue(this.channelData);
     }

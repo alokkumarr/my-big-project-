@@ -111,13 +111,11 @@ export class CreateSourceDialogComponent {
       ...formData
     };
     return this.datasourceService
-      .testChannelWithBody(channelData, this.opType)
+      .testChannelWithBody(channelData, this.opType, this.channelData.channelId)
       .pipe(first());
   }
 
   testChannel(formData) {
-    console.log(this.selectedSource); //"sftp"
-    console.log(this.opType); //"update"
     this.testChannelAPI(formData).subscribe(data => {
       if (data && data.error) {
         this.showConnectivityLog(data.message);
