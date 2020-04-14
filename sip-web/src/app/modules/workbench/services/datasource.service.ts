@@ -301,8 +301,9 @@ export class DatasourceService {
    * @returns {Observable<any>}
    * @memberof DatasourceService
    */
-  testChannelWithBody(payload): Observable<any> {
-    const endpoint = `${this.api}/ingestion/batch/channels/test`;
+  testChannelWithBody(payload, type): Observable<any> {
+    console.log(payload);
+    const endpoint = type === 'update' ? `${this.api}/ingestion/batch/channels/test` : `${this.api}/ingestion/batch/channels/test`;
 
     return this.http
       .post(endpoint, payload)
