@@ -79,9 +79,20 @@ export class FilterPromptLayout implements OnInit {
   }
 
   ngOnInit() {
-    this.filters = cloneDeep(this.data.filters);
+    this.filters = cloneDeep(this.resetFilters(this.data.filters));
+
     this.groupedFilters = groupBy(this.data.filters, 'tableName');
     this.onChange.emit(this.filterGroup);
+  }
+
+  resetFilters(tree) {
+    for (var i in tree) {
+      if (tree[i].model) {
+        delete tree[i].model;
+      }
+      if (typeof tree[i] == 'object') this.resetFilters(tree[i])
+    }
+    return tree;
   }
 
   fetchColumns(childId) {
