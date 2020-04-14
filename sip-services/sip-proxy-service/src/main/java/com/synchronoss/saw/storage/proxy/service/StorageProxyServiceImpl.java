@@ -95,8 +95,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private final String analysisMetadataTable = "analysisMetadata";
   private static final String METASTORE = "services/metadata";
   public static final String CUSTOMER_CODE = "customerCode";
-  public static final String REPORT = "REPORT";
-  private static final String CHART = "CHART";
+  public static final String ANALYSIS_TYPE_REPORT = "REPORT";
+  private static final String ANALYSIS_TYPE_CHART = "CHART";
 
   @Value("${schema.file}")
   private String schemaFile;
@@ -634,7 +634,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               sipQueryFromSemantic);
     } else {
       response = new ExecuteAnalysisResponse();
-      if (CHART.equalsIgnoreCase(analysis.getType())) {
+      if (ANALYSIS_TYPE_CHART.equalsIgnoreCase(analysis.getType())) {
         LimitByAxis limitByAxis = analysis.getChartOptions().getLimitByAxis();
         if (limitByAxis != null) {
           sipQuery = reOrderFieldsByLimitByAxis(sipQuery, limitByAxis);
@@ -647,7 +647,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     saveExecutionResult(
         executionType, response, analysis, startTime, authTicket, queryId, dskAttribute);
-    if (!REPORT.equalsIgnoreCase(analysis.getType())) {
+    if (!ANALYSIS_TYPE_REPORT.equalsIgnoreCase(analysis.getType())) {
 
       // return only requested data based on page no and page size, only for FE
       List<Object> pagingData = pagingData(page, pageSize, (List<Object>) response.getData());
