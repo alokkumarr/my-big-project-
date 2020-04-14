@@ -410,6 +410,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   fetchFilters(sipQuery) {
+    if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+      return sipQuery.filters;
+    }
     if (isUndefined(get(sipQuery.filters[0], 'filters'))) {
       const aggregatedFilters = sipQuery.filters.filter(option => {
         return option.isAggregationFilter === true;

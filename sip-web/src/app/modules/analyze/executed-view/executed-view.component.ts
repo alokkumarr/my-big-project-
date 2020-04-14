@@ -125,18 +125,23 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
-    if (isUndefined(get(this.filters[0], 'filters'))) {
-      const aggregatedFilters = this.filters.filter(option => {
-        return option.isAggregationFilter === true;
-      });
-      const oldFormatFilters = cloneDeep(this.filters);
-      this.filters = [];
-      const normalFilters = [{
-        booleanCriteria: queryBuilder.booleanCriteria,
-        filters: oldFormatFilters
-      }]
 
-      this.filters = concat(normalFilters, aggregatedFilters);
+    if (isUndefined(get(this.filters[0], 'filters'))) {
+      if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+      } else {
+        const aggregatedFilters = this.filters.filter(option => {
+          return option.isAggregationFilter === true;
+        });
+        const oldFormatFilters = cloneDeep(this.filters);
+        this.filters = [];
+        const normalFilters = [{
+          booleanCriteria: queryBuilder.booleanCriteria,
+          filters: oldFormatFilters
+        }]
+
+        this.filters = concat(normalFilters, aggregatedFilters);
+      }
+
     }
   }
 
