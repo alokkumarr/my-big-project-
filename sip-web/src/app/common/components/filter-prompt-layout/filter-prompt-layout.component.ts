@@ -80,7 +80,6 @@ export class FilterPromptLayout implements OnInit {
 
   ngOnInit() {
     this.filters = cloneDeep(this.resetFilters(this.data.filters));
-
     this.groupedFilters = groupBy(this.data.filters, 'tableName');
     this.onChange.emit(this.filterGroup);
   }

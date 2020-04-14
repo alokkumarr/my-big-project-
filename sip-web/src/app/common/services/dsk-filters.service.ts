@@ -89,7 +89,7 @@ export class DskFiltersService {
     );
   }
 
-  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false, data) {
+  isDSKFilterValid(filter, isTopLevel = false, data) {
     switch (data.mode) {
       case 'DSK':
         let condition;
@@ -131,41 +131,25 @@ export class DskFiltersService {
           }) => {
             if (isEmpty(columnName)) {
               areValid = false;
-              return false;
             }
-
-            if (data.isInRuntimeMode) {
-              if (isOptional) {
-                areValid = Boolean(
-                  data.isInRuntimeMode
-                    ? isOptional && isRuntimeFilter
-                    : isRuntimeFilter
-                );
-                return areValid;
-              }
-            }
-
-            if (!isRuntimeFilter && isGlobalFilter) {
-              areValid = true;
-            } else if (!model) {
-              areValid = Boolean(
-                data.isInRuntimeMode
-                  ? isOptional && isRuntimeFilter
-                  : isRuntimeFilter
-              );
-            } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
-              areValid = this.isNumberFilterValid(model);
-              if (isAggregationFilter && areValid) {
-                areValid = !isEmpty(aggregate);
-              }
-            } else if (type === 'string') {
-              areValid = this.isStringFilterValid(model);
-            } else if (DATE_TYPES.includes(type)) {
-              areValid = this.isDateFilterValid(model);
-            }
-            if (!areValid) {
-              return false;
-            }
+            else if (!isRuntimeFilter && isGlobalFilter) {
+            areValid = true;
+          } else if (!model) {
+            areValid = Boolean(
+              data.isInRuntimeMode
+                ? isOptional && isRuntimeFilter
+                : isRuntimeFilter
+            );
+          } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
+            areValid = this.isNumberFilterValid(model);
+          } else if (type === 'string') {
+            areValid = this.isStringFilterValid(model);
+          } else if (DATE_TYPES.includes(type)) {
+            areValid = this.isDateFilterValid(model);
+          }
+          if (!areValid) {
+            return false;
+          }
           }
         );
         return areValid;
