@@ -88,7 +88,11 @@ export class FilterPromptLayout implements OnInit {
   resetFilters(tree) {
     for (var i in tree) {
       if (tree[i].model) {
-        delete tree[i].model;
+        if (this.data.isInRuntimeMode) {
+          if (tree[i].isRuntimeFilter) {
+            delete tree[i].model;
+          }
+        }
       }
       if (typeof tree[i] == 'object') this.resetFilters(tree[i])
     }
