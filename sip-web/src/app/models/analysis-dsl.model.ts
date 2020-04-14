@@ -93,7 +93,7 @@ export interface ChartOptions {
   labelOptions?: LabelOptions;
   xAxis?: Axis;
   yAxis?: Axis;
-  limitByAxis? : 'dimension' | 'groupBy';
+  limitByAxis?;
 }
 export interface AnalysisChartDSL extends AnalysisBaseDSL {
   chartType: string;
