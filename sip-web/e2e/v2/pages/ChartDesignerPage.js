@@ -82,6 +82,7 @@ class ChartsDesignerPage extends Designer {
           `//*[@text-anchor="middle"]/*[contains(text(),'${value}')]`
         )
       );
+    this._aggregateChooser = element(by.xpath(`//*[contains(@class,'icon-more')]`))
   }
 
   searchAttribute(attribute) {
@@ -183,6 +184,21 @@ class ChartsDesignerPage extends Designer {
   clickOnSelectAndChooseAggregate(name) {
     browser.sleep(1000); // Somehow aggregate button was not able to load the aggregate list. So put the browser to sleep.
     // For aggregate chooser component commonfunction is not able to make the element visible. So using the browser to identify.
+    browser
+      .actions()
+      .mouseMove(this._selectAndChooseAggregate(name))
+      .click()
+      .perform();
+  }
+
+  clickAndChooseAggregateForScatterChart(name) {
+    browser.sleep(2000);
+    browser
+      .actions()
+      .mouseMove(this._aggregateChooser)
+      .click()
+      .perform();
+    browser.sleep(2000);
     browser
       .actions()
       .mouseMove(this._selectAndChooseAggregate(name))
