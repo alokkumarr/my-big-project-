@@ -220,7 +220,7 @@ public class SipId3Controller {
 
     try {
       sipTicketId = map.get(SIP_TICKET_ID).trim();
-      Ticket ticket = userRepository.getTicketDetails(sipTicketId);
+      Ticket ticket = userRepository.getTicketForId3(sipTicketId);
       if (ticket == null || ticket.getMasterLoginId() == null) {
         response.sendError(
             HttpStatus.BAD_REQUEST.value(), "Invalid SipTicketId !!");

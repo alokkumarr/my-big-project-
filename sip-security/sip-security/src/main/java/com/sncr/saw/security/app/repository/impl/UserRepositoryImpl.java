@@ -3414,4 +3414,27 @@ public class UserRepositoryImpl implements UserRepository {
 		logger.info("DSK Object : {}",dskAttributeList.toString());
 		return dskAttributeList;
 	}
+
+	@Override
+	public Ticket getTicketForId3(String ticketId) {
+		Ticket ticket = null;
+		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID, VALID_UPTO, T.VALID_INDICATOR"
+				+ " FROM TICKET T"
+				+ " INNER JOIN  USERS U ON (T.MASTER_LOGIN_ID = U.USER_ID)"
+				+ " INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID)"
+				+ " INNER JOIN ID3_TICKET_DETAILS IT ON (IT.SIP_TICKET_ID = T.TICKET_ID)"
+				+ " INNER JOIN ID3_CLIENT_DETAILS IC ON (IT.ID3_CLIENT_SYS_ID = IC.ID3_CLIENT_SYS_ID)"
+				+ " WHERE TICKET_ID = ?";
+		try {
+			ticket = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, ticketId), new UserRepositoryImpl.TicketDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
+		}
+
+		return ticket;
+
+	}
 }
