@@ -1,4 +1,5 @@
 package com.synchronoss.saw.inspect;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -69,12 +70,13 @@ public class SAWDelimitedReader {
   }
 
   private String getFilePath(String path) throws Exception {
+    String normalizedPath = SipCommonUtils.normalizePath(path);
     String filePath = null;
     if (!this.localFileSystem) {
       FileSystem fs = HFileOperations.getFileSystem();
       if (fs != null)
         try {
-          FileStatus[] plist = fs.globStatus(new Path(path));
+          FileStatus[] plist = fs.globStatus(new Path(normalizedPath));
           for (FileStatus f : plist) {
             if (f.isFile()) {
               filePath = f.getPath().toString();
@@ -84,10 +86,10 @@ public class SAWDelimitedReader {
           logger.error("Exception occured while the reading the files from fileSystem", e);
         }
     } else {
-      File file = new File(path);
+      File file = new File(normalizedPath);
       if (!file.isDirectory() && !file.isFile()) {
-        String extension = FilenameUtils.getExtension(path);
-        String basePath = FilenameUtils.getFullPathNoEndSeparator(path);
+        String extension = FilenameUtils.getExtension(normalizedPath);
+        String basePath = FilenameUtils.getFullPathNoEndSeparator(normalizedPath);
         File dir = new File(basePath);
         final FilenameFilter filter = new FilenameFilter() {
           @Override
@@ -113,12 +115,13 @@ public class SAWDelimitedReader {
   }
 
   private Reader getReader(String path) throws Exception {
+    String normalizedPath = SipCommonUtils.normalizePath(path);
     InputStream inputStream = null;
     if (!this.localFileSystem) {
-      inputStream = HFileOperations.readFileToInputStream(path);
+      inputStream = HFileOperations.readFileToInputStream(normalizedPath);
       return new InputStreamReader(inputStream, "UTF-8");
     } else {
-      File file = new File(path);
+      File file = new File(normalizedPath);
       inputStream = new FileInputStream(file);
       return new InputStreamReader(inputStream, "UTF-8");
     }

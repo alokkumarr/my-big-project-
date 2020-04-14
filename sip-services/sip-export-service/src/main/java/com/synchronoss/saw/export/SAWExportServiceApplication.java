@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import info.faljse.SDNotify.SDNotify;
 import java.io.File;
 import java.io.IOException;
@@ -58,8 +59,8 @@ public class SAWExportServiceApplication {
     boolean status = false;
 
     ObjectMapper mapper = new ObjectMapper();
-
-    String content = new String(Files.readAllBytes(Paths.get(ftpDetailsFile)));
+    String normalizedFtpDetailsPath = SipCommonUtils.normalizePath(ftpDetailsFile);
+    String content = new String(Files.readAllBytes(Paths.get(normalizedFtpDetailsPath)));
 
     ObjectNode ftpDetails = (ObjectNode) mapper.readTree(content);
 
@@ -84,8 +85,8 @@ public class SAWExportServiceApplication {
   }
 
   private static boolean checkIfPrivateKeyExists(String privateKeyFullPath) {
-    File privateKeyFile = new File(privateKeyFullPath);
-
+    String normalizedPrivateKeyFullPath = SipCommonUtils.normalizePath(privateKeyFullPath);
+    File privateKeyFile = new File(normalizedPrivateKeyFullPath);
     return privateKeyFile.exists();
   }
 

@@ -28,7 +28,7 @@ public class MailSenderUtil {
 						 String attachFile) {
 		logger.debug("User activity started here:" + this.getClass().getName()	+ " MailUtility  method");
 		logger.debug("recipients :" + recipients + " attachFiles " + attachFile);
-        String normalizedattachFile=SipCommonUtils.normalizeFileName(attachFile);
+        String normalizedattachFile=SipCommonUtils.normalizePath(attachFile);
 		try {
 			System.setProperty("java.net.preferIPv4Stack", "true");
 			// create a message

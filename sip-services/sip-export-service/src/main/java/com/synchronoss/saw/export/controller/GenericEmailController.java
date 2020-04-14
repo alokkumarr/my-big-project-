@@ -65,7 +65,7 @@ public class GenericEmailController {
     }
     
     if (emailDetails.getAttachmentFilePath() != null) {
-      File file = new File(SipCommonUtils.normalizeFileName(emailDetails.getAttachmentFilePath()));
+      File file = new File(SipCommonUtils.normalizePath(emailDetails.getAttachmentFilePath()));
       if (!file.exists()) {
         throw new JSONValidationSAWException("Attachment file path "
             + "doesnt exists");

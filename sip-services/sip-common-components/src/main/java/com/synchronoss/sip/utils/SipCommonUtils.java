@@ -345,12 +345,12 @@ public class SipCommonUtils {
   }
 
   /**
-   * normalize the filename to eliminate the PathManipulation vulnarabilities.
+   * normalize the path to eliminate the PathManipulation vulnarabilities.
    *
-   * @param fileName filename to be normalized
-   * @return normalized filename
+   * @param path  to be normalized
+   * @return normalized path
    */
-  public static String normalizeFileName(String fileName) {
-     return FilenameUtils.normalize(fileName);
+  public static String normalizePath(String path) {
+     return FilenameUtils.normalize(path);
   }
 }

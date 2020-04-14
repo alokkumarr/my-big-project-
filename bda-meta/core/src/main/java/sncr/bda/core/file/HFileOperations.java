@@ -1,5 +1,6 @@
 package sncr.bda.core.file;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -74,8 +75,8 @@ public class HFileOperations {
         FileSystem fs;
         InputStream stream;
         try {
-
-            Path path = new Path(fileName);
+            String normalizedFilePath =normalizePath(fileName);
+            Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
             CompressionCodecFactory factory = new CompressionCodecFactory(conf);
@@ -234,4 +235,13 @@ public class HFileOperations {
 
     public static FileContext getFileContext() { return fc;}
 
+  /**
+   * normalize the path to eliminate the PathManipulation vulnarabilities.
+   *
+   * @param path to be normalized
+   * @return normalized filename
+   */
+  public static String normalizePath(String path) {
+    return FilenameUtils.normalize(path);
+  }
 }

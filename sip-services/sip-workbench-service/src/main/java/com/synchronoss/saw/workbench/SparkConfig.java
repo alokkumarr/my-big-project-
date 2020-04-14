@@ -1,5 +1,6 @@
 package com.synchronoss.saw.workbench;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 
 import javax.annotation.PreDestroy;
@@ -130,7 +131,7 @@ public class SparkConfig {
 		logger.debug("#### Setting librarires as class path for spark context ######");
 		
 		JavaSparkContext jsc = new  JavaSparkContext(SparkContext.getOrCreate(conf()));
-		
+        libPath = SipCommonUtils.normalizePath(libPath);
 		if(libPath != null && !libPath.isEmpty()) {
 			File folder = new File(libPath);
 			File[] files = folder.listFiles();

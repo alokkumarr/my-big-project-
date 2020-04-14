@@ -110,6 +110,7 @@ public class SAWDelimitedInspector {
   }
 
   private String getFilePath(String path) throws Exception {
+    path=SipCommonUtils.normalizePath(path);
     String filePath = null;
     if (!this.localFileSystem) {
       FileSystem fs = HFileOperations.getFileSystem();
@@ -177,12 +178,13 @@ public class SAWDelimitedInspector {
   }
 
   private Reader getReader(String path) throws Exception {
+    String normalizedPath=SipCommonUtils.normalizePath(path);
     InputStream inputStream = null;
     if (!this.localFileSystem) {
-      inputStream = HFileOperations.readFileToInputStream(path);
+      inputStream = HFileOperations.readFileToInputStream(normalizedPath);
       return new InputStreamReader(inputStream, "UTF-8");
     } else {
-      File file = new File(path);
+      File file = new File(normalizedPath);
       inputStream = new FileInputStream(file);
       return new InputStreamReader(inputStream, "UTF-8");
     }

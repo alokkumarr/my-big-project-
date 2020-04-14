@@ -170,10 +170,12 @@ public class GatewayController {
             ResponseEntity<String> uploadResponseEntity = null;
             try {
               for (MultipartFile fileItem : uploadfiles){
-                String fileName = SipCommonUtils.normalizeFileName(fileItem.getOriginalFilename());
-                Path pathToFile = Paths.get(tmpDir + File.separator + fileName);
+                String fileName = fileItem.getOriginalFilename();
+                String normalizedPath =
+                    SipCommonUtils.normalizePath(tmpDir + File.separator + fileName);
+                Path pathToFile = Paths.get(normalizedPath);
                 Files.createDirectories(pathToFile.getParent());
-                File incomingTargetFile = new File(tmpDir + File.separator + fileName);
+                File incomingTargetFile = new File(normalizedPath);
                 java.nio.file.Files.copy(fileItem.getInputStream(), incomingTargetFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
                 IOUtils.closeQuietly(fileItem.getInputStream());
                 requestfile = new FileSystemResource(incomingTargetFile);
