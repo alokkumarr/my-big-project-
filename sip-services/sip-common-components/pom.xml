@@ -15,7 +15,8 @@
   <version>${revision}</version>
   <packaging>jar</packaging>
   <properties>
-  <junit.version>4.12</junit.version>
+    <junit.version>4.12</junit.version>
+    <compress>1.18</compress>
   </properties>
   <dependencies>
     <dependency>
@@ -73,6 +74,11 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>${compress}</version>
     </dependency>
   </dependencies>
   <build>
