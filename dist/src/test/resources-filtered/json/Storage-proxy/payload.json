@@ -1,0 +1,13 @@
+{
+  "storage": "ES",
+  "indexName": "sampleAlias",
+  "objectType": "sample",
+  "action": "aggregate",
+  "query": "{\"size\":0,\"aggs\":{\"categories\":{\"filter\":{\"term\":{\"string.keyword\":\"string 1\"}},\"aggs\":{\"distinct_categories\":{\"terms\":{\"field\":\"string.keyword\"}}}}}}",
+  "moduleName": "analyze",
+  "dataSecurityKey": [],
+  "resultFormat": "json",
+  "requestedTime": "1586383962583",
+  "productCode": "SIP",
+  "requestBy": "integrationTests"
+}
