@@ -24,10 +24,7 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-<<<<<<< HEAD
   const fieldName = 'field';
-=======
->>>>>>> afb7226b0e999e171e82383643f662e07137c384
 
   let host;
   let token;
