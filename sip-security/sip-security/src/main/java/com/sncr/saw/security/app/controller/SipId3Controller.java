@@ -217,10 +217,11 @@ public class SipId3Controller {
           HttpStatus.BAD_REQUEST.value(), "sipTicketId is mandatory");
       return ssoResponse;
     }
-
+    String userId = id3Claims.getMasterLoginId();
+    
     try {
       sipTicketId = map.get(SIP_TICKET_ID).trim();
-      Ticket ticket = userRepository.getTicketForId3(sipTicketId);
+      Ticket ticket = userRepository.getTicketForId3(sipTicketId, userId);
       if (ticket == null || ticket.getMasterLoginId() == null) {
         response.sendError(
             HttpStatus.BAD_REQUEST.value(), "Invalid SipTicketId !!");

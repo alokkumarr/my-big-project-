@@ -3416,22 +3416,28 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public Ticket getTicketForId3(String ticketId) {
+	public Ticket getTicketForId3(String ticketId, String userId) {
 		Ticket ticket = null;
-		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID, VALID_UPTO, T.VALID_INDICATOR"
-				+ " FROM TICKET T"
-				+ " INNER JOIN  USERS U ON (T.MASTER_LOGIN_ID = U.USER_ID)"
-				+ " INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID)"
-				+ " INNER JOIN ID3_TICKET_DETAILS IT ON (IT.SIP_TICKET_ID = T.TICKET_ID)"
-				+ " INNER JOIN ID3_CLIENT_DETAILS IC ON (IT.ID3_CLIENT_SYS_ID = IC.ID3_CLIENT_SYS_ID)"
-				+ " WHERE TICKET_ID = ?";
+		String sql =
+				"SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID, VALID_UPTO, T.VALID_INDICATOR"
+						+ " FROM TICKET T"
+						+ " INNER JOIN  USERS U ON (T.MASTER_LOGIN_ID = U.USER_ID)"
+						+ " INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID)"
+						+ " INNER JOIN ID3_TICKET_DETAILS IT ON (IT.SIP_TICKET_ID = T.TICKET_ID)"
+						+ " INNER JOIN ID3_CLIENT_DETAILS IC ON (IT.ID3_CLIENT_SYS_ID = IC.ID3_CLIENT_SYS_ID)"
+						+ " WHERE TICKET_ID = ? AND U.USER_ID = ?";
 		try {
-			ticket = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, ticketId), new UserRepositoryImpl.TicketDetailExtractor());
+			ticket = jdbcTemplate.query(sql, preparedStatement -> {
+				preparedStatement.setString(1, ticketId);
+				preparedStatement.setString(2, userId);
+			}, new UserRepositoryImpl.TicketDetailExtractor());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;
 		} catch (Exception e) {
-			logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
+			logger
+					.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+							null, e);
 		}
 
 		return ticket;
