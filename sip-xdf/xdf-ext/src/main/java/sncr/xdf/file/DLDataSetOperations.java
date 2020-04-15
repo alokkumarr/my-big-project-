@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import sncr.bda.utils.BdaCoreUtils;
 
 /**
  * Created by srya0001 on 10/12/2017.
@@ -200,19 +201,20 @@ public class DLDataSetOperations {
         try {
             FileStatus[] files = fs.listStatus(loc, FILE_FILTER);
             for (FileStatus s : files) {
+                Path normalizedPath = BdaCoreUtils.normalizePath(s.getPath());
                 if(s.isDirectory()){
                     // Blindly remove any directory
-                    fs.delete(s.getPath(), true);
+                    fs.delete(normalizedPath, true);
 
                 } else {
                     if(s.getPath().getName().endsWith(FORMAT_PARQUET)){
                         if(isEmptyParquetFile(s, fsConf)){
-                            fs.delete(s.getPath(), false);
+                            fs.delete(normalizedPath, false);
                         }
                     } else if(s.getPath().getName().startsWith("_")){
-                        fs.delete(s.getPath(), false);
+                        fs.delete(normalizedPath, false);
                     } else if(s.getLen() == 0 && !s.isDirectory()) {
-                        fs.delete(s.getPath(), false);
+                        fs.delete(normalizedPath, false);
                     }
                 }
             }

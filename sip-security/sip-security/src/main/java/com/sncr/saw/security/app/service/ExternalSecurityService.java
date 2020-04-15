@@ -1072,7 +1072,6 @@ public class ExternalSecurityService {
               userDetailsResponse.setValidityMessage("User Details updated successfully");
           }
         } else {
-          logger.debug("Error occurred while updating user details:{}", valid.getError());
           userDetailsResponse.setValid(false);
           userDetailsResponse.setValidityMessage(valid.getError());
         }

@@ -11,6 +11,7 @@ import com.synchronoss.saw.batch.plugin.SipIngestionPluginFactory;
 import com.synchronoss.saw.batch.service.ChannelTypeService;
 import com.synchronoss.saw.logs.constants.SourceType;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -186,8 +187,9 @@ public class SawBisPluginController {
         response = sipTransferService.immediateTransfer(requestBody);
       }
       for (BisDataMetaInfo info : response) {
-        if (info.getDestinationPath() != null) {
-          File folderWhereFilesDumped = new File(info.getDestinationPath());
+        String normalizedDestionationPath = SipCommonUtils.normalizePath(info.getDestinationPath());
+        if (normalizedDestionationPath != null) {
+          File folderWhereFilesDumped = new File(normalizedDestionationPath);
           if (folderWhereFilesDumped.exists() && folderWhereFilesDumped.isDirectory()) {
             logger.trace("Thread with Name :" + Thread.currentThread().getName()
                 + "has completed & created folder to put the files in "
@@ -295,8 +297,10 @@ public class SawBisPluginController {
                   + Thread.currentThread().getName(), throwable);
             }
             for (BisDataMetaInfo info : p) {
-              if (info.getDestinationPath() != null) {
-                File folderWhereFilesDumped = new File(info.getDestinationPath());
+              String normalizedDestionationPath =
+                  SipCommonUtils.normalizePath(info.getDestinationPath());
+              if (normalizedDestionationPath != null) {
+                File folderWhereFilesDumped = new File(normalizedDestionationPath);
                 if (folderWhereFilesDumped.exists() && folderWhereFilesDumped.isDirectory()) {
                   logger.trace("Thread with Name :" + Thread.currentThread().getName()
                       + "has completed & created folder to put the files in "

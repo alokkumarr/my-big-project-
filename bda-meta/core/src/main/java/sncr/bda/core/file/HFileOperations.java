@@ -1,6 +1,6 @@
 package sncr.bda.core.file;
 
-import org.apache.commons.io.FilenameUtils;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -47,7 +47,7 @@ public class HFileOperations {
         FileSystem fs;
         InputStream stream;
         try {
-            String normalizedFilePath =normalizePath(fileName);
+            String normalizedFilePath = SipCommonUtils.normalizePath(fileName);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
@@ -75,7 +75,7 @@ public class HFileOperations {
         FileSystem fs;
         InputStream stream;
         try {
-            String normalizedFilePath =normalizePath(fileName);
+            String normalizedFilePath = SipCommonUtils.normalizePath(fileName);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
@@ -160,7 +160,7 @@ public class HFileOperations {
     public static void deleteEnt(String file) throws Exception {
         FileSystem fs;
         try {
-            String normalizedFilePath =normalizePath(file);
+            String normalizedFilePath = SipCommonUtils.normalizePath(file);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
@@ -199,7 +199,7 @@ public class HFileOperations {
     public static void createDir(String s) throws Exception {
         FileSystem fs;
         try {
-            String normalizedFilePath =normalizePath(s);
+            String normalizedFilePath = SipCommonUtils.normalizePath(s);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
@@ -236,14 +236,4 @@ public class HFileOperations {
     }
 
     public static FileContext getFileContext() { return fc;}
-
-  /**
-   * normalize the path to eliminate the PathManipulation vulnarabilities.
-   *
-   * @param path to be normalized
-   * @return normalized filename
-   */
-  public static String normalizePath(String path) {
-    return FilenameUtils.normalize(path);
-  }
 }

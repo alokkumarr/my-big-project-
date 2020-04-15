@@ -10,6 +10,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,7 +78,7 @@ public class AmazonS3Handler {
     String timeStampStr = currentTime.toString("yyyy-MM-dd_HH:mm:ss.SSS");
     String finalFileName = fileName + "_" + timeStampStr + "." + extension;
 
-    String s3Key = outputLocation + "/" + finalFileName;
+    String s3Key = SipCommonUtils.normalizePath(outputLocation + "/" + finalFileName);
 
     logger.debug("Upload location = " + s3Key);
 

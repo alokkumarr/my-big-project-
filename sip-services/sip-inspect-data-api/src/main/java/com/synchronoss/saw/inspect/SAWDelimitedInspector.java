@@ -110,13 +110,13 @@ public class SAWDelimitedInspector {
   }
 
   private String getFilePath(String path) throws Exception {
-    path=SipCommonUtils.normalizePath(path);
+    String normalizedPath = SipCommonUtils.normalizePath(path);
     String filePath = null;
     if (!this.localFileSystem) {
       FileSystem fs = HFileOperations.getFileSystem();
       if (fs != null)
         try {
-          FileStatus[] plist = fs.globStatus(new Path(path));
+          FileStatus[] plist = fs.globStatus(new Path(normalizedPath));
           for (FileStatus f : plist) {
             if (f.isFile()) {
               filePath = f.getPath().toString();
@@ -126,10 +126,10 @@ public class SAWDelimitedInspector {
           logger.error("Exception occured while the reading the files from fileSystem", e);
         }
     } else {
-      File file = new File(path);
+      File file = new File(normalizedPath);
       if (!file.isDirectory() && !file.isFile()) {
-        String extension = FilenameUtils.getExtension(path);
-        String basePath = FilenameUtils.getFullPathNoEndSeparator(path);
+        String extension = FilenameUtils.getExtension(normalizedPath);
+        String basePath = FilenameUtils.getFullPathNoEndSeparator(normalizedPath);
         File dir = new File(basePath);
         final FilenameFilter filter = new FilenameFilter() {
           @Override

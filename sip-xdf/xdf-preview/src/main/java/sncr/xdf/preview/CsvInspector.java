@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.json.JsonSanitizer;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import org.apache.hadoop.fs.FileStatus;
@@ -43,7 +44,8 @@ public class CsvInspector {
     public static void main(String[] args){
 
         try {
-            String cnf =  new Scanner(new File(args[0])).useDelimiter("\\Z").next();
+            String normalizedPath = SipCommonUtils.normalizePath(args[0]);
+            String cnf =  new Scanner(new File(normalizedPath)).useDelimiter("\\Z").next();
             CsvInspector parser = new CsvInspector(cnf, "");
             parser.parseSomeLines();
             String str = parser.toJson();

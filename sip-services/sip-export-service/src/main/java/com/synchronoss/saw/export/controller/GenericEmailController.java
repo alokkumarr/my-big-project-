@@ -63,15 +63,16 @@ public class GenericEmailController {
       throw new JSONValidationSAWException("Recipient address "
           + "and subject are required");
     }
-    
+
     if (emailDetails.getAttachmentFilePath() != null) {
-      File file = new File(SipCommonUtils.normalizePath(emailDetails.getAttachmentFilePath()));
+      String normalizedPath = SipCommonUtils.normalizePath(emailDetails.getAttachmentFilePath());
+      File file = new File(normalizedPath);
       if (!file.exists()) {
         throw new JSONValidationSAWException("Attachment file path "
             + "doesnt exists");
       }
     }
-    
+
     logger.trace("Email send request recieved");
     logger.trace("Subject ::" + emailDetails.getSubject());
     logger.trace("Recipients ::" + emailDetails.getRecipients());

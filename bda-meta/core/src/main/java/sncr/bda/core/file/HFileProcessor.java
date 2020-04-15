@@ -1,5 +1,6 @@
 package sncr.bda.core.file;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +39,8 @@ public class HFileProcessor implements FileProcessor {
     Configuration conf = new Configuration();
     conf.set("hadoop.job.ugi", user);
     FileSystem fs = FileSystem.get(URI.create(location), conf);
-    FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
+    String normalizedPath = SipCommonUtils.normalizePath(localFile.getPath());
+    FSDataOutputStream fos = fs.create(new Path(normalizedPath));
     IOUtils.copyBytes(stream, fos, 8192, false);
     fos.close();
     fs.close();

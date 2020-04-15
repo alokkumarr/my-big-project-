@@ -1,5 +1,6 @@
 package sncr.xdf.component;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FileStatus;
@@ -9,6 +10,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.log4j.Logger;
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.utils.BdaCoreUtils;
 import sncr.xdf.context.Context;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
@@ -187,7 +189,8 @@ public interface WithMovableResult {
     default void clearDirectory (Path location, Context ctx) throws IOException {
         FileStatus[] list = ctx.fs.listStatus(location);
         for (FileStatus file: list) {
-            ctx.fs.delete(file.getPath(), true);
+            Path normalizedPath= BdaCoreUtils.normalizePath(file.getPath());
+            ctx.fs.delete(normalizedPath, true);
         }
     }
 
@@ -203,8 +206,10 @@ public interface WithMovableResult {
                                       MoveDataDescriptor moveDataDesc,
                                       Context ctx ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
-            Path source = new Path(moveDataDesc.source + partitionKey);
-            Path dest = new Path(moveDataDesc.dest +  partitionKey);
+            String normalizedSourcePath = SipCommonUtils.normalizePath(moveDataDesc.source + partitionKey);
+            String normalizedDestPath = SipCommonUtils.normalizePath(moveDataDesc.dest + partitionKey);
+            Path source = new Path(normalizedSourcePath);
+            Path dest = new Path(normalizedDestPath);
 
             String ext = "." + moveDataDesc.format.toLowerCase();
 

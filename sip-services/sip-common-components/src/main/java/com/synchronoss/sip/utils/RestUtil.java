@@ -215,7 +215,8 @@ public class RestUtil {
                     new File(normalizedKeyStorePath),
                     keyStorePassword.toCharArray(),
                     keyStorePassword.toCharArray())
-                .loadTrustMaterial(new File(normalizedtrustStorePath), trustStorePassword.toCharArray())
+                .loadTrustMaterial(
+                    new File(normalizedtrustStorePath), trustStorePassword.toCharArray())
                 .build();
         client =
             HttpClients.custom()
@@ -256,7 +257,9 @@ public class RestUtil {
         sslContext =
             SSLContextBuilder.create()
                 .loadKeyMaterial(
-                    new File(normalizedKeyStorePath), keyPassword.toCharArray(), keyPassword.toCharArray())
+                    new File(normalizedKeyStorePath),
+                    keyPassword.toCharArray(),
+                    keyPassword.toCharArray())
                 .loadTrustMaterial(new File(normalizedtrustStorePath), trustPassword.toCharArray())
                 .build();
         client =
@@ -300,7 +303,8 @@ public class RestUtil {
                     new File(normalizedKeyStorePath),
                     keyStorePassword.toCharArray(),
                     keyStorePassword.toCharArray())
-                .loadTrustMaterial(new File(normalizedtrustStorePath), trustStorePassword.toCharArray())
+                .loadTrustMaterial(
+                    new File(normalizedtrustStorePath), trustStorePassword.toCharArray())
                 .build();
       } catch (Exception e) {
         logger.error("Error occured while building SSL context", e);
@@ -360,7 +364,9 @@ public class RestUtil {
     SSLContext sslContext =
         SSLContextBuilder.create()
             .loadKeyMaterial(
-                new File(normalizedKeyStorePath), keyPassword.toCharArray(), keyPassword.toCharArray())
+                new File(normalizedKeyStorePath),
+                keyPassword.toCharArray(),
+                keyPassword.toCharArray())
             .loadTrustMaterial(new File(normalizedtrustStorePath), trustPassword.toCharArray())
             .build();
     return sslContext;
