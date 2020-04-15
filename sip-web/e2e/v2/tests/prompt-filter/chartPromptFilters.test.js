@@ -24,8 +24,6 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-  const savedCategory = 'My Analysis';
-  const savedSubCategory = 'DRAFTS';
 
   let host;
   let token;
@@ -138,13 +136,13 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             data.fieldName
           ]);
           chartDesignerPage.clickOnSave();
-          chartDesignerPage.clickOnSaveAndCloseDialogButton();
+          chartDesignerPage.clickOnSaveDialogButton();
 
           // From analysis detail/view page
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnAnalysisLink(name);
           chartDesignerPage.shouldFilterDialogPresent();
@@ -170,8 +168,8 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           // VerifyPromptFromListView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('list');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();
@@ -188,8 +186,8 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();

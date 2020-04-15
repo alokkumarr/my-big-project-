@@ -474,12 +474,15 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat }) => {
-          const momentDateFormat = this.getMomentDateFormat(dateFormat)
-            .dateFormat;
-          dataPoint[removeKeyword(columnName)] =
-            moment(dataPoint[removeKeyword(columnName)], momentDateFormat)
-              .utc()
-              .unix() * 1000;
+          const {
+            momentFormat,
+            momentFormatForBackend
+          } = this.getMomentDateFormat(dateFormat);
+          const colName = removeKeyword(columnName);
+          const format = momentFormatForBackend || momentFormat;
+          const unix = moment(dataPoint[colName], format).utc().unix();
+          const miliseconds = unix * 1000;
+          dataPoint[colName] = miliseconds;
         });
       });
     }
@@ -861,7 +864,7 @@ export class ChartService {
       seriesData.dataLabels.enabled = labelOptions.enabled;
 
       /* eslint-disable */
-      seriesData.dataLabels.formatter = function() {
+      seriesData.dataLabels.formatter = function () {
         if (this.percentage <= 5) {
           return null;
         }

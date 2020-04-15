@@ -17,6 +17,13 @@ class SaveDialog extends FilterDialog {
     this._cancelDialogButton = element(
       by.css(`[e2e="designer-dialog-cancel"]`)
     );
+    this._clickCategoryList = element(by.css(
+      `[e2e="category-list"]`
+    )
+    );
+    this._selectCategory = categoryName => element(by.xpath(
+      `//span[@class="mat-option-text" and contains(text(),'${categoryName}')]`)
+    );
   }
 
   enterAnalysisName(name) {
@@ -29,6 +36,7 @@ class SaveDialog extends FilterDialog {
 
   clickOnSaveAndCloseDialogButton(landingPageAfterSave = null) {
     commonFunctions.clickOnElement(this._saveAndCloseButton);
+    browser.sleep(2000); //need to add else menu button will not be visible
     if (landingPageAfterSave) {
       commonFunctions.waitFor.pageToBeReady(landingPageAfterSave);
     } else {
@@ -43,6 +51,11 @@ class SaveDialog extends FilterDialog {
 
   clickOnCancelDialogButton() {
     commonFunctions.clickOnElement(this._cancelDialogButton);
+  }
+
+  clickAndSelectCategory(categoryName) {
+    commonFunctions.clickOnElement(this._clickCategoryList);
+    commonFunctions.clickOnElement(this._selectCategory(categoryName));
   }
 }
 module.exports = SaveDialog;
