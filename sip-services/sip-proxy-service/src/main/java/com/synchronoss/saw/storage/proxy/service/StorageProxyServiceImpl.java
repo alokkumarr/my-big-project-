@@ -361,7 +361,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                               storageConnectorService.searchDocuments(proxy.getQuery(), proxy);
                       long actualCount =
                           searchResponse.getHits() != null
-                              ? searchResponse.getHits().getTotal()
+                              ? searchResponse.getHits().getTotal().getValue()
                               : 0;
                       if (actualCount > 0) {
                         proxy.setStatusMessage(
