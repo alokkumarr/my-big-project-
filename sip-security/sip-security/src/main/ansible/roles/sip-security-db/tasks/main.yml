@@ -7,7 +7,7 @@
   yum_repository:
     name: mariadb
     description: MariaDB repository
-    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.3/centos7-amd64') }}"
+    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.4/centos7-amd64') }}"
     gpgcheck: no
 - name: Install MariaDB package
   # Note: While using the MariaDB repository, use the capitalized
@@ -20,16 +20,7 @@
 - name: Include mariadb-dare.yml if sip_secure=true
   include: mariadb-dare.yml
   when: sip_secure
-  
-# Workaround: MariaDB 10.3.10 introduced changes that cause the error
-# "/bin/galera_new_cluster: line 31: return: can only `return' from a
-# function or sourced script" when bootstrapping the cluster.  Remove
-# the offending line until MariaDB is fixed.
-- name: Remove invalid line from galera_new_cluster
-  lineinfile:
-    path: /bin/galera_new_cluster
-    state: absent
-    regexp: '^return \$extcode$'
+
 - name: Install MariaDB configuration additions
   template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.cnf
 # Workaround: The MariaDB Galera cluster initialization below invokes

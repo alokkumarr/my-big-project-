@@ -87,7 +87,7 @@
 - name: create MariaDB user for saw_security to other sip-nodes
   command: >
     mysql -u root -e "CREATE USER IF NOT EXISTS 'saw_security'@'{{ hostvars[inventory_hostname]
-    ['ansible_default_ipv4']['address'] }}' IDENTIFIED BY '{{ saw_security_db_password }}'"
+    ['ansible_default_ipv4']['address'] }}' IDENTIFIED VIA ed25519 USING  PASSWORD('{{ saw_security_db_password }}')"
     -p{{ saw_mariadb_db_password }}
     
 - name: GRANT PRIVILEGES for saw_security to other sip-nodes
