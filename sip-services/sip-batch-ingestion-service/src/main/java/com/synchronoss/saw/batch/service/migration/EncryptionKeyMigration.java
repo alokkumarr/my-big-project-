@@ -69,6 +69,7 @@ public class EncryptionKeyMigration implements KeyMigration {
         }
         BisChannelEntity channelEntity = new BisChannelEntity();
         BeanUtils.copyProperties(bisChannelDto, channelEntity);
+        channelEntity.setPwdMigrated(1);
         channelEntity = bisChannelRepository.save(channelEntity);
         logger.info("channel : {} updated succesfully", channelEntity.getBisChannelSysId());
       } catch (Exception e) {
