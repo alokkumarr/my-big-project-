@@ -63,6 +63,10 @@ export class DesignerSaveComponent implements OnInit {
     }
   }
 
+  fetchChildren(children) {
+    return this.jwtService.fetchChildren(children);
+  }
+
   displayErrorMessage(state) {
     if (state === 'nameLength') {
       return `* Name cannot be empty or exceed ${100} characters.`;
