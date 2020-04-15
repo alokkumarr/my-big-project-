@@ -2,12 +2,9 @@ const using = require('jasmine-data-provider');
 const testDataReader = require('../../testdata/testDataReader.js');
 const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
-const categories = require('../../helpers/data-generation/categories');
-const subCategories = require('../../helpers/data-generation/subCategories');
 const commonFunctions = require('../../pages/utils/commonFunctions');
-const Constants = require('../../helpers/Constants');
-const assert = require('chai').assert;
-
+const chai = require('chai');
+const assert = chai.assert;
 let AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
@@ -15,26 +12,23 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const Constants = require('../../helpers/Constants');
+const categories = require('../../helpers/data-generation/categories');
+const subCategories = require('../../helpers/data-generation/subCategories');
 const Header = require('../../pages/components/Header');
 const users = require('../../helpers/data-generation/users');
 
-describe('Executing fork from menu option and delete chart tests from charts/forkFromCardViewDelete.test.js', () => {
-  const categoryName = categories.analyses.name;
-  const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
-
-  //updated fields
-  const metrics = 'Integer';
-  const dimension = 'Date';
-  const yAxisName2 = 'Long';
-  const groupName = 'String';
-  const sizeByName = 'Float';
-
+describe('Executing fork form Menu and Delete for pivots from pivots/UpdateAndDeletePivot.test.js', () => {
   let forkedAnalysisId;
+  let analysesDetails = [];
   let host;
   let token;
-  let analyses = [];
+  const categoryName = categories.analyses.name;
+  const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
+  const dateFieldName = 'Date';
+  const numberFieldName = 'Integer';
   beforeAll(() => {
-    logger.info('Starting charts/forkFromCardViewDelete.test.js.....');
+    logger.info('Starting pivots/UpdateAndDeletePivot.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(
       host,
@@ -53,9 +47,9 @@ describe('Executing fork from menu option and delete chart tests from charts/for
   afterEach(function(done) {
     setTimeout(function() {
       if (forkedAnalysisId) {
-        analyses.push(forkedAnalysisId);
+        analysesDetails.push(forkedAnalysisId);
       }
-      analyses.forEach(id => {
+      analysesDetails.forEach(id => {
         logger.warn('deleting analysis with id: ' + id);
         new AnalysisHelper().deleteAnalysis(
           host,
@@ -70,92 +64,64 @@ describe('Executing fork from menu option and delete chart tests from charts/for
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
+
   using(
-    testDataReader.testData['FORKMENUCHARTS']['positiveTests']
-      ? testDataReader.testData['FORKMENUCHARTS']['positiveTests']
+    testDataReader.testData['FORK_PIVOT']['forkPivot']
+      ? testDataReader.testData['FORK_PIVOT']['forkPivot']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
         const now = new Date().getTime();
-        const chartName = `e2e ${now}`;
-        const chartDescription = `e2e chart description ${now}`;
-        const type = data.chartType.split(':')[1];
-        if (!token) {
-          logger.error('token cannot be null');
-          expect(token).toBeTruthy();
-          assert.isNotNull(token, 'token cannot be null');
-        }
-
-        //Create new analysis.
-        const analysis = new AnalysisHelper().createNewAnalysis(
+        const pivotName = `e2e ${now}`;
+        const pivotDescription = `e2e pivot description ${now}`;
+        let analysis = new AnalysisHelper().createNewAnalysis(
           host,
           token,
-          chartName,
-          chartDescription,
-          Constants.CHART,
-          type
+          pivotName,
+          pivotDescription,
+          Constants.PIVOT,
+          null, // No subtype of Pivot.
+          null
         );
         expect(analysis).toBeTruthy();
-        assert.isNotNull(analysis, 'analysis should not be null');
-        analyses.push(analysis.analysisId);
+        assert.isNotNull(analysis, 'analysis cannot be null');
+        analysesDetails.push(analysis.analysisId);
+
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
-
         const header = new Header();
         header.openCategoryMenu();
         header.selectCategory(categoryName);
         header.selectSubCategory(subCategoryName);
-
         const analyzePage = new AnalyzePage();
-        analyzePage.goToView('card');
-        analyzePage.clickOnForkButton(chartName);
 
-        const executePage = new ExecutePage();
-
+        //fork Analysis from View
+        analyzePage.goToView(data.forkFromView);
+        analyzePage.clickOnForkButton(pivotName);
         const chartDesignerPage = new ChartDesignerPage();
         chartDesignerPage.searchInputPresent();
         chartDesignerPage.clearAttributeSelection();
-
-        if (data.chartType === 'chart:pie') {
-          chartDesignerPage.clickOnAttribute(dimension, 'Color By');
-          chartDesignerPage.clickOnAttribute(metrics, 'Angle');
-        } else {
-          chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
-          chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
-        }
-
-        if (data.chartType === 'chart:bubble') {
-          chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
-          chartDesignerPage.clickOnAttribute(groupName, 'Color By');
-        }
-        // If Combo then add one more metric field
-        if (data.chartType === 'chart:combo') {
-          chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
-        } else if (data.chartType !== 'chart:bubble') {
-          chartDesignerPage.clickOnAttribute(groupName, 'Group By');
-        }
-        const forkedName = chartName + ' forked';
-        const forkedDescription = chartDescription + 'forked';
-        //Save
+        chartDesignerPage.clickOnAttribute(dateFieldName, 'Row');
+        chartDesignerPage.clickOnAttribute(numberFieldName, 'Data');
+        // Save the analysis
+        const forkedName = pivotName + ' frkd';
+        const forkedDescription = pivotDescription + 'frkd';
         chartDesignerPage.clickOnSave();
         chartDesignerPage.enterAnalysisName(forkedName);
         chartDesignerPage.enterAnalysisDescription(forkedDescription);
+        chartDesignerPage.clickAndSelectCategory(subCategoryName);
         chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
 
-        // Verify analysis displayed in list and card view
-        analyzePage.goToView('list');
-        analyzePage.verifyElementPresent(
-          analyzePage._analysisTitleLink(forkedName),
-          true,
-          'report should be present in list/card view'
-        );
-        analyzePage.goToView('card');
-        // Go to detail page and very details
+        //
+        commonFunctions.goToHome();
+        header.openCategoryMenu();
+        header.selectCategory(categoryName);
+        header.selectSubCategory(subCategoryName);
         analyzePage.clickOnAnalysisLink(forkedName);
 
+        const executePage = new ExecutePage();
         executePage.verifyTitle(forkedName);
-
         executePage.getAnalysisId().then(id => {
           forkedAnalysisId = id;
         });
@@ -172,9 +138,10 @@ describe('Executing fork from menu option and delete chart tests from charts/for
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'FORKMENUCHARTS',
-        dataProvider: 'positiveTests'
+        feature: 'FORK_PIVOT',
+        dataProvider: 'forkPivot'
       };
     }
   );
 });
+
