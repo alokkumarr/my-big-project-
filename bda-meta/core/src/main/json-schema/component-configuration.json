@@ -296,6 +296,10 @@
         "scriptLocation" : {
           "description" : "Location containing SQL script, special value: 'inline' means scripts field itself is base64 encoded SQL script",
           "type" : "string"
+        },
+        "disablePrestoParser" : {
+          "description" : "Configuration to disable the presto parser.",
+          "type" : "boolean"
         }
       }
     },
