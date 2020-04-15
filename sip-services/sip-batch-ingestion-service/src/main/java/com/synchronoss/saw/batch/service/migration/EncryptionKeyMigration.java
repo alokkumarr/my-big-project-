@@ -13,6 +13,7 @@ import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -81,5 +82,20 @@ public class EncryptionKeyMigration implements KeyMigration {
 
     decryptedPassword = SipCommonUtils.decryptPassword(secretKey, encryptedPassword);
     return decryptedPassword;
+  }
+
+  @Test
+  public void test() throws Exception {
+    encryptionKey = "Saw12345Saw12345";
+    SecretKey secKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
+    String prabhu = "Prabhu";
+    String obfsuctionEn = SipCommonUtils.encryptPassword(secKey, prabhu);
+    logger.info("obfsuctionEn : {}", obfsuctionEn);
+    String cCodeEn = Ccode.cencode(prabhu, encryptionKey.getBytes());
+    logger.info("cCodeEn : {}", cCodeEn);
+
+    logger
+        .info("obsufction decoded pwd : {}", SipCommonUtils.decryptPassword(secKey, obfsuctionEn));
+    logger.info("cCode decoded pwd : {}", Ccode.cdecode(cCodeEn, encryptionKey.getBytes()));
   }
 }
