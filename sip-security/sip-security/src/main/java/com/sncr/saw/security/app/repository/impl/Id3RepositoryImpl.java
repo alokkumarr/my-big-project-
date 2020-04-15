@@ -93,6 +93,7 @@ public class Id3RepositoryImpl implements Id3Repository {
         authorizationCodeDetails.setCustomerCode(id3ClientDetails.getCustomerCode());
         authorizationCodeDetails.setTicketDetailsId(keyHolder.getKey().longValue());
         authorizationCodeDetails.setValidUpto(System.currentTimeMillis() + 2 * 60 * 1000);
+        authorizationCodeDetails.setValid(Boolean.TRUE);
         return Jwts.builder()
             .setSubject(authorizationCodeDetails.getMasterLoginId())
             .claim("ticket", authorizationCodeDetails)
@@ -168,9 +169,10 @@ public class Id3RepositoryImpl implements Id3Repository {
             if (id3ClientTicketDetails.isValidIndicator()
                 && id3ClientTicketDetails.isId3Enabled()
                 && id3ClientTicketDetails.isUserActive()
-                && authorizationCodeDetails.getValidUpto() >= System.currentTimeMillis())
+                && authorizationCodeDetails.getValidUpto() >= System.currentTimeMillis()) {
                 logger.trace("Successfully validated request for user: " + masterLoginId);
-            authorizationCodeDetails.setValid(true);
+                authorizationCodeDetails.setValid(true);
+            }
             // Authorization code is for onetime use, Invalidate the code once used.
             String invalidateCodeSql = "UPDATE ID3_TICKET_DETAILS SET VALID_INDICATOR=0 , MODIFIED_TIME = sysdate() " +
                 "WHERE SIP_TICKET_ID = ? AND ID3_TICKET_DETAILS_SYS_ID=?";

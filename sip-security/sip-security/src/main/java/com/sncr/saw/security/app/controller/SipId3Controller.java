@@ -125,7 +125,11 @@ public class SipId3Controller {
     SSOResponse ssoResponse = null;
     AuthorizationCodeDetails authorizationCodeDetails =
         id3Repository.validateAuthorizationCode(authorizationCode, id3AuthenticationRequest);
-    if (authorizationCodeDetails.getMasterLoginId() != null && authorizationCodeDetails.isValid()) {
+    if (authorizationCodeDetails == null || !authorizationCodeDetails.isValid()) {
+      response.sendError(
+          HttpStatus.UNAUTHORIZED.value(), MALFORMED_TOKEN);
+      return ssoResponse;
+    } else if (authorizationCodeDetails.getMasterLoginId() != null) {
       ssoResponse =
           ssoRequestHandler.createSAWToken(authorizationCodeDetails.getMasterLoginId(),
               true, authorizationCodeDetails.getSipTicketId());
