@@ -113,7 +113,9 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
 
+          commonFunctions.waitForProgressBarToComplete();
           executePage.clickOnEditLink();
+          commonFunctions.waitForProgressBarToComplete();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
           chartDesignerPage.clickOnAddFilterButtonByField(fieldName);

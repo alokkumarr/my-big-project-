@@ -982,7 +982,7 @@
           "secondValue": "7"
         },
         "expectedAggregate": {
-          "fieldName": "state",
+          "fieldName": "COUNTY",
           "displayOperator": "BTW",
           "displayedValue": "5 and 7"
         },

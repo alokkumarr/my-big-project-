@@ -111,9 +111,9 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
-          const reportDesignerPage = new ReportDesignerPage();
+          commonFunctions.waitForProgressBarToComplete();
           executePage.clickOnEditLink();
-          reportDesignerPage.refreshAnalysis();
+          commonFunctions.waitForProgressBarToComplete();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
           chartDesignerPage.clickOnAddFilterButtonByField(fieldName);

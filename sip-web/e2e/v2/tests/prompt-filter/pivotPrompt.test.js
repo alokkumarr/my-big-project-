@@ -128,8 +128,9 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
-
+          commonFunctions.waitForProgressBarToComplete();
           executePage.clickOnEditLink();
+          commonFunctions.waitForProgressBarToComplete();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
           chartDesignerPage.clickOnAddFilterButtonByField(fieldName);

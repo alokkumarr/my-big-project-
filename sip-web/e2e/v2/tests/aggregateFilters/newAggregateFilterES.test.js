@@ -78,16 +78,16 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithESRe
         reportDesignerPage.clickOnReportFields(tables);
         // Verify that all the columns are displayed
         reportDesignerPage.verifyDisplayedColumns(tables);
+        commonFunctions.waitForProgressBarToComplete();
         // Apply aggregation
-        reportDesignerPage.refreshAnalysis();
         reportDesignerPage.applyAggregate(data.aggregate);
         reportDesignerPage.refreshAnalysis();
+        commonFunctions.waitForProgressBarToComplete();
         reportDesignerPage.applyNewAggregateFilter(data.aggregatePopup);
         const executePage = new ExecutePage();
 
         executePage.verifyAppliedFilter(data.expectedAggregate, Constants.REPORT);
         //reportDesignerPage.verifyAppliedAggregateFilter(data.expectedAggregateValue);
-        reportDesignerPage.refreshAnalysis();
         if(data.removeAggregate) {
           reportDesignerPage.removeAggregateAndVerify(data.expectedAggregateValue);
         }

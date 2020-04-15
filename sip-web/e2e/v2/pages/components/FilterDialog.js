@@ -4,7 +4,7 @@ const commonFunctions = require('../utils/commonFunctions');
 
 class FilterDialog {
   constructor() {
-    this._addFilter = element(by.css(`[class="mat-icon notranslate material-icons icon-plus2 mat-icon-no-color"]`))
+    this._addFilter = element(by.css(`[e2e="add-new-filter"]`));
     this._filterColumnDropDown = element(
       by.css('[e2e="filter-columns"]')
     );
@@ -47,11 +47,11 @@ class FilterDialog {
       by.css(`mat-checkbox[e2e="filter-dialog-prompt-checkbox"]`)
     );
     this._filterDialogText = element(
-      by.xpath(`//strong[contains(text(),'Filter')]`)
+      by.css(`[e2e="filter-dialog-header-text"]`)
     );
 
     this._cancleFilterPromptBtn = element(
-      by.xpath(`//span[text()='Cancel']`)
+      by.css(`[e2e="designer-dialog-cancel"]`)
     );
     this._selectedFilterField = value =>element(
       by.xpath(`//*[@class="mat-select-value"]/following::span[text()='${value}']`)
@@ -62,17 +62,23 @@ class FilterDialog {
   }
 
   clickOnAddFilterButtonByField(fieldName) {
+    commonFunctions.waitFor.elementToBePresent(this._filterDialogText);
+    commonFunctions.waitFor.elementToBePresent(this._cancleFilterPromptBtn);
+    commonFunctions.waitFor.elementToBePresent(this._applyFiltersBtn);
     commonFunctions.clickOnElement(this._addFilter);
     commonFunctions.clickOnElement(this._selectFilterField(fieldName));
     commonFunctions.waitFor.elementToBePresent(this._tableArtifacts);
+    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
   }
 
   clickOnColumnInput() {
     commonFunctions.clickOnElement(this._filterColumnDropDown);
+    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
   }
 
   clickOnColumnDropDown(name) {
     commonFunctions.clickOnElement(this._columnNameDropDownItem(name));
+    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
   }
   selectPreset(presetName) {
     commonFunctions.clickOnElement(this._filterPresetDropDown);
@@ -90,18 +96,21 @@ class FilterDialog {
     commonFunctions.clickOnElement(this._stringOperatorDropDownItem(operator));
     if (operator === 'Is in' || operator === 'Is not in') {
       commonFunctions.fillInput(this._filterStringIsInIsNotInInput, value);
+      browser.actions().sendKeys(protractor.Key.ENTER).perform();
     } else {
       commonFunctions.fillInput(this._filterStringInput, value);
+      browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
   }
 
   clickOnApplyFilterButton() {
     commonFunctions.clickOnElement(this._applyFiltersBtn);
-    browser.sleep(2000);
+    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
   }
 
   clickOnPromptCheckBox() {
     commonFunctions.clickOnElement(this._promptCheckBox);
+    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
   }
 
   shouldFilterDialogPresent() {

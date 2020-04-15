@@ -49,12 +49,12 @@ class ReportDesignerPage extends Designer {
             `//span[@class="mat-option-text" and contains(text(),'${value}')]`
         )
     );
-    this._verifyAppliedAggregateFilter = value => element(by.css(`[e2e="filters-execute-${value}"]`));
-    this._removeAggregateFilter = value => this._verifyAppliedAggregateFilter(value).element(
-      by.css(
-        `[fonticon="icon-remove"]`
-      )
-    );
+    this._verifyAppliedAggregateFilter = (field,operator,value) =>
+        element(by.xpath(
+            `//*[text()='${field}']/following::span[text()='${operator}']/following::span[text()='[${value}]']`
+            )
+        );
+    this._removeAggregateFilter = element(by.css(`div[fonticon="icon-remove"]`));
     this._previewExpression = element(
       by.cssContainingText('mat-panel-title','Preview Expression'
       )
@@ -169,12 +169,15 @@ class ReportDesignerPage extends Designer {
   }
 
   removeAggregateAndVerify(value) {
-    commonFunctions.clickOnElement(this._removeAggregateFilter(value));
-    commonFunctions.waitFor.elementToBeNotVisible(this._verifyAppliedAggregateFilter(value));
+    commonFunctions.waitFor.elementToBeVisible(this._removeAggregateFilter);
+    commonFunctions.clickOnElement(this._removeAggregateFilter);
+    commonFunctions.waitFor.elementToBeNotVisible(this._verifyAppliedAggregateFilter(value))
   }
 
   applyNewAggregateFilter(aggregateFilters) {
     this.clickFilter();
+    commonFunctions.waitForProgressBarToComplete();
+    browser.sleep(1000);//need to add till filter Popup visible
     this.verifyAggregateFilters();
     commonFunctions.clickOnElement(
       this._addAggregateFilter
@@ -185,18 +188,21 @@ class ReportDesignerPage extends Designer {
     commonFunctions.clickOnElement(
       this._selectOption(aggregateFilters.field)
     );
+    browser.sleep(1000);//need to add else filter will break
     commonFunctions.clickOnElement(
       this._aggregateOption
     );
     commonFunctions.clickOnElement(
       this._selectOption(aggregateFilters.designerLabel)
     );
+    browser.sleep(1000);//need to add else filter will break
     commonFunctions.clickOnElement(
       this._aggregateOperator
     );
     commonFunctions.clickOnElement(
       this._selectOption(aggregateFilters.operator)
     );
+    browser.sleep(1000);//need to add else filter will break
     if(aggregateFilters.operator === "Between") {
       commonFunctions.fillInput(this._betOperatorFirstValue,aggregateFilters.firstValue);
       commonFunctions.fillInput(this._betOperatorSecondValue,aggregateFilters.secondValue);
@@ -205,6 +211,7 @@ class ReportDesignerPage extends Designer {
         this._aggregateOperatorValue,aggregateFilters.operatorValue
       );
     }
+    browser.sleep(1000);//need to add else filter will break
     commonFunctions.clickOnElement(this._applyAggregateFilter);
     browser.sleep(2000); //Need to wait till result grid refresh with new filters
   }

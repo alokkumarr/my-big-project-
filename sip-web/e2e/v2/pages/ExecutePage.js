@@ -31,7 +31,7 @@ class ExecutePage extends ConfirmationModel {
     );
     this._selectedDateFilter = (field,option) =>
     element(by.xpath(
-    `//*[@class='prompt-filter' and text()='${field}']/following::*[text()='${option}']`
+    `//*[text()='${field}']/following::span[text()='${option}']`
     )
     );
     this._selectedFilter = (field,operator,value) =>
@@ -204,16 +204,18 @@ class ExecutePage extends ConfirmationModel {
       commonFunctions.waitFor.elementToBeVisible(this._reportColumnChooser);
     }
 
-    if(filters.fieldName === "date") {
-     browser.sleep(1500); // Some how this need to be added
-     commonFunctions.waitFor.elementToBePresent(this._selectedDateFilter(filters.fieldName,filters.displayedValue));
-     commonFunctions.waitFor.elementToBeVisible(this._selectedDateFilter(filters.fieldName,filters.displayedValue));
-    }else {
-    browser.sleep(1500); // Some how this need to be added
-    commonFunctions.waitFor.elementToBePresent(this._selectedFilter(
-    filters.fieldName, filters.displayOperator,filters.displayedValue));
-    commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(
-    filters.fieldName, filters.displayOperator,filters.displayedValue));
+    if(filters.displayOperator === "=") {
+      browser.sleep(1500); // Some how this need to be added
+      commonFunctions.waitFor.elementToBePresent(this._selectedDateFilter(
+        filters.fieldName,filters.displayedValue));
+      commonFunctions.waitFor.elementToBeVisible(this._selectedDateFilter(
+        filters.fieldName,filters.displayedValue));
+    } else {
+      browser.sleep(1500); // Some how this need to be added
+      commonFunctions.waitFor.elementToBePresent(this._selectedFilter(
+        filters.fieldName, filters.displayOperator,filters.displayedValue));
+      commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(
+        filters.fieldName, filters.displayOperator,filters.displayedValue));
     }
   }
 

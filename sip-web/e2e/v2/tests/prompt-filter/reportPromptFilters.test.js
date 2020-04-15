@@ -16,7 +16,6 @@ let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const Header = require('../../pages/components/Header');
-const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const users = require('../../helpers/data-generation/users');
@@ -118,10 +117,10 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           header.selectSubCategory(subCategoryName);
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
-          const reportDesignerPage = new ReportDesignerPage();
           const executePage = new ExecutePage();
+          commonFunctions.waitForProgressBarToComplete();
           executePage.clickOnEditLink();
-          reportDesignerPage.refreshAnalysis();
+          commonFunctions.waitForProgressBarToComplete();
 
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
@@ -130,7 +129,6 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
-          reportDesignerPage.refreshAnalysis();
 
           chartDesignerPage.validateAppliedFilters(analysisType, [
             (data.fieldName).toString().toLowerCase()
