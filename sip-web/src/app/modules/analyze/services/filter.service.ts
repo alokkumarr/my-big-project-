@@ -65,7 +65,7 @@ export class FilterService {
             return resolve();
           }
           if (analysis.designerEdit && analysis.type === 'report') {
-            analysis.sipQuery.filters = result.filters;
+            analysis.sipQuery.filters = [result];
           } else {
             analysis.sipQuery.filters = result;
           }

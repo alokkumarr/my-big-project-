@@ -5,6 +5,7 @@ import * as filter from 'lodash/filter';
 import * as groupBy from 'lodash/groupBy';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
+import * as get from 'lodash/get';
 import * as isFinite from 'lodash/isFinite';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
@@ -49,6 +50,7 @@ export interface DesignerFilterDialogResult {
 export class DesignerFilterDialogComponent implements OnInit {
   artifacts: Artifact[] | ArtifactDSL[];
   filters: Filter[];
+  queryFilters;
   groupedFilters;
   areFiltersValid = false;
   queryWithClass;
@@ -65,26 +67,43 @@ export class DesignerFilterDialogComponent implements OnInit {
       && this.data.analysisReportType === 'query'
         ? this.loadQueryWithClasses()
         : '';
-    this.filters = cloneDeep(this.data.filters);
-    forEach(this.filters, filtr => {
-      this.modelValueArray.push([]);
-      if (filtr.artifactsName) {
-        filtr.tableName = filtr.artifactsName;
-      }
 
-      if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
-        filtr.model.modelValues = [];
-      }
-    });
-    this.groupedFilters = groupBy(this.filters, 'tableName');
-    forEach(this.artifacts, artifact => {
-      const name =
-        (<Artifact>artifact).artifactName ||
-        (<ArtifactDSL>artifact).artifactsName;
-      if (!this.groupedFilters[name]) {
-        this.addFilter(name, true);
-      }
-    });
+    if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
+      this.queryFilters = get(this.data, 'filters[0].filters');
+      forEach(this.queryFilters, filtr => {
+        this.modelValueArray.push([]);
+        if (filtr.artifactsName) {
+          filtr.tableName = filtr.artifactsName;
+        }
+
+        if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
+          filtr.model.modelValues = [];
+        }
+      });
+    } else {
+      this.filters = cloneDeep(this.data.filters);
+      forEach(this.filters, filtr => {
+        this.modelValueArray.push([]);
+        if (filtr.artifactsName) {
+          filtr.tableName = filtr.artifactsName;
+        }
+
+        if (this.data.analysisType === 'report' && this.data.analysisReportType === 'query') {
+          filtr.model.modelValues = [];
+        }
+      });
+      this.groupedFilters = groupBy(this.filters, 'tableName');
+      forEach(this.artifacts, artifact => {
+        const name =
+          (<Artifact>artifact).artifactName ||
+          (<ArtifactDSL>artifact).artifactsName;
+        if (!this.groupedFilters[name]) {
+          this.addFilter(name, true);
+        }
+      });
+
+    }
+
     this.onFiltersChange();
   }
 
@@ -185,7 +204,7 @@ export class DesignerFilterDialogComponent implements OnInit {
       fpToPairs,
       fpFlatMap(([_, filters]) => filters)
     )(this.groupedFilters);
-    this.areFiltersValid = this.validateFilters(this.filters);
+    this.areFiltersValid = this.validateFilters(this.queryFilters);
   }
 
   artifactTrackByFn(_, artifact: Artifact | ArtifactDSL) {
@@ -202,7 +221,7 @@ export class DesignerFilterDialogComponent implements OnInit {
     const result: DesignerFilterDialogResult = {
       filters:
         this.data.analysisType === 'report' && this.data.analysisReportType === 'query'
-          ? this.filters
+          ? this.queryFilters
           :  filter(this.filters, 'columnName'),
       booleanCriteria: this.data.booleanCriteria
     };
@@ -282,10 +301,10 @@ export class DesignerFilterDialogComponent implements OnInit {
   createFilterRequest(event, i, id) {
     switch (id) {
       case 'column':
-        this.filters[i].displayName = event.srcElement.value;
+        this.queryFilters[i].displayName = event.srcElement.value;
         break;
       case 'description':
-        this.filters[i].description = event.srcElement.value;
+        this.queryFilters[i].description = event.srcElement.value;
         break;
     }
     this.onFiltersChange();
@@ -301,7 +320,7 @@ export class DesignerFilterDialogComponent implements OnInit {
     if (input) {
       input.value = '';
     }
-    this.filters[index].model.modelValues = this.modelValueArray[index];
+    this.queryFilters[index].model.modelValues = this.modelValueArray[index];
     this.onFiltersChange();
   }
 
@@ -310,7 +329,7 @@ export class DesignerFilterDialogComponent implements OnInit {
     if (optIndex >= 0) {
       this.modelValueArray[index].splice(optIndex, 1);
     }
-    this.filters[index].model.modelValues = this.modelValueArray[index];
+    this.queryFilters[index].model.modelValues = this.modelValueArray[index];
     this.onFiltersChange();
   }
 }
