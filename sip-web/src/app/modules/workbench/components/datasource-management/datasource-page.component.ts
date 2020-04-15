@@ -164,9 +164,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   createSource(channelData) {
-    const channelMetadata = isUndefined(channelData)
+    let channelMetadata = isUndefined(channelData)
       ? []
       : JSON.parse(channelData.channelMetadata);
+
+    channelMetadata.channelId = isUndefined(channelData) ? '' : channelData.bisChannelSysId;
     const dateDialogRef = this.dialog.open(CreateSourceDialogComponent, {
       hasBackdrop: true,
       autoFocus: false,

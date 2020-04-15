@@ -10,7 +10,6 @@ import { AnalysisDSL } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish';
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
-import { CUSTOM_HEADERS } from '../../../common/consts';
 import { Store } from '@ngxs/store';
 
 import * as clone from 'lodash/clone';
@@ -108,57 +107,7 @@ export class AnalyzeActionsService {
   }
 
   publishAnalysis(analysis: AnalysisDSL, lastCategoryId: number | string) {
-    const publish = (a = analysis) =>
-      this._publishService.publishAnalysis(a, lastCategoryId);
-
-    /* This is not a fork-to-edit analysis. Publish this normally */
-    if (!analysis.parentAnalysisId) {
-      return publish();
-    }
-
-    return this._analyzeService
-      .readAnalysis(analysis.parentAnalysisId, !!(analysis as any).sipQuery, {
-        [CUSTOM_HEADERS.SKIP_TOAST]: '1'
-      })
-      .then(
-        parentAnalysis => {
-          if (!parentAnalysis) {
-            return publish();
-          }
-          /* The destination category is different from parent analysis's category. Publish it normally */
-          const parentAnalysisCategoryId = parentAnalysis.category;
-          const childAnalysisCategoryId = analysis.category;
-          if (
-            parentAnalysisCategoryId.toString() !==
-            childAnalysisCategoryId.toString()
-          ) {
-            return publish();
-          }
-
-          /* If the parent has been modified since fork/editing, allow user to choose whether
-           they want to overwrite the parent analysis */
-          if (analysis.parentLastModified < +parentAnalysis.modifiedTime) {
-            return this.showPublishOverwriteConfirmation()
-              .afterClosed()
-              .toPromise()
-              .then(shouldPublish => {
-                if (shouldPublish) {
-                  return publish();
-                } else {
-                  return null;
-                }
-              });
-          }
-          return publish();
-        },
-        err => {
-          delete analysis.parentAnalysisId;
-          delete analysis.parentCategoryId;
-          delete analysis.parentLastModified;
-
-          return publish();
-        }
-      );
+    return this._publishService.publishAnalysis(analysis, lastCategoryId);
   }
 
   openPublishModal(analysis: AnalysisDSL) {

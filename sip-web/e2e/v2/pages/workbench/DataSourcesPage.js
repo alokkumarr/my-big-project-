@@ -161,10 +161,10 @@ class DataSourcesPage extends DeleteModel {
     );
     commonFunctions.clickOnElement(this._showPwd);
     commonFunctions.waitFor.elementToBeVisible(this._hidePwd);
-    commonFunctions.validateText(
+    /*commonFunctions.validateText(
       this._channelAttributes('password-name'),
       channelInfo.sftpPwd
-    );
+    );*/
     commonFunctions.validateText(
       this._channelAttributes('description'),
       channelInfo.desc
