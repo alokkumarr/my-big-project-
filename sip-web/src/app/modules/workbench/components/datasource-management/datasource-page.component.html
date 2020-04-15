@@ -262,46 +262,7 @@
               <span>{{ selectedSourceData?.userName }}</span>
             </div>
             <mat-divider [vertical]="true"></mat-divider>
-            <!-- <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="password-name" i18n
-                >Password :
-              </span>
-              <div *ngIf="selectedSourceData">
-                <span *ngIf="show; else hidePwd">{{
-                  selectedSourceData?.password
-                }}</span>
-                <ng-template #hidePwd
-                  >&bull; &bull; &bull; &bull; &bull; &bull; &bull; &bull;
-                  &bull;</ng-template
-                >
-                <button
-                  *ngIf="!show"
-                  e2e="show-password-ds"
-                  matTooltip="Toggle Password"
-                  color="primary"
-                  mat-button
-                  matSuffix
-                  mat-icon-button
-                  aria-label="show"
-                  (click)="togglePWD()"
-                >
-                  <mat-icon fontIcon="icon-show"></mat-icon>
-                </button>
-                <button
-                  *ngIf="show"
-                  e2e="hide-password-ds"
-                  matTooltip="Toggle Password"
-                  color="primary"
-                  mat-button
-                  matSuffix
-                  mat-icon-button
-                  aria-label="show"
-                  (click)="togglePWD()"
-                >
-                  <mat-icon fontIcon="icon-hide"></mat-icon>
-                </button>
-              </div>
-            </div> -->
+
           </div>
           <mat-divider></mat-divider>
           <dx-data-grid
