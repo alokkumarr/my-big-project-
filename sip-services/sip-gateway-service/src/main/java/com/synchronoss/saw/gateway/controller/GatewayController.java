@@ -56,6 +56,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.util.HtmlUtils;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
 import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
@@ -151,7 +152,7 @@ public class GatewayController {
           if (!ServletFileUpload.isMultipartContent(request)) {
             proxiedRequest = createHttpUriRequest(request, userMetadata);
             proxiedResponse = httpClient.execute(proxiedRequest);
-            responseEntity = new ResponseEntity<>(HtmlUtils.htmlEscape(read(proxiedResponse.getEntity())), makeResponseHeaders(proxiedResponse),
+            responseEntity = new ResponseEntity<>(JsonSanitizer.sanitize(read(proxiedResponse.getEntity())), makeResponseHeaders(proxiedResponse),
                                                   HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
           } else {
             logger.trace("Inside the file upload section....");
@@ -218,7 +219,7 @@ public class GatewayController {
       if (request.getRequestURI().endsWith(URLRequestTransformer.API_DOCS_PATH)) {
         proxiedRequest = createHttpUriRequest(request, new UserCustomerMetaData());
         proxiedResponse = httpClient.execute(proxiedRequest);
-        return new ResponseEntity<>(HtmlUtils.htmlEscape(read(proxiedResponse.getEntity())), makeResponseHeaders(proxiedResponse),
+        return new ResponseEntity<>(JsonSanitizer.sanitize(read(proxiedResponse.getEntity())), makeResponseHeaders(proxiedResponse),
                                     HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
       }
       responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
