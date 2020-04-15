@@ -24,7 +24,10 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing reportPromptFilters tests from reportPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
+<<<<<<< HEAD
   const fieldName = 'field';
+=======
+>>>>>>> afb7226b0e999e171e82383643f662e07137c384
 
   let analysisId;
   let host;
@@ -136,7 +139,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
             (data.fieldName).toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
-          chartDesignerPage.clickOnSaveAndCloseDialogButton();
+          chartDesignerPage.clickOnSaveDialogButton();
 
           // From analysis detail/view page
           commonFunctions.goToHome();
