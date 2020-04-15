@@ -117,6 +117,7 @@ public class UserRepositoryImpl implements UserRepository {
    * @return
    */
   public boolean[] authenticateUser(String masterLoginId, String password) {
+	logger.info("#############Auhtenticating user passowrd"+ password);
     boolean isAuthenticated = false;
     boolean isPasswordActive = false;
     boolean[] ret = {false, false, false};
@@ -126,29 +127,32 @@ public class UserRepositoryImpl implements UserRepository {
     logger.debug("lockingTime : {} ",lockingTime);
     logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
-    try {
-		password = AdvancedEncryptionUtil.createHash(password);
-	} catch (CannotPerformOperationException e1) {
-		logger.error("Error in encrypting password entered by user ");
-	}
-    String pwd = password;
+    
+   // String pwd = password;
     String sql =
-        "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS "
+        "SELECT U.PWD_MODIFIED_DATE, U.ENCRYPTED_PASSWORD, C.PASSWORD_EXPIRY_DAYS "
             + "FROM USERS U, CUSTOMERS C "
-            + "WHERE U.USER_ID = ? AND U.ENCRYPTED_PASSWORD = ? "
+            + "WHERE U.USER_ID = ?  "
             + " AND U.ACTIVE_STATUS_IND = '1' "
             + "AND U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID";
     try {
       PasswordDetails passwordDetails = jdbcTemplate.query(sql, preparedStatement -> {
             preparedStatement.setString(1, masterLoginId);
-            preparedStatement.setString(2, pwd);
+           // preparedStatement.setString(2, pwd);
           },
           new UserRepositoryImpl.PwdDetailExtractor());
+      
+      
+      logger.info("Passowrd Details retrived value from DB ::"+ passwordDetails);
 
       if (passwordDetails != null) {
-        isAuthenticated = true;
+    	  logger.info("Passowrd Details not null ");
+    	  logger.info("checking verify password  for password ###"+ password + " encrypted ::"+ passwordDetails.getEncryptedPwd());
+        isAuthenticated = AdvancedEncryptionUtil.verifyPassword(
+        		password,passwordDetails.getEncryptedPwd());
         if (!isPwdExpired(passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
           isPasswordActive = true;
+          logger.info("Passowrd Active ");
         }
         ret[0] = isAuthenticated;
         ret[1] = isPasswordActive;
@@ -247,7 +251,14 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-		String encNewPass = Ccode.cencode(newPass).trim();
+		String encNewPass = null;
+		
+			try {
+				encNewPass =  AdvancedEncryptionUtil.createHash(newPass.trim());
+	  		} catch (CannotPerformOperationException e) {
+	  			logger.error("Error during hashing password");
+	  		}
+		
 		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
 		try {
@@ -263,7 +274,7 @@ public class UserRepositoryImpl implements UserRepository {
 			 */
 
 			sql = "SELECT PH.* FROM PASSWORD_HISTORY PH WHERE PH.USER_SYS_ID=? ORDER BY PH.DATE_OF_CHANGE DESC ";
-
+			final String  encNewPassword = encNewPass;
 			message = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, userSysId);
@@ -280,7 +291,7 @@ public class UserRepositoryImpl implements UserRepository {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
 						preparedStatement.setString(1, sysId);
 						preparedStatement.setString(2, userSysId);
-						preparedStatement.setString(3, encNewPass);
+						preparedStatement.setString(3, encNewPassword);
 					}
 				});
 
@@ -288,7 +299,7 @@ public class UserRepositoryImpl implements UserRepository {
 						+ "U.PWD_MODIFIED_DATE=SYSDATE(),U.MODIFIED_BY ='CHANGE_PASSWORD' WHERE U.USER_SYS_ID=?";
 				jdbcTemplate.update(sql, new PreparedStatementSetter() {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
-						preparedStatement.setString(1, encNewPass);
+						preparedStatement.setString(1, encNewPassword);
 						preparedStatement.setString(2, userSysId);
 					}
 				});
@@ -317,7 +328,7 @@ public class UserRepositoryImpl implements UserRepository {
 	
 	@Override
 	public void migratePwdsEncryption() {
-		logger.debug("###Beginning of migration ####");
+		logger.info("###Beginning of migration ####");
 		String sql = "SELECT U.USER_SYS_ID, U.ENCRYPTED_PASSWORD FROM USERS U" + " WHERE U.PWD_MIGRATED = 0" ;
 		
 		
@@ -329,7 +340,7 @@ public class UserRepositoryImpl implements UserRepository {
 				return userDetails;
 			}
 		});
-		logger.debug("###Retrived users  count ::####"+ users.size());
+		logger.info("###Retrived users  count ::####"+ users.size());
 		String updateSql = "UPDATE USERS U  SET  U.ENCRYPTED_PASSWORD = ?, U.PWD_MIGRATED = 1" ;
 		int[][] updateCounts = jdbcTemplate.batchUpdate(updateSql,users,10,
 	            new ParameterizedPreparedStatementSetter<UserDetails>() {
@@ -337,17 +348,18 @@ public class UserRepositoryImpl implements UserRepository {
 					@Override
 					public void setValues(PreparedStatement ps, UserDetails user) throws SQLException {
 						String existingPwd  =  user.getPassword();
-						logger.debug("Existing password ::"+ existingPwd);
+						logger.info("Existing encrypted password ::"+ existingPwd);
 						String actualPwd = Ccode.cdecode(existingPwd);
-						logger.debug("Existing decoded password ::"+ existingPwd);
+						logger.info("Actual password ::"+ actualPwd);
 						String hashedPwd = null;
 						try {
 							hashedPwd = AdvancedEncryptionUtil.createHash(actualPwd);
-							logger.debug("new encrypted password ::"+ existingPwd);
+							logger.info("new encrypted password ::"+ hashedPwd);
 						} catch (CannotPerformOperationException e) {
 							logger.error("Exception while encrypting pwd for user ::" 
 						    + user.getUserId());
 						}
+						logger.info("Updating DB password to new encrypted password " + hashedPwd);
 						ps.setString(1,hashedPwd);
 	                    
 						
@@ -365,16 +377,24 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-		String encOldPass = Ccode.cencode(oldPass).trim();
-		String encNewPass = Ccode.cencode(newPass).trim();
+		String encOldPass = null;
+		String encNewPass = null;
+		try {
+			encOldPass = AdvancedEncryptionUtil.createHash(oldPass.trim());
+			encNewPass = AdvancedEncryptionUtil.createHash(newPass.trim());
+		} catch (CannotPerformOperationException e) {
+			logger.error("Error during hashing password");
+		}
+				
 		String sql = "SELECT U.USER_SYS_ID" + " FROM USERS U" + " WHERE U.USER_ID = ?"
 				+ " and  U.ENCRYPTED_PASSWORD = ?";
-
+		final String encNewPassword = encNewPass;
+		final String encOldPassword = encOldPass;
 		try {
 			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, loginId);
-					preparedStatement.setString(2, encOldPass);
+					preparedStatement.setString(2, encOldPassword);
 				}
 			}, new UserRepositoryImpl.StringExtractor("user_sys_id"));
 
@@ -398,14 +418,14 @@ public class UserRepositoryImpl implements UserRepository {
         jdbcTemplate.update(sql, preparedStatement -> {
           preparedStatement.setString(1, sysId);
           preparedStatement.setString(2, userSysId);
-          preparedStatement.setString(3, encNewPass);
+          preparedStatement.setString(3, encNewPassword);
         });
 
 				sql = "update USERS U  set U.ENCRYPTED_PASSWORD=?"
 						+ " ,  U.PWD_MODIFIED_DATE=sysdate(),U.MODIFIED_BY ='change_password' where U.USER_SYS_ID=?";
 				int i = jdbcTemplate.update(sql, new PreparedStatementSetter() {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
-						preparedStatement.setString(1, encNewPass);
+						preparedStatement.setString(1, encNewPassword);
 						preparedStatement.setString(2, userSysId);
 					}
 				});
@@ -548,6 +568,7 @@ public class UserRepositoryImpl implements UserRepository {
 				passwordDetails = new PasswordDetails();
 				passwordDetails.setPwdModifiedDate(rs.getDate("PWD_MODIFIED_DATE"));
 				passwordDetails.setPasswordExpiryDays(rs.getInt("PASSWORD_EXPIRY_DAYS"));
+				passwordDetails.setEncryptedPwd(rs.getString("ENCRYPTED_PASSWORD"));
 			}
 			return passwordDetails;
 		}
@@ -1369,7 +1390,12 @@ public class UserRepositoryImpl implements UserRepository {
         preparedStatement.setString(2, user.getEmail());
         preparedStatement.setLong(3, user.getRoleId());
         preparedStatement.setLong(4, user.getCustomerId());
-        preparedStatement.setString(5, Ccode.cencode(user.getPassword()).trim());
+        try {
+			preparedStatement.setString(5, 
+					AdvancedEncryptionUtil.createHash(user.getPassword()).trim());
+		} catch (CannotPerformOperationException e) {
+			logger.error("Error during hashing password");
+		}
         preparedStatement.setString(6, user.getFirstName());
         preparedStatement.setString(7, user.getMiddleName());
         preparedStatement.setString(8, user.getLastName());
@@ -1412,7 +1438,13 @@ public class UserRepositoryImpl implements UserRepository {
           ps.setString(2, user.getEmail());
           ps.setLong(3, user.getRoleId());
           ps.setLong(4, user.getCustomerId());
-          ps.setString(5, Ccode.cencode(user.getPassword()).trim());
+          
+          try {
+  			ps.setString(5, 
+  					AdvancedEncryptionUtil.createHash(user.getPassword()).trim());
+  		} catch (CannotPerformOperationException e) {
+  			logger.error("Error during hashing password");
+  		}
           ps.setString(6, user.getFirstName());
           ps.setString(7, user.getMiddleName());
           ps.setString(8, user.getLastName());
@@ -1432,7 +1464,13 @@ public class UserRepositoryImpl implements UserRepository {
 		StringBuffer sql = new StringBuffer();
 		sql.append("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ? ");
 		if (user.getPassword() != null) {
-			sql.append(",ENCRYPTED_PASSWORD = '" + Ccode.cencode(user.getPassword()).trim() + "'");
+			
+			try {
+				sql.append(",ENCRYPTED_PASSWORD = '" + 
+	  					AdvancedEncryptionUtil.createHash(user.getPassword()).trim() + "'");
+	  		} catch (CannotPerformOperationException e) {
+	  			logger.error("Error during hashing password");
+	  		}
 			sql.append(",PWD_MODIFIED_DATE = SYSDATE()");
 		}
 
@@ -3197,7 +3235,12 @@ public class UserRepositoryImpl implements UserRepository {
             } else {
               preparedStatement.setNull(5, Types.BIGINT);
             }
-            preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword()).trim());
+            try {
+    			preparedStatement.setString(5, 
+    					AdvancedEncryptionUtil.createHash(userDetails.getPassword()).trim());
+    		} catch (CannotPerformOperationException e) {
+    			logger.error("Error during hashing password");
+    		}
             preparedStatement.setString(7, userDetails.getFirstName());
             preparedStatement.setString(8, userDetails.getMiddleName());
             preparedStatement.setString(9, userDetails.getLastName());
@@ -3244,7 +3287,13 @@ public class UserRepositoryImpl implements UserRepository {
                     } else {
                         preparedStatement.setNull(3, Types.BIGINT);
                     }
-                    preparedStatement.setString(4, Ccode.cencode(userDetails.getPassword()).trim());
+                    
+                    try {
+            			preparedStatement.setString(4, 
+            					AdvancedEncryptionUtil.createHash(userDetails.getPassword()).trim());
+            		} catch (CannotPerformOperationException e) {
+            			logger.error("Error during hashing password");
+            		}
                     preparedStatement.setString(5, userDetails.getFirstName());
                     preparedStatement.setString(6, userDetails.getMiddleName());
                     preparedStatement.setString(7, userDetails.getLastName());

@@ -1,15 +1,15 @@
 package com.sncr.saw.security.common.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
-import com.sncr.saw.security.common.util.Ccode;
 /**
  * 
  * @author ssom0002
  *
  */
+@Ignore
 public class CcodeTest {
 
     @Test

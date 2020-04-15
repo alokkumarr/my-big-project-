@@ -177,8 +177,25 @@ public class AdvancedEncryptionUtil
     }
 	public static void main(String args[]) {
 		try {
-			String hashString = AdvancedEncryptionUtil.createHash("sawadmin@123");
+			String hashString1 = AdvancedEncryptionUtil.createHash("sawadmin@123");
+			String hashString2 = AdvancedEncryptionUtil.createHash("sawadmin@123");
+			String hashString3 = AdvancedEncryptionUtil.createHash("sawadmin@123");
+			
+			System.out.print(hashString1);
+			System.out.print(hashString2);
+			System.out.print(hashString3);
+			boolean isValid1 = AdvancedEncryptionUtil.verifyPassword("sawadmin@123",hashString1);
+			boolean isValid2 = AdvancedEncryptionUtil.verifyPassword("sawadmin@124",hashString2);
+			boolean isValid3 = AdvancedEncryptionUtil.verifyPassword("sawadmin@123",hashString3);
+			System.out.println("Is valid:" + isValid1);
+			System.out.println("Is valid:" + isValid2);
+			System.out.println("Is valid:" + isValid3);
 		} catch (CannotPerformOperationException e) {
+		} catch (InvalidHashException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
+	
+	
 }
