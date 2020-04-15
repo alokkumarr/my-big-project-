@@ -229,7 +229,7 @@ export class DskFiltersService {
 
               return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
                 field.model.operator || ''
-              }</span> <span [attr.e2e]="'ffilter-model-value'">[${[values]}]</span>`;
+              }</span> <span>[${[values]}]</span>`;
 
             case 'date':
             const datevalues =  get(field, 'model.preset');
@@ -239,7 +239,7 @@ export class DskFiltersService {
 
               if (get(field, 'model.preset') == 'NA') {
                 return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator"> BTW
-                </span> <span [attr.e2e]="'ffilter-model-value'">[ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]</span>`;
+                </span> <span>[ from ${get(field, 'model.gte')} to ${get(field, 'model.lte')}]</span>`;
               } else {
                 return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> = <span class="operator">${
                   get(field, 'model.preset') || ''
@@ -249,11 +249,11 @@ export class DskFiltersService {
               if (field.model.operator === 'BTW') {
                 return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
                   field.model.operator
-                }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
+                }</span> <span>[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
               } else {
                 return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
                   field.model.operator || ''
-                }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
+                }</span> <span>[${[get(field, 'model.value')]}]</span>`;
               }
           }
         }

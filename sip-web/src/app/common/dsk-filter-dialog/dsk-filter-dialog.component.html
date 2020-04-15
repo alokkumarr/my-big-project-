@@ -68,14 +68,14 @@
               <code
               [innerHTML]="
                 previewString ||
-                'Filters might be missing or invalid. Please add fields below or check for errors.'
+                ''
               "
               >
             </code>
 
             <code
               [innerHTML]="fetchAggregatedFilters(aggregatedFilters)"
-              *ngIf="previewString && data.mode === 'ANALYZE'"
+              *ngIf="data.mode === 'ANALYZE'"
               style="margin-left: 50px;"
               >
             </code>
