@@ -1132,6 +1132,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysis = this._store.selectSnapshot(
           state => state.designerState.analysis
         );
+
+        if (analysis.sipQuery.filters[0].booleanCriteria) {
+          analysis.sipQuery.filters = [];
+        }
         this.filterService
           .getRuntimeFilterValuesIfAvailable(analysis, 'preview', true)
           .then(model => {
@@ -1198,7 +1202,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   changeToQueryModePermanently() {
     this._store.dispatch(new DesignerUpdateEditMode(true));
     this.filters = [];
-
     this.sorts = [];
   }
 
