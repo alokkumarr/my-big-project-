@@ -70,19 +70,16 @@ public interface UserRepository {
 	Long createAdminUserForOnboarding(User user);
 	Boolean IsTicketValid(String ticketId, String masterLogin);
 	List<CategoryDetails> fetchCategoriesByProdModId(ProductModuleDetails productModuleDetails, Long roleId);
-  Long getCustomerSysid(String customerCode);
-  Long getSecurityGroupSysid(String dskGroup,Long customerSysId);
-  Long getRoleSysId(String roleName,Long customerSysId);
-
-    Valid updateUserDetails(UserDetails userDetails, String createdBy);
-
-    UserDetails getUser(String masterLoginId, Long customerSysId);
-  Valid addUserDetails(UserDetails userDetails, String masterLoginId);
-
-    UserDetails getUserbyId(long userSysId, Long customerSysId);
-
-    List<UserDetails> getUsersDetailList(Long customerId);
-  boolean getRoleStatus(Long roleId);
-  DskDetails getUserById(String masterLoginId);
-void migratePwdsEncryption();
+	Long getCustomerSysid(String customerCode);
+	Long getSecurityGroupSysid(String dskGroup, Long customerSysId);
+	Long getRoleSysId(String roleName, Long customerSysId);
+	Valid updateUserDetails(UserDetails userDetails, String createdBy);
+	UserDetails getUser(String masterLoginId, Long customerSysId);
+	Valid addUserDetails(UserDetails userDetails, String masterLoginId);
+	UserDetails getUserbyId(long userSysId, Long customerSysId);
+	List<UserDetails> getUsersDetailList(Long customerId);
+	boolean getRoleStatus(Long roleId);
+	DskDetails getUserById(String masterLoginId);
+	void migratePwdsEncryption();
+	Ticket getTicketForId3(String ticketId, String userId);
 }

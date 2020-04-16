@@ -8,6 +8,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.xml.bind.DatatypeConverter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.synchronoss.sip.utils.RestUtil;
 public class AdvancedEncryptionUtil
 {
     @SuppressWarnings("serial")
@@ -40,6 +45,7 @@ public class AdvancedEncryptionUtil
     public static final int HASH_SIZE_INDEX = 2;
     public static final int SALT_INDEX = 3;
     public static final int PBKDF2_INDEX = 4;
+    private static final Logger logger = LoggerFactory.getLogger(AdvancedEncryptionUtil.class);
     public static String createHash(String password)
         throws CannotPerformOperationException
     {
@@ -63,7 +69,6 @@ public class AdvancedEncryptionUtil
             toBase64(salt) +
             ":" +
             toBase64(hash);
-        System.out.println(parts.length());
         return parts;
     }
     public static boolean verifyPassword(String password, String correctHash)
@@ -181,19 +186,17 @@ public class AdvancedEncryptionUtil
 			String hashString2 = AdvancedEncryptionUtil.createHash("sawadmin@123");
 			String hashString3 = AdvancedEncryptionUtil.createHash("sawadmin@123");
 			
-			System.out.print(hashString1);
-			System.out.print(hashString2);
-			System.out.print(hashString3);
 			boolean isValid1 = AdvancedEncryptionUtil.verifyPassword("sawadmin@123",hashString1);
 			boolean isValid2 = AdvancedEncryptionUtil.verifyPassword("sawadmin@124",hashString2);
 			boolean isValid3 = AdvancedEncryptionUtil.verifyPassword("sawadmin@123",hashString3);
-			System.out.println("Is valid:" + isValid1);
-			System.out.println("Is valid:" + isValid2);
-			System.out.println("Is valid:" + isValid3);
+			
+			logger.debug("is First one valid ::" + isValid1);
+			logger.debug("is First one valid ::" + isValid2);
+			logger.debug("is First one valid ::" + isValid3);
 		} catch (CannotPerformOperationException e) {
+			logger.error("Error while encryption");
 		} catch (InvalidHashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error while encryption");
 		}
 	}
 	
