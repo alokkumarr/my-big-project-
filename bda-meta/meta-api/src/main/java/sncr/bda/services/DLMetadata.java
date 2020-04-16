@@ -1,6 +1,5 @@
 package sncr.bda.services;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -380,15 +379,15 @@ public class DLMetadata extends MetadataBase {
         // Check if we have file to upload
         if(asName != null) {
             // Yes, we have file to upload
-            String normalizedFilePath = SipCommonUtils.normalizePath(rawPath + Path.SEPARATOR + asName);
+            String normalizedFilePath = BdaCoreUtils.normalizePath(rawPath + Path.SEPARATOR + asName);
             Path filePath = new Path(normalizedFilePath);
             if(fs.exists(filePath)){
               String fileDate = new SimpleDateFormat("mmss").format(new Date());
               asName = asName.substring(0, asName.indexOf('.')) +"_"+fileDate + asName.substring(asName.indexOf('.'), asName.length());
-              String normalizePath=SipCommonUtils.normalizePath(rawPath + Path.SEPARATOR + asName);
+              String normalizePath=BdaCoreUtils.normalizePath(rawPath + Path.SEPARATOR + asName);
               filePath = new Path(normalizePath);
             }
-            String normalizedAbsolutePath = SipCommonUtils.normalizePath("file://" + absoluteFilePath);
+            String normalizedAbsolutePath = BdaCoreUtils.normalizePath("file://" + absoluteFilePath);
             Path localPath = new Path(normalizedAbsolutePath);
             fs.copyFromLocalFile(true, localPath, filePath);
         }

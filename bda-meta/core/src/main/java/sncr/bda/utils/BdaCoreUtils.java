@@ -1,6 +1,6 @@
 package sncr.bda.utils;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 
 public class BdaCoreUtils {
@@ -13,7 +13,17 @@ public class BdaCoreUtils {
    */
   public static Path normalizePath(Path path) {
     String pathTobeNormalized = path.toString();
-    String normalizePath = SipCommonUtils.normalizePath(pathTobeNormalized);
+    String normalizePath = normalizePath(pathTobeNormalized);
     return new Path(normalizePath);
+  }
+
+  /**
+   * normalize the path to eliminate the PathManipulation vulnarabilities.
+   *
+   * @param path to be normalized
+   * @return normalized path
+   */
+  public static String normalizePath(String path) {
+    return FilenameUtils.normalize(path);
   }
 }

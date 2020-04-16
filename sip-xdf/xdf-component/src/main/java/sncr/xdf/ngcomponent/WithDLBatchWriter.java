@@ -1,6 +1,5 @@
 package sncr.xdf.ngcomponent;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import com.google.gson.JsonParser;
 import org.apache.spark.sql.Row;
@@ -159,7 +158,7 @@ public interface WithDLBatchWriter {
                     
                     WithDLBatchWriterHelper.logger.debug("Deleting source :: "+ moveTask.source );
                     //Delete temporary data object directory
-                    String normalizedPath= SipCommonUtils.normalizePath(moveTask.source);
+                    String normalizedPath= BdaCoreUtils.normalizePath(moveTask.source);
                     HFileOperations.fs.delete(new Path(normalizedPath ), true);
                 }
             } //<-- for
@@ -191,8 +190,8 @@ public interface WithDLBatchWriter {
                                       InternalContext ctx, Map<String, Long> partitionKeys ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
 
-            String normalizedSourcePath =SipCommonUtils.normalizePath( moveDataDesc.source + partitionKey);
-            String normalizedDestPath = SipCommonUtils.normalizePath(moveDataDesc.dest +  partitionKey);
+            String normalizedSourcePath =BdaCoreUtils.normalizePath( moveDataDesc.source + partitionKey);
+            String normalizedDestPath = BdaCoreUtils.normalizePath(moveDataDesc.dest +  partitionKey);
             Path source = new Path(normalizedSourcePath);
             Path dest = new Path(normalizedDestPath);
 

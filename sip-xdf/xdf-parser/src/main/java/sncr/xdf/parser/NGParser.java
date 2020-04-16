@@ -1,6 +1,5 @@
 package sncr.xdf.parser;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -488,7 +487,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     String currentTimestamp = LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
                     String normalizedPath =
-                        SipCommonUtils.normalizePath(
+                        BdaCoreUtils.normalizePath(
                             archiveDir
                                 + Path.SEPARATOR
                                 + currentTimestamp
@@ -1031,7 +1030,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                     String tempRejectedLocation = this.rejectedDatasetLocation + "_" + UUID.randomUUID()
                         + "_" + System.currentTimeMillis();
-                    String normalizedTempRejLocation= SipCommonUtils.normalizePath(tempRejectedLocation);
+                    String normalizedTempRejLocation= BdaCoreUtils.normalizePath(tempRejectedLocation);
                     logger.debug("Writing rejected data to temp directory " + normalizedTempRejLocation);
 
                     writeRdd(rejectedRecords, normalizedTempRejLocation);

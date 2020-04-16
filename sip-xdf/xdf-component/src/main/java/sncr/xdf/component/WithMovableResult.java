@@ -1,6 +1,5 @@
 package sncr.xdf.component;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FileStatus;
@@ -206,8 +205,8 @@ public interface WithMovableResult {
                                       MoveDataDescriptor moveDataDesc,
                                       Context ctx ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
-            String normalizedSourcePath = SipCommonUtils.normalizePath(moveDataDesc.source + partitionKey);
-            String normalizedDestPath = SipCommonUtils.normalizePath(moveDataDesc.dest + partitionKey);
+            String normalizedSourcePath = BdaCoreUtils.normalizePath(moveDataDesc.source + partitionKey);
+            String normalizedDestPath = BdaCoreUtils.normalizePath(moveDataDesc.dest + partitionKey);
             Path source = new Path(normalizedSourcePath);
             Path dest = new Path(normalizedDestPath);
 

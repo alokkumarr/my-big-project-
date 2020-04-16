@@ -68,8 +68,6 @@ public class Ccode {
     }
     
     public static void main(String[] args) {
-        String l=Ccode.cencode("null");
-        String s=Ccode.cdecode("NfEYrk8RxyjW077rOUy0rw==");
 
         int rc = 0;
         String res = null;

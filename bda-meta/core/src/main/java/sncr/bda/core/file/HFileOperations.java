@@ -1,6 +1,5 @@
 package sncr.bda.core.file;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -11,6 +10,7 @@ import org.apache.hadoop.util.Shell;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import sncr.bda.utils.BdaCoreUtils;
 
 /**
  * Created by srya0001 on 2/23/2017.
@@ -47,7 +47,7 @@ public class HFileOperations {
         FileSystem fs;
         InputStream stream;
         try {
-            String normalizedFilePath = SipCommonUtils.normalizePath(fileName);
+            String normalizedFilePath = BdaCoreUtils.normalizePath(fileName);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
@@ -75,7 +75,7 @@ public class HFileOperations {
         FileSystem fs;
         InputStream stream;
         try {
-            String normalizedFilePath = SipCommonUtils.normalizePath(fileName);
+            String normalizedFilePath = BdaCoreUtils.normalizePath(fileName);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
@@ -160,7 +160,7 @@ public class HFileOperations {
     public static void deleteEnt(String file) throws Exception {
         FileSystem fs;
         try {
-            String normalizedFilePath = SipCommonUtils.normalizePath(file);
+            String normalizedFilePath = BdaCoreUtils.normalizePath(file);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
@@ -199,7 +199,7 @@ public class HFileOperations {
     public static void createDir(String s) throws Exception {
         FileSystem fs;
         try {
-            String normalizedFilePath = SipCommonUtils.normalizePath(s);
+            String normalizedFilePath = BdaCoreUtils.normalizePath(s);
             Path path = new Path(normalizedFilePath);
             Configuration conf = new Configuration();
             fs = FileSystem.get(path.toUri(), conf);
