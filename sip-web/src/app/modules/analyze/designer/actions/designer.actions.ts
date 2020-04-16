@@ -220,6 +220,12 @@ export class DesignerUpdateAggregateInSorts {
   constructor(public column: any) {}
 }
 
+export class DesignerUpdateAnalysisChartLimitByOptions {
+  static readonly type =
+  '[Designer] update chart limit by options';
+  constructor(public limitByAxis: {}) {}
+}
+
 export class DesignerUpdateQueryFilters {
   static readonly type =
     '[Designer] update query with runtime filters';
