@@ -3227,7 +3227,7 @@ public class UserRepositoryImpl implements UserRepository {
             if (userDetails.getSecGroupSysId() != null) {
               preparedStatement.setLong(5, userDetails.getSecGroupSysId());
             } else {
-              preparedStatement.setNull(5, Types.BIGINT);
+              preparedStatement.setNull(6, Types.BIGINT);
             }
             try {
     			preparedStatement.setString(5, 
