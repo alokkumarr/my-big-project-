@@ -64,8 +64,7 @@ public class SawBatchServiceApplication {
   @Value("${sip.retry.queue-capacity}")
   private String retryQueueCapacity;
 
-  @Autowired
-  KeyMigration keyMigration;
+  @Autowired KeyMigration keyMigration;
 
   /**
    * This is the entry method of the class.

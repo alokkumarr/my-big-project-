@@ -26,12 +26,17 @@ public class EncryptionKeyMigration implements KeyMigration {
   private static final Logger logger = LoggerFactory.getLogger(EncryptionKeyMigration.class);
 
   @Autowired
+  public EncryptionKeyMigration(@Value("${encryption.sftp-key}") String encryptionKey) {
+    this.encryptionKey = encryptionKey;
+    secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
+  }
+
+  @Autowired
   BisChannelDataRestRepository bisChannelRepository;
 
-  @Value("${encryption.sftp-key}")
   private String encryptionKey;
 
-  public final SecretKey secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
+  public final SecretKey secretKey;
 
   @Override
   public void migrate() {
