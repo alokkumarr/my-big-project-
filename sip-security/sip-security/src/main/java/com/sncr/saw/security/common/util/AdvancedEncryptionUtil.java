@@ -180,25 +180,6 @@ public class AdvancedEncryptionUtil
     {
         return DatatypeConverter.printBase64Binary(array);
     }
-	public static void main(String args[]) {
-		try {
-			String hashString1 = AdvancedEncryptionUtil.createHash("sawadmin@123");
-			String hashString2 = AdvancedEncryptionUtil.createHash("sawadmin@123");
-			String hashString3 = AdvancedEncryptionUtil.createHash("sawadmin@123");
-			
-			boolean isValid1 = AdvancedEncryptionUtil.verifyPassword("sawadmin@123",hashString1);
-			boolean isValid2 = AdvancedEncryptionUtil.verifyPassword("sawadmin@124",hashString2);
-			boolean isValid3 = AdvancedEncryptionUtil.verifyPassword("sawadmin@123",hashString3);
-			
-			logger.debug("is First one valid ::" + isValid1);
-			logger.debug("is First one valid ::" + isValid2);
-			logger.debug("is First one valid ::" + isValid3);
-		} catch (CannotPerformOperationException e) {
-			logger.error("Error while encryption");
-		} catch (InvalidHashException e) {
-			logger.error("Error while encryption");
-		}
-	}
 	
 	
 }
