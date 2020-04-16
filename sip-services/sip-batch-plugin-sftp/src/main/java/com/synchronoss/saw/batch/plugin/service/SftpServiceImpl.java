@@ -1336,7 +1336,7 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.info("Actual file name after downloaded in the  :"
               + localDirectory.getAbsolutePath() + " file name "
               + localFile.getName());
-          String normalizedPath= SipCommonUtils.normalizePath(localFile.getPath());
+          String normalizedPath = SipCommonUtils.normalizePath(localFile.getPath());
           FSDataOutputStream fos = fs.create(new Path(normalizedPath));
           logger.trace("starting template get for file ::" + fileName);
           SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(
