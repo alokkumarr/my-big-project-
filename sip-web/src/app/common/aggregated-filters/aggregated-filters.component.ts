@@ -52,7 +52,11 @@ export class AggregatedFiltersComponent implements OnInit {
 
     if (this.data.isInRuntimeMode) {
       if (this.filter.isRuntimeFilter) {
-        this.filter.aggregate = 'sum';
+        if (this.filter.type === 'string' || this.filter.type === 'date') {
+          this.filter.aggregate = 'count';
+        } else {
+          this.filter.aggregate = 'sum';
+        }
         delete this.filter.model;
       }
     }
