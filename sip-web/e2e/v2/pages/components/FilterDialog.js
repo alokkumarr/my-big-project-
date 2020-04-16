@@ -59,6 +59,10 @@ class FilterDialog {
     this._allFilterButton=element(by.xpath(`//button[contains(*,'All')]`));
     this._selectFilterField = value => element(by.css(`[e2e="add-${value}"]`));
     this._tableArtifacts = element(by.css(`mat-select[e2e="filter-artifacts"]`));
+    this._previewExpression = element(
+        by.cssContainingText('mat-panel-title','Preview Expression'
+        )
+    );
   }
 
   clickOnAddFilterButtonByField(fieldName) {
@@ -68,17 +72,17 @@ class FilterDialog {
     commonFunctions.clickOnElement(this._addFilter);
     commonFunctions.clickOnElement(this._selectFilterField(fieldName));
     commonFunctions.waitFor.elementToBePresent(this._tableArtifacts);
-    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
+    browser.sleep(2000); // e2e script execution is fast need to wait till element loads in DOM
   }
 
   clickOnColumnInput() {
     commonFunctions.clickOnElement(this._filterColumnDropDown);
-    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
+    browser.sleep(2000); // e2e script execution is fast need to wait till element loads in DOM
   }
 
   clickOnColumnDropDown(name) {
     commonFunctions.clickOnElement(this._columnNameDropDownItem(name));
-    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
+    browser.sleep(2000); // e2e script execution is fast need to wait till element loads in DOM
   }
   selectPreset(presetName) {
     commonFunctions.clickOnElement(this._filterPresetDropDown);
@@ -104,13 +108,16 @@ class FilterDialog {
   }
 
   clickOnApplyFilterButton() {
+    commonFunctions.waitForProgressBarToComplete();
+    commonFunctions.clickOnElement(this._previewExpression);
+    browser.sleep(2000); // e2e script execution is fast need to wait till element loads in DOM
     commonFunctions.clickOnElement(this._applyFiltersBtn);
-    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
+    browser.sleep(2000); // e2e script execution is fast need to wait till element loads in DOM
   }
 
   clickOnPromptCheckBox() {
     commonFunctions.clickOnElement(this._promptCheckBox);
-    browser.sleep(2000); // e2e script is execution is fast need to wait till element loads in DOM
+    browser.sleep(2000); // e2e script execution is fast need to wait till element loads in DOM
   }
 
   shouldFilterDialogPresent() {
