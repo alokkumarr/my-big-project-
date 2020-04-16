@@ -211,7 +211,14 @@ class ReportDesignerPage extends Designer {
         this._aggregateOperatorValue,aggregateFilters.operatorValue
       );
     }
-    browser.sleep(1000);//need to add else filter will break
+    commonFunctions.clickOnElement(
+      this._aggregateColumn
+    );
+    commonFunctions.clickOnElement(
+      this._selectOption(aggregateFilters.field)
+    );
+    commonFunctions.clickOnElement(this._previewExpression);
+    browser.sleep(2000);//need to add else filter will break
     commonFunctions.clickOnElement(this._applyAggregateFilter);
     browser.sleep(2000); //Need to wait till result grid refresh with new filters
   }

@@ -12,6 +12,7 @@ import com.sncr.saw.security.common.bean.external.response.Id3User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.security.SecureRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,12 @@ public class Id3RepositoryImpl implements Id3Repository {
      */
     @Override
     public String obtainAuthorizationCode(AuthorizationCodeDetails authorizationCodeDetails) {
-        String sipTicketId = UUID.randomUUID().toString();
+        SecureRandom random = new SecureRandom();
+        String sipTicketId = Thread.currentThread().getId()
+            + "_"
+            + System.currentTimeMillis()
+            + "_"
+            + random.nextInt(Integer.MAX_VALUE);
         authorizationCodeDetails.setSipTicketId(sipTicketId);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         Id3ClientDetails id3ClientDetails =
@@ -84,8 +90,10 @@ public class Id3RepositoryImpl implements Id3Repository {
                 return ps;
             },
             keyHolder);
+        authorizationCodeDetails.setCustomerCode(id3ClientDetails.getCustomerCode());
         authorizationCodeDetails.setTicketDetailsId(keyHolder.getKey().longValue());
         authorizationCodeDetails.setValidUpto(System.currentTimeMillis() + 2 * 60 * 1000);
+        authorizationCodeDetails.setValid(Boolean.TRUE);
         return Jwts.builder()
             .setSubject(authorizationCodeDetails.getMasterLoginId())
             .claim("ticket", authorizationCodeDetails)
@@ -161,9 +169,10 @@ public class Id3RepositoryImpl implements Id3Repository {
             if (id3ClientTicketDetails.isValidIndicator()
                 && id3ClientTicketDetails.isId3Enabled()
                 && id3ClientTicketDetails.isUserActive()
-                && authorizationCodeDetails.getValidUpto() >= System.currentTimeMillis())
+                && authorizationCodeDetails.getValidUpto() >= System.currentTimeMillis()) {
                 logger.trace("Successfully validated request for user: " + masterLoginId);
-            authorizationCodeDetails.setValid(true);
+                authorizationCodeDetails.setValid(true);
+            }
             // Authorization code is for onetime use, Invalidate the code once used.
             String invalidateCodeSql = "UPDATE ID3_TICKET_DETAILS SET VALID_INDICATOR=0 , MODIFIED_TIME = sysdate() " +
                 "WHERE SIP_TICKET_ID = ? AND ID3_TICKET_DETAILS_SYS_ID=?";
