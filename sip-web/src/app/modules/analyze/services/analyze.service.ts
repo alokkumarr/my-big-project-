@@ -484,6 +484,13 @@ export class AnalyzeService {
     const paginationParams = ['report', 'esReport'].includes(model.type)
       ? `&page=${page}&pageSize=${options.take}`
       : '';
+
+    /* BE not capable of executing query mode reports with new filter strucutre, hence this mior adjustment */
+    if (model.type === 'report' && model.designerEdit === true) {
+      const oldFilters = model.sipQuery.filters[0].filters;
+      model.sipQuery.filters = [];
+      model.sipQuery.filters = cloneDeep(oldFilters);
+    }
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${model.id ||
