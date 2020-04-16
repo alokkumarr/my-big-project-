@@ -117,7 +117,6 @@ public class UserRepositoryImpl implements UserRepository {
    * @return
    */
   public boolean[] authenticateUser(String masterLoginId, String password) {
-	logger.info("#############Auhtenticating user passowrd"+ password);
     boolean isAuthenticated = false;
     boolean isPasswordActive = false;
     boolean[] ret = {false, false, false};
@@ -143,16 +142,12 @@ public class UserRepositoryImpl implements UserRepository {
           new UserRepositoryImpl.PwdDetailExtractor());
       
       
-      logger.info("Passowrd Details retrived value from DB ::"+ passwordDetails);
 
       if (passwordDetails != null) {
-    	  logger.info("Passowrd Details not null ");
-    	  logger.info("checking verify password  for password ###"+ password + " encrypted ::"+ passwordDetails.getEncryptedPwd());
         isAuthenticated = AdvancedEncryptionUtil.verifyPassword(
         		password,passwordDetails.getEncryptedPwd());
         if (!isPwdExpired(passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
           isPasswordActive = true;
-          logger.info("Passowrd Active ");
         }
         ret[0] = isAuthenticated;
         ret[1] = isPasswordActive;
@@ -348,13 +343,10 @@ public class UserRepositoryImpl implements UserRepository {
 					@Override
 					public void setValues(PreparedStatement ps, UserDetails user) throws SQLException {
 						String existingPwd  =  user.getPassword();
-						logger.info("Existing encrypted password ::"+ existingPwd);
 						String actualPwd = Ccode.cdecode(existingPwd);
-						logger.info("Actual password ::"+ actualPwd);
 						String hashedPwd = null;
 						try {
 							hashedPwd = AdvancedEncryptionUtil.createHash(actualPwd);
-							logger.info("new encrypted password ::"+ hashedPwd);
 						} catch (CannotPerformOperationException e) {
 							logger.error("Exception while encrypting pwd for user ::" 
 						    + user.getUserId());
