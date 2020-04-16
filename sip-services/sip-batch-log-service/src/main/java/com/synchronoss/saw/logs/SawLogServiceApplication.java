@@ -16,7 +16,9 @@ import org.springframework.context.event.EventListener;
     basePackages = {"com.synchronoss.saw.batch.entities", "com.synchronoss.saw.logs.entities"})
 @ComponentScan(
     basePackages = {
-    		"com.synchronoss.bda.sip.config"
+      "com.synchronoss.bda.sip.config",
+      "com.synchronoss.saw.logs.controller",
+      "com.synchronoss.sip.utils",
         
     })
 public class SawLogServiceApplication {
