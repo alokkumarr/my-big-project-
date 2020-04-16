@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
+import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
@@ -183,6 +184,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
 
     dateDialogRef.afterClosed().subscribe(data => {
+      if (isEmpty(data.sourceDetails.password) && data.sourceDetails.channelType === 'sftp') {
+        delete data.sourceDetails.password;
+      }
       if (!isUndefined(data)) {
         const payload: ChannelObject = {
           createdBy: '',
