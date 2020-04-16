@@ -118,7 +118,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private boolean isSchemaContainsJsonType;
     private DataSetHelper datasetHelper = null;
     private Flattener flattner = null;
-    private Set<String> suppressDateAttrFields = null;
+    private Set<String> suppressDateAttrFields = new HashSet<>();
     /**
      * fieldDefaultValuesMap - Contains all Parser Config Field Names as Keys and Tuple2 as value
      * Tuple2 contains key as Field index from source.
@@ -1135,7 +1135,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         isIndexConfigNotExists[0] = true;
         final int[] index = new int[1];
         fieldDefaultValuesMap = new HashMap<>();
-        suppressDateAttrFields = new HashSet<>();
         index[0] = 0;
         //configFields contains only fields which provided in Parser Config.
         configFields.forEach(field -> {

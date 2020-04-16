@@ -214,7 +214,7 @@ class AnalyzePage extends CreateAnalysisModel {
     commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
   }
 
-  clickOnForkButtonFromCardView(name) {
+  clickOnForkButton(name) {
     commonFunctions.clickOnElement(this._forkButtonByAnalysis(name));
   }
 
