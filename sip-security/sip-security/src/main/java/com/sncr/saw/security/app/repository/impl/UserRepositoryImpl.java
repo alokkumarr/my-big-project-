@@ -3227,10 +3227,10 @@ public class UserRepositoryImpl implements UserRepository {
             if (userDetails.getSecGroupSysId() != null) {
               preparedStatement.setLong(5, userDetails.getSecGroupSysId());
             } else {
-              preparedStatement.setNull(6, Types.BIGINT);
+              preparedStatement.setNull(5, Types.BIGINT);
             }
             try {
-    			preparedStatement.setString(5, 
+    			preparedStatement.setString(6, 
     					AdvancedEncryptionUtil.createHash(userDetails.getPassword()).trim());
     		} catch (CannotPerformOperationException e) {
     			logger.error("Error during hashing password");
