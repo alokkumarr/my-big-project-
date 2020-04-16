@@ -383,6 +383,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(this.analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
+      if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+        this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
+      }
 
       if (isUndefined(get(this.filters[0], 'filters'))) {
         const aggregatedFilters = this.filters.filter(option => {
@@ -410,9 +413,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   fetchFilters(sipQuery) {
-    if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
-      return sipQuery.filters;
-    }
+    // if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+    //   console.log(sipQuery.filters);
+    //   return sipQuery.filters;
+    // }
     if (isUndefined(get(sipQuery.filters[0], 'filters'))) {
       const aggregatedFilters = sipQuery.filters.filter(option => {
         return option.isAggregationFilter === true;
@@ -1132,15 +1136,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysis = this._store.selectSnapshot(
           state => state.designerState.analysis
         );
-
-        if (analysis.sipQuery.filters[0].booleanCriteria) {
-          analysis.sipQuery.filters = [];
-        }
         this.filterService
           .getRuntimeFilterValuesIfAvailable(analysis, 'preview', true)
           .then(model => {
             if (isUndefined(model)) {
-              this.areMinRequirmentsMet = false;
+              this._store.dispatch(
+                new DesignerUpdateQueryFilters(this.queryRunTimeFilters)
+              );
             } else {
               this._store.dispatch(
                 new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters'))

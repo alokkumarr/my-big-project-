@@ -1058,18 +1058,38 @@ export class DesignerState {
     // const regex = new RegExp(`/[^${QUERY_RUNTIME_IDENTIFIER}]/g`);
     // const runTimeFiltersInQueryCount = sqlQuery.replace(regex, "");
     //check if query has runtime filters
-    const runTimeFilters = [];
-    for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
-      runTimeFilters.push({
-        isRuntimeFilter: true,
-        displayName: isEmpty(filters[i]) ? '' : filters[i].displayName,
-        description: isEmpty(filters[i]) ? '' : filters[i].description,
-        model: {
-          modelValues: isEmpty(filters[i]) ? [] : filters[i].model.modelValues,
-          operator: 'EQ'
-        }
-      });
+    let runTimeFilters = [];
+    if (isEmpty(filters)) {
+      const newFilters = [];
+      for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
+        newFilters.push({
+          isRuntimeFilter: true,
+          displayName: '',
+          description: '',
+          model: {
+            modelValues: [],
+            operator: 'EQ'
+          }
+        });
+      }
+      runTimeFilters = [{
+        booleanCriteria: 'AND',
+        filters: newFilters
+      }];
+    } else {
+      for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
+        runTimeFilters.push({
+          isRuntimeFilter: true,
+          displayName: filters[0].filters[i].displayName || '',
+          description: filters[0].filters[i].description || '',
+          model: {
+            modelValues: filters[0].filters[i].model.modelValues,
+            operator: 'EQ'
+          }
+        });
+      }
     }
+
     return patchState({
       analysis: {
         ...analysis,

@@ -65,7 +65,7 @@ export class FilterService {
             return resolve();
           }
           if (analysis.designerEdit && analysis.type === 'report') {
-            analysis.sipQuery.filters = result.filters;
+            analysis.sipQuery.filters = [result];
           } else {
             analysis.sipQuery.filters = result;
           }
@@ -142,6 +142,15 @@ export class FilterService {
     if (!cleanedRuntimeFilters.length) {
       return Promise.resolve(clone);
     }
+
+    const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
+    if (analysis.type === 'report' && reportType === 'query') {
+      if (cleanedRuntimeFilters[0].filters.length === 0) {
+        return Promise.resolve(clone);
+      }
+    }
+
+
     return this.openRuntimeModal(clone, analysis.sipQuery.filters, navigateBack, designerPage);
   }
 }
