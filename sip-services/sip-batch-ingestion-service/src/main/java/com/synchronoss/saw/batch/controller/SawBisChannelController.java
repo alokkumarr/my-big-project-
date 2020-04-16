@@ -73,7 +73,7 @@ public class SawBisChannelController {
   @Autowired
   private BisChannelService bisChannelService;
 
-  @Value("${bis.encryption-key}")
+  @Value("${encryption.sftp-key}")
   private String encryptionKey;
 
   private static final Long STATUS_ACTIVE = 1L;

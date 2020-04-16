@@ -1,6 +1,5 @@
 package com.synchronoss.saw.batch;
 
-import com.synchronoss.saw.batch.service.migration.EncryptionKeyMigration;
 import com.synchronoss.saw.batch.service.migration.KeyMigration;
 import info.faljse.SDNotify.SDNotify;
 import javax.persistence.EntityManagerFactory;
@@ -49,24 +48,24 @@ public class SawBatchServiceApplication {
 
   @Autowired
   private Environment environment;
-  
+
   @Value("${sip.transfer.core-pool-size}")
-  private String transferCorePoolSize; 
+  private String transferCorePoolSize;
   @Value("${sip.transfer.max-pool-size}")
   private String transferMaxPoolSize;
   @Value("${sip.transfer.queue-capacity}")
   private String transferQueueCapacity;
-  
-  
-  
+
+
   @Value("${sip.retry.core-pool-size}")
-  private String retryCorePoolSize; 
+  private String retryCorePoolSize;
   @Value("${sip.retry.max-pool-size}")
   private String retryMaxPoolSize;
   @Value("${sip.retry.queue-capacity}")
   private String retryQueueCapacity;
 
-
+  @Autowired
+  KeyMigration keyMigration;
 
   /**
    * This is the entry method of the class.
@@ -97,7 +96,6 @@ public class SawBatchServiceApplication {
   public void onApplicationEvent(ApplicationReadyEvent event) {
     LOG.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
-    KeyMigration keyMigration = new EncryptionKeyMigration();
     keyMigration.migrate();
   }
 

@@ -13,7 +13,6 @@ import com.synchronoss.sip.utils.SipCommonUtils;
 import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -24,15 +23,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class EncryptionKeyMigration implements KeyMigration {
 
-  public EncryptionKeyMigration() {
-  }
-
   private static final Logger logger = LoggerFactory.getLogger(EncryptionKeyMigration.class);
 
   @Autowired
   BisChannelDataRestRepository bisChannelRepository;
 
-  @Value("${bis.encryption-key}")
+  @Value("${encryption.sftp-key}")
   private String encryptionKey;
 
   public final SecretKey secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
@@ -61,22 +57,24 @@ public class EncryptionKeyMigration implements KeyMigration {
             secretPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
             logger.info("New Encryption : {}", secretPhrase);
             rootNode.put("password", secretPhrase);
+
+
+            bisChannelDto = new BisChannelDto();
+            BeanUtils.copyProperties(entity, bisChannelDto);
+            bisChannelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+            logger.info("migration for channel : {}", bisChannelDto.getBisChannelSysId());
+            if (entity.getCreatedDate() != null) {
+              bisChannelDto.setCreatedDate(entity.getCreatedDate().getTime());
+            }
+            if (entity.getModifiedDate() != null) {
+              bisChannelDto.setModifiedDate(entity.getModifiedDate().getTime());
+            }
+            BisChannelEntity channelEntity = new BisChannelEntity();
+            BeanUtils.copyProperties(bisChannelDto, channelEntity);
+            channelEntity.setPwdMigrated(1);
+            channelEntity = bisChannelRepository.save(channelEntity);
+            logger.info("channel : {} updated succesfully", channelEntity.getBisChannelSysId());
           }
-          bisChannelDto = new BisChannelDto();
-          BeanUtils.copyProperties(entity, bisChannelDto);
-          bisChannelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-          logger.info("migration for channel : {}", bisChannelDto.getBisChannelSysId());
-          if (entity.getCreatedDate() != null) {
-            bisChannelDto.setCreatedDate(entity.getCreatedDate().getTime());
-          }
-          if (entity.getModifiedDate() != null) {
-            bisChannelDto.setModifiedDate(entity.getModifiedDate().getTime());
-          }
-          BisChannelEntity channelEntity = new BisChannelEntity();
-          BeanUtils.copyProperties(bisChannelDto, channelEntity);
-          channelEntity.setPwdMigrated(1);
-          channelEntity = bisChannelRepository.save(channelEntity);
-          logger.info("channel : {} updated succesfully", channelEntity.getBisChannelSysId());
         } catch (Exception e) {
           logger.error("Exception while reading the list :", e);
         }
