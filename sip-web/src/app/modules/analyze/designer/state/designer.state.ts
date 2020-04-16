@@ -15,6 +15,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as fpFilter from 'lodash/fp/filter';
+import * as isUndefined from 'lodash/isUndefined';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -1078,15 +1079,27 @@ export class DesignerState {
       }];
     } else {
       for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
-        runTimeFilters.push({
-          isRuntimeFilter: true,
-          displayName: filters[0].filters[i].displayName || '',
-          description: filters[0].filters[i].description || '',
-          model: {
-            modelValues: filters[0].filters[i].model.modelValues,
-            operator: 'EQ'
-          }
-        });
+        if (isUndefined(filters[0].filters[i])) {
+          runTimeFilters.push({
+            isRuntimeFilter: true,
+            displayName: '',
+            description: '',
+            model: {
+              modelValues: [],
+              operator: 'EQ'
+            }
+          });
+        } else {
+          runTimeFilters.push({
+            isRuntimeFilter: true,
+            displayName: filters[0].filters[i].displayName || '',
+            description: filters[0].filters[i].description || '',
+            model: {
+              modelValues: filters[0].filters[i].model.modelValues,
+              operator: 'EQ'
+            }
+          });
+        }
       }
     }
 
