@@ -147,7 +147,7 @@ public class UserRepositoryImpl implements UserRepository {
 
       if (passwordDetails != null) {
         isAuthenticated = AdvancedHashingUtil.verifyPassword(
-        		password,passwordDetails.getEncryptedPwd());
+        		password.trim(),passwordDetails.getEncryptedPwd());
         if (!isPwdExpired(passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
           isPasswordActive = true;
         }
@@ -377,7 +377,7 @@ public class UserRepositoryImpl implements UserRepository {
 		String encNewPass = null;
 		Optional<String> hashedPwd = this.hashPassword(newPass.trim());
 		if(hashedPwd.isPresent()) {
-			encNewPass = this.hashPassword(newPass.trim()).get();
+			encNewPass = hashedPwd.get();
 		} else {
 			logger.error("Error during hashing password");
   			message = "Error encountered while changing password";
