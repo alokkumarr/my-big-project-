@@ -34,6 +34,7 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.AdvancedEncryptionUtil;
 import com.sncr.saw.security.common.util.AdvancedEncryptionUtil.CannotPerformOperationException;
+import com.sncr.saw.security.common.util.AdvancedEncryptionUtil.InvalidHashException;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
@@ -372,25 +373,30 @@ public class UserRepositoryImpl implements UserRepository {
 		String encOldPass = null;
 		String encNewPass = null;
 		try {
-			encOldPass = AdvancedEncryptionUtil.createHash(oldPass.trim());
+			//encOldPass = AdvancedEncryptionUtil.createHash(oldPass.trim());
 			encNewPass = AdvancedEncryptionUtil.createHash(newPass.trim());
 		} catch (CannotPerformOperationException e) {
 			logger.error("Error during hashing password");
 		}
 				
-		String sql = "SELECT U.USER_SYS_ID" + " FROM USERS U" + " WHERE U.USER_ID = ?"
-				+ " and  U.ENCRYPTED_PASSWORD = ?";
+		String sql = "SELECT U.USER_SYS_ID, U.ENCRYPTED_PASSWORD FROM USERS U WHERE U.USER_ID = ?";
+				//+ " and  U.ENCRYPTED_PASSWORD = ?";
 		final String encNewPassword = encNewPass;
-		final String encOldPassword = encOldPass;
+		//final String encOldPassword = encOldPass;
 		try {
-			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+			ResetPasswordDetails pwdDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, loginId);
-					preparedStatement.setString(2, encOldPassword);
+				//	preparedStatement.setString(2, encOldPassword);
 				}
-			}, new UserRepositoryImpl.StringExtractor("user_sys_id"));
+			}, new UserRepositoryImpl.PasswordResetExtractor());
+			
+			
+			logger.info("### Is old password entered correct verfication check ::"+ AdvancedEncryptionUtil.
+					verifyPassword(oldPass, pwdDetails.getPassword()));
 
-			if (userSysId == null) {
+			if (pwdDetails == null || !AdvancedEncryptionUtil.
+					verifyPassword(oldPass, pwdDetails.getPassword())) {
 				message = "Value provided for old Password did not match.";
 				return message;
 			}
@@ -398,9 +404,9 @@ public class UserRepositoryImpl implements UserRepository {
 
 			message = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, userSysId);
+					preparedStatement.setString(1, pwdDetails.getUserSysId());
 				}
-			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
+			}, new UserRepositoryImpl.PasswordValidator(newPass));
 			if (message != null && message.equals("valid")) {
 				String sysId = System.currentTimeMillis() + "";
 
@@ -409,7 +415,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         jdbcTemplate.update(sql, preparedStatement -> {
           preparedStatement.setString(1, sysId);
-          preparedStatement.setString(2, userSysId);
+          preparedStatement.setString(2, pwdDetails.getUserSysId());
           preparedStatement.setString(3, encNewPassword);
         });
 
@@ -418,7 +424,7 @@ public class UserRepositoryImpl implements UserRepository {
 				int i = jdbcTemplate.update(sql, new PreparedStatementSetter() {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
 						preparedStatement.setString(1, encNewPassword);
-						preparedStatement.setString(2, userSysId);
+						preparedStatement.setString(2, pwdDetails.getUserSysId());
 					}
 				});
 				if (i == 1) {
@@ -1128,6 +1134,38 @@ public class UserRepositoryImpl implements UserRepository {
 			return resetValid;
 		}
 	}
+	
+	
+	public class PasswordResetExtractor implements ResultSetExtractor<ResetPasswordDetails> {
+		@Override
+		public ResetPasswordDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
+			ResetPasswordDetails pwdDetails = new ResetPasswordDetails();
+			
+			if (rs.next()) {
+				pwdDetails.setUserSysId(rs.getString("USER_SYS_ID"));
+				pwdDetails.setUserSysId(rs.getString("ENCRYPTED_PASSWORD"));
+			}
+			
+			return pwdDetails;
+		}
+	}
+	
+	public class ResetPasswordDetails {
+		String userSysId;
+		String password;
+		public String getUserSysId() {
+			return userSysId;
+		}
+		public void setUserSysId(String userSysId) {
+			this.userSysId = userSysId;
+		}
+		public String getPassword() {
+			return password;
+		}
+		public void setPassword(String password) {
+			this.password = password;
+		}
+	}
 
 	public class StringExtractor implements ResultSetExtractor<String> {
 		private String fieldName;
@@ -1167,21 +1205,35 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	public class PasswordValidator implements ResultSetExtractor<String> {
-		String encNewPass = null;
+		String pwd = null;
 
-		public PasswordValidator(String encNewPass) {
-			this.encNewPass = encNewPass;
+		public PasswordValidator(String pwd) {
+			this.pwd = pwd;
 		}
 
 		@Override
 		public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-			String password = null;
+			String oldpwd = null;
 			int counter = 0;
 			while (rs.next() && counter <= 4) {
-				password = rs.getString("PASSWORD") != null ? rs.getString("PASSWORD").trim()
+				
+				
+				oldpwd = rs.getString("PASSWORD") != null ? rs.getString("PASSWORD").trim()
 						: rs.getString("PASSWORD");
-				if (password.equals(encNewPass)) {
-					return "New password should not match to the last 5 password !!";
+				
+				
+				String isValid = null;
+				try {
+					if(AdvancedEncryptionUtil.
+						verifyPassword(pwd, oldpwd)) {
+						return "New password should not match to the last 5 password !!";
+					}
+				} catch (CannotPerformOperationException e) {
+					logger.error("Exception while verifying password history");
+					return  "Invalid";
+				} catch (InvalidHashException e) {
+					logger.error("Exception while verifying password history");
+					return "Invalid";
 				}
 				counter = counter + 1;
 			}
