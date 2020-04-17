@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.synchronoss.sip.utils.RestUtil;
-public class AdvancedEncryptionUtil
+public class AdvancedHashingUtil
 {
     @SuppressWarnings("serial")
     static public class InvalidHashException extends Exception {
@@ -36,7 +36,7 @@ public class AdvancedEncryptionUtil
     public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512";
     // These constants may be changed without breaking existing hashes.
     public static final int SALT_BYTE_SIZE = 8;
-    public static final int HASH_BYTE_SIZE = 128;
+    public static final int HASH_BYTE_SIZE = 16;
     public static final int PBKDF2_ITERATIONS = 1000;
     // These constants define the encoding and may not be changed.
     public static final int HASH_SECTIONS = 5;
@@ -45,7 +45,7 @@ public class AdvancedEncryptionUtil
     public static final int HASH_SIZE_INDEX = 2;
     public static final int SALT_INDEX = 3;
     public static final int PBKDF2_INDEX = 4;
-    private static final Logger logger = LoggerFactory.getLogger(AdvancedEncryptionUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdvancedHashingUtil.class);
     public static String createHash(String password)
         throws CannotPerformOperationException
     {
