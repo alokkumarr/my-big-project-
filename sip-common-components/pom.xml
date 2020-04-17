@@ -117,18 +117,24 @@
                   <user>mapr</user>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-common-components/bin</name>
+                  <name>/opt/sip/sip-common-components/lib</name>
                   <directory>true</directory>
+                  <user>mapr</user>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-common-components/lib</name>
+                  <name>/opt/sip/sip-common-components/bin</name>
+                  <directory>true</directory>
+                  <user>mapr</user>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-common-components/lib/sip-common-components-${project.version}.jar</name>
                   <collect>
                     <from>target/sip-common-components-${project.version}.jar</from>
                   </collect>
                   <!--<ruleset>default</ruleset>-->
                 </entry>
                 <entry>
-                  <name>/opt/bda/sip-common-components/bin/ccode.sh</name>
+                  <name>/opt/sip/sip-common-components/bin/ccode</name>
                   <file>src/main/bin/ccode</file>
                   <mode>0755</mode>
                 </entry>

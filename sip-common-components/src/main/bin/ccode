@@ -7,6 +7,6 @@ declare -r sip_common_components_home=/opt/sip/sip-common-components
 declare lib_classpath=/opt/sip/sip-common-components/lib/*.jar
 
 CMD="exec java \
-     -cp $lib_classpath com.synchronoss.sip.utils.Ccode"
+     -cp $lib_classpath com.synchronoss.sip.utils.Ccode $@"
 
 $CMD
