@@ -90,10 +90,9 @@ export class DskFiltersService {
   }
 
   isDSKFilterValid(filter, isTopLevel = false, data) {
+    let condition;
     switch (data.mode) {
       case 'DSK':
-        let condition;
-        condition = filter.booleanQuery.length > 0;
         condition = filter.booleanQuery.length > 0;
         return (
           filter.booleanCriteria &&
@@ -114,6 +113,25 @@ export class DskFiltersService {
         );
 
       case 'ANALYZE':
+      const newFilters = filter.filters ? filter : filter[0];
+      condition = newFilters.filters.length > 0;
+      const checkFiltlers = (
+        newFilters.filters &&
+          condition &&
+          newFilters.filters.every(child => {
+
+            if ((child).filters) {
+              return this.isDSKFilterValid(child, false, data);
+            }
+            const field = child;
+            return (
+              field.artifactsName
+            );
+          })
+        );
+      if (!checkFiltlers) {
+        return checkFiltlers;
+      }
         const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
 
         let areValid = true;
