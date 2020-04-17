@@ -13,9 +13,9 @@
 #   /etc/bda/saw-security.vars
 #   $CMD_DIR/appl_info
 #   $APPL_HOME/bin/mk_conf.sh
-#   $APPL_HOME/bin/ccode.sh
 #   $APPL_HOME/lib/$APPL_NAME*.jar
 #   $APPL_HOME/conf/templates/*
+#   $UTIL_HOME/bin/ccode
 ###
 [[ $DEBUG ]] && set -vx
 
@@ -43,6 +43,11 @@ APPL_USER=$( appl_info user )
 APPL_GROUP=$( appl_info group )
 : ${APPL_GROUP:?no value}
 
+UTIL_HOME=$( appl_info utildir )
+: ${UTIL_HOME:?no value}
+( cd $UTIL_HOME ) || exit $?
+
+
 # Check vars file exists
 vars_file=/etc/bda/$APPL_NAME.vars
 ( <$vars_file ) || exit $?
@@ -52,6 +57,15 @@ vars_file=/etc/bda/$APPL_NAME.vars
 # Function API
 mk_conf() {
     $APPL_HOME/bin/mk_conf.sh "$@"
+}
+
+get_encryption_key() {
+    value=$(<${vars_file})
+
+    line=$(sed -n '/^encryption.key/p' ${file})
+
+    enc_key=$(cut -d'=' -f2 <<<"$line")
+    echo $enc_key
 }
 
 # extended pattern matching operators
@@ -84,8 +98,8 @@ db_init_pass=$(< $db_password_file)
 ds_cpass_val=
 [[ $db_init_pass ]] && {
     # Calc pass crypto
-    ( $APPL_HOME/bin/ccode.sh ) || exit
-    db_cenc_pass=$($APPL_HOME/bin/ccode.sh "$db_init_pass")
+    ( $UTIL_HOME/bin/ccode ) || exit
+    db_cenc_pass=$($UTIL_HOME/bin/ccode "$db_init_pass" ${encryption_key})
     ds_cpass_val='db.cpass='"$db_cenc_pass"
     echo '# pass crypto created'
 }
