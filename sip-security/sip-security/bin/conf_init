@@ -99,7 +99,7 @@ ds_cpass_val=
 [[ $db_init_pass ]] && {
     # Calc pass crypto
     ( $APPL_HOME/bin/ccode.sh ) || exit
-    db_cenc_pass=$($UTIL_HOME/bin/ccode.sh "$db_init_pass" ${encryption_key})
+    db_cenc_pass=$($UTIL_HOME/bin/ccode "$db_init_pass" ${encryption_key})
     ds_cpass_val='db.cpass='"$db_cenc_pass"
     echo '# pass crypto created'
 }
