@@ -1443,8 +1443,8 @@ public class UserRepositoryImpl implements UserRepository {
 		
     
 		String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
-        + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
-        + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
+        + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY, PWD_MIGRATED ) "
+        + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ?, 1 ); ";
 	    try {
 	      jdbcTemplate.update(sql, preparedStatement -> {
 	        preparedStatement.setString(1, user.getMasterLoginId());
@@ -1543,7 +1543,7 @@ public class UserRepositoryImpl implements UserRepository {
 		
 		String query = "UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ?, ENCRYPTED_PASSWORD = ?"
 				+ ", PWD_MODIFIED_DATE = SYSDATE(), FIRST_NAME = ?"
-				+ ", MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,  MODIFIED_DATE = SYSDATE()"
+				+ ", MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,  MODIFIED_DATE = SYSDATE(), PWD_MIGRATED = 1"
 				+ ", MODIFIED_BY = ? WHERE USER_SYS_ID = ?";
 		final String pwd = encNewPass;
     try {
@@ -3302,8 +3302,8 @@ public class UserRepositoryImpl implements UserRepository {
     
     String sql =
         "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID,SEC_GROUP_SYS_ID, ENCRYPTED_PASSWORD, "
-            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, ID3_ENABLED, CREATED_DATE, CREATED_BY ) "
-            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, SYSDATE(), ? ); ";
+            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, ID3_ENABLED, CREATED_DATE, CREATED_BY, PWD_MIGRATED ) "
+            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, SYSDATE(), ?, 1 ); ";
     try {
       jdbcTemplate.update(
           sql,
