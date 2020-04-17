@@ -151,7 +151,8 @@ export interface DesignerChangeEvent {
     | 'updateDerivedMetric'
     | 'mapSettings'
     | 'filters'
-    | 'seriesColorChange';
+    | 'seriesColorChange'
+    | 'limitByAxis';
   column?: ArtifactColumn;
   data?: any;
 }
@@ -176,6 +177,7 @@ export interface DSLChartOptionsModel {
   chartType: string;
   chartTitle: string;
   isInverted: boolean;
+  limitByAxis: string;
   legend?: Legend;
   labelOptions?: LabelOptions;
   xAxis: Axis;

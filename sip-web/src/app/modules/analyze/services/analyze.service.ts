@@ -16,6 +16,7 @@ import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
 import * as isArray from 'lodash/isArray';
+import * as fpFilter from 'lodash/fp/filter';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -491,9 +492,11 @@ export class AnalyzeService {
       model.sipQuery.filters = [];
       model.sipQuery.filters = cloneDeep(oldFilters);
     }
+
+    const requestModel = this.checkForGroups(model);
     return this._http
       .post(
-        `${apiUrl}/internal/proxy/storage/execute?id=${model.id ||
+        `${apiUrl}/internal/proxy/storage/execute?id=${requestModel.id ||
           DUMMY_ANALYSIS_ID}&executionType=${mode}${paginationParams}`,
         omit(model, LEGACY_PROPERTIES)
       )
@@ -502,17 +505,61 @@ export class AnalyzeService {
           const data = resp.data ? resp.data : resp;
           return {
             data: data,
-            executionId: resp.executionId || (model.sipQuery ? '123456' : null),
+            executionId: resp.executionId || (requestModel.sipQuery ? '123456' : null),
             executionType: mode,
             executedBy: this._jwtService.getLoginId(),
             executedAt: Date.now(),
             designerQuery: fpGet(`query`, resp),
-            queryBuilder: { ...model.sipQuery },
+            queryBuilder: { ...requestModel.sipQuery },
             count: fpGet(`totalRows`, resp) || data.length
           };
         })
       )
       .toPromise();
+  }
+
+  checkForGroups(model) {
+    if (model.type !== 'chart') {
+      return model;
+    }
+
+    let yfields = fpFilter(({ area }) => {
+      return area === 'y';
+    })(model.sipQuery.artifacts[0].fields);
+
+    let xfields = fpFilter(({ area }) => {
+      return area === 'x';
+    })(model.sipQuery.artifacts[0].fields);
+
+    let gfields = fpFilter(({ area }) => {
+      return area === 'g';
+    })(model.sipQuery.artifacts[0].fields);
+
+    if (gfields.length === 0) {
+      return model;
+    }
+
+    const limitByAxis = model.chartOptions.limitByAxis;
+    let fields = cloneDeep(yfields);
+    if (limitByAxis === 'groupBy') {
+      forEach(gfields, g => {
+        fields.push(g);
+      })
+
+      forEach(xfields, x => {
+        fields.push(x);
+      })
+    } else {
+      forEach(xfields, x => {
+        fields.push(x);
+      })
+
+      forEach(gfields, g => {
+        fields.push(g);
+      })
+    }
+    model.sipQuery.artifacts[0].fields = fields;
+    return model;
   }
 
   applyAnalysisNonDSL(
