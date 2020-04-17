@@ -200,6 +200,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   displayErrorMessage(state) {
+    if (state === 'nameLength') {
+      return `* Name cannot be empty or exceed ${30} characters.`
+    }
     return entityNameErrorMessage(state);
   }
 

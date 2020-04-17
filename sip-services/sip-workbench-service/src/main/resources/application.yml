@@ -42,6 +42,8 @@ workbench:
         livy-uri: http://localhost:8998
         storage-url: ${connector}://localhost:9800
         stream.base-path: "/var/sip/workbench/services/workbench/executor"
+        rtis-stream-base: "/var/sip/streams"
+        rtis-base-url: ${connector}://localhost:9501
 
 metastore:
     base:  hdfs:///var/sip

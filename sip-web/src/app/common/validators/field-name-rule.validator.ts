@@ -1,11 +1,12 @@
-export const minimumNameLength = 30;
+export const minimumNameLength = 100;
 
 const checkEntityName = (name) => {
   const analysisNameLength = name.length;
   // Due to an error in generating an excel file during dispatch opearation,
   // we need to apply the following length and special character rules.
+  const analysisMinLength = 100;
   const validateCheck = {
-    validateLength: analysisNameLength === 0 || analysisNameLength > minimumNameLength ? true : false,
+    validateLength: analysisNameLength === 0 || analysisNameLength > analysisMinLength ? true : false,
     validateCharacters: /[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(name)
   };
   const { validateLength, validateCharacters } = validateCheck;

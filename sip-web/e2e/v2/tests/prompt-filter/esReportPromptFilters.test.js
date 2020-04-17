@@ -24,8 +24,6 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-  const savedCategory = 'My Analysis';
-  const savedSubCategory = 'DRAFTS';
 
   let host;
   let token;
@@ -59,8 +57,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.ES_REPORT
+          id
         );
       });
 
@@ -137,13 +134,13 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
             data.fieldName
           ]);
           chartDesignerPage.clickOnSave();
-          chartDesignerPage.clickOnSaveAndCloseDialogButton();
+          chartDesignerPage.clickOnSaveDialogButton();
 
           // From analysis detail/view page
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnAnalysisLink(name);
           chartDesignerPage.shouldFilterDialogPresent();
@@ -169,8 +166,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           // VerifyPromptFromListView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('list');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();
@@ -187,8 +184,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
-          header.selectCategory(savedCategory);
-          header.selectSubCategory(savedSubCategory);
+          header.selectCategory(categoryName);
+          header.selectSubCategory(subCategoryName);
           analysisPage.goToView('card');
           analysisPage.clickOnActionLinkByAnalysisName(name);
           analysisPage.clickOnExecuteButtonAnalyzePage();

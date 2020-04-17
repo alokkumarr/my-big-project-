@@ -38,9 +38,6 @@ export interface Analysis {
   module?: string;
   name: string;
   outputFile?: OutputFile;
-  parentAnalysisId?: string;
-  parentCategoryId?: string | number;
-  parentLastModified?: number;
   repository?: Repository;
   saved: boolean;
   schedule?: Schedule;

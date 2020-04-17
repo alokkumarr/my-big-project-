@@ -53,8 +53,7 @@ describe('Executing Publish Functionality for Reports from list/Card/Details Vie
             host,
             token,
             protractorConf.config.customerCode,
-            currentAnalysis.analysisId,
-            Constants.ES_REPORT ||Constants.REPORT
+            currentAnalysis.analysisId
           );
         }
       });

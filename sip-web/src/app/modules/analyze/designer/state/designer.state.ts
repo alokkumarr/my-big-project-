@@ -60,6 +60,7 @@ import {
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
   DesignerCheckAggregateFilterSupport,
+  DesignerUpdateAnalysisChartLimitByOptions,
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
@@ -68,7 +69,7 @@ import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
-  CHART_DATE_FORMATS_OBJ,
+  DATE_FORMATS_OBJ,
   QUERY_RUNTIME_IDENTIFIER
 } from '../../consts';
 import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
@@ -91,6 +92,7 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   chartTitle: null,
   chartType: null,
   isInverted: false,
+  limitByAxis: '',
   legend: {
     align: '',
     layout: ''
@@ -787,7 +789,7 @@ export class DesignerState {
           groupInterval.groupInterval = isComparisonChart
             ? artifactColumn.groupInterval ||
               COMPARISON_CHART_DATE_INTERVALS[0].value
-            : CHART_DATE_FORMATS_OBJ[
+            : DATE_FORMATS_OBJ[
                 artifactColumn.dateFormat || <string>artifactColumn.format
               ].groupInterval;
 
@@ -797,6 +799,7 @@ export class DesignerState {
                 .formatForBackEnd
             : artifactColumn.dateFormat;
           break;
+
         case 'pivot':
           groupInterval.groupInterval = 'day';
           break;
@@ -1052,6 +1055,22 @@ export class DesignerState {
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartLimitByOptions)
+  updateLimitByAxisOptions(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { limitByAxis } : DesignerUpdateAnalysisChartLimitByOptions
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, limitByAxis: limitByAxis }
+      }
     });
   }
 

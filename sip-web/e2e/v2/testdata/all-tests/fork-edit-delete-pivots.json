@@ -1,0 +1,32 @@
+{
+  "FORK_PIVOT": {
+    "forkPivot": {
+      "FRKPVT001": {
+        "suites": [
+          "critical","regression","sanity"
+        ],
+        "user": "admin",
+        "forkFromView": "list",
+        "description": "Admin should be able to edit form Menu(list) update the pivot"
+      },
+      "FRKPVT002": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "forkFromView": "card",
+        "description": "UserOne should be able to edit form Menu(Card) update the pivot"
+      },
+      "FRKPVT003": {
+        "suites": ["regression"],
+        "user": "admin",
+        "forkFromView": "card",
+        "description": "Admin should be able to edit form Menu(Card) update the pivot"
+      },
+      "FRKPVT004": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "forkFromView": "list",
+        "description": "UserOne should be able to edit form Menu(list) update the pivot"
+      }
+    }
+  }
+}

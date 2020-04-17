@@ -77,10 +77,23 @@ class AnalyzePage extends CreateAnalysisModel {
       );
     this._scheduledTimingsInListView = reportName =>
       element(
-      by.xpath(`//a[text()='${reportName}']/following::td[2]`));
+        by.xpath(`//a[text()='${reportName}']/following::td[2]`));
     this._scheduledTimingsInCardView = reportName =>
       element(
-      by.xpath(`//a[text()='${reportName}']/followiclickOnActionLinkByAnalysisNameng::mat-card-subtitle/span[2]`));
+        by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
+    this._analysisTypeDropdown = element(
+      by.css(`[role="listbox"]`)
+    );
+    this._verifyAnalysisTypeListView = analysisName => element(
+      by.xpath(
+        `//a[text()='${analysisName}']/following::td[3]`
+      )
+    );
+    this._verifyAnalysisTypeCardView = analysisName => element(
+      by.xpath(
+        `//a[text()='${analysisName}']/preceding::mat-chip`
+      )
+    );
   }
 
   goToView(viewName) {
@@ -201,7 +214,7 @@ class AnalyzePage extends CreateAnalysisModel {
     commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
   }
 
-  clickOnForkButtonFromCardView(name) {
+  clickOnForkButton(name) {
     commonFunctions.clickOnElement(this._forkButtonByAnalysis(name));
   }
 
@@ -256,6 +269,34 @@ class AnalyzePage extends CreateAnalysisModel {
       this.clickOnActionLinkByAnalysisName(analysisName);
     }
   }
+
+  clickOnAnalysisTypeDropDown() {
+    commonFunctions.clickOnElement(this._analysisTypeDropdown);
+  }
+  selectAnalysisType(analysisType) {
+    commonFunctions.clickOnElement(this._analysisTypeDsiplay(analysisType));
+  }
+
+  goToViewAndVerifyAnalysis(analysisName,reportType) {
+    this.goToView('card');
+    expect(this._verifyAnalysisTypeCardView(analysisName).getText()).toEqual(reportType.toUpperCase());
+    this.goToView('list');
+    expect(this._verifyAnalysisTypeListView(analysisName).getText()).toEqual(reportType.toUpperCase());
+  }
+
+  chooseAnalysisTypeAndVerify(analysisType,chartName,pivotName,reportName){
+    this.clickOnAnalysisTypeDropDown();
+    this.selectAnalysisType(analysisType);
+    switch (analysisType) {
+      case "Chart": this.goToViewAndVerifyAnalysis(chartName,analysisType.toUpperCase());
+        break;
+      case "Pivot": this.goToViewAndVerifyAnalysis(pivotName,analysisType.toUpperCase());
+        break;
+      case "Report": this.goToViewAndVerifyAnalysis(reportName,analysisType.toUpperCase());
+        break;
+    }
+  }
+
 
 }
 module.exports = AnalyzePage;

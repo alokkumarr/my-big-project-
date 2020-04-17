@@ -61,8 +61,7 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.CHART
+          id
         );
       });
 

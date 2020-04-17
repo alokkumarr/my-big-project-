@@ -28,7 +28,7 @@ public class Hits<T> {
      */
     @JsonProperty("total")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private Integer total = 0;
+    private Total total;
     /**
      * The Max_score Schema
      * <p>
@@ -50,7 +50,7 @@ public class Hits<T> {
      * 
      */
     @JsonProperty("total")
-    public Integer getTotal() {
+    public Total getTotal() {
         return total;
     }
 
@@ -61,7 +61,7 @@ public class Hits<T> {
      * 
      */
     @JsonProperty("total")
-    public void setTotal(Integer total) {
+    public void setTotal(Total total) {
         this.total = total;
     }
 

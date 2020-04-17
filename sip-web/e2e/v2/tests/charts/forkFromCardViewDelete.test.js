@@ -61,8 +61,7 @@ describe('Executing fork from menu option and delete chart tests from charts/for
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.CHART
+          id
         );
       });
 
@@ -110,7 +109,7 @@ describe('Executing fork from menu option and delete chart tests from charts/for
 
         const analyzePage = new AnalyzePage();
         analyzePage.goToView('card');
-        analyzePage.clickOnForkButtonFromCardView(chartName);
+        analyzePage.clickOnForkButton(chartName);
 
         const executePage = new ExecutePage();
 

@@ -1,6 +1,7 @@
 package sncr.xdf.parser;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -49,8 +50,15 @@ import sncr.xdf.parser.spark.Pivot;
 import sncr.xdf.parser.spark.Flattener;
 import java.util.stream.IntStream;
 import org.apache.spark.sql.Encoders;
-import static org.apache.spark.sql.functions.from_json;
 import scala.Tuple2;
+import scala.collection.JavaConversions;
+import scala.collection.Seq;
+import java.util.stream.Collectors;
+import sncr.xdf.parser.spark.functions.AddDateAttributes;
+import org.apache.spark.sql.catalyst.encoders.RowEncoder;
+
+import static org.apache.spark.sql.functions.from_json;
+import static org.apache.spark.sql.functions.input_file_name;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -97,6 +105,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private JavaRDD<Row> rejectedDataCollector;
     private JavaRDD<Row> acceptedDataCollector;
+    private StructType outputDSSchema;
 
     private boolean isRealTime;
     private long inputDSCount = 0;
@@ -107,6 +116,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private boolean isSchemaContainsJsonType;
     private DataSetHelper datasetHelper = null;
     private Flattener flattner = null;
+    private Set<String> suppressDateAttrFields = new HashSet<>();
     /**
      * fieldDefaultValuesMap - Contains all Parser Config Field Names as Keys and Tuple2 as value
      * Tuple2 contains key as Field index from source.
@@ -117,6 +127,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
      * isSkipFieldsEnabled - Do we have to skip any fields from Input source.
      */
     private Boolean isSkipFieldsEnabled = false;
+
+	private FileStatus[] files;
 
     private static final String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
 
@@ -200,7 +212,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 FileSystem fs = HFileOperations.getFileSystem();
                 logger.debug("Input Source Path = " + sourcePath);
                 Path inputPath = new Path(sourcePath);
-                FileStatus[] files = fs.globStatus(inputPath);
+                files = fs.globStatus(inputPath);
                 if(files != null && files.length == 1 && files[0].isDirectory()){
                     logger.debug("Files length = 1 and is a directory");
                     // If so - we have to process all the files inside - create the mask
@@ -288,9 +300,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 // This block has been added to support DF in Parser
                 // SIP-7758
                 else {
+                    /**
+                     * If Header exists Then below if block executes otherwise else
+                     */
                     if (headerSize >= 1) {
                         logger.debug("Header present");
-                        FileStatus[] files = fs.globStatus(new Path(sourcePath));
+                        //files = fs.globStatus(new Path(sourcePath));
 
                         if (files != null) {
                             logger.debug("Total number of files in the directory = " + files.length);
@@ -301,43 +316,29 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                             // If so - we have to process all the files inside - create the mask
                             sourcePath += Path.SEPARATOR + "*";
                             // ... and query content
-                            files = fs.globStatus(new Path(sourcePath));
+                            //files = fs.globStatus(new Path(sourcePath));
                         }
+                        /**
+                         * If Pivot or flattening or Json fields exist in config
+                         * Then it will go to new ParserAndUnion Files flow
+                         */
                         if(isPivotApplied || isFlatteningEnabled || isSchemaContainsJsonType){
                             retval = parseAndUnionFiles(files, outputDataSetMode);
                         }else{
+                            /**
+                             * If no new config (Pivot, flattening or Json fields) not exist
+                             * It wil lgo to old flow parserFiles
+                             */
                             retval = parseFiles(files, outputDataSetMode);
                         }
                     } else {
+                        /**
+                         * When there is no Header then only this flow executes
+                         */
                         logger.debug("No Header");
                         retval = parse(outputDataSetMode);
                     }
-                }
-                if(!isPivotApplied && !isFlatteningEnabled && !isSchemaContainsJsonType) {
-                    //Write Consolidated Accepted data
-                    if (this.acceptedDataCollector != null) {
-                        scala.collection.Seq<Column> outputColumns =
-                            scala.collection.JavaConversions.asScalaBuffer(
-                                createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
-
-                        Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
-
-                        ngctx.datafileDFmap.put(ngctx.dataSetName, outputDS.cache());
-                        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
-                        //TODO: This is a crude way of checking. This need to be revisited.
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("####### end of parser after caching " + outputDS.count());
-                        }
-                    }
-                }
-
-                //Write rejected data
-                if (this.rejectedDataCollector != null) {
-                    boolean status = writeRejectedData();
-
-                    if (!status) {
-                        logger.warn("Unable to write rejected data");
-                    }
+                    
                 }
             }catch (Exception e) {
                 logger.error("Exception in parser module: ",e);
@@ -363,13 +364,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
+            inputDataset = addDateAttributeCols(inputDataset);
+            inputDataset = addDefaultColumns(inputDataset);
             inputDataset = pivotOrFlattenDataset(inputDataset);
-            logger.debug("Final DS Schema : "+ inputDataset.schema());
             commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
-
+            collectAcceptedData(inputDataset);
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
         }
         else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
         {
@@ -386,13 +387,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, sourcePath);
             }
+            inputDataset = addDateAttributeCols(inputDataset);
+            inputDataset = addDefaultColumns(inputDataset);
             inputDataset = pivotOrFlattenDataset(inputDataset);
-            logger.debug("Final DS Schema : "+ inputDataset.schema());
             commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
-
+            collectAcceptedData(inputDataset);
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
         }
         else if(this.inputDataFrame != null)
         {
@@ -401,26 +402,51 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             if(ngctx.componentConfiguration.isErrorHandlingEnabled() && inputDSCount == 0){
                 throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, "");
             }
-
+            inputDataFrame = addDateAttributeCols(inputDataFrame);
+            inputDataFrame = addDefaultColumns(inputDataFrame);
             inputDataFrame = pivotOrFlattenDataset(inputDataFrame);
-            logger.debug("Final DS Schema : "+ inputDataFrame.schema());
             commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
-
+            collectAcceptedData(inputDataFrame);
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
         }
 
-        //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
-        //TODO: This is a crude way of checking. This need to be revisited.
-        if(
-            //logger.isDebugEnabled() &&
-            ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
-            logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-        }
+        //This method adds Output Dataset to NGContect DatafileDFMap
+        addToDatasetMap();
+        //Write rejected data
+        writeRejectedData();
+
         logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
         validateOutputDSCounts(inputDSCount, isPivotApplied);
         return retval;
+    }
+
+    /**
+     * This method adds Output Dataset to NGContect DatafileDFMap
+     * This is require for single spark pipeline processing.
+     */
+    public void addToDatasetMap(){
+        if (this.acceptedDataCollector != null) {
+            scala.collection.Seq<Column> outputColumns =
+                scala.collection.JavaConversions.asScalaBuffer(
+                    createOutputFieldList(outputDSSchema)).toList();
+
+            Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), outputDSSchema).select(outputColumns);
+            logger.debug("Output DS Schema : "+ outputDS.schema());
+            ngctx.datafileDFmap.put(ngctx.dataSetName, outputDS.cache());
+
+            //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
+            //TODO: This is a crude way of checking. This need to be revisited.
+            if(
+                //logger.isDebugEnabled() &&
+                ngctx.datafileDFmap.get(ngctx.dataSetName) != null) {
+                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + " ==> " + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+                logger.debug("Output DS Schema : "+ ngctx.datafileDFmap.get(ngctx.dataSetName).schema());
+                if(logger.isDebugEnabled()){
+                    ngctx.datafileDFmap.get(ngctx.dataSetName).show();
+                }
+            }
+        }
     }
 
 
@@ -445,9 +471,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if (!this.isRealTime) {
 
             logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
+            logger.debug("####files length at beginning of archive ####"+ files.length);
 
             try {
-                FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
+            	
+            	//archieval should be only processed files. Should not do fresh glob search.
 
                 if (files != null && files.length != 0) {
                     // Create archive directory
@@ -527,24 +555,21 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
 
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        outputDataset = addDateAttributeCols(outputDataset);
+        outputDataset = addDefaultColumns(outputDataset);
 
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
         outputDataset = convertJsonStringColToStruct(outputDataset, ngctx.componentConfiguration.getParser().getFields());
         Dataset<Row> outputDS = pivotOrFlattenDataset(outputDataset);
-        logger.debug("Final DS Schema : "+ outputDS.schema());
         status = commitDataSetFromDSMap(ngctx, outputDS, outputDataSetName, tempDir.toString(), "append");
 
-        if(isPivotApplied || isFlatteningEnabled) {
-            ngctx.datafileDFmap.put(ngctx.dataSetName, outputDS.cache());
-        }else{
-            collectAcceptedData(parsedRdd, outputRdd);
-        }
+        collectAcceptedData(outputDS);
 
         if (status != 0) {
             return -1;
         }
 
-        boolean rejectedStatus = collectRejectedData(parsedRdd, outputRdd);
+        boolean rejectedStatus = collectRejectedData(parsedRdd);
         if (status != 0 || !rejectedStatus) {
             logger.error("Failed to write rejected data");
         }
@@ -622,7 +647,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
 
             Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
-
+            df = addDateAttributeCols(df);
+            df = addDefaultColumns(df);
             logger.debug("Output rdd length = " + recCounter.value() + "\n");
             logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
             logger.debug("Dest dir for file " + file + " = " + destDir + "\n");
@@ -633,12 +659,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Write dataset status = " + rc);
 
             //Filter out Accepted Data
-            collectAcceptedData(parseRdd, outputRdd);
+            collectAcceptedData(df);
 
             logger.debug("Write dataset status = " + rc);
 
             //Filter out Rejected Data
-            collectRejectedData(parseRdd, outputRdd);
+            collectRejectedData(parseRdd);
         }
         return rc;
     }
@@ -679,22 +705,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Rejected rdd count in data frame :: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> localDataFrame = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        localDataFrame = addDateAttributeCols(localDataFrame);
+        localDataFrame = addDefaultColumns(localDataFrame);
         logger.debug("Output rdd length in data frame = " + recCounter.value() +"\n");
         logger.debug("Rejected rdd length in data frame = " + errCounter.value() +"\n");
         logger.debug("Dest dir for file in data frame = " + destDir +"\n");
         localDataFrame = convertJsonStringColToStruct(localDataFrame, ngctx.componentConfiguration.getParser().getFields());
         localDataFrame = pivotOrFlattenDataset(localDataFrame);
-        logger.debug("Final DS Schema : "+ localDataFrame.schema());
         int rc = 0;
         rc = commitDataSetFromDSMap(ngctx, localDataFrame, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
         logger.debug("Write dataset status = " + rc);
-        if(isPivotApplied || isFlatteningEnabled) {
-            ngctx.datafileDFmap.put(ngctx.dataSetName, localDataFrame.cache());
-        }else{
-            collectAcceptedData(parseRdd,outputRdd);
-        }
+        collectAcceptedData(localDataFrame);
         //Filter out Rejected Data
-        collectRejectedData(parseRdd, outputRdd);
+        collectRejectedData(parseRdd);
         logger.debug("parsing dataframe ends here");
         return rc;
     }
@@ -740,37 +763,22 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Rejected rdd length = " + errCounter.value() + "\n");
 
         Dataset<Row> outputDS = convertRddToDS(outputRdd);
+        outputDS = addDateAttributeCols(outputDS);
+        outputDS = addDefaultColumns(outputDS);
         outputDS = convertJsonStringColToStruct(outputDS, ngctx.componentConfiguration.getParser().getFields());
         Dataset<Row> pivotDS = pivotOrFlattenDataset(outputDS);
-        logger.debug("Final DS Schema : "+ pivotDS.schema());
         logger.debug("************************************** Dest dir for rdd = " + tempDir + "\n");
 
         int retval = commitDataSetFromDSMap(ngctx, pivotDS, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+        collectAcceptedData(pivotDS);
+        //Filter out Rejected Datasss
+        collectRejectedData(parseRdd);
+
         if (retval == 0) {
-            ngctx.datafileDFmap.put(ngctx.dataSetName, pivotDS.cache());
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, mode, outputFormat, pkeys));
         }
-        //Filter out Rejected Datasss
-        collectRejectedData(parseRdd, outputRdd);
         return retval;
-    }
-
-    private JavaRDD<String> loadSingleFile(Path file){
-        logger.debug("Reading " + file + "\n");
-        logger.debug("Header size : " + headerSize +"\n");
-
-        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(file.toString(), 1);
-
-        JavaRDD<String> rddWithoutHeader = rdd
-            // Add line numbers
-            .zipWithIndex()
-            // Filter out header based on line number
-            .filter(new HeaderFilter(headerSize))
-            // Get rid of file numbers
-            .keys();
-        return rddWithoutHeader;
     }
 
     private Dataset<Row> convertRddToDS(JavaRDD<Row> outputRdd){
@@ -784,28 +792,110 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return outputDS;
     }
 
-    private boolean collectAcceptedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd) {
-        boolean status = true;
+    /**
+     *
+     * @param rdd - Dataset<Row> - Dataset from File
+     * @return - Dataset<Row> - Returns Dataset after adding SIP_PROCESS_DT, SIP_FILE_NAME, SIP_BATCH_ID columns
+     *
+     * It takes Raw Dataset of Row
+     * Then it adds SIP_PROCESS_DT, SIP_FILE_NAME, SIP_BATCH_ID columns
+     * Returns Dataset<Row>
+     *
+     */
+    public Dataset<Row> addDefaultColumns(Dataset<Row> fileDS){
+        //Adding SIP_FILE_NAME column with value
+        fileDS = fileDS.withColumn(SIP_FILE_NAME, input_file_name());
 
+        //Adding SIP_PROCESS_DT column with Value
+        //Adding SIP_BATCH_ID column with Value
+        fileDS = NGComponentUtil.addDefaultColumns(ngctx,fileDS);
+
+        return fileDS;
+    }
+
+    /**
+     *
+     * @param dataset - Dataset<Row> - Dataset of Rows
+     * @return - Dataset<Row> - Returns Dataset after adding extra Date Attribute columns
+     *
+     * It takes Dataset of Rows and checks for timestamp type fields
+     * Then it adds Date Attribute columns for each timestamp field to the Rows
+     * Returns Dataset<Row>
+     *
+     */
+    private Dataset<Row> addDateAttributeCols(Dataset<Row> dataset){
+
+        boolean isSuppressDateAttrCols = ngctx.componentConfiguration.getParser().isSuppressDateAttrCols();
+        logger.debug("Parser level suppressDateAttrCols : "+ isSuppressDateAttrCols);
+        if(!isSuppressDateAttrCols){
+            final StructType schema = dataset.schema();
+            final List<String> tsfields = Arrays.stream(schema.fields())
+                //We are Taking only Timestamp fields
+                //and which are not in suppressDateAttrFields
+                .filter(structField -> structField.dataType() instanceof TimestampType && !suppressDateAttrFields.contains(structField.name()))
+                .map(structField -> structField.name())
+                .collect(Collectors.toList());
+
+            if(tsfields != null && !tsfields.isEmpty()){
+                logger.debug(tsfields.size() +" Timestamp fields exist in dataset.");
+                //Gets new schema after adding new Date attributes of Timestamp fields to Existing Schema.
+                final StructType newSchema = getSchemaWithDateAttr(schema, tsfields);
+                logger.debug("New Schema with Date Attributes : "+ newSchema);
+                JavaRDD<Row> rdd = dataset.toJavaRDD().map(new AddDateAttributes(tsfields, newSchema));
+                dataset = this.ctx.sparkSession.createDataset(rdd.rdd(),RowEncoder.apply(newSchema));
+            }
+        }
+        return dataset;
+    }
+
+    /**
+     *
+     * @param schema - StructType - Dataset Schema
+     * @param tsfields - List<StructField> -  Timestamp Fields List
+     * @return - StructType - Returns new schema with Date Attributes
+     *
+     * This method adds Date attributes of Timestamp fields to Existing Schema
+     * Returns New schema.
+     */
+    private StructType getSchemaWithDateAttr(StructType schema, List<String> tsfields){
+
+        //Date Attribute Column Postfixes
+        final String YEAR_POSTFIX = "_YEAR";
+        final String MONTH_POSTFIX = "_MONTH";
+        final String MONTH_NUM_POSTFIX = "_MONTH_NUM";
+        final String DAY_OF_WEEK_POSTFIX = "_DAY_OF_WEEK";
+        final String DAY_OF_MONTH_POSTFIX = "_DAY_OF_MONTH";
+        final String DAY_OF_YEAR_POSTFIX = "_DAY_OF_YEAR";
+        final String HOUR_OF_DAY_POSTFIX = "_HOUR_OF_DAY";
+
+        //Iterating Timestamp field List and adding New Date Attribute Fields to list
+        List<StructField> newFieldsList = new ArrayList<>();
+        tsfields.forEach(fieldName -> {
+            newFieldsList.add(new StructField(fieldName + YEAR_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(fieldName + MONTH_POSTFIX, DataTypes.StringType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(fieldName + MONTH_NUM_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(fieldName + DAY_OF_WEEK_POSTFIX, DataTypes.StringType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(fieldName + DAY_OF_MONTH_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(fieldName + DAY_OF_YEAR_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+            newFieldsList.add(new StructField(fieldName + HOUR_OF_DAY_POSTFIX, DataTypes.IntegerType, true, Metadata.empty()));
+        });
+
+        //Creating New schema by adding new Fields
+        //Return new schema
+        return new StructType(ArrayUtils.addAll(schema.fields(), newFieldsList.toArray(new StructField[0])));
+    }
+
+    private boolean collectAcceptedData(Dataset<Row> outpuDS) {
+        boolean status = true;
         try {
+            outputDSSchema = outpuDS.schema();
             // Get all entries which are rejected
             logger.debug("Collecting Accepted data");
-
-            JavaRDD<Row> acceptedRdd = getOutputData(fullRdd);
-
             if (this.acceptedDataCollector == null) {
-                acceptedDataCollector = acceptedRdd;
+                acceptedDataCollector = outpuDS.toJavaRDD();
             } else {
-                acceptedDataCollector = acceptedDataCollector.union(acceptedRdd);
+                acceptedDataCollector = acceptedDataCollector.union(outpuDS.toJavaRDD());
             }
-
-
-            //TODO: SIP-9791 - The count statements are executed even when it is logger.debug mode.
-            //TODO: This is a crude way of checking. This need to be revisited.
-            if(logger.isDebugEnabled()) {
-                logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
-            }
-
         } catch (Exception exception) {
             logger.error(exception);
             logger.debug(ExceptionUtils.getStackTrace(exception));
@@ -818,13 +908,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
      * Extract all the rejected records from the full rdd and write it in the specified location.
      *
      * @param fullRdd Complete RDD which contains both output and rejected records
-     * @param outputRdd Contains output records
      * @return
      *      true - if write is successful
      *      false - if location is not specified or write operation fails
      *
      */
-    private boolean collectRejectedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd) {
+    private boolean collectRejectedData(JavaRDD<Row> fullRdd) {
         boolean status = true;
 
         try {
@@ -847,83 +936,134 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return status;
     }
 
-    private boolean writeRdd(JavaRDD rdd, String path) {
+    private boolean writeRdd(JavaRDD<String> rdd, String path) {
         if (rdd != null && path != null) {
-            logger.debug("Writing data to location " + path);
-            rdd.coalesce(1).saveAsTextFile(path);
+            Dataset<String> dataset = this.ctx.sparkSession.createDataset(rdd.rdd(),Encoders.STRING());
+            Dataset<Row> rowDS = addDefaultColumns(dataset.toDF());
+            logger.debug("Rejected records count : "+ rowDS.count());
+            if(logger.isDebugEnabled()) {
+                rowDS.show();
+            }
+            rowDS.coalesce(1).write().option("delimiter", delimiter+"").csv(path);
         } else {
             logger.info("Nothing to write");
         }
         return true;
     }
 
+    /**
+     *
+     * @param rdd - JavaRDD<Row> - Rejected Records RDD
+     * @param rowLength - int - Record Length
+     * @param seperator - String - delimiter
+     * @return - JavaRDD<String> - JavaRDD contains Rejected Records String representation
+     *
+     * It converts Rejected Records JavaRDD<Row> to rejected reccords JavaRDD<Row>
+     * Rejected record contains only values in below positions
+     * 0 -> Actual Input Record content
+     * length-2 -> Rejected Flag
+     * length-1 -> Rejected Reason
+     * So we are extracting only above 6 values from rejected record and converting as String from each row
+     * Returning JavaRDD<String>
+     *
+     */
+    private JavaRDD<String> getRejectedRecordsRDD(JavaRDD<Row> rejRdd, final int rowLength, final String delimiter){
+        return rejRdd.map(row -> {
+            //Converting Output Row as Object[] of values
+            Object[] record = JavaConversions.seqAsJavaList(row.toSeq()).toArray(new Object[0]);
+            return StringUtils.joinWith(delimiter,
+                record[0], record[rowLength - 2], record[rowLength - 1]);
+        });
+    }
+
     private boolean writeRejectedData () {
         boolean status = true;
+        if (this.rejectedDataCollector != null) {
+            logger.debug("Writing rejected data in the end");
 
-        logger.debug("Writing rejected data in the end");
+            try {
+                JavaRDD<String> rejectedRecords = getRejectedRecordsRDD(rejectedDataCollector, internalSchema.length(), Character.toString(delimiter));
+                if (rejectedDatasetLocation != null) {
+                    if (rejectedDataSetMode.equalsIgnoreCase(Output.Mode.APPEND.toString())) {
+                        /**
+                         * Check if rejected data already exists.
+                         * If yes, read the existing data from the rejected directory and created a rdd
+                         * Merge the existing dataset with current dataset
+                         *
+                         * If not, write the current rejected dataset
+                         *
+                         */
+                        if (HFileOperations.exists(rejectedDatasetLocation)) {
+                            JavaRDD<String> existingData = this.ctx.sparkSession
+                                .sparkContext()
+                                .textFile(rejectedDatasetLocation, 1).toJavaRDD();
 
-        try {
-            JavaRDD<String> rejectedRecords = rejectedDataCollector
-                .map(new TransformRDDWithDelimiter(this.delimiter));
-            if (rejectedDatasetLocation != null) {
-                if (rejectedDataSetMode.equalsIgnoreCase(Output.Mode.APPEND.toString())) {
-                    /**
-                     * Check if rejected data already exists.
-                     * If yes, read the existing data from the rejected directory and created a rdd
-                     * Merge the existing dataset with current dataset
-                     *
-                     * If not, write the current rejected dataset
-                     *
-                     */
-                    if (HFileOperations.exists(rejectedDatasetLocation)) {
-                        JavaRDD<String> existingData = this.ctx.sparkSession
-                            .sparkContext()
-                            .textFile(rejectedDatasetLocation, 1).toJavaRDD();
-
-                        if (existingData != null && !existingData.isEmpty()) {
-                            rejectedRecords = existingData.union(rejectedRecords);
+                            if (existingData != null && !existingData.isEmpty()) {
+                                rejectedRecords = existingData.union(rejectedRecords);
+                            }
                         }
-                    }
 
-                } else  {
-                    /**
-                     * Mode is replace by default
-                     * Check if rejected data already exists.
-                     * If yes, delete the existing data from the rejected location
-                     * Write the current data into the rejected location
-                     *
-                     * If no, write the current data into the rejected location
-                     */
+                    } else {
+                        /**
+                         * Mode is replace by default
+                         * Check if rejected data already exists.
+                         * If yes, delete the existing data from the rejected location
+                         * Write the current data into the rejected location
+                         *
+                         * If no, write the current data into the rejected location
+                         */
 //                    if (HFileOperations.exists(rejectedDatasetLocation)) {
 //                        logger.debug("Deleting existing rejected records");
 //                        HFileOperations.deleteEnt(rejectedDatasetLocation);
 //                    }
 
+                    }
+
+                    String tempRejectedLocation = this.rejectedDatasetLocation + "_" + UUID.randomUUID()
+                        + "_" + System.currentTimeMillis();
+                    logger.debug("Writing rejected data to temp directory " + tempRejectedLocation);
+
+                    writeRdd(rejectedRecords, tempRejectedLocation);
+
+
+                    if (HFileOperations.exists(this.rejectedDatasetLocation)) {
+                        logger.debug("Deleting existing rejected records");
+                        HFileOperations.deleteEnt(this.rejectedDatasetLocation);
+                    }
+
+                    this.ctx.fs.rename(new Path(tempRejectedLocation),
+                        new Path(this.rejectedDatasetLocation));
                 }
+            } catch (Exception exception) {
+                logger.error("Error occurred while writing rejected records");
+                logger.error(exception);
 
-                String tempRejectedLocation = this.rejectedDatasetLocation + "_" + UUID.randomUUID()
-                    + "_" + System.currentTimeMillis();
-                logger.debug("Writing rejected data to temp directory " + tempRejectedLocation);
-
-                writeRdd(rejectedRecords, tempRejectedLocation);
-
-
-                if (HFileOperations.exists(this.rejectedDatasetLocation)) {
-                    logger.debug("Deleting existing rejected records");
-                    HFileOperations.deleteEnt(this.rejectedDatasetLocation);
-                }
-
-                this.ctx.fs.rename(new Path(tempRejectedLocation),
-                    new Path(this.rejectedDatasetLocation));
+                status = false;
             }
-        } catch (Exception exception) {
-            logger.error("Error occurred while writing rejected records");
-            logger.error(exception);
-
-            status = false;
         }
-
+        if (!status) {
+            logger.warn("Unable to write rejected data");
+        }
         return status;
+    }
+
+    /**
+     *
+     * @param fields - List<Field> - Field List
+     * @return - List<Column> -  Returns List of Columns which includes default columns
+     *
+     * it takes Field list and convert into Spark Columns
+     * will add Default columns as well
+     * returns Columns List
+     */
+    private List<Column> createOutputFieldList(StructType schema){
+        List<Column> retval = new ArrayList<>();
+        for(String name : schema.fieldNames()){
+            if(!REJECTED_FLAG.equalsIgnoreCase(name) && !REJ_REASON.equalsIgnoreCase(name)){
+                retval.add(new Column(name));
+            }
+        }
+        return retval;
     }
 
     private static List<Column> createFieldList(List<Field> fields){
@@ -1003,6 +1143,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
              * Tuple2 contains value as default value provided in Field config after converting into spark DataType object
              */
             fieldDefaultValuesMap.put(field.getName(), new Tuple2<>(fieldIndex, defaultValObj));
+            if(field.isSuppressDateAttrCols()){
+                suppressDateAttrFields.add(field.getName());
+            }
             index[0] = index[0]+1;
         });
         isSkipFieldsEnabled = skipFieldsEnabled[0];
@@ -1024,6 +1167,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
      *
      * This method assigns value to internalSchema
      * internalSchema is spark StructType schema contains structFields (schema fields) + 2 rejected details fields
+     *
      */
     private void createInternalSchema(StructField[] structFields){
         StructField rejFlagField = new StructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty());
@@ -1354,9 +1498,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         /*if(isPivotApplied || isFlatteningEnabled) {
             dataset = sortColumnNames(dataset);
         }*/
-        if(logger.isDebugEnabled()){
-            dataset.show();
-        }
         return dataset;
     }
     /**
