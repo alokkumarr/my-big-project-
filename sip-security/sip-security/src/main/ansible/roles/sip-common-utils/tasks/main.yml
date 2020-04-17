@@ -2,5 +2,5 @@
   copy: src="{{ item }}" dest=/tmp/sip-common-components.rpm
   with_fileglob: ["../../sip-common-components/rpms/sip-common-components-*.rpm"]
 - name: Install SIP common utils package
-  yum: name=/tmp/sip-common-components-*.rpm state=present
+  yum: name=/tmp/sip-common-components.rpm state=present
 
