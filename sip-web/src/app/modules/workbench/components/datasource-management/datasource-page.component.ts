@@ -184,10 +184,10 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
 
     dateDialogRef.afterClosed().subscribe(data => {
-      if (isEmpty(data.sourceDetails.password) && data.sourceDetails.channelType === 'sftp') {
-        delete data.sourceDetails.password;
-      }
       if (!isUndefined(data)) {
+        if (isEmpty(data.sourceDetails.password) && data.sourceDetails.channelType === 'sftp') {
+          delete data.sourceDetails.password;
+        }
         const payload: ChannelObject = {
           createdBy: '',
           productCode: '',
