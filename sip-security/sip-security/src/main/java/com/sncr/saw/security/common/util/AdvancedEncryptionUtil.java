@@ -36,7 +36,7 @@ public class AdvancedEncryptionUtil
     public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512";
     // These constants may be changed without breaking existing hashes.
     public static final int SALT_BYTE_SIZE = 8;
-    public static final int HASH_BYTE_SIZE = 8;
+    public static final int HASH_BYTE_SIZE = 128;
     public static final int PBKDF2_ITERATIONS = 1000;
     // These constants define the encoding and may not be changed.
     public static final int HASH_SECTIONS = 5;

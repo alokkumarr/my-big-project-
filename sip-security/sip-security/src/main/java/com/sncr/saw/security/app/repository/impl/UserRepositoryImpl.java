@@ -392,7 +392,7 @@ public class UserRepositoryImpl implements UserRepository {
 			}, new UserRepositoryImpl.PasswordResetExtractor());
 			
 			
-			logger.info("### Is old password entered correct verfication check ::"+ AdvancedEncryptionUtil.
+			logger.info("### Is old password entered correct verfication check for pwd ::"+pwdDetails.getPassword() + " is ::"+ AdvancedEncryptionUtil.
 					verifyPassword(oldPass, pwdDetails.getPassword()));
 
 			if (pwdDetails == null || !AdvancedEncryptionUtil.
@@ -1143,7 +1143,7 @@ public class UserRepositoryImpl implements UserRepository {
 			
 			if (rs.next()) {
 				pwdDetails.setUserSysId(rs.getString("USER_SYS_ID"));
-				pwdDetails.setUserSysId(rs.getString("ENCRYPTED_PASSWORD"));
+				pwdDetails.setPassword(rs.getString("ENCRYPTED_PASSWORD"));
 			}
 			
 			return pwdDetails;
