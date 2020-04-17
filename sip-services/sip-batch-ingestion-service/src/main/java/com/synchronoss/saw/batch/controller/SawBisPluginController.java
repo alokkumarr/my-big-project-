@@ -8,6 +8,7 @@ import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.plugin.SipIngestionPluginFactory;
+import com.synchronoss.saw.batch.plugin.service.SftpServiceImpl;
 import com.synchronoss.saw.batch.service.ChannelTypeService;
 import com.synchronoss.saw.logs.constants.SourceType;
 
@@ -29,6 +30,7 @@ import java.util.concurrent.Executor;
 
 import javax.validation.Valid;
 
+import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +47,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
-
-
-
-
 
 @RestController
 @RequestMapping("/ingestion/batch")
@@ -129,25 +127,52 @@ public class SawBisPluginController {
     return JSON.toJSONString(sipConnService.connectChannel(channelId));
   }
 
-  /**
-   * This end-point to test connectivity for channel.
-   */
-
-  @ApiOperation(value = "To test connectivity for channel without an entity present on the system",
-      nickname = "sftpActionBis", notes = "", response = HttpStatus.class)
+  /** This end-point to test connectivity for channel. */
+  @ApiOperation(
+      value = "To test connectivity for channel without an entity present on the system",
+      nickname = "sftpActionBis",
+      notes = "",
+      response = HttpStatus.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
-          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
-  @RequestMapping(value = "/channels/test", method = RequestMethod.POST,
+      value = {
+        @ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")
+      })
+  @RequestMapping(
+      value = "/channels/test",
+      method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public String connectImmediateChannel(@ApiParam(value = "Payload to test connectivity",
-      required = true) @Valid @RequestBody BisConnectionTestPayload payload) {
+  public String connectImmediateChannel(
+      @ApiParam(value = "Payload to test connectivity", required = true) @Valid @RequestBody
+          BisConnectionTestPayload payload,
+      @QueryParam("channelId") Optional<Long> channelId) {
+    logger.debug("Channel ID = ", channelId);
 
-    SipPluginContract sipConnService = factory.getInstance(
-        payload.getChannelType().toString());
+    String channelType = payload.getChannelType().toString();
+
+    SipPluginContract sipConnService = factory.getInstance(payload.getChannelType().toString());
+
+    if (channelId.isPresent()) {
+      Long channelIdVal = channelId.get();
+
+      if (channelType.equalsIgnoreCase("sftp")) {
+        try {
+          SftpServiceImpl sftpService = (SftpServiceImpl) sipConnService;
+
+          return JSON.toJSONString(
+              sftpService.immediateConnectChannelWithChannelId(payload, channelIdVal));
+        } catch (IOException exception) {
+          logger.error("IO Error occurred", exception);
+          return "Error occurred: " + exception.getMessage();
+        } catch (Exception exception) {
+          logger.error("Error occurred", exception);
+          return "Error occurred: " + exception.getMessage();
+        }
+      }
+    }
     return JSON.toJSONString(sipConnService.immediateConnectChannel(payload));
   }
 

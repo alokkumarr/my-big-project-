@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost:3306/sip_bis
     username: root
-    password: root
+    password: NfEYrk8RxyjW077rOUy0rw==
     driver-class-name: org.mariadb.jdbc.Driver
     dbcp2:
       test-while-idle: true
@@ -110,6 +110,10 @@ bis:
   destination-fs-user: mapr
   duplicate-entry: true
   http-pool-size: 50
+
+encryption:
+  key: 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4
+
  
   
 

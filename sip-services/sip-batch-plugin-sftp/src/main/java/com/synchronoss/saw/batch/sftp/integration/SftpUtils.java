@@ -1,7 +1,7 @@
 package com.synchronoss.saw.batch.sftp.integration;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
-import com.synchronoss.saw.batch.utils.IntegrationUtils;
+import com.synchronoss.sip.utils.IntegrationUtils;
 import java.io.File;
 import java.util.Date;
 import org.apache.commons.io.FilenameUtils;

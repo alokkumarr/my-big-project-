@@ -16,8 +16,6 @@ import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.service.BisChannelService;
-import com.synchronoss.saw.batch.utils.IntegrationUtils;
-import com.synchronoss.saw.batch.utils.SipObfuscation;
 
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
@@ -123,9 +121,8 @@ public class SawBisChannelController {
     String channelType = requestBody.getChannelType();
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
-      SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
       String secretPhrase = rootNode.get("password").asText();
-      String passwordPhrase = obfuscator.encrypt(secretPhrase);
+      String passwordPhrase = SipCommonUtils.encryptPassword(secretPhrase);
       rootNode.put("password", passwordPhrase);
       requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     }
@@ -143,8 +140,26 @@ public class SawBisChannelController {
           return retryChannelEntity;
         });
     BeanUtils.copyProperties(channelEntityData, requestBody);
+
+    if (channelType.equals(BisChannelType.SFTP.toString())) {
+      // Remove password from channel metadata
+      String returnChannelMetadata =
+          removePasswordFromChannelMetadata(requestBody.getChannelMetadata(), objectMapper);
+
+      requestBody.setChannelMetadata(returnChannelMetadata);
+    }
+
     requestBody.setCreatedDate(channelEntityData.getCreatedDate().getTime());
     return ResponseEntity.ok(requestBody);
+  }
+
+  private String removePasswordFromChannelMetadata(
+      String channelMetadata, ObjectMapper objectMapper) throws IOException {
+
+    ObjectNode returnChannelMetadataObj = (ObjectNode) objectMapper.readTree(channelMetadata);
+    returnChannelMetadataObj.remove("password");
+
+    return returnChannelMetadataObj.toString();
   }
 
   /**
@@ -196,9 +211,7 @@ public class SawBisChannelController {
         String channelType = rootNode.get("channelType").textValue();
 
         if (channelType.equals(BisChannelType.SFTP.toString())) {
-          String secretPhrase = rootNode.get("password").asText();
-          secretPhrase = this.decryptPassword(secretPhrase);
-          rootNode.put("password", secretPhrase);
+          rootNode.remove("password");
         }
         bisChannelDto = new BisChannelDto();
         BeanUtils.copyProperties(entity, bisChannelDto);
@@ -259,9 +272,7 @@ public class SawBisChannelController {
       String channelType = rootNode.get("channelType").textValue();
 
       if (channelType.equals(BisChannelType.SFTP.toString())) {
-        String secretPhrase = rootNode.get("password").asText();
-        secretPhrase = this.decryptPassword(secretPhrase);
-        rootNode.put("password", secretPhrase);
+        rootNode.remove("password");
       }
       BeanUtils.copyProperties(channelEntityData, channelDto);
       channelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
@@ -319,15 +330,33 @@ public class SawBisChannelController {
 
     String channelType = requestBody.getChannelType();
 
-    if (channelType.equals(BisChannelType.SFTP.toString())) {
-      String secretPhrase = rootNode.get("password").asText();
-      secretPhrase = this.encryptPassword(secretPhrase);
-      rootNode.put("password", secretPhrase);
-      requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
-    }
     Optional<BisChannelEntity> optionalChannel = bisChannelDataRestRepository.findById(channelId);
     if (optionalChannel.isPresent()) {
       BisChannelEntity channel = optionalChannel.get();
+
+      if (channelType.equals(BisChannelType.SFTP.toString())) {
+        JsonNode passwordNode = rootNode.get("password");
+
+        String secretPhrase = null;
+
+        if (passwordNode == null || passwordNode.isNull()) {
+          // If password is not provided, retrieve it from DB
+          String savedChannelMetadata = channel.getChannelMetadata();
+
+          ObjectNode savedChannelMetadataObj =
+              (ObjectNode) objectMapper.readTree(savedChannelMetadata);
+
+          String savedPassword = savedChannelMetadataObj.get("password").asText();
+
+          rootNode.put("password", savedPassword);
+        } else {
+          secretPhrase = SipCommonUtils.encryptPassword(passwordNode.asText());
+          rootNode.put("password", secretPhrase);
+        }
+
+        requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+      }
+
       logger.trace("Channel updated :" + channel);
       requestBody.setBisChannelSysId(channelId);
       BeanUtils.copyProperties(requestBody, channel, "modifiedDate", "createdDate");
@@ -339,8 +368,16 @@ public class SawBisChannelController {
         channel.setStatus(STATUS_ACTIVE);
       }
       channel = bisChannelDataRestRepository.save(channel);
-      channel = bisChannelDataRestRepository.findById(channelId).get();
       BeanUtils.copyProperties(channel, requestBody);
+
+      if (channelType.equals(BisChannelType.SFTP.toString())) {
+        // Remove password from channel metadata
+        String returnChannelMetadata = requestBody.getChannelMetadata();
+
+        requestBody.setChannelMetadata(
+            removePasswordFromChannelMetadata(returnChannelMetadata, objectMapper));
+      }
+
       requestBody.setCreatedDate(channel.getCreatedDate().getTime());
       requestBody.setModifiedDate(channel.getModifiedDate().getTime());
     } else {
@@ -464,27 +501,10 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = channelMetadata.get("password").asText();
-      String passwordPhrase = this.encryptPassword(secretPhrase);
+      String passwordPhrase = SipCommonUtils.encryptPassword(secretPhrase);
       channelMetadata.put("password", passwordPhrase);
     }
 
     return objectMapper.writeValueAsString(channelMetadata);
-  }
-
-  private String encryptPassword(String password) throws Exception {
-    String encryptedPassword = null;
-
-    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
-    encryptedPassword = obfuscator.encrypt(password);
-    return encryptedPassword;
-  }
-
-  private String decryptPassword(String encryptedPassword) throws Exception {
-    String decryptedPassword = null;
-
-    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
-    decryptedPassword = obfuscator.decrypt(encryptedPassword);
-
-    return decryptedPassword;
   }
 }
