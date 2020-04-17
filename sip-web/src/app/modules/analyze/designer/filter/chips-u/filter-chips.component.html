@@ -17,21 +17,13 @@
         ''
       "
        (click)="openFilterPopUp()"
-       [ngClass]="!readonly
-              ? 'highlight-expression'
-              : ''
-          "
-       >
+       class='highlight-expression'>
     </code>
     <code
       [innerHTML]="aggregatePreview"
       style="margin-left: 50px;"
       (click)="openFilterPopUp()"
-      [ngClass]="!readonly
-              ? 'highlight-expression'
-              : ''
-          "
-      >
+      class='highlight-expression'>
     </code>
   </div>
 
@@ -42,6 +34,6 @@
     class="clear-all"
     (click)="onRemoveAll()"
   >
-    Clear All
+    Clear Filters
   </div>
 </div>

@@ -155,6 +155,7 @@
           [filters]="filters"
           [readonly]="true"
           [artifacts]="metric && metric.artifacts"
+          (onFilterClick)="onFiltersClick()"
         ></filter-chips-u>
 
         <div *ngIf="!executionId && !hasExecution && noPreviousExecution">

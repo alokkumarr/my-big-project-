@@ -1,7 +1,7 @@
 <header class="base-dialog__header" [attr.e2e]="'filter-dialog-header-text'">
   <span [ngSwitch]="data.mode">
     <strong *ngSwitchCase="'ANALYZE'">
-      Filter
+      {{data.isInRuntimeMode ? 'Enter Prompt Values' : 'Filters'}}
     </strong>
     <strong *ngSwitchCase="'DSK'">
       {{ operation }} Attributes - {{ data?.groupSelected?.securityGroupName }}
@@ -13,7 +13,7 @@
     <div class="errors" *ngIf="errorState">
       <span [innerHtml]="errorMessage"></span>
     </div>
-    <h3> Filters </h3>
+    <h3 *ngIf="!data.isInRuntimeMode"> Filters </h3>
     <dsk-filter-group
       *ngIf="(!data.isInRuntimeMode && data.mode === 'ANALYZE') || data.mode === 'DSK'"
       [data]="data"

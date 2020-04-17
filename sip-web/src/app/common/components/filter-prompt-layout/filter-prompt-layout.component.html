@@ -27,7 +27,7 @@
         <div class="input-fields" fxLayout="row"
         *ngIf="(data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter) || !data.isInRuntimeMode"
         >
-          <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+          <!-- <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
               <mat-label>Artifacts</mat-label>
               <mat-select
                           [value]="filterGroup.booleanQuery[childId].artifactsName" [attr.e2e]="'filter-artifacts'"
@@ -37,17 +37,17 @@
                   {{ artifact.artifactName }}
                 </mat-option>
               </mat-select>
-            </mat-form-field>
+            </mat-form-field> -->
 
             <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
-              <mat-label> Columns
+              <!-- <mat-label> Columns
                 <span
                 *ngIf="!filterGroup.booleanQuery[childId].isOptional && data.isInRuntimeMode"
                 class="mandatory-asterisk"
                 style="color:red"
                 >*</span>
-              </mat-label>
-              <mat-select (selectionChange)="columnsSelect($event.value, childId)"
+              </mat-label> -->
+              <!-- <mat-select (selectionChange)="columnsSelect($event.value, childId)"
                           [value]="filterGroup.booleanQuery[childId].columnName"
                           [disabled]="data.isInRuntimeMode"
                           [attr.e2e]="'filter-columns'">
@@ -55,7 +55,18 @@
                             [value]="column.columnName">
                   {{ column.displayName }}
                 </mat-option>
-              </mat-select>
+              </mat-select> -->
+              <mat-label> Columns
+                <span
+                *ngIf="!filterGroup.booleanQuery[childId].isOptional && data.isInRuntimeMode"
+                class="mandatory-asterisk"
+                style="color:red"
+                >*</span>
+              </mat-label>
+              <input matInput
+                      [value]="filterGroup.booleanQuery[childId].columnName"
+                      [disabled]="data.isInRuntimeMode"
+                      [attr.e2e]="'filter-columns'"/>
             </mat-form-field>
 
             <div [ngSwitch]="TYPE_MAP[fetchType(childId)]"

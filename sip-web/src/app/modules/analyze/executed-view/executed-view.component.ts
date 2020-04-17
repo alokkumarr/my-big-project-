@@ -310,6 +310,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     );
   }
 
+  onFiltersClick() {
+    this.executeAnalysis(this.analysis, EXECUTION_MODES.LIVE);
+  }
+
   onSelectExecution(executionId) {
     if (!executionId) {
       return;
