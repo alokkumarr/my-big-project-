@@ -37,7 +37,7 @@ public class AdvancedHashingUtil
     // These constants may be changed without breaking existing hashes.
     public static final int SALT_BYTE_SIZE = 8;
     public static final int HASH_BYTE_SIZE = 16;
-    public static final int PBKDF2_ITERATIONS = 1000;
+    public static final int PBKDF2_ITERATIONS = 100000;
     // These constants define the encoding and may not be changed.
     public static final int HASH_SECTIONS = 5;
     public static final int HASH_ALGORITHM_INDEX = 0;
