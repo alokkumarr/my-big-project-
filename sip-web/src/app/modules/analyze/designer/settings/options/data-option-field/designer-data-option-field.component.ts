@@ -92,7 +92,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
 
     if (get(this.artifactColumn, 'area') === "y") {
-      this.state = isEmpty(this.artifactColumn.limitType) ||  isUndefined(this.artifactColumn.limitValue);
+      this.state = isEmpty((<ArtifactColumnChart>this.artifactColumn).limitType) ||  isUndefined((<ArtifactColumnChart>this.artifactColumn).limitValue);
     }
 
 

@@ -17,8 +17,6 @@ export interface ArtifactColumn {
   format: Format | string | null;
   aliasName: string;
   alias?: string;
-  limitType?: string;
-  limitValue?: Number;
   aggregate?:
     | 'sum'
     | 'avg'
