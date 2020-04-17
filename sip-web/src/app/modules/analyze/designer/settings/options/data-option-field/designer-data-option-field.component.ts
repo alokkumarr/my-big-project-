@@ -9,6 +9,7 @@ import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
 import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';
+import * as isUndefined from 'lodash/isUndefined';
 import { Store } from '@ngxs/store';
 
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
@@ -91,7 +92,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
 
     if (get(this.artifactColumn, 'area') === "y") {
-      this.state = isEmpty(get(this.artifactColumn, 'limitType')) || isEmpty(get(this.artifactColumn, 'limitValue').toString());
+      this.state = isEmpty(this.artifactColumn.limitType) ||  isUndefined(this.artifactColumn.limitValue);
     }
 
 
