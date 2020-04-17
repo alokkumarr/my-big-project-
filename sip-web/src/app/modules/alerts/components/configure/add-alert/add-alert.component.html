@@ -126,6 +126,11 @@
               <email-list
                 formControlName="subscribers"
                 [emails]="alertSubscribersFormGroup.controls.subscribers.value"
+                (emailsChange)="
+                  alertSubscribersFormGroup.controls.subscribers.setValue(
+                    $event
+                  )
+                "
                 [allowCustomInput]="false"
                 [autoCompleteSuggestions]="subscriberEmails$ | async"
               ></email-list>
