@@ -84,4 +84,5 @@ public interface UserRepository {
     List<UserDetails> getUsersDetailList(Long customerId);
   boolean getRoleStatus(Long roleId);
   DskDetails getUserById(String masterLoginId);
+	Ticket getTicketForId3(String ticketId, String userId);
 }

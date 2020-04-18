@@ -119,16 +119,15 @@
       </mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label i18n>Password</mat-label>
+      <mat-label i18n>{{opType !== 'create' && value.password.length === 0 ? 'Password Not Changed' : 'Password'}}</mat-label>
       <input
         type="password"
         matInput
         showPassword
-        placeholder="Password"
+        [placeholder]="opType !== 'create' &&  value.password.length === 0 ? 'Password Not Changed' : 'Password'"
         name="user-password"
         e2e="user-password"
         formControlName="password"
-        required
         autocomplete="new-password"
       />
       <button
