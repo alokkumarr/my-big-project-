@@ -8,63 +8,68 @@ class ReportDesignerPage extends Designer {
     super();
 
     this._reportField = (tableName, fieldName) =>
-        element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
+      element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
 
     this._reportFieldCheckbox = (tableName, fieldName) =>
-        this._reportField(tableName, fieldName).element(by.css('mat-checkbox'));
+      this._reportField(tableName, fieldName).element(by.css('mat-checkbox'));
 
     this._selectedField = name =>
-        element(by.xpath(`//span[@class="column-name" and text()="${name}"]`));
+      element(by.xpath(`//span[@class="column-name" and text()="${name}"]`));
 
     this._reportGrid = element(by.xpath(`//report-grid-upgraded`));
 
-    this._attributeIcon = name =>
-        element(
-            by.xpath(
-                `//span[@class="column-name" and text()="${name}"]/following-sibling::mat-icon`
-            )
-        );
-    this._aggregationOption = element(
-        by.xpath(`//*[contains(text(),'Aggregation')]`)
-    );
-    this._aggregation = name => element(by.xpath(`//span[text()="${name}"]`));
+    this._attributeIcon = name => element(by.css(`[e2e="expand-${name}"]`));
+    this._aggregationOption = element(by.css(`[e2e="Aggregation-Option"]`));
+    this._aggregation = name => element(by.css(`[e2e='${name}']`));
     this._queryBtn = element(by.css(`[e2e='e2e-query-btn']`));
     this._confirmOkBtn = element(by.css(`[e2e='confirm-dialog-ok-btn']`));
     this._querySubmitButton = element(by.css(`[e2e='e2e-query-submit']`));
     this._rows = element(by.xpath(`(//tbody)[2]/tr`));
     this._totalRows = element.all(by.xpath(`(//tbody)[2]/tr`));
     this._rowData = (row, col) =>
-        element(by.xpath(`(//tbody)[2]/tr[${row}]/td[${col}]`));
+      element(by.xpath(`(//tbody)[2]/tr[${row}]/td[${col}]`));
     this._totalFields = element.all(by.css(`[role="columnheader"]`));
     this._filterIcon = element(by.css(`[fonticon="icon-filter"]`));
-    this._aggregatedFilters = element(by.css(`[class="analyze-aggregate-filters ng-star-inserted"]`));
-    this._addAggregateFilter = element(by.css(`[e2e="aggregate-filter-add-btn-"]`));
+    this._aggregatedFilters = element(
+      by.css(`[class="analyze-aggregate-filters ng-star-inserted"]`)
+    );
+    this._addAggregateFilter = element(
+      by.css(`[e2e="aggregate-filter-add-btn-"]`)
+    );
     this._aggregateColumn = element(by.css(`[role="listbox"]`));
     this._aggregateOption = element(by.css(`[e2e="filter-aggregate-select"]`));
-    this._aggregateOperator = element(by.css(`[e2e="filter-number-operator-select"]`));
-    this._aggregateOperatorValue = element(by.css(`[e2e="designer-number-filter-input"]`));
+    this._aggregateOperator = element(
+      by.css(`[e2e="filter-number-operator-select"]`)
+    );
+    this._aggregateOperatorValue = element(
+      by.css(`[e2e="designer-number-filter-input"]`)
+    );
     this._applyAggregateFilter = element(by.css(`[e2e="save-attributes-btn"]`));
-    this._selectOption = value => element(
+    this._selectOption = value =>
+      element(
         by.xpath(
-            `//span[@class="mat-option-text" and contains(text(),'${value}')]`
+          `//span[@class="mat-option-text" and contains(text(),'${value}')]`
         )
+      );
+    this._verifyAppliedAggregateFilter = (field, operator, value) =>
+      element(
+        by.xpath(
+          `//*[text()='${field}']/following::span[text()='${operator}']/following::span[text()='[${value}]']`
+        )
+      );
+    this._removeAggregateFilter = element(
+      by.css(`div[fonticon="icon-remove"]`)
     );
-    this._verifyAppliedAggregateFilter = (field,operator,value) =>
-        element(by.xpath(
-            `//*[text()='${field}']/following::span[text()='${operator}']/following::span[text()='[${value}]']`
-            )
-        );
-    this._removeAggregateFilter = element(by.css(`div[fonticon="icon-remove"]`));
     this._previewExpression = element(
-      by.cssContainingText('mat-panel-title','Preview Expression'
-      )
+      by.cssContainingText('mat-panel-title', 'Preview Expression')
     );
-    this._betOperatorFirstValue = element(by.xpath(`(//input[@type="number"])[1]`));
-    this._betOperatorSecondValue = element(by.xpath(`(//input[@type="number"])[2]`));
-    this._refreshData = element(
-      by.xpath(`//span[text()='Refresh Data']`
-      )
+    this._betOperatorFirstValue = element(
+      by.xpath(`(//input[@type="number"])[1]`)
     );
+    this._betOperatorSecondValue = element(
+      by.xpath(`(//input[@type="number"])[2]`)
+    );
+    this._refreshData = element(by.css(`[e2e='refresh-data-btn']`));
   }
 
   clickOnReportFields(tables) {
@@ -103,7 +108,7 @@ class ReportDesignerPage extends Designer {
     commonFunctions.elementToBeClickableAndClickByMouseMove(
       this._aggregationOption
     );
-    commonFunctions.elementToBeClickableAndClickByMouseMove(
+    commonFunctions.elementToBeClickableAndDoubleClickByMouseMove(
       this._aggregation(aggregate.designerLabel)
     );
   }
@@ -165,60 +170,57 @@ class ReportDesignerPage extends Designer {
   }
 
   verifyAppliedAggregateFilter(value) {
-    commonFunctions.waitFor.elementToBeVisible(this._verifyAppliedAggregateFilter(value))
+    commonFunctions.waitFor.elementToBeVisible(
+      this._verifyAppliedAggregateFilter(value)
+    );
   }
 
   removeAggregateAndVerify(value) {
     commonFunctions.waitFor.elementToBeVisible(this._removeAggregateFilter);
     commonFunctions.clickOnElement(this._removeAggregateFilter);
-    commonFunctions.waitFor.elementToBeNotVisible(this._verifyAppliedAggregateFilter(value))
+    commonFunctions.waitFor.elementToBeNotVisible(
+      this._verifyAppliedAggregateFilter(value)
+    );
   }
 
   applyNewAggregateFilter(aggregateFilters) {
     this.clickFilter();
-    commonFunctions.waitForProgressBarToComplete();
-    browser.sleep(1000);//need to add till filter Popup visible
+    //commonFunctions.waitForProgressBarToComplete();
+    browser.sleep(1000); //need to add till filter Popup visible
     this.verifyAggregateFilters();
-    commonFunctions.clickOnElement(
-      this._addAggregateFilter
-    );
-    commonFunctions.clickOnElement(
-      this._aggregateColumn
-    );
-    commonFunctions.clickOnElement(
-      this._selectOption(aggregateFilters.field)
-    );
-    browser.sleep(1000);//need to add else filter will break
-    commonFunctions.clickOnElement(
-      this._aggregateOption
-    );
+    commonFunctions.clickOnElement(this._addAggregateFilter);
+    commonFunctions.clickOnElement(this._aggregateColumn);
+    commonFunctions.clickOnElement(this._selectOption(aggregateFilters.field));
+    browser.sleep(1000); //need to add else filter will break
+    commonFunctions.clickOnElement(this._aggregateOption);
     commonFunctions.clickOnElement(
       this._selectOption(aggregateFilters.designerLabel)
     );
-    browser.sleep(1000);//need to add else filter will break
-    commonFunctions.clickOnElement(
-      this._aggregateOperator
-    );
+    browser.sleep(1000); //need to add else filter will break
+    commonFunctions.clickOnElement(this._aggregateOperator);
     commonFunctions.clickOnElement(
       this._selectOption(aggregateFilters.operator)
     );
-    browser.sleep(1000);//need to add else filter will break
-    if(aggregateFilters.operator === "Between") {
-      commonFunctions.fillInput(this._betOperatorFirstValue,aggregateFilters.firstValue);
-      commonFunctions.fillInput(this._betOperatorSecondValue,aggregateFilters.secondValue);
-    }else {
+    browser.sleep(1000); //need to add else filter will break
+    if (aggregateFilters.operator === 'Between') {
       commonFunctions.fillInput(
-        this._aggregateOperatorValue,aggregateFilters.operatorValue
+        this._betOperatorFirstValue,
+        aggregateFilters.firstValue
+      );
+      commonFunctions.fillInput(
+        this._betOperatorSecondValue,
+        aggregateFilters.secondValue
+      );
+    } else {
+      commonFunctions.fillInput(
+        this._aggregateOperatorValue,
+        aggregateFilters.operatorValue
       );
     }
-    commonFunctions.clickOnElement(
-      this._aggregateColumn
-    );
-    commonFunctions.clickOnElement(
-      this._selectOption(aggregateFilters.field)
-    );
+    //commonFunctions.clickOnElement(this._aggregateColumn);
+    //commonFunctions.clickOnElement(this._selectOption(aggregateFilters.field));
     commonFunctions.clickOnElement(this._previewExpression);
-    browser.sleep(2000);//need to add else filter will break
+    browser.sleep(2000); //need to add else filter will break
     commonFunctions.clickOnElement(this._applyAggregateFilter);
     browser.sleep(2000); //Need to wait till result grid refresh with new filters
   }

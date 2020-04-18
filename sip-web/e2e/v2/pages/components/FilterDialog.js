@@ -5,17 +5,13 @@ const commonFunctions = require('../utils/commonFunctions');
 class FilterDialog {
   constructor() {
     this._addFilter = element(by.css(`[e2e="add-new-filter"]`));
-    this._filterColumnDropDown = element(
-      by.css('[e2e="filter-columns"]')
-    );
+    this._filterColumnDropDown = element(by.css('[e2e="filter-columns"]'));
     this._columnNameDropDownItem = columnName =>
       element(
         by.xpath(`(//mat-option/span[contains(text(),"${columnName}")])[1]`)
       );
     // Date
-    this._filterPresetDropDown = element(
-      by.css('[e2e="filter-date-preset"]')
-    );
+    this._filterPresetDropDown = element(by.css('[e2e="filter-date-preset"]'));
     this._presetDropDownItem = presetName =>
       element(by.xpath(`//mat-option[contains(text(),"${presetName}")]`));
 
@@ -41,7 +37,9 @@ class FilterDialog {
     this._filterStringIsInIsNotInInput = element(
       by.xpath(`//input[@e2e="designer-filter-string-input"]`)
     );
-    this._applyFiltersBtn = element(by.css(`button[e2e="save-attributes-btn"]`));
+    this._applyFiltersBtn = element(
+      by.css(`button[e2e="save-attributes-btn"]`)
+    );
 
     this._promptCheckBox = element(
       by.css(`mat-checkbox[e2e="filter-dialog-prompt-checkbox"]`)
@@ -53,15 +51,14 @@ class FilterDialog {
     this._cancleFilterPromptBtn = element(
       by.css(`[e2e="designer-dialog-cancel"]`)
     );
-    this._selectedFilterField = value =>element(
-      by.xpath(`//*[@class="mat-select-value"]/following::span[text()='${value}']`)
-    );
-    this._allFilterButton=element(by.xpath(`//button[contains(*,'All')]`));
+    this._selectedFilterField = element(by.css(`[e2e='filter-columns']`));
+    this._allFilterButton = element(by.xpath(`//button[contains(*,'All')]`));
     this._selectFilterField = value => element(by.css(`[e2e="add-${value}"]`));
-    this._tableArtifacts = element(by.css(`mat-select[e2e="filter-artifacts"]`));
+    this._tableArtifacts = element(
+      by.css(`mat-select[e2e="filter-artifacts"]`)
+    );
     this._previewExpression = element(
-        by.cssContainingText('mat-panel-title','Preview Expression'
-        )
+      by.cssContainingText('mat-panel-title', 'Preview Expression')
     );
   }
 
@@ -129,7 +126,9 @@ class FilterDialog {
   }
 
   verifySelectFieldValue(value) {
-    commonFunctions.waitFor.elementToBePresent(this._selectedFilterField(value));
+    expect(this._selectedFilterField.getAttribute('value')).toEqual(
+      value.toLowerCase()
+    );
   }
 
   fillFilterOptions(fieldType, operator, value) {
