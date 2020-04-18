@@ -64,7 +64,7 @@
                 >*</span>
               </mat-label>
               <input matInput
-                      [value]="filterGroup.booleanQuery[childId].columnName"
+                      [value]="filterGroup.booleanQuery[childId].columnName.split('.keyword')[0]"
                       [disabled]="data.isInRuntimeMode"
                       [attr.e2e]="'filter-columns'"/>
             </mat-form-field>
