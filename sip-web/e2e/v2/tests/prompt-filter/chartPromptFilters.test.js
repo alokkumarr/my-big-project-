@@ -112,10 +112,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
-
-          commonFunctions.waitForProgressBarToComplete();
           executePage.clickOnEditLink();
-          commonFunctions.waitForProgressBarToComplete();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
           chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
@@ -124,7 +121,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
           chartDesignerPage.validateAppliedFilters(analysisType, [
-            (data.fieldName).toString().toLowerCase()
+            data.fieldName.toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveDialogButton();
@@ -190,7 +187,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          // commented below code because of SIP-7804
+          //commented below code because of SIP-7804
           //executePage.verifyAppliedFilter(filters);
         } catch (e) {
           console.error(e);

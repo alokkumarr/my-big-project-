@@ -36,8 +36,8 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithESRe
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterEach(function(done) {
-    setTimeout(function() {
+  afterEach(function (done) {
+    setTimeout(function () {
       if (analysisId) {
         new AnalysisHelper().deleteAnalysis(
           host,
@@ -78,18 +78,24 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithESRe
         reportDesignerPage.clickOnReportFields(tables);
         // Verify that all the columns are displayed
         reportDesignerPage.verifyDisplayedColumns(tables);
-        commonFunctions.waitForProgressBarToComplete();
+        //commonFunctions.waitForProgressBarToComplete();
         // Apply aggregation
         reportDesignerPage.applyAggregate(data.aggregate);
-        reportDesignerPage.refreshAnalysis();
-        commonFunctions.waitForProgressBarToComplete();
+        //reportDesignerPage.refreshAnalysis();
+        //commonFunctions.waitForProgressBarToComplete(null, 120000);
+        browser.sleep(5000);
         reportDesignerPage.applyNewAggregateFilter(data.aggregatePopup);
         const executePage = new ExecutePage();
 
-        executePage.verifyAppliedFilter(data.expectedAggregate, Constants.REPORT);
+        executePage.verifyAppliedFilter(
+          data.expectedAggregate,
+          Constants.REPORT
+        );
         //reportDesignerPage.verifyAppliedAggregateFilter(data.expectedAggregateValue);
-        if(data.removeAggregate) {
-          reportDesignerPage.removeAggregateAndVerify(data.expectedAggregateValue);
+        if (data.removeAggregate) {
+          reportDesignerPage.removeAggregateAndVerify(
+            data.expectedAggregateValue
+          );
         }
         reportDesignerPage.clickOnSave();
         reportDesignerPage.enterAnalysisName(reportName);
