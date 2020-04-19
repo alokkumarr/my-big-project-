@@ -57,5 +57,12 @@
       <directory>../sip-security/sip-security/src/main/ansible</directory>
       <outputDirectory>modules/sip-security/ansible</outputDirectory>
     </fileSet>
+  <fileSet>
+    <directory>../sip-common-components/target</directory>
+    <outputDirectory>modules/sip-common-components/rpms</outputDirectory>
+    <includes>
+      <include>sip-common-components-*.rpm</include>
+    </includes>
+  </fileSet>
   </fileSets>
 </assembly>

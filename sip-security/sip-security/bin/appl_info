@@ -11,5 +11,6 @@ group:   saw
 #
 optdir:  /opt/bda/saw-security
 vardir:  /var/bda/saw-security
+utildir: /opt/sip/sip-common-components
 #
 # more values can be added on the box
