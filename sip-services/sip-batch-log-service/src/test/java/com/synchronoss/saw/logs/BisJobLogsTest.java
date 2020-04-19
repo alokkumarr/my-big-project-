@@ -7,7 +7,6 @@ import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 import java.util.List;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Ignore
 public class BisJobLogsTest {
   @Autowired SipJobDataRepository jobRepository;
   @Autowired BisFileLogsRepository bisFileLogsRepository;
