@@ -82,14 +82,11 @@ if [ ! -e $db_password_file -a -e $initial_setup_marker ]; then
 fi
 
 # Generate database passwords
-generate_password() {
-    local password_file=$1
-    if [ -e $password_file ]; then
-        return
-    fi
-    local password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
-    echo $password > $password_file
-    chmod go-rwx $password_file
+get_encryption_key() {
+    line=$(sed -n '/^encryption.key/p' ${vars_file})
+
+    enc_key=$(cut -d'=' -f2 <<<"$line")
+    echo $enc_key
 }
 generate_password $db_password_file
 
