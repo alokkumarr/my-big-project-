@@ -298,11 +298,18 @@ export class DatasourceService {
    * Check channel connection using config
    *
    * @param {*} payload
+   * @param {*} type
+   * @param {*} channelId
    * @returns {Observable<any>}
    * @memberof DatasourceService
    */
-  testChannelWithBody(payload): Observable<any> {
-    const endpoint = `${this.api}/ingestion/batch/channels/test`;
+  testChannelWithBody(payload, type, channelId): Observable<any> {
+    let endpoint = '';
+    if (payload.channelType === 'sftp' && type === 'update') {
+      endpoint = `${this.api}/ingestion/batch/channels/test?channelId=${channelId}`
+    } else {
+      endpoint = `${this.api}/ingestion/batch/channels/test`;
+    }
 
     return this.http
       .post(endpoint, payload)
