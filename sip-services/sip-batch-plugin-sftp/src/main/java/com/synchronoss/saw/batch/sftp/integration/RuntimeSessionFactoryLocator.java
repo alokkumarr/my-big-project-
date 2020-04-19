@@ -38,7 +38,7 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
 
-  @Value("${bis.encryption-key}")
+  @Value("${encryption.sftp-key}")
   private String encryptionKey;
 
   @Override
