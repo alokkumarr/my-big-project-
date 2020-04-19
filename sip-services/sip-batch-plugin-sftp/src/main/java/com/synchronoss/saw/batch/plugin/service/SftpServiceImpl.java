@@ -137,7 +137,7 @@ public class SftpServiceImpl extends SipPluginContract {
   @NotNull
   private Integer maxInprogressMins = 45;
 
-  @Value("${bis.encryption-key}")
+  @Value("${encryption.sftp-key}")
   private String encryptionKey;
   
   public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
