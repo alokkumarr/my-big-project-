@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.ModuleName;
 import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
@@ -20,21 +19,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class AlertRuleDetailsConverter implements AlertConverter {
 
   private static final Logger logger = LoggerFactory.getLogger(AlertRuleDetailsConverter.class);
-  Gson gson = new Gson();
+  Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-  @Autowired private SubscriberService subscriberService;
+  @Autowired
+  private SubscriberService subscriberService;
 
   private static String CUSTOMER_CODE = "customerCode";
   private static String NOTIFICATION = "notification";
 
   @Override
-  public AlertRuleDetails convert(JsonObject oldAlertsDefinition) {
+  public JsonObject convert(JsonObject oldAlertsDefinition) {
     JsonObject email = null;
     JsonObject notification = null;
     JsonArray emailIds = null;
@@ -77,7 +76,8 @@ public class AlertRuleDetailsConverter implements AlertConverter {
                     subscriberService.addSubscriber(notificationSubscriber, finalCustomerCode);
                 subsId[0] = notificationSubscriber.getSubscriberId();
               } else {
-                subsId[0] = emails.get(mail);
+                subsId[0] = emails.get(mail.getAsString());
+                logger.debug("subsId[0] : {}", subsId[0]);
               }
               SubscriberDetails subscriberDetails = new SubscriberDetails();
               subscriberDetails.setSubscriberId(subsId[0]);
@@ -96,8 +96,7 @@ public class AlertRuleDetailsConverter implements AlertConverter {
     subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
 
     oldAlertsDefinition.remove(NOTIFICATION);
-    AlertRuleDetails alertRuleDetails = gson.fromJson(oldAlertsDefinition, AlertRuleDetails.class);
-    return alertRuleDetails;
+    return oldAlertsDefinition;
   }
 
   /**

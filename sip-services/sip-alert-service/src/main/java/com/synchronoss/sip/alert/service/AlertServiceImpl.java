@@ -804,14 +804,15 @@ public class AlertServiceImpl implements AlertService {
    */
   private void setSubcriberAlertMapping(AlertRuleDetails alert, String id) {
     List<SubscriberDetails> subscriberDetailsList = new ArrayList<>();
-    alert.getSubscribers().forEach(s -> {
-      SubscriberDetails subscriberDetails = new SubscriberDetails();
-      subscriberDetails.setSubscriberId(s);
-      subscriberDetails.setChannelTypes(Collections.singletonList(NotificationChannelType.EMAIL));
-      subscriberDetailsList.add(subscriberDetails);
-    });
-
-    setSubscriberModuleMapping(id, subscriberDetailsList);
+    if (!CollectionUtils.isEmpty(alert.getSubscribers())) {
+      alert.getSubscribers().forEach(s -> {
+        SubscriberDetails subscriberDetails = new SubscriberDetails();
+        subscriberDetails.setSubscriberId(s);
+        subscriberDetails.setChannelTypes(Collections.singletonList(NotificationChannelType.EMAIL));
+        subscriberDetailsList.add(subscriberDetails);
+      });
+      setSubscriberModuleMapping(id, subscriberDetailsList);
+    }
   }
 
   /**

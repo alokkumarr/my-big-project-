@@ -3,10 +3,10 @@ package com.synchronoss.sip.alert.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.synchronoss.sip.alert.metadata.AlertsMetadata;
-import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.service.migrationservice.AlertConverter;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import sncr.bda.base.MaprConnection;
 
 @Service
 public class MigrateAlerts {
@@ -39,7 +40,7 @@ public class MigrateAlerts {
   @Autowired
   private AlertConverter alertConverter;
 
-  Gson gson = new Gson();
+  Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   public MigrateAlerts() {
   }
@@ -54,10 +55,11 @@ public class MigrateAlerts {
           alertRuleDetails -> {
             JsonObject alertJsonObject =
                 new JsonParser().parse(alertRuleDetails.toString()).getAsJsonObject();
-            logger.info("Converted Json : {}", gson.toJson(alertJsonObject));
-            AlertRuleDetails alertRuleDetails1 = alertConverter.convert(alertJsonObject);
-            logger.info("Updated AlertRuleDef : {}", gson.toJson(alertRuleDetails1));
-            updateAlertRule(alertRuleDetails1, alertRuleDetails1.getAlertRulesSysId());
+            logger.info("Before Converting AlertRule - Json : {}", gson.toJson(alertJsonObject));
+            alertJsonObject = alertConverter.convert(alertJsonObject);
+            String alertRulesSysId = alertJsonObject.get("alertRulesSysId").getAsString();
+            logger.info("Updated AlertRuleDef : {}", gson.toJson(alertJsonObject));
+            updateAlertRule(alertJsonObject, alertRulesSysId);
           });
     } else {
       logger.info("No Alerts definitions to migrate !!");
@@ -92,14 +94,16 @@ public class MigrateAlerts {
    * @param alertRuleId Alert rule id
    * @return Updated alert rule
    */
-  public AlertRuleDetails updateAlertRule(AlertRuleDetails alertRuleDetails, String alertRuleId) {
+  public JsonObject updateAlertRule(JsonObject alertRuleDetails, String alertRuleId) {
     try {
-      AlertsMetadata alertsMetadata = new AlertsMetadata(alertRulesMetadata, basePath);
-
-      alertsMetadata.update(alertRuleId, new JsonParser().parse(alertRuleDetails.toString()));
-      logger.info("AlertDefinition update : {}", gson.toJson(alertRuleDetails));
+      MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+      logger.trace("alertRuleId : {}, alertRulesMetadata : {}, basePath : {}", alertRuleId,
+          alertRulesMetadata, basePath);
+      connection.update(alertRuleId, alertRuleDetails);
+      logger.info("AlertDefinition id {} successfully updated : {}", alertRuleId,
+          gson.toJson(alertRuleDetails));
     } catch (Exception e) {
-      logger.info("Exception occurred while updating AlertDefinition : {}", e.getMessage());
+      logger.error("Exception occurred while updating AlertDefinition : {}", e);
     }
     return alertRuleDetails;
   }

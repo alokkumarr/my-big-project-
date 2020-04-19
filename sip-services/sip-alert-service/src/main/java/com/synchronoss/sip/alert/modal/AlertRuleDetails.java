@@ -8,6 +8,7 @@ import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
 import java.util.List;
 
+@JsonInclude(Include.NON_NULL)
 public class AlertRuleDetails {
 
   @JsonProperty("alertRulesSysId")
