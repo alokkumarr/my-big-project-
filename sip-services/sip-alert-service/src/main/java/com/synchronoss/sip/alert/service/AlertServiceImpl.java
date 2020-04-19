@@ -22,10 +22,12 @@ import com.synchronoss.sip.alert.modal.AlertSeverity;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
+import com.synchronoss.sip.alert.modal.Email;
 import com.synchronoss.sip.alert.modal.ModuleName;
 import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
 import com.synchronoss.sip.alert.modal.MonitoringType;
 import com.synchronoss.sip.alert.modal.NotificationChannelType;
+import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.modal.Subscriber;
 import com.synchronoss.sip.alert.modal.SubscriberDetails;
 import com.synchronoss.sip.alert.service.evaluator.EvaluatorListener;
@@ -50,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
@@ -63,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import sncr.bda.base.MaprConnection;
 import sncr.bda.store.generic.schema.Sort;
 
@@ -101,16 +105,6 @@ public class AlertServiceImpl implements AlertService {
 
   @Autowired EvaluatorListener evaluatorListener;
 
-//  @PostConstruct
-//  public void init() {
-//    try {
-//      MaprConnection alertRuleTableConnection = new MaprConnection(basePath, alertRulesMetadata);
-//      MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertResults);
-//    } catch (OjaiException e) {
-//      LOGGER.error("Error occurred while setup tables {}", e);
-//    }
-//  }
-
   /**
    * Create Alert rule.
    *
@@ -131,8 +125,10 @@ public class AlertServiceImpl implements AlertService {
     alert.setCreatedBy(ticket.getUserFullName());
     alert.setCustomerCode(ticket.getCustCode());
     setSubcriberAlertMapping(alert, id);
+    setNewSubscribers(alert, id);
     //decouple alertsRule from subscriber. Remove the subscribers from alert Metadata.
     alert.setSubscribers(null);
+    alert.setNotification(null);
     connection.insert(id, alert);
     return alert;
   }
@@ -158,7 +154,9 @@ public class AlertServiceImpl implements AlertService {
     alertRuleDetails.setCustomerCode(ticket.getCustCode());
     alertRuleDetails.setAlertRulesSysId(alertRuleId);
     setSubcriberAlertMapping(alertRuleDetails, alertRuleId);
+    setNewSubscribers(alertRuleDetails, alertRuleId);
     alertRuleDetails.setSubscribers(null);
+    alertRuleDetails.setNotification(null);
     connection.update(alertRuleId, alertRuleDetails);
     return alertRuleDetails;
   }
@@ -801,7 +799,6 @@ public class AlertServiceImpl implements AlertService {
   }
 
   /**
-   *
    * @param alert
    * @param id
    */
@@ -814,16 +811,10 @@ public class AlertServiceImpl implements AlertService {
       subscriberDetailsList.add(subscriberDetails);
     });
 
-    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
-        new ModuleSubscriberMappingPayload();
-    moduleSubscriberMappingPayload.setModuleId(id);
-    moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
-    moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
-    subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
+    setSubscriberModuleMapping(id, subscriberDetailsList);
   }
 
   /**
-   *
    * @param alertId
    * @return
    */
@@ -836,5 +827,65 @@ public class AlertServiceImpl implements AlertService {
       subscriberList.add(subscriberDetails.getSubscriberId());
     });
     return subscriberList;
+  }
+
+  /**
+   * If email sent directly across API then create subscribers for those emails.
+   *
+   * @param alertRuleDetails
+   */
+  public void setNewSubscribers(AlertRuleDetails alertRuleDetails, String alertId) {
+    if (alertRuleDetails.getNotification() != null
+        && alertRuleDetails.getNotification().getEmail() != null) {
+      Email email = alertRuleDetails.getNotification().getEmail();
+
+      List<NotificationSubscriber> subscribers =
+          subscriberService.getSubscribersByCustomerCode(alertRuleDetails.getCustomerCode());
+      Map<String, String> emailSubscriber = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+      subscribers.forEach(
+          subscriber -> {
+            emailSubscriber.put(subscriber.getChannelValue(), subscriber.getSubscriberId());
+          });
+
+      List<SubscriberDetails> subscriberDetailsList = new ArrayList<>();
+      if (!CollectionUtils.isEmpty(email.getRecipients())) {
+        Set<String> recepients = email.getRecipients();
+        String[] subsId = new String[1];
+        recepients.forEach(recepient -> {
+          if (!emailSubscriber.containsKey(recepient)) {
+            NotificationSubscriber notificationSubscriber = new NotificationSubscriber();
+            notificationSubscriber.setChannelType(NotificationChannelType.EMAIL);
+            notificationSubscriber.setChannelValue(recepient);
+            notificationSubscriber.setSubscriberName(recepient);
+            notificationSubscriber =
+                subscriberService
+                    .addSubscriber(notificationSubscriber, alertRuleDetails.getCustomerCode());
+            subsId[0] = notificationSubscriber.getSubscriberId();
+          } else {
+            subsId[0] = emailSubscriber.get(recepient);
+          }
+          SubscriberDetails subscriberDetails = new SubscriberDetails();
+          subscriberDetails.setSubscriberId(subsId[0]);
+          subscriberDetails.setChannelTypes(
+              Collections.singletonList(NotificationChannelType.EMAIL));
+          subscriberDetailsList.add(subscriberDetails);
+        });
+      }
+      setSubscriberModuleMapping(alertId, subscriberDetailsList);
+    }
+  }
+
+  /**
+   * @param alertId
+   * @param subscriberDetailsList
+   */
+  public void setSubscriberModuleMapping(String alertId,
+      List<SubscriberDetails> subscriberDetailsList) {
+    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
+        new ModuleSubscriberMappingPayload();
+    moduleSubscriberMappingPayload.setModuleId(alertId);
+    moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
+    moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
+    subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
   }
 }

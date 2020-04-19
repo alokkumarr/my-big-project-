@@ -1,6 +1,7 @@
 package com.synchronoss.sip.alert.modal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
@@ -81,7 +82,7 @@ public class AlertRuleDetails {
   @JsonProperty("sipQuery")
   private SipQuery sipQuery;
 
-  @JsonIgnore
+  @JsonInclude(Include.NON_NULL)
   @JsonProperty("notification")
   private Notification notification;
 
@@ -91,14 +92,17 @@ public class AlertRuleDetails {
   @JsonProperty("triggerOnLookback")
   private Boolean triggerOnLookback = false;
 
+  @JsonInclude(Include.NON_NULL)
   @JsonProperty("subscribers")
   private List<String> subscribers;
 
+  @JsonInclude(Include.NON_NULL)
   @JsonProperty("subscribers")
   public List<String> getSubscribers() {
     return subscribers;
   }
 
+  @JsonInclude(Include.NON_NULL)
   @JsonProperty("subscribers")
   public void setSubscribers(List<String> subscribers) {
     this.subscribers = subscribers;
@@ -506,6 +510,7 @@ public class AlertRuleDetails {
    *
    * @return value of notification
    */
+  @JsonInclude(Include.NON_NULL)
   public Notification getNotification() {
     return notification;
   }
@@ -513,6 +518,7 @@ public class AlertRuleDetails {
   /**
    * Sets notification.
    */
+  @JsonInclude(Include.NON_NULL)
   public void setNotification(Notification notification) {
     this.notification = notification;
   }

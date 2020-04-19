@@ -1,5 +1,7 @@
 package com.synchronoss.sip.alert.service;
 
+import static com.synchronoss.sip.alert.util.AlertUtils.saveNotificationStatus;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,21 +10,15 @@ import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.sip.alert.modal.AlertNotificationLog;
 import com.synchronoss.sip.alert.modal.AlertRuleDetails;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
-import com.synchronoss.sip.alert.modal.ModuleName;
-import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
-import com.synchronoss.sip.alert.modal.NotificationChannelType;
 import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.modal.Subscriber;
-import com.synchronoss.sip.alert.modal.SubscriberDetails;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import sncr.bda.base.MaprConnection;
 
 @Component
 public class EmailNotifier implements Notifier {
@@ -85,16 +80,8 @@ public class EmailNotifier implements Notifier {
 
   private AlertRuleDetails alertRule;
 
-  public String getAlertTriggerSysId() {
-    return alertTriggerSysId;
-  }
-
   public void setAlertTriggerSysId(String alertTriggerSysId) {
     this.alertTriggerSysId = alertTriggerSysId;
-  }
-
-  public AlertRuleDetails getAlertRule() {
-    return alertRule;
   }
 
   public void setAlertRule(AlertRuleDetails alertRule) {
@@ -132,8 +119,6 @@ public class EmailNotifier implements Notifier {
     notificationLog.setThresholdValue(alertRulesDetails.getThresholdValue());
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
-
-    // TODO : Read from MariaDB the list of subs associated with this alert.
 
     Set<String> recipients = new HashSet<>();
     List<NotificationSubscriber> notificationSubscriberList = subscriberService
@@ -173,11 +158,11 @@ public class EmailNotifier implements Notifier {
                 + alertRulesDetails.getAlertRulesSysId());
       }
       notificationLog.setCreatedTime(new Date());
-      saveNotificationStatus(notificationLog);
+      saveNotificationStatus(notificationLog, basePath, notificationLogTable);
     } catch (RuntimeException exeception) {
       notificationLog.setNotifiedStatus(false);
       notificationLog.setMessage(exeception.toString());
-      saveNotificationStatus(notificationLog);
+      saveNotificationStatus(notificationLog, basePath, notificationLogTable);
       logger.error("Exception occured while sending Email Notification" + exeception);
     }
   }
@@ -194,18 +179,6 @@ public class EmailNotifier implements Notifier {
           }
         });
     return recipientsList;
-  }
-
-  void saveNotificationStatus(AlertNotificationLog notificationLog) {
-    logger.info("Saving the notification status");
-    try {
-      MaprConnection connection = new MaprConnection(basePath, notificationLogTable);
-      String id = UUID.randomUUID().toString();
-      notificationLog.setNotificationSysId(id);
-      connection.insert(id, notificationLog);
-    } catch (Exception e) {
-      logger.error("Exception occured while writing the notificaton status." + e);
-    }
   }
 
   /**
