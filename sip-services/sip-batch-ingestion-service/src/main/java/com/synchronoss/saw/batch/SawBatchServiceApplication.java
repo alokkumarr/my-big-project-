@@ -92,6 +92,11 @@ public class SawBatchServiceApplication {
     return tomcat;
   }
 
+  /**
+   * Application starter function.
+   *
+   * @param event Application Event
+   */
   @EventListener
   public void onApplicationEvent(ApplicationReadyEvent event) {
     LOG.info("Notifying service manager about start-up completion");
@@ -136,12 +141,12 @@ public class SawBatchServiceApplication {
     template.setBackOffPolicy(backOffPolicy);
     return template;
   }
-  
+
   /**
    * Thread pool executor with initial
    * configuration for worker threads
    * to transfer files.
-   * 
+   *
    * @return task executor
    */
   @Bean
@@ -154,7 +159,7 @@ public class SawBatchServiceApplication {
 
     return executor;
   }
-  
+
   /**
    * Threadpool exeuctor with initial
    * configuration for retry threads.
