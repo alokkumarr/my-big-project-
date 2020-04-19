@@ -59,9 +59,7 @@ mk_conf() {
 }
 
 get_encryption_key() {
-    value=$(<${vars_file})
-
-    line=$(sed -n '/^encryption.key/p' ${file})
+    line=$(sed -n '/^encryption.key/p' ${vars_file})
 
     enc_key=$(cut -d'=' -f2 <<<"$line")
     echo $enc_key
