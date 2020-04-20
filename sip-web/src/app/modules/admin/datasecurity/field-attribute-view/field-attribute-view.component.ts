@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import { DSKFilterGroup } from '../dsk-filter.model';
-import { DataSecurityService } from '../datasecurity.service';
+import { DSKFilterGroup } from './../../../../common/dsk-filter.model';
+import { DskFiltersService } from '../../../../common/services/dsk-filters.service';
 
 @Component({
   selector: 'field-attribute-view',
@@ -22,10 +22,10 @@ export class FieldAttributeViewComponent implements OnInit, OnChanges {
     this.emptyState = isEmpty(this.dskFilterGroup);
     this.previewString = this.emptyState
       ? ''
-      : this.datasecurityService.generatePreview(this.dskFilterGroup);
+      : this.DskFiltersService.generatePreview(this.dskFilterGroup, 'DSK');
   }
 
-  constructor(private datasecurityService: DataSecurityService) {}
+  constructor(private DskFiltersService: DskFiltersService) {}
 
   ngOnInit() {}
 

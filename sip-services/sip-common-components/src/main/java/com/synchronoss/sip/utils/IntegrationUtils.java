@@ -1,4 +1,4 @@
-package com.synchronoss.saw.batch.utils;
+package com.synchronoss.sip.utils;
 
 import com.google.common.base.Joiner;
 import java.io.BufferedInputStream;

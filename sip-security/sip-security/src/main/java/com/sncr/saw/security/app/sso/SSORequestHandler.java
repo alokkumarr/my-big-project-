@@ -62,7 +62,7 @@ public class SSORequestHandler {
     }
     if (validity && masterLoginId != null) {
       logger.trace("Successfully validated single sign-on request for user: " + masterLoginId);
-      return createSAWToken(masterLoginId, false);
+      return createSAWToken(masterLoginId, false, null);
     }
     logger.info("Authentication failed single sign-on request for user: " + masterLoginId);
     return null;
@@ -75,7 +75,7 @@ public class SSORequestHandler {
    Id3Claims id3Claims = validateId3IdentityToken.validateToken(token,Id3Claims.Type.ID);
     if (id3Claims.getMasterLoginId() != null) {
       logger.trace("Successfully validated single sign-on request for user: " + id3Claims.getMasterLoginId());
-      ssoResponse = createSAWToken(id3Claims.getMasterLoginId(), true);
+      ssoResponse = createSAWToken(id3Claims.getMasterLoginId(), true, null);
     }
     logger.trace("Authentication failed single sign-on request for user: " + id3Claims.getMasterLoginId());
     return ssoResponse;
@@ -87,7 +87,7 @@ public class SSORequestHandler {
    * @param masterLoginId
    * @return
    */
-  public SSOResponse createSAWToken(String masterLoginId, Boolean id3Enabled) {
+  public SSOResponse createSAWToken(String masterLoginId, Boolean id3Enabled, String ticketId) {
     logger.info("Ticket will be created for SSO request");
     logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
     Ticket ticket;
@@ -106,7 +106,7 @@ public class SSORequestHandler {
           (nSSOProperties.getValidityMins() != null
               ? Long.parseLong(nSSOProperties.getValidityMins())
               : 60));
-      ticket = tHelper.createTicket(user, false);
+      ticket = tHelper.createTicket(user, false, ticketId);
       newRToken = new RefreshToken();
       newRToken.setValid(true);
       newRToken.setMasterLoginId(masterLoginId);

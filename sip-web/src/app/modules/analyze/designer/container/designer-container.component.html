@@ -11,6 +11,8 @@
 >
 </designer-header>
 
+{{layoutConfiguration}}
+
 <div *ngIf="analysis" [ngSwitch]="layoutConfiguration" class="designer__main">
   <single-table-designer-layout
     *ngSwitchCase="'single'"
@@ -26,6 +28,7 @@
     [chartTitle]="chartTitle"
     [sipQuery]="analysis.sipQuery"
     [designerState]="designerState"
+    (requestAction)="onToolbarAction($event)"
   >
   </single-table-designer-layout>
 
@@ -40,6 +43,7 @@
     [sorts]="sorts"
     [filters]="dslFilters$ | async"
     [designerState]="designerState"
+    (requestAction)="onToolbarAction($event)"
   >
   </multi-table-designer-layout>
 </div>

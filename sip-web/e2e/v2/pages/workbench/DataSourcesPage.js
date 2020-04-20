@@ -159,12 +159,12 @@ class DataSourcesPage extends DeleteModel {
       this._channelAttributes('user-name'),
       channelInfo.sftpUser
     );
-    commonFunctions.clickOnElement(this._showPwd);
+    /*commonFunctions.clickOnElement(this._showPwd);
     commonFunctions.waitFor.elementToBeVisible(this._hidePwd);
     commonFunctions.validateText(
       this._channelAttributes('password-name'),
       channelInfo.sftpPwd
-    );
+    );*/
     commonFunctions.validateText(
       this._channelAttributes('description'),
       channelInfo.desc
