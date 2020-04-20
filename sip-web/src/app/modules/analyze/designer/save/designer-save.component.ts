@@ -10,6 +10,7 @@ import { PRIVILEGES } from '../../consts';
 import { AnalysisDSL } from '../../types';
 import { JwtService } from 'src/app/common/services';
 import * as get from 'lodash/get';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import {
   USER_ANALYSIS_CATEGORY_NAME,
@@ -28,6 +29,7 @@ export class DesignerSaveComponent implements OnInit {
   @Input() public designerMode: string;
 
   categories = [];
+  categoryIdForDrafts;
 
   userCategoryName = USER_ANALYSIS_CATEGORY_NAME;
   userSubCategoryName = USER_ANALYSIS_SUBCATEGORY_NAME;
@@ -43,6 +45,11 @@ export class DesignerSaveComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.categoryIdForDrafts = cloneDeep(this.analysis.category);
+    const categoryDetails = this.jwtService.fetchCategoryDetails(this.analysis.category)[0];
+    if (get(categoryDetails, 'systemCategory')) {
+      this.analysis.category = this.jwtService.userAnalysisCategoryId;
+    }
     this.saveForm = this.fb.group({
       name: [
         this.analysis.name,
@@ -60,13 +67,11 @@ export class DesignerSaveComponent implements OnInit {
     } as any);
 
     this.loadAllCategories();
-
-
   }
 
   async loadAllCategories() {
     try {
-      const categoryDetails = this.jwtService.fetchCategoryDetails(this.analysis.category)[0];
+      const categoryDetails = this.jwtService.fetchCategoryDetails(this.categoryIdForDrafts)[0];
       if (get(categoryDetails, 'systemCategory')) {
         this.analysis.category = this.jwtService.userAnalysisCategoryId;
         this.categories = await this.analyzeService.getCategories(
