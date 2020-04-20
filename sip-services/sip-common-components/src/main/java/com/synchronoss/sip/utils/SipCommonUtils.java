@@ -345,6 +345,37 @@ public class SipCommonUtils {
   }
 
   /**
+   * Encrypts a given string.
+   *
+   * @param password Password to be encrypted
+   * @return Encrypted password
+   * @throws Exception In case of any error
+   */
+  public static String encryptPassword(String password) throws Exception {
+    String encryptedPassword = null;
+
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    encryptedPassword = obfuscator.encrypt(password);
+    return encryptedPassword;
+  }
+
+  /**
+   * Decrypts a given encrypted string.
+   *
+   * @param encryptedPassword Password to be decrypted
+   * @return Decrypted password
+   * @throws Exception In case of any error
+   */
+  public static String decryptPassword(String encryptedPassword) throws Exception {
+    String decryptedPassword = null;
+
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    decryptedPassword = obfuscator.decrypt(encryptedPassword);
+
+    return decryptedPassword;
+  }
+
+  /**
    * normalize the path to eliminate the PathManipulation vulnarabilities.
    *
    * @param path to be normalized

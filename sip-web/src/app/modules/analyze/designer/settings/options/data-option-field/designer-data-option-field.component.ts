@@ -7,6 +7,9 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
+import * as isEmpty from 'lodash/isEmpty';
+import * as get from 'lodash/get';
+import * as isUndefined from 'lodash/isUndefined';
 import { Store } from '@ngxs/store';
 
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
@@ -49,6 +52,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   @Input() artifactColumn: ArtifactColumn;
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
+  @Input() limitByAxis;
   @Input('sipQuery') set setSipQuery(sipQuery: QueryDSL) {
     this.sipQuery = sipQuery;
     const fields = fpPipe(
@@ -56,8 +60,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       fpFilter(artifact => artifact.area === 'y')
     )(sipQuery.artifacts);
     this.fieldCount = fields.length;
+    this.isGroupByPresent = fpFilter(({ area }) => {
+      return area === 'g';
+    })(this.sipQuery.artifacts[0].fields).length > 0;
   }
   public typeIcon: string;
+  public isGroupByPresent: boolean;
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
@@ -65,6 +73,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public supportsDateFormat = false;
   public isDataField = false;
   public colorPickerConfig = {};
+  public state: boolean;
 
   constructor(private _store: Store) {
     this.onAliasChange = debounce(this.onAliasChange, ALIAS_CHANGE_DELAY);
@@ -72,7 +81,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-
     this.supportsDateInterval =
       DATE_TYPES.includes(type) &&
       (this.analysisType === 'pivot' || this.analysisSubtype === 'comparison');
@@ -82,6 +90,11 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       this.analysisSubtype !== 'comparison' && // no date formats supported in comparison chart
       (this.analysisType !== 'pivot' || // all charts
         this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
+
+    if (get(this.artifactColumn, 'area') === "y") {
+      this.state = isEmpty((<ArtifactColumnChart>this.artifactColumn).limitType) ||  isUndefined((<ArtifactColumnChart>this.artifactColumn).limitValue);
+    }
+
 
     this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
@@ -188,6 +201,20 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         subject: 'seriesColorChange',
         data: { artifact: this.artifactColumn }
       });
+    }
+  }
+
+  onLimitByAxisChange() {
+    this.change.emit({ subject: 'limitByAxis', data: { limitByAxis: this.limitByAxis } });
+  }
+
+  stateChange(event) {
+    this.state = event.data;
+    if (this.state) {
+      setTimeout(() => {
+        this.limitByAxis = 'dimension';
+        this.change.emit({ subject: 'limitByAxis', data: { limitByAxis: 'dimension' } });
+      }, 300);
     }
   }
 }

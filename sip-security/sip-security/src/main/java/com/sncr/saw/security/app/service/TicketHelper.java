@@ -6,7 +6,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 
 public interface TicketHelper {
 
-  Ticket createTicket(User user, Boolean isReCreate) throws Exception;
+  Ticket createTicket(User user, Boolean isReCreate, String ticketId) throws Exception;
 
   Ticket createDefaultTicket(User user, Boolean onlyDef) throws Exception;
 
@@ -20,7 +20,7 @@ public interface TicketHelper {
 
   Ticket reCreateTicketChangePwd(String ticketId, Long validMins);
 
-  Ticket prepareTicket(User user);
+  Ticket prepareTicket(User user, String ticketId);
 
   Ticket prepareTicket(Ticket ticket, Long validMins);
 

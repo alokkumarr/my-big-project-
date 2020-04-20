@@ -60,6 +60,7 @@ import {
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
   DesignerCheckAggregateFilterSupport,
+  DesignerUpdateAnalysisChartLimitByOptions,
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
@@ -91,6 +92,7 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   chartTitle: null,
   chartType: null,
   isInverted: false,
+  limitByAxis: '',
   legend: {
     align: '',
     layout: ''
@@ -1053,6 +1055,22 @@ export class DesignerState {
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
+    });
+  }
+
+  @Action(DesignerUpdateAnalysisChartLimitByOptions)
+  updateLimitByAxisOptions(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { limitByAxis } : DesignerUpdateAnalysisChartLimitByOptions
+  ) {
+    const analysis = getState().analysis;
+    const chartOptions =
+      (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
+    return patchState({
+      analysis: {
+        ...analysis,
+        chartOptions: { ...chartOptions, limitByAxis: limitByAxis }
+      }
     });
   }
 
