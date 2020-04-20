@@ -12,34 +12,28 @@ import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
-import com.synchronoss.sip.alert.modal.NotificationSubscriber;
 import com.synchronoss.sip.alert.modal.SubscriberStatus;
 import com.synchronoss.sip.alert.service.AlertService;
-import com.synchronoss.sip.alert.service.SubscriberService;
 import com.synchronoss.sip.alert.util.AlertUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.ws.rs.QueryParam;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,7 +61,6 @@ public class SipAlertController {
 
   @Autowired private AlertUtils utils;
   @Autowired private AlertService alertService;
-  @Autowired private SubscriberService subscriberService;
 
   private static final String ACCESS = "Access";
   private static final String VIEW_ALERT = "View Alerts";

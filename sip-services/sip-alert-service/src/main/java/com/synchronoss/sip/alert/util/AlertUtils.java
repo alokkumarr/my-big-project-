@@ -390,7 +390,7 @@ public class AlertUtils {
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       alertResult = objectMapper.treeToValue(jsonAlertRule, AlertResult.class);
     } catch (JsonProcessingException e) {
-      logger.error("Error occured while parsing the alert rule details :" + e);
+      logger.error("Error occured while parsing the alert rule details : {}", e);
     }
     return alertResult;
   }
