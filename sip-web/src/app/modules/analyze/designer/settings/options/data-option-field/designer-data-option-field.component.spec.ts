@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { MaterialModule } from 'src/app/material.module';
+import { FormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DesignerDataOptionFieldComponent } from './designer-data-option-field.component';
 import { IsAnalysisTypePipe } from 'src/app/common/pipes/is-analysis-type.pipe';
@@ -24,7 +25,7 @@ describe('Designer Data Options', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [MaterialModule, NoopAnimationsModule],
+      imports: [MaterialModule, NoopAnimationsModule, FormsModule],
       declarations: [DesignerDataOptionFieldComponent, IsAnalysisTypePipe],
       providers: [
         {
@@ -41,6 +42,7 @@ describe('Designer Data Options', () => {
     component = fixture.componentInstance;
     component.artifactColumn = {} as any;
     component.analysisSubtype = 'column';
+    component.limitByAxis = 'dimension';
     fixture.detectChanges();
   });
 

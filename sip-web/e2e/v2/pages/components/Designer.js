@@ -49,6 +49,8 @@ class Designer extends SaveDialog {
   clickOnFilterButton() {
     commonFunctions.waitFor.elementToBeClickable(this._saveButton);
     commonFunctions.clickOnElement(this._filterBtn);
+    commonFunctions.waitForProgressBarToComplete();
+    browser.sleep(2000);
   }
 
   clickOnSortButton() {

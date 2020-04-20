@@ -150,6 +150,7 @@ export interface DesignerChangeEvent {
     | 'addNewDerivedMetric'
     | 'updateDerivedMetric'
     | 'mapSettings'
+    | 'filters'
     | 'seriesColorChange'
     | 'limitByAxis';
   column?: ArtifactColumn;
