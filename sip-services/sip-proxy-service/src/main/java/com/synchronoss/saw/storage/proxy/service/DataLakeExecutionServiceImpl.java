@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +93,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
         sipQuery.getFilters().forEach(filter -> {
           String filterValue = getRunTimeFilters(filter);
-          if (filterValue != null) {
+          if (!StringUtils.isEmpty(filterValue)) {
             runTimeFilters.add(filterValue);
           }
         });
@@ -155,14 +156,14 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     try {
       HFileOperations.deleteEnt(path);
     } catch (Exception e) {
-      logger.error("cannot get the file in path" + path);
+      logger.error("cannot get the file in path:{}", path);
     }
     return true;
   }
 
   private void waitForResultRetry(String resultId, Integer retries) {
     if (retries == 0) {
-      throw new RuntimeException("Timed out waiting for result: " + resultId);
+      throw new RuntimeException("Timed out waiting for result: {}" + resultId);
     }
     logger.info("Waiting for result: {}", resultId);
     try {
@@ -236,7 +237,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       dataStream
           .limit(limit)
           .forEach(
-              (element) -> {
+              element -> {
                 try {
                   JsonNode jsonNode = mapper.readTree(element);
                   data.add((jsonNode));
@@ -251,7 +252,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           .skip(startIndex)
           .limit(pageSize)
           .forEach(
-              (element) -> {
+              element -> {
                 try {
                   JsonNode jsonNode = mapper.readTree(element);
                   data.add((jsonNode));
@@ -264,7 +265,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   }
 
   private Long getRecordCount(String outputLocation) throws Exception {
-    logger.info("Getting record count reading results for Dl reports: {}");
+    logger.info("Getting record count reading results for Dl reports:");
     ObjectMapper mapper = new ObjectMapper();
     InputStream inputStream = null;
     Long count = null;
@@ -330,11 +331,26 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
    */
   public String getRunTimeFilters(Filter filter) {
     String runTimeFilter = null;
-    if (filter != null && Boolean.valueOf(filter.getIsRuntimeFilter())) {
+    if (filter != null) {
       List<String> filList = new ArrayList<>();
-      filter.getModel().getModelValues().forEach(val -> {
-        filList.add(String.format("'%s'", val));
-      });
+      if (filter.getBooleanCriteria() != null && !CollectionUtils.isEmpty(filter.getFilters())) {
+        filter.getFilters().forEach(filter1 -> {
+          if (BooleanUtils.isTrue(filter1.getIsRuntimeFilter())) {
+            filter1.getModel().getModelValues().forEach(val -> {
+              filList.add(String.format("'%s'", val));
+            });
+          }
+        });
+      } else if (BooleanUtils.isTrue(filter.getIsRuntimeFilter()))  {
+        if (filter.getModel() == null && CollectionUtils
+            .isEmpty(filter.getModel().getModelValues())) {
+          throw new RuntimeException(
+              "Run time filter for queryMode : {ModelValues} can't be null or empty!! ");
+        }
+        filter.getModel().getModelValues().forEach(val ->
+          filList.add(String.format("'%s'", val))
+        );
+      }
       runTimeFilter = String.join(", ", filList);
     }
     return runTimeFilter;

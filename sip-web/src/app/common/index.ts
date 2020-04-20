@@ -90,6 +90,19 @@ import { CustomColorPickerComponent } from './components/custom-color-picker';
 import { UChartModule } from './components/charts';
 import { MapBoxModule } from './map-box/map-box.module';
 
+import { DskFilterGroupComponent } from './dsk-filter-group/dsk-filter-group.component';
+import { DskFilterDialogComponent } from './dsk-filter-dialog/dsk-filter-dialog.component';
+import { DskFilterGroupViewComponent } from './dsk-filter-group-view/dsk-filter-group-view.component';
+import { DskFiltersService } from './services/dsk-filters.service';
+import { FilterPromptLayout } from './components/filter-prompt-layout/filter-prompt-layout.component';
+
+import { DesignerFilterRowComponent } from './../modules/analyze/designer/filter/row';
+import { DesignerStringFilterComponent } from './../modules/analyze/designer/filter/string';
+import { DesignerDateFilterComponent } from './../modules/analyze/designer/filter/date';
+import { DesignerNumberFilterComponent } from './../modules/analyze/designer/filter/number';
+import { FilterChipsComponent } from './../modules/analyze/designer/filter/chips-u';
+import { AggregatedFiltersComponent } from './aggregated-filters/aggregated-filters.component';
+
 import {
   RemoteFolderSelectorComponent,
   CreatefolderDialogComponent
@@ -178,7 +191,17 @@ const COMPONENTS = [
   CreatefolderDialogComponent,
   SSOAuthComponent,
   EmailListComponent,
-  CustomColorPickerComponent
+  CustomColorPickerComponent,
+  DskFilterDialogComponent,
+  DskFilterGroupComponent,
+  DskFilterGroupViewComponent,
+  DesignerFilterRowComponent,
+  DesignerStringFilterComponent,
+  DesignerDateFilterComponent,
+  DesignerNumberFilterComponent,
+  FilterChipsComponent,
+  AggregatedFiltersComponent,
+  FilterPromptLayout
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
@@ -208,7 +231,8 @@ const SERVICES = [
   CustomIconService,
   DndPubsubService,
   CommonSemanticService,
-  CookiesService
+  CookiesService,
+  DskFiltersService
 ];
 
 const INTERCEPTORS = [
