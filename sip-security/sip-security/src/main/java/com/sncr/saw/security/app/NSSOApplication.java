@@ -23,11 +23,6 @@ import org.springframework.context.annotation.ComponentScan;
  */
 
 @SpringBootApplication
-//@ComponentScan(
-//    basePackages = {
-//        "com.sncr.saw.security",
-//        "com.synchronoss.bda.sip.config"
-//    })
 public class NSSOApplication extends SpringBootServletInitializer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NSSOApplication.class);

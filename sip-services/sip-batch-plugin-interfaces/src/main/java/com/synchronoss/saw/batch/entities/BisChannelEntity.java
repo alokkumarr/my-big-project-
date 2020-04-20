@@ -61,7 +61,7 @@ public class BisChannelEntity implements Serializable {
   }
 
   @Column(name = "PWD_MIGRATED")
-  private int pwdMigrated;
+  private Integer pwdMigrated;
 
   public int getPwdMigrated() {
     return pwdMigrated;
