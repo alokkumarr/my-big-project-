@@ -73,7 +73,9 @@
       <label fxFlex i18n>Limit:</label>
       <designer-data-limit-selector
         (change)="change.emit($event)"
+        (stateChange)="stateChange($event)"
         [artifactColumn]="artifactColumn"
+        [state]="state"
         fxFlex="75"
       >
       </designer-data-limit-selector>
@@ -84,6 +86,7 @@
         analysisType === 'chart' &&
         asChartColumn(artifactColumn).area === 'y' &&
         isGroupByPresent &&
+        !state &&
         fieldCount < 2
       "
       fxLayout="row"

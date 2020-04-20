@@ -80,6 +80,8 @@ public class SawBisChannelController {
   
   private static final Long STATUS_DEACTIVE = 0L;
 
+  private static final String FIELD_PASSWORD = "password";
+
 
   /**
    * This API provides an ability to add a source.
@@ -124,9 +126,9 @@ public class SawBisChannelController {
     String channelType = requestBody.getChannelType();
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
-      String secretPhrase = rootNode.get("password").asText();
+      String secretPhrase = rootNode.get(FIELD_PASSWORD).asText();
       String passwordPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
-      rootNode.put("password", passwordPhrase);
+      rootNode.put(FIELD_PASSWORD, passwordPhrase);
       requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     }
 
@@ -156,11 +158,19 @@ public class SawBisChannelController {
     return ResponseEntity.ok(requestBody);
   }
 
+  /**
+   * Removes password fields from channel metadata string.
+   *
+   * @param channelMetadata Channel metadata in stringified JSON format
+   * @param objectMapper Jackson object mapper
+   * @return Stringified channel metadata with password field removed
+   * @throws IOException In case of any errors
+   */
   private String removePasswordFromChannelMetadata(
       String channelMetadata, ObjectMapper objectMapper) throws IOException {
 
     ObjectNode returnChannelMetadataObj = (ObjectNode) objectMapper.readTree(channelMetadata);
-    returnChannelMetadataObj.remove("password");
+    returnChannelMetadataObj.remove(FIELD_PASSWORD);
 
     return returnChannelMetadataObj.toString();
   }
@@ -214,7 +224,7 @@ public class SawBisChannelController {
         String channelType = rootNode.get("channelType").textValue();
 
         if (channelType.equals(BisChannelType.SFTP.toString())) {
-          rootNode.remove("password");
+          rootNode.remove(FIELD_PASSWORD);
         }
         bisChannelDto = new BisChannelDto();
         BeanUtils.copyProperties(entity, bisChannelDto);
@@ -275,7 +285,7 @@ public class SawBisChannelController {
       String channelType = rootNode.get("channelType").textValue();
 
       if (channelType.equals(BisChannelType.SFTP.toString())) {
-        rootNode.remove("password");
+        rootNode.remove(FIELD_PASSWORD);
       }
       BeanUtils.copyProperties(channelEntityData, channelDto);
       channelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
@@ -338,7 +348,7 @@ public class SawBisChannelController {
       BisChannelEntity channel = optionalChannel.get();
 
       if (channelType.equals(BisChannelType.SFTP.toString())) {
-        JsonNode passwordNode = rootNode.get("password");
+        JsonNode passwordNode = rootNode.get(FIELD_PASSWORD);
 
         String secretPhrase = null;
 
@@ -349,12 +359,12 @@ public class SawBisChannelController {
           ObjectNode savedChannelMetadataObj =
               (ObjectNode) objectMapper.readTree(savedChannelMetadata);
 
-          String savedPassword = savedChannelMetadataObj.get("password").asText();
+          String savedPassword = savedChannelMetadataObj.get(FIELD_PASSWORD).asText();
 
-          rootNode.put("password", savedPassword);
+          rootNode.put(FIELD_PASSWORD, savedPassword);
         } else {
           secretPhrase = Ccode.cencode(passwordNode.asText(), encryptionKey.getBytes());
-          rootNode.put("password", secretPhrase);
+          rootNode.put(FIELD_PASSWORD, secretPhrase);
         }
 
         requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
@@ -503,9 +513,9 @@ public class SawBisChannelController {
     String channelType = requestBody.getChannelType();
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
-      String secretPhrase = channelMetadata.get("password").asText();
+      String secretPhrase = channelMetadata.get(FIELD_PASSWORD).asText();
       String passwordPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
-      channelMetadata.put("password", passwordPhrase);
+      channelMetadata.put(FIELD_PASSWORD, passwordPhrase);
     }
 
     return objectMapper.writeValueAsString(channelMetadata);

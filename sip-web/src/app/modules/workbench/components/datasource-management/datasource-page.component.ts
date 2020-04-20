@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as countBy from 'lodash/countBy';
+import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
@@ -164,9 +165,11 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   createSource(channelData) {
-    const channelMetadata = isUndefined(channelData)
+    let channelMetadata = isUndefined(channelData)
       ? []
       : JSON.parse(channelData.channelMetadata);
+
+    channelMetadata.channelId = isUndefined(channelData) ? '' : channelData.bisChannelSysId;
     const dateDialogRef = this.dialog.open(CreateSourceDialogComponent, {
       hasBackdrop: true,
       autoFocus: false,
@@ -182,6 +185,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
     dateDialogRef.afterClosed().subscribe(data => {
       if (!isUndefined(data)) {
+        if (isEmpty(data.sourceDetails.password) && data.sourceDetails.channelType === 'sftp') {
+          delete data.sourceDetails.password;
+        }
         const payload: ChannelObject = {
           createdBy: '',
           productCode: '',
