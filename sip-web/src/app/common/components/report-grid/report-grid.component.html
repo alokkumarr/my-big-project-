@@ -61,6 +61,7 @@
         class="column-menu"
         [matMenuTriggerFor]="menu"
         fontIcon="icon-expand"
+        [attr.e2e]="'expand-' + cell.column.caption"
       ></mat-icon>
       <mat-menu #menu="matMenu" class="menu-buttons">
         <button
@@ -68,6 +69,7 @@
           mat-menu-item
           [matMenuTriggerFor]="aggregations"
           (mouseenter)="fetchAggregation(cell.column.payload.type)"
+          e2e="Aggregation-Option"
         >
           <mat-icon fontIcon="icon-Sum"></mat-icon>
           Aggregation
@@ -75,6 +77,7 @@
         <button
           (click)="renameColumn(cell.column, cell.column.index)"
           class="report-options"
+          e2e="Rename-Option"
           mat-menu-item
         >
           <mat-icon fontIcon="icon-edit"></mat-icon> Rename
@@ -82,6 +85,7 @@
         <button
           (click)="removeColumn(cell.column)"
           class="report-options"
+          e2e="Remove-Option"
           mat-menu-item
         >
           <mat-icon fontIcon="icon-delete"></mat-icon> Remove
@@ -91,6 +95,7 @@
           *ngIf="checkFormatDataCondition(cell.column.type)"
           (click)="formatColumn(cell.column)"
           class="report-options"
+          e2e="FormatData-Option"
           mat-menu-item
         >
           <mat-icon fontIcon="icon-filter"></mat-icon> Format Data
@@ -103,6 +108,7 @@
           mat-menu-item
           *ngFor="let aggregateType of aggregates; index as i; trackBy: i"
           (click)="aggregateColumn(cell.column.payload, aggregateType.value)"
+          [attr.e2e]="aggregateType.label"
           [ngClass]="
             cell.column.payload.aggregate &&
             cell.column.payload.aggregate.toLowerCase() ===

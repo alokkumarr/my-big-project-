@@ -5,13 +5,15 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 import * as get from 'lodash/get';
+import * as forEach from 'lodash/forEach';
+import * as isArray from 'lodash/isArray';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
-import * as fpConcat from 'lodash/fp/concat';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
+import { AnalyzeService } from './analyze.service';
 import { AnalysisDSL } from '../types';
 
 @Injectable()
@@ -19,7 +21,8 @@ export class FilterService {
   constructor(
     public _dialog: AnalyzeDialogService,
     private router: Router,
-    private locationService: Location
+    private locationService: Location,
+    private _analyzeService: AnalyzeService
   ) {}
 
   getRuntimeFiltersFrom(filters = []) {
@@ -40,7 +43,8 @@ export class FilterService {
   }
 
   hasRuntimeAggregatedFilters(analysis: AnalysisDSL): boolean {
-    return analysis.sipQuery.filters.some(
+    const checkAggregates = this._analyzeService.flattenAndFetchFilters(analysis.sipQuery.filters, [])
+    return checkAggregates.some(
       f => f.isAggregationFilter && f.isRuntimeFilter
     );
   }
@@ -60,16 +64,10 @@ export class FilterService {
           if (!result) {
             return resolve();
           }
-          const runtimeFiltersWithValues = result.filters;
-          const allFiltersWithEmptyRuntimeFilters = analysis.sipQuery.filters;
-          const allFiltersWithValues = this.mergeValuedRuntimeFiltersIntoFilters(
-            runtimeFiltersWithValues,
-            allFiltersWithEmptyRuntimeFilters
-          );
           if (analysis.designerEdit && analysis.type === 'report') {
-            analysis.sipQuery.filters = result.filters;
+            analysis.sipQuery.filters = [result];
           } else {
-            analysis.sipQuery.filters = allFiltersWithValues;
+            analysis.sipQuery.filters = result;
           }
 
           resolve(analysis);
@@ -78,21 +76,33 @@ export class FilterService {
     });
   }
 
+
+  mergeFilters(filters, flattenedFilters, filterObj) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.mergeFilters(filter, flattenedFilters, filterObj);
+      }
+      if (filter.columnName &&
+        (filter.uuid === filterObj.uuid
+          && filter.columnName === filterObj.columnName)) {
+        filter.model = cloneDeep(filterObj.model);
+        if (filter.isRuntimeFilter && !filter.isGlobalFilter) {
+          delete filter.model;
+        }
+        filter.isGlobalFilter = false;
+      }
+    });
+    return flattenedFilters;
+  }
+
   mergeValuedRuntimeFiltersIntoFilters(
     runtimeFilters,
     allFiltersWithEmptyRuntimeFilters
   ) {
-    const nonRuntimeFilters = filter(
-      allFiltersWithEmptyRuntimeFilters,
-      f => !(f.isRuntimeFilter || f.isGlobalFilter)
-    );
-    return fpPipe(
-      fpFilter(
-        ({ isRuntimeFilter, isOptional, model }) =>
-          !(isRuntimeFilter && isOptional && !model)
-      ),
-      fpConcat(nonRuntimeFilters)
-    )(runtimeFilters);
+    forEach(runtimeFilters, filter => {
+      this.mergeFilters(allFiltersWithEmptyRuntimeFilters, [], filter);
+    });
+    return allFiltersWithEmptyRuntimeFilters;
   }
 
   private navigateTo(navigateTo, analysisCategory) {
@@ -108,6 +118,7 @@ export class FilterService {
 
   getCleanedRuntimeFilterValues(analysis) {
     const filters = get(analysis, 'sipQuery.filters');
+    const flattenedFilters = cloneDeep(this._analyzeService.flattenAndFetchFilters(filters, []));
     const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
     if (analysis.type === 'report' && reportType === 'query') {
       return filters;
@@ -117,7 +128,7 @@ export class FilterService {
     return fpPipe(
       fpFilter(f => f.isRuntimeFilter),
       fpMap(fpOmit('model'))
-    )(filters);
+    )(flattenedFilters);;
   }
 
   public getRuntimeFilterValuesIfAvailable(
@@ -131,6 +142,15 @@ export class FilterService {
     if (!cleanedRuntimeFilters.length) {
       return Promise.resolve(clone);
     }
-    return this.openRuntimeModal(clone, cleanedRuntimeFilters, navigateBack, designerPage);
+
+    const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
+    if (analysis.type === 'report' && reportType === 'query') {
+      if (cleanedRuntimeFilters[0].filters.length === 0) {
+        return Promise.resolve(clone);
+      }
+    }
+
+
+    return this.openRuntimeModal(clone, analysis.sipQuery.filters, navigateBack, designerPage);
   }
 }

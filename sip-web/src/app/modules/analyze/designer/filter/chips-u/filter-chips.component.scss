@@ -1,3 +1,4 @@
+@import 'src/themes/base/colors';
 :host {
   display: block;
 }
@@ -26,4 +27,43 @@
       margin-bottom: 5px;
     }
   }
+}
+
+::ng-deep code {
+  .bool-op {
+    color: $primary-blue-b2;
+  }
+
+  .operator {
+    color: $secondary-orange;
+  }
+
+  .prompt-filter {
+    color: #7f0055;
+  }
+}
+
+.filter-expression {
+  font-size: 15px;
+  width: 92%
+}
+
+.clear-all {
+  font-size: 13px;
+  margin-top: 4px;
+  color: $primary-blue-b2;
+}
+
+.clear-all:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.icon-filter {
+  color: $primary-blue-b2;
+}
+
+.highlight-expression:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }

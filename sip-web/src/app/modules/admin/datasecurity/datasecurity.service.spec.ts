@@ -10,15 +10,10 @@ import { DataSecurityService } from './datasecurity.service';
 import { JwtService } from '../../../common/services/jwt.service';
 import { Observable } from 'rxjs';
 import APP_CONFIG from '../../../../../appConfig';
-import {
-  DSKFilterGroup,
-  DSKFilterBooleanCriteria,
-  DSKFilterOperator
-} from './dsk-filter.model';
 
 const mockService = {};
 
-describe('User Assignment Service', () => {
+describe('Data Security Service', () => {
   let httpTestingController: HttpTestingController;
   let datasecurityService: DataSecurityService;
   beforeEach(done => {
@@ -74,27 +69,6 @@ describe('User Assignment Service', () => {
       });
       httpTestingController.verify();
     }));
-  });
-
-  describe('generatePreview', () => {
-    it('should generate preview string', () => {
-      const filterGroup: DSKFilterGroup = {
-        booleanCriteria: DSKFilterBooleanCriteria.AND,
-        booleanQuery: [
-          {
-            columnName: 'ABC',
-            model: {
-              operator: DSKFilterOperator.ISIN,
-              values: ['123']
-            }
-          }
-        ]
-      };
-      const previewString = datasecurityService.generatePreview(filterGroup);
-      expect(
-        previewString.match(filterGroup.booleanQuery[0]['columnName'])
-      ).toBeTruthy();
-    });
   });
 
   describe('getFiltersFor', () => {

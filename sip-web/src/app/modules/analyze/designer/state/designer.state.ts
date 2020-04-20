@@ -15,6 +15,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as fpFilter from 'lodash/fp/filter';
+import * as isUndefined from 'lodash/isUndefined';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -37,7 +38,6 @@ import {
   DesignerUpdateAnalysisSubType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria,
   DesignerUpdateAnalysisChartTitle,
   DesignerUpdateAnalysisChartInversion,
   DesignerUpdateAnalysisChartLegend,
@@ -68,7 +68,6 @@ import { AnalyzeService } from '../../services/analyze.service';
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
-  CUSTOM_DATE_PRESET_VALUE,
   DATE_FORMATS_OBJ,
   QUERY_RUNTIME_IDENTIFIER
 } from '../../consts';
@@ -931,36 +930,24 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    filters.forEach(filt => {
-      filt.artifactsName = filt.tableName || filt.artifactsName;
-      if (
-        filt.type === 'date' &&
-        !filt.isRuntimeFilter &&
-        !filt.isGlobalFilter &&
-        filt.model.preset === CUSTOM_DATE_PRESET_VALUE
-      ) {
-        filt.model = {
-          gte: filt.model.gte,
-          lte: filt.model.lte,
-          format: 'yyyy-MM-dd HH:mm:ss',
-          preset: CUSTOM_DATE_PRESET_VALUE
-        };
-      }
-    });
+    // filters.forEach(filt => {
+    //   filt.artifactsName = filt.tableName || filt.artifactsName;
+    //   if (
+    //     filt.type === 'date' &&
+    //     !filt.isRuntimeFilter &&
+    //     !filt.isGlobalFilter &&
+    //     filt.model.preset === CUSTOM_DATE_PRESET_VALUE
+    //   ) {
+    //     filt.model = {
+    //       gte: filt.model.gte,
+    //       lte: filt.model.lte,
+    //       format: 'yyyy-MM-dd HH:mm:ss',
+    //       preset: CUSTOM_DATE_PRESET_VALUE
+    //     };
+    //   }
+    // });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, filters } }
-    });
-  }
-
-  @Action(DesignerUpdatebooleanCriteria)
-  updatebooleanCriteria(
-    { patchState, getState }: StateContext<DesignerStateModel>,
-    { booleanCriteria }: DesignerUpdatebooleanCriteria
-  ) {
-    const analysis = getState().analysis;
-    const sipQuery = analysis.sipQuery;
-    return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria } }
     });
   }
 
@@ -1016,16 +1003,19 @@ export class DesignerState {
     analysis.sipQuery.joins.forEach(join => {
       const DSLCriteria = [];
       join.criteria.forEach(dslCRT => {
-        DSLCriteria.push({
-          tableName: dslCRT.joinCondition['left'].artifactsName,
-          columnName: dslCRT.joinCondition['left'].columnName,
-          side: 'left'
-        });
-        DSLCriteria.push({
-          tableName: dslCRT.joinCondition['right'].artifactsName,
-          columnName: dslCRT.joinCondition['right'].columnName,
-          side: 'right'
-        });
+        if (!isEmpty(dslCRT)) {
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['left'].artifactsName,
+            columnName: dslCRT.joinCondition['left'].columnName,
+            side: 'left'
+          });
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['right'].artifactsName,
+            columnName: dslCRT.joinCondition['right'].columnName,
+            side: 'right'
+          });
+        }
+
       });
       const dslJoin = {
         type: join.join,
@@ -1087,18 +1077,50 @@ export class DesignerState {
     // const regex = new RegExp(`/[^${QUERY_RUNTIME_IDENTIFIER}]/g`);
     // const runTimeFiltersInQueryCount = sqlQuery.replace(regex, "");
     //check if query has runtime filters
-    const runTimeFilters = [];
-    for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
-      runTimeFilters.push({
-        isRuntimeFilter: true,
-        displayName: isEmpty(filters[i]) ? '' : filters[i].displayName,
-        description: isEmpty(filters[i]) ? '' : filters[i].description,
-        model: {
-          modelValues: isEmpty(filters[i]) ? [] : filters[i].model.modelValues,
-          operator: 'EQ'
+    let runTimeFilters = [];
+    if (isEmpty(filters)) {
+      const newFilters = [];
+      for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
+        newFilters.push({
+          isRuntimeFilter: true,
+          displayName: '',
+          description: '',
+          model: {
+            modelValues: [],
+            operator: 'EQ'
+          }
+        });
+      }
+      runTimeFilters = [{
+        booleanCriteria: 'AND',
+        filters: newFilters
+      }];
+    } else {
+      for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
+        if (isUndefined(filters[0].filters[i])) {
+          runTimeFilters.push({
+            isRuntimeFilter: true,
+            displayName: '',
+            description: '',
+            model: {
+              modelValues: [],
+              operator: 'EQ'
+            }
+          });
+        } else {
+          runTimeFilters.push({
+            isRuntimeFilter: true,
+            displayName: filters[0].filters[i].displayName || '',
+            description: filters[0].filters[i].description || '',
+            model: {
+              modelValues: filters[0].filters[i].model.modelValues,
+              operator: 'EQ'
+            }
+          });
         }
-      });
+      }
     }
+
     return patchState({
       analysis: {
         ...analysis,

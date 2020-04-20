@@ -7,6 +7,7 @@ $icon-font-size: 12px;
   display: block;
   padding: 5px;
   width: 100%;
+  overflow-y: scroll;
 }
 
 ::ng-deep {
@@ -18,6 +19,11 @@ $icon-font-size: 12px;
     background: white;
     z-index: 1;
   }
+}
+
+.analyze-criteria-header {
+  width: 900px;
+  padding: 10px 0 10px 10px;
 }
 
 .boolean-criteria-header {
@@ -54,4 +60,41 @@ mat-icon {
   line-height: $icon-font-size !important;
   width: $icon-font-size;
   height: $icon-font-size;
+}
+
+.filter__remove-button__icon {
+  color: red;
+}
+
+.filter__data__space {
+  max-width: 80%;
+}
+
+.filter__action__space {
+  mat-checkbox:first-child {
+    margin-right: 10px;
+  }
+
+  mat-checkbox:nth-child(2) {
+    margin-right: 10px;
+  }
+}
+
+mat-select {
+  margin-right: 5px;
+}
+
+.mandatory-asterisk {
+  color: red;
+  position: absolute;
+  top: 3px;
+  left: -4px;
+}
+
+.input-fields {
+  width: 680px;
+
+  .mat-form-field {
+    margin-left: 10px;
+  }
 }

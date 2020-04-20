@@ -19,6 +19,7 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
   const numberFieldName = 'Integer';
   const numberFieldNameDataOption = 'SUM(Integer)';
   const stringFieldName = 'String';
+  const fieldName = 'field';
   beforeAll(() => {
     logger.info('Starting pivots/pivotFilters.test.js.....');
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -96,7 +97,7 @@ describe('Executing pivot filter tests cases from pivots/pivotFilters.test.js', 
         }
 
         chartDesignerPage.clickOnFilterButton();
-        chartDesignerPage.clickOnAddFilterButtonByTableName('sample');
+        chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
         chartDesignerPage.clickOnColumnInput();
         chartDesignerPage.clickOnColumnDropDown(filter.columnName);
 
