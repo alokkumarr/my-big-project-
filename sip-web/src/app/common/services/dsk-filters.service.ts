@@ -8,7 +8,6 @@ import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
-import * as fpFilter from 'lodash/fp/filter';
 import * as isEmpty from 'lodash/isEmpty';
 
 import { Observable, of } from 'rxjs';
@@ -90,17 +89,18 @@ export class DskFiltersService {
     );
   }
 
-  isDSKFilterValid(filter, isTopLevel = false, data, filterObject) {
-    let condition;
+  isDSKFilterValid(filter, isTopLevel = false, data) {
+
     switch (data.mode) {
       case 'DSK':
+        let condition;
         condition = filter.booleanQuery.length > 0;
         return (
           filter.booleanCriteria &&
           condition &&
           filter.booleanQuery.every(child => {
             if ((<DSKFilterGroup>child).booleanCriteria) {
-              return this.isDSKFilterValid(<DSKFilterGroup>child, false, data, filterObject);
+              return this.isDSKFilterValid(<DSKFilterGroup>child, false, data);
             }
 
             const field = <DSKFilterField>child;
@@ -114,38 +114,7 @@ export class DskFiltersService {
         );
 
       case 'ANALYZE':
-      const newFilters = filter.filters ? filter : filter[0];
-      condition = newFilters.filters.length > 0;
-      let checkFiltlers = (
-        newFilters.filters &&
-          condition &&
-          newFilters.filters.every(child => {
-
-            if ((child).filters) {
-              return this.isDSKFilterValid(child, false, data, filterObject);
-            }
-            const field = child;
-            return (
-              field.artifactsName
-            );
-          })
-        );
-
       const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
-      const isAggregatePresent = fpFilter(({ isAggregationFilter }) => {
-        return isAggregationFilter;
-      })(flattenedFilters).length > 0;
-
-      if (!checkFiltlers) {
-        if (isEmpty(filterObject.filters) && isAggregatePresent) {
-          checkFiltlers = true;
-        }
-      }
-      if (!checkFiltlers) {
-        return checkFiltlers;
-      }
-
-
         let areValid = true;
 
         forEach(
