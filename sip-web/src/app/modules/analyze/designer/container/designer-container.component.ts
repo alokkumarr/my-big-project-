@@ -104,6 +104,7 @@ import {
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts,
   DesignerCheckAggregateFilterSupport,
+  DesignerUpdateAnalysisChartLimitByOptions,
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
@@ -427,7 +428,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             : (<any>this.analysis).labelOptions || {},
           isInverted: isDSLAnalysis(<any>this.analysis)
             ? chartOptions.isInverted
-            : (<any>this.analysis).isInverted
+            : (<any>this.analysis).isInverted,
+          limitByAxis: chartOptions.limitByAxis || 'dimension'
         };
 
         this.auxSettings = {
@@ -826,9 +828,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysisForPreview = isDSLAnalysis(this.analysis)
           ? this._store.selectSnapshot(state => state.designerState.analysis)
           : this.analysis;
-        this._analyzeDialogService.openPreviewDialog(
-          <Analysis | AnalysisDSL>analysisForPreview
-        );
+        this._analyzeDialogService.openPreviewDialog(<
+          | Analysis
+          | AnalysisDSL>analysisForPreview);
         break;
       case 'description':
         this._analyzeDialogService
@@ -901,15 +903,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         })
       );
     } else if (['new', 'fork'].includes(this.designerMode)) {
-      (<Analysis>(
-        this.analysis
-      )).categoryId = this._jwtService.userAnalysisCategoryId;
+      (<Analysis>this
+        .analysis).categoryId = this._jwtService.userAnalysisCategoryId;
     }
 
     const analysisForSave = isDSLAnalysis(this.analysis)
       ? this._store.selectSnapshot(state => state.designerState.analysis)
       : this.analysis;
-
     return this._analyzeDialogService
       .openSaveDialog(
         <Analysis | AnalysisDSL>analysisForSave,
@@ -1090,21 +1090,28 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'submitQuery':
         this.changeToQueryModePermanently();
-        this._store.dispatch(new DesignerUpdateQueryFilters(this.queryRunTimeFilters));
-        const analysis = this._store.selectSnapshot(state => state.designerState.analysis);
-        this.filterService.getRuntimeFilterValuesIfAvailable(analysis, 'preview', true).then(
-          model => {
+        this._store.dispatch(
+          new DesignerUpdateQueryFilters(this.queryRunTimeFilters)
+        );
+        const analysis = this._store.selectSnapshot(
+          state => state.designerState.analysis
+        );
+        this.filterService
+          .getRuntimeFilterValuesIfAvailable(analysis, 'preview', true)
+          .then(model => {
             if (isUndefined(model)) {
               this.areMinRequirmentsMet = false;
             } else {
-              this._store.dispatch(new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters')));
+              this._store.dispatch(
+                new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters'))
+              );
               this.queryRunTimeFilters = get(model, 'sipQuery.filters');
-              this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+              this.designerState =
+                DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
               this.areMinRequirmentsMet = this.canRequestData();
               this.requestDataIfPossible();
             }
-          }
-        )
+          });
         break;
       case 'filter':
       case 'sort':
@@ -1308,6 +1315,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.resetAnalysis();
         });
         break;
+      case 'limitByAxis':
+        this._store.dispatch(
+          new DesignerUpdateAnalysisChartLimitByOptions(
+            event.data.limitByAxis
+          )
+        )
+        this.auxSettings = { ...this.auxSettings, ...event.data };
+        this.requestDataIfPossible();
+        break;
     }
   }
 
@@ -1440,9 +1456,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const answer = isRequestValid(sipQuery, this.analysis.type);
 
         if (!answer.willRequestBeValid) {
-          const {
-            warning: { title, msg }
-          } = answer as InvalidAnswer;
+          const { warning: { title, msg } } = answer as InvalidAnswer;
           this._analyzeDialogService.openWarningDialog(title, msg);
         }
         return every(requestCondition, Boolean) && answer.willRequestBeValid;

@@ -5,6 +5,7 @@ import * as debounce from 'lodash/debounce';
 import { Store } from '@ngxs/store';
 import { ArtifactColumnChart, DesignerChangeEvent } from '../../../types';
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
+import * as isEmpty from 'lodash/isEmpty';
 
 const MAX_LIMIT = 99;
 const LIMIT_DEBOUNCE_DELAY = 400;
@@ -15,7 +16,9 @@ const LIMIT_DEBOUNCE_DELAY = 400;
 })
 export class DesignerDataLimitSelectorComponent implements OnInit {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() stateChange: EventEmitter<any> = new EventEmitter();
   @Input() artifactColumn: ArtifactColumnChart;
+  @Input() state: boolean;
   public limitType;
   public limitValue;
   public isInTabletMode = false;
@@ -44,6 +47,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   onLimitDataChange(value, type) {
     this.limitValue = value;
     this.limitType = type;
+
     this.resetInvalidValueIfNeeded(this.limitValue);
     if (
       !this.limitType ||
@@ -51,6 +55,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     ) {
       return;
     }
+    this.state = isEmpty(this.limitType) ||  isEmpty(this.limitValue);
     this.emitChange(this.limitType, this.limitValue);
   }
 
@@ -58,6 +63,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     if (this.limitType === limitType) {
       this.limitType = null;
       this.limitValue = null;
+      this.state = isEmpty(this.limitType) ||  isEmpty(this.limitValue);
       this.emitChange(this.limitType, this.limitValue);
     }
   }
@@ -74,6 +80,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
       })
     );
     this.change.emit({ subject: 'fetchLimit' });
+    this.stateChange.emit({ data: this.state });
   }
 
   resetInvalidValueIfNeeded(value) {

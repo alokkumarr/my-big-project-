@@ -72,9 +72,6 @@ export interface AnalysisBaseDSL {
   modifiedTime?: string;
   module: string;
   name: string;
-  parentAnalysisId?: string; // todo
-  parentCategoryId?: string | number; // todo
-  parentLastModified?: number; // todo
   projectCode: string;
   query?: string;
   queryManual?: string;
@@ -96,6 +93,7 @@ export interface ChartOptions {
   labelOptions?: LabelOptions;
   xAxis?: Axis;
   yAxis?: Axis;
+  limitByAxis?;
 }
 export interface AnalysisChartDSL extends AnalysisBaseDSL {
   chartType: string;

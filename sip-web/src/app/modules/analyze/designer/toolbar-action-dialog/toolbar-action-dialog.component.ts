@@ -4,8 +4,8 @@ import * as cloneDeep from 'lodash/cloneDeep';
 
 import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
-import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
+import { AnalyzeService } from './../../services/analyze.service';
 import { validateEntityName } from './../../../../common/validators/field-name-rule.validator';
 
 @Component({
@@ -21,6 +21,7 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
     public _designerService: DesignerService,
+    public _analyzeService: AnalyzeService,
     public _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
@@ -69,6 +70,10 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     this.data.analysis.name = name;
   }
 
+  onCategoryChange(categoryId) {
+    this.data.analysis.category = categoryId;
+  }
+
   onOk() {
     const result: IToolbarActionResult = {};
     /* prettier-ignore */
@@ -87,16 +92,18 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     if (this.validateNameField(this.data.analysis.name).state) {
       return;
     }
+
+    const analysis = this._analyzeService.checkForGroups(this.data.analysis);
     this._designerService
       .saveAnalysis(this.data.analysis)
       .then((response: any) => {
-        this.data.analysis.id = response.id;
+        analysis.id = response.id;
 
         if (response.type === 'report') {
-          (this.data.analysis as AnalysisReport).query = response.query;
+          analysis.query = response.query;
         }
         const result: IToolbarActionResult = {
-          analysis: this.data.analysis,
+          analysis: analysis,
           action
         };
         this.dialogRef.close(result);

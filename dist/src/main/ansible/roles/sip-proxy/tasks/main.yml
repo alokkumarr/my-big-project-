@@ -11,8 +11,11 @@
 # NGINX service not existing.  When the workaround below has been
 # removed, this step can be moved back to the end of the file to be
 # grouped together with the other NGINX steps.
+# Ensure latest NGINX version installed per enviroment, Latest version will auto certified
+# with integration/E2E tests hence, no specific nginx version lock required (Added to address
+# security-vulnerability with older version of Nginx.) 
 - name: Install NGINX package
-  yum: name=nginx state=present
+  yum: name=nginx state=latest
 # Workaround: Stop NGINX to ensure port 80 is not bound when upgrading
 # SIP and installing HAProxy for the first time.  The new NGINX
 # configuration moves it to a different port.  Can be removed when all

@@ -2,7 +2,8 @@ import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 import {
   getArtifactColumnGeneralType,
-  getArtifactColumnTypeIcon
+  getArtifactColumnTypeIcon,
+  getFilterTypes
 } from './utils';
 
 import { ArtifactColumn } from '../types';
@@ -27,6 +28,29 @@ describe('Analyze utils', () => {
     expect(getArtifactColumnGeneralType(lngLatColumn, 'map', 'map')).toBe(
       'coordinate'
     );
+    expect(
+      getArtifactColumnGeneralType({ expression: 'abc' } as any, 'pivot')
+    ).toEqual('derived');
+
+    expect(
+      getArtifactColumnGeneralType(
+        { type: 'double', geoType: 'lngLat' } as any,
+        'map',
+        'chart'
+      )
+    ).toEqual('number');
+
+    expect(
+      getArtifactColumnGeneralType(
+        { type: 'double', geoType: 'testing' } as any,
+        'map',
+        'chart'
+      )
+    ).toEqual('geo');
+
+    expect(
+      getArtifactColumnGeneralType({ type: 'double' } as any, 'map', 'chart')
+    ).toEqual('number');
   });
 
   it('should return the icon of an artifactColumn', () => {
@@ -45,5 +69,19 @@ describe('Analyze utils', () => {
     expect(getArtifactColumnTypeIcon(lngLatColumn, 'map', 'map')).toBe(
       'icon-geo-chart'
     );
+  });
+
+  it('should return the filter type', () => {
+    const pivotIcons = getFilterTypes('pivot', '');
+    expect(pivotIcons.find(icon => icon.value === 'geo')).toBeUndefined();
+
+    const chart = getFilterTypes('chart', '');
+    expect(chart.find(icon => icon.value === 'geo')).toBeUndefined();
+
+    const mapChart = getFilterTypes('map', 'chart');
+    expect(mapChart.find(icon => icon.value === 'coordinate')).toBeUndefined();
+
+    const mapIcons = getFilterTypes('map', 'map');
+    expect(mapIcons.find(icon => icon.value === 'geo')).toBeUndefined();
   });
 });

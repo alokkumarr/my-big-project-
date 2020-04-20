@@ -211,6 +211,16 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>${slfj.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.prestosql</groupId>
+      <artifactId>presto-parser</artifactId>
+      <version>327</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>28.2-jre</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/log4j/log4j -->
     <dependency>
         <groupId>log4j</groupId>
@@ -276,8 +286,7 @@
       <artifactId>meta-api</artifactId>
       <version>${revision}</version>
     </dependency>
-<!-- BDA Internal dependencies END -->
-
+  <!-- BDA Internal dependencies END -->
 
   </dependencies>
   <!--/dependencyManagement-->
@@ -303,6 +312,36 @@
     <module>xdf-rtps</module>
   </modules>
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>com.google.guava:guava:jar:28.2-jre</include>
+                </includes>
+              </artifactSet>
+              <minimizeJar>false</minimizeJar>
+              <relocations>
+                <relocation>
+                  <pattern>com.google.common</pattern>
+                  <shadedPattern>repackaged.com.google.common</shadedPattern>
+                </relocation>
+              </relocations>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <defaultGoal>package</defaultGoal>
   </build>
 

@@ -1,4 +1,4 @@
-package com.synchronoss.saw.batch.utils;
+package com.synchronoss.sip.utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -9,7 +9,7 @@ public class SipObfuscation {
   private Cipher dcipher;
 
   /**
-   * Parameterized Contstrutor.
+   * Parameterized Constructor.
    * 
    * @param key SecretKey i.e. salt.
    * @throws Exception exception.
