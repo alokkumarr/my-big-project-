@@ -393,7 +393,7 @@ public class UserRepositoryImpl implements UserRepository {
 			}, new UserRepositoryImpl.PasswordResetExtractor());
 			
 			if (pwdDetails == null || !AdvancedHashingUtil.
-					verifyPassword(oldPass, pwdDetails.getPassword())) {
+					verifyPassword(oldPass.trim(), pwdDetails.getPassword())) {
 				message = "Value provided for old Password did not match.";
 				return message;
 			}
