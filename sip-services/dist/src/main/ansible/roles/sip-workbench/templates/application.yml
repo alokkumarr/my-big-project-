@@ -92,12 +92,14 @@ workbench:
         app-name: workbench-executor
         lib.path: "{{ saw_workbench_lib_path | default('/opt/bda/saw-workbench-service/lib/') }}"
         stream.base-path:  {{ sip_var_path | default('/var/sip') }}/services/workbench/executor
+        rtis-stream-base: {{ sip_var_path | default('/var/sip') }}/streams
+        rtis-base-url: ${connector}://localhost:9501
 metastore:
     base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"
 
     
 spark:
-  master: "{{ saw_spark_master_url | default('spark://localhost:7077') }}"
+  master: "local[2]"
   executor.memory: "{{ spark.executor.memory | default('2G') }}"
   cores.max: "{{ spark.cores.max | default('2') }}"
   executor.cores: "{{ spark.cores.max | default('2') }}"

@@ -417,7 +417,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> parseRdd = javaPairRDD
             // Filter out header based on line number from all values
-            .flatMapValues(new HeaderMapFilter(headerSize, lineSeparator))
+            .flatMapValues(new HeaderMapFilter(headerSize, lineSeparator, null))
             .values()
             // Add line numbers
             .zipWithIndex()

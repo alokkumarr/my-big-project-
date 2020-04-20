@@ -33,7 +33,7 @@ export class DesignerSaveComponent implements OnInit {
   ngOnInit() {
     this.saveForm = this.fb.group({
       name: [this.analysis.name, [Validators.required,
-        Validators.maxLength(30)],
+        Validators.maxLength(100)],
         this.validatePattern
       ]
     });
@@ -45,6 +45,9 @@ export class DesignerSaveComponent implements OnInit {
   }
 
   displayErrorMessage(state) {
+    if (state === 'nameLength') {
+      return `* Name cannot be empty or exceed ${100} characters.`
+    }
     return entityNameErrorMessage(state);
   }
 

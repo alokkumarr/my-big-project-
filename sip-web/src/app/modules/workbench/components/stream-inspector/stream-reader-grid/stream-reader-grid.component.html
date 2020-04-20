@@ -1,0 +1,28 @@
+<div>
+  <dx-data-grid
+    #dsGrid
+    fxFlex
+    [dataSource]="gridData"
+    [columns]="gridColumns"
+    [customizeColumns]="customizeColumn"
+    [rowAlternationEnabled]="true"
+    [showBorders]="false"
+    [showColumnLines]="false"
+    [hoverStateEnabled]="true"
+    [showRowLines]="false"
+    [height]="'100%'"
+    [width]="'100%'"
+  >
+    <dxo-remote-operations [paging]="false"> </dxo-remote-operations>
+    <dxo-paging [pageSize]="DEFAULT_PAGE_SIZE" [enabled]="true"></dxo-paging>
+    <dxo-pager
+      [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 25, 50]"
+      [showPageSizeSelector]="true"
+      [showNavigationButtons]="true"
+      [showInfo]="enaplePaging"
+      [visible]="enaplePaging"
+    ></dxo-pager>
+    <dxo-selection mode="none"></dxo-selection>
+    <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
+  </dx-data-grid>
+</div>

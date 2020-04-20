@@ -60,8 +60,7 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
           host,
           token,
           protractorConf.config.customerCode,
-          id,
-          Constants.CHART
+          id
         );
       });
 

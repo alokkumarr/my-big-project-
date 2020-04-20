@@ -101,3 +101,8 @@ $back-button-size: 32px;
 .mat-progress-bar {
   height: 2px !important;
 }
+
+::ng-deep .name-tooltip  {
+  word-break: break-all !important;
+  white-space: normal !important;
+}
