@@ -1,7 +1,5 @@
 package com.synchronoss.sip.alert.service.migrationservice;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.synchronoss.sip.alert.modal.ModuleName;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Service;
 public class AlertRuleDetailsConverter implements AlertConverter {
 
   private static final Logger logger = LoggerFactory.getLogger(AlertRuleDetailsConverter.class);
-  Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   @Autowired
   private SubscriberService subscriberService;
@@ -59,6 +56,7 @@ public class AlertRuleDetailsConverter implements AlertConverter {
     }
 
     Map<String, String> emails = getAllSubscribers(oldAlertsDefinition);
+    logger.trace("email reciepients : {}", emailIds);
 
     List<SubscriberDetails> subscriberDetailsList = new ArrayList<>();
     if (emailIds != null && emailIds.size() > 0) {
@@ -86,14 +84,16 @@ public class AlertRuleDetailsConverter implements AlertConverter {
               subscriberDetailsList.add(subscriberDetails);
             }
           });
-    }
 
-    ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
-        new ModuleSubscriberMappingPayload();
-    moduleSubscriberMappingPayload.setModuleId(alertRulesSysId);
-    moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
-    moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
-    subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
+      ModuleSubscriberMappingPayload moduleSubscriberMappingPayload =
+          new ModuleSubscriberMappingPayload();
+      moduleSubscriberMappingPayload.setModuleId(alertRulesSysId);
+      moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
+      logger.debug("setting subscriberDetailsList for alert : {} , {}", alertRulesSysId,
+          subscriberDetailsList);
+      moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
+      subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
+    }
 
     oldAlertsDefinition.remove(NOTIFICATION);
     return oldAlertsDefinition;
@@ -118,6 +118,8 @@ public class AlertRuleDetailsConverter implements AlertConverter {
         subscriber -> {
           emailSubscriber.put(subscriber.getChannelValue(), subscriber.getSubscriberId());
         });
+    logger.trace("getAllSubscribers for alert id : {} is {}",
+        oldAlertsDefinition.get("alertRulesSysId").getAsString(), emailSubscriber);
     return emailSubscriber;
   }
 }

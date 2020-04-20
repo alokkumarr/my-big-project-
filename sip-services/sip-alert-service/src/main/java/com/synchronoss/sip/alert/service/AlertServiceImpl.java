@@ -130,6 +130,9 @@ public class AlertServiceImpl implements AlertService {
     alert.setSubscribers(null);
     alert.setNotification(null);
     connection.insert(id, alert);
+    List<String> subscriberList = getSubscriberByModuleId(id);
+    // set subscriber list back in response for UI - subscriber Mgt.
+    alert.setSubscribers(subscriberList);
     return alert;
   }
 
@@ -158,6 +161,9 @@ public class AlertServiceImpl implements AlertService {
     alertRuleDetails.setSubscribers(null);
     alertRuleDetails.setNotification(null);
     connection.update(alertRuleId, alertRuleDetails);
+    List<String> subscriberList = getSubscriberByModuleId(alertRuleId);
+    // set subscriber list back in response for UI - subscriber Mgt.
+    alertRuleDetails.setSubscribers(subscriberList);
     return alertRuleDetails;
   }
 
@@ -888,5 +894,20 @@ public class AlertServiceImpl implements AlertService {
     moduleSubscriberMappingPayload.setModuleName(ModuleName.ALERT);
     moduleSubscriberMappingPayload.setSubscribers(subscriberDetailsList);
     subscriberService.addSubscribersToModule(moduleSubscriberMappingPayload);
+  }
+
+  /**
+   * @param alertId
+   * @return
+   */
+  public List<String> getSubscriberByModuleId(String alertId) {
+    ModuleSubscriberMappingPayload payload =
+        subscriberService
+            .fetchSubscribersForModule(alertId, ModuleName.ALERT);
+    List<String> subscriberList = new ArrayList<>();
+    payload.getSubscribers().forEach(subscriberDetails -> {
+      subscriberList.add(subscriberDetails.getSubscriberId());
+    });
+    return subscriberList;
   }
 }

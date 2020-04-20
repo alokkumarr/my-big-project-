@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import sncr.bda.base.MaprConnection;
 
 @Service
 public class MigrateAlerts {
@@ -40,6 +39,8 @@ public class MigrateAlerts {
   @Autowired
   private AlertConverter alertConverter;
 
+  private static String NOTIFICATION = "notification";
+
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   public MigrateAlerts() {
@@ -55,11 +56,13 @@ public class MigrateAlerts {
           alertRuleDetails -> {
             JsonObject alertJsonObject =
                 new JsonParser().parse(alertRuleDetails.toString()).getAsJsonObject();
-            logger.info("Before Converting AlertRule - Json : {}", gson.toJson(alertJsonObject));
-            alertJsonObject = alertConverter.convert(alertJsonObject);
-            String alertRulesSysId = alertJsonObject.get("alertRulesSysId").getAsString();
-            logger.info("Updated AlertRuleDef : {}", gson.toJson(alertJsonObject));
-            updateAlertRule(alertJsonObject, alertRulesSysId);
+            if (alertJsonObject != null && alertJsonObject.has(NOTIFICATION)) {
+              logger.info("Before Converting AlertRule - Json : {}", gson.toJson(alertJsonObject));
+              alertJsonObject = alertConverter.convert(alertJsonObject);
+              String alertRulesSysId = alertJsonObject.get("alertRulesSysId").getAsString();
+              logger.info("Updated AlertRuleDef : {}", gson.toJson(alertJsonObject));
+              updateAlertRule(alertJsonObject, alertRulesSysId);
+            }
           });
     } else {
       logger.info("No Alerts definitions to migrate !!");
@@ -96,10 +99,10 @@ public class MigrateAlerts {
    */
   public JsonObject updateAlertRule(JsonObject alertRuleDetails, String alertRuleId) {
     try {
-      MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+      AlertsMetadata alertsMetadata = new AlertsMetadata(alertRulesMetadata, basePath);
       logger.trace("alertRuleId : {}, alertRulesMetadata : {}, basePath : {}", alertRuleId,
           alertRulesMetadata, basePath);
-      connection.update(alertRuleId, alertRuleDetails);
+      alertsMetadata.update(alertRuleId, alertRuleDetails);
       logger.info("AlertDefinition id {} successfully updated : {}", alertRuleId,
           gson.toJson(alertRuleDetails));
     } catch (Exception e) {
