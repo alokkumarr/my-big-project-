@@ -9,6 +9,12 @@ import { AnalyzeService } from '../../services/analyze.service';
 import { PRIVILEGES } from '../../consts';
 import { AnalysisDSL } from '../../types';
 import { JwtService } from 'src/app/common/services';
+import * as get from 'lodash/get';
+
+import {
+  USER_ANALYSIS_CATEGORY_NAME,
+  USER_ANALYSIS_SUBCATEGORY_NAME
+} from '../../../../common/consts';
 
 @Component({
   selector: 'designer-save',
@@ -22,6 +28,9 @@ export class DesignerSaveComponent implements OnInit {
   @Input() public designerMode: string;
 
   categories = [];
+
+  userCategoryName = USER_ANALYSIS_CATEGORY_NAME;
+  userSubCategoryName = USER_ANALYSIS_SUBCATEGORY_NAME;
 
   userSubCategoryId = +this.jwtService.userAnalysisCategoryId;
 
@@ -51,13 +60,28 @@ export class DesignerSaveComponent implements OnInit {
     } as any);
 
     this.loadAllCategories();
+
+
   }
 
   async loadAllCategories() {
     try {
-      this.categories = await this.analyzeService.getCategories(
-        PRIVILEGES.PUBLISH
-      );
+      const categoryDetails = this.jwtService.fetchCategoryDetails(this.analysis.category)[0];
+      if (get(categoryDetails, 'systemCategory')) {
+        this.analysis.category = this.jwtService.userAnalysisCategoryId;
+        this.categories = await this.analyzeService.getCategories(
+          PRIVILEGES.PUBLISH
+        );
+
+        this.categories = this.categories.filter(
+          category => category.data.prodModFeatureName.trim().toLowerCase() === 'my analysis'
+        )
+      } else {
+        this.categories = await this.analyzeService.getCategories(
+          PRIVILEGES.PUBLISH
+        );
+      }
+
     } catch (error) {
       throw error;
     }
