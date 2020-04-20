@@ -50,6 +50,7 @@ import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -344,24 +345,33 @@ public class UserRepositoryImpl implements UserRepository {
 		});
 		logger.info("###Retrived users  count ::####"+ users.size());
 		String updateSql = "UPDATE USERS U  SET  U.ENCRYPTED_PASSWORD = ?, U.PWD_MIGRATED = 1" ;
-	    jdbcTemplate.batchUpdate(updateSql,users,10,
-	            new ParameterizedPreparedStatementSetter<UserDetails>() {
-	                 
-					@Override
-					public void setValues(PreparedStatement ps, UserDetails user) throws SQLException {
-						String existingPwd  =  user.getPassword();
-						String actualPwd = Ccode.cdecode(existingPwd);
-						String hashedPwd = null;
-						try {
-							hashedPwd = AdvancedHashingUtil.createHash(actualPwd);
-							ps.setString(1,hashedPwd);
-						} catch (CannotPerformOperationException e) {
-							logger.error("Exception while hashing pwd for user ::" 
-						    + user.getUserId());
+		
+		
+	    try {
+			jdbcTemplate.batchUpdate(updateSql,users,10,
+			        new ParameterizedPreparedStatementSetter<UserDetails>() {
+			             
+						@Override
+						public void setValues(PreparedStatement ps, UserDetails user) throws SQLException {
+							String existingPwd  =  user.getPassword();
+							String actualPwd = Ccode.cdecode(existingPwd);
+							String hashedPwd = null;
+							try {
+								hashedPwd = AdvancedHashingUtil.createHash(actualPwd);
+								ps.setString(1,hashedPwd);
+							} catch (CannotPerformOperationException e) {
+								logger.error("Exception while hashing pwd for user ::" 
+							    + user.getUserId());
+							}
+							
 						}
-						
-					}
-	            });
+			        });
+		} catch (DataAccessException e) {
+			logger.error("DataAccessException while migration of  pwd for user ::");
+		}
+	    catch (Exception e) {
+	    	logger.error("Exception while hashing pwd for user ::" );
+		}
 	         
 	}
 		
