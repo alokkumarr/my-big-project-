@@ -59,12 +59,13 @@
 
     <div *dxTemplate="let cell of 'actionsTemplate'">
       <div fxLayout="row">
-        <button mat-icon-button matTooltip="Edit" (click)="edit(cell.data)">
+        <button mat-icon-button matTooltip="Edit" class="subscribers-icon" (click)="edit(cell.data)">
           <mat-icon fontIcon="icon-edit"></mat-icon>
         </button>
 
         <button
           mat-icon-button
+          class="subscribers-icon"
           matTooltip="Delete"
           (click)="delete(cell.data.id)"
         >
