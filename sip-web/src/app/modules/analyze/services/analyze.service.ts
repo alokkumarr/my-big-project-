@@ -15,10 +15,12 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
+import * as isArray from 'lodash/isArray';
 import * as fpFilter from 'lodash/fp/filter';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { v4 as uuid } from 'uuid';
 import {
   Analysis,
   AnalysisDSL,
@@ -36,7 +38,6 @@ import AppConfig from '../../../../../appConfig';
 import { Observable, of } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
-import * as isArray from 'lodash/isArray';
 import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
@@ -484,6 +485,14 @@ export class AnalyzeService {
     const paginationParams = ['report', 'esReport'].includes(model.type)
       ? `&page=${page}&pageSize=${options.take}`
       : '';
+
+    /* BE not capable of executing query mode reports with new filter strucutre, hence this mior adjustment */
+    if (model.type === 'report' && model.designerEdit === true) {
+      const oldFilters = model.sipQuery.filters[0].filters;
+      model.sipQuery.filters = [];
+      model.sipQuery.filters = cloneDeep(oldFilters);
+    }
+
     const requestModel = this.checkForGroups(model);
     return this._http
       .post(
@@ -862,5 +871,65 @@ export class AnalyzeService {
       },
       {}
     );
+  }
+
+  flattenAndFetchFilters(filters, flattenedFilters) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.flattenAndFetchFilters(filter, flattenedFilters);
+      }
+      if (filter.columnName) {
+        flattenedFilters.push(filter);
+      }
+    });
+    return flattenedFilters;
+  }
+
+  flattenAndCheckFilters(filters, flattenedFilters) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.flattenAndCheckFilters(filter, flattenedFilters);
+      }
+
+      if (filter.artifactsName) {
+        flattenedFilters.push(filter);
+      }
+    });
+    return flattenedFilters;
+  }
+
+  flattenAndFetchFiltersChips(filters, flattenedFilters) {
+    forEach(filters, filter => {
+      if (filter.filters || isArray(filter)) {
+        this.flattenAndFetchFiltersChips(filter, flattenedFilters);
+      }
+      if (filter.columnName) {
+        filter.uuid = uuid();
+        flattenedFilters.push(filter);
+      }
+    });
+    return flattenedFilters;
+  }
+
+  deleteFilterFromTree(tree, uuid) {
+    function getNode(a, i) {
+      if (a.uuid === uuid) {
+        index = i;
+        return true;
+      }
+      if (Array.isArray(a.filters) && a.filters.some(getNode)) {
+        if (~index) {
+          a.filters.splice(index, 1);
+          index = -1;
+        }
+        return true;
+      }
+    }
+
+    var index = -1;
+    [tree].some(getNode);
+    return tree;
+
+
   }
 }

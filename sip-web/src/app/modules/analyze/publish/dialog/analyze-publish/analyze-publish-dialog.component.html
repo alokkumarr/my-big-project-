@@ -23,7 +23,7 @@
               [label]="category.name"
             >
               <mat-option
-                *ngFor="let subCategory of category.children"
+                *ngFor="let subCategory of fetchChildren(category.children)"
                 [value]="subCategory.id.toString()"
                 >{{ subCategory.name }}</mat-option
               >

@@ -1,0 +1,180 @@
+{
+  "type": "esReport",
+  "semanticId": "workbench::sample-elasticsearch",
+  "name": "Untitled Analysis",
+  "description": "",
+  "createdBy": "sawadmin@synchronoss.com",
+  "userId": 1,
+  "customerCode": "SYNCHRONOSS",
+  "projectCode": "workbench",
+  "module": "ANALYZE",
+  "sipQuery": {
+    "artifacts": [
+      {
+        "artifactsName": "sample",
+        "fields": [
+          {
+            "alias": "",
+            "columnName": "date",
+            "displayName": "Date",
+            "groupInterval": null,
+            "name": "date",
+            "type": "date",
+            "table": "sample",
+            "dateFormat": "yyyy-MM-dd",
+            "visibleIndex": 0
+          },
+          {
+            "alias": "",
+            "columnName": "double",
+            "displayName": "Double",
+            "groupInterval": null,
+            "name": "double",
+            "type": "double",
+            "table": "sample",
+            "format": {
+              "precision": 2
+            },
+            "visibleIndex": 1
+          },
+          {
+            "alias": "",
+            "columnName": "float",
+            "displayName": "Float",
+            "groupInterval": null,
+            "name": "float",
+            "type": "float",
+            "table": "sample",
+            "format": {
+              "precision": 2
+            },
+            "visibleIndex": 2
+          },
+          {
+            "alias": "",
+            "columnName": "integer",
+            "displayName": "Integer",
+            "groupInterval": null,
+            "name": "integer",
+            "type": "integer",
+            "table": "sample",
+            "format": {},
+            "visibleIndex": 3
+          },
+          {
+            "alias": "",
+            "columnName": "long",
+            "displayName": "Long",
+            "groupInterval": null,
+            "name": "long",
+            "type": "long",
+            "table": "sample",
+            "format": {},
+            "visibleIndex": 4
+          },
+          {
+            "alias": "",
+            "columnName": "COUNTY.keyword",
+            "displayName": "State",
+            "groupInterval": null,
+            "name": "COUNTY",
+            "type": "string",
+            "table": "sample",
+            "visibleIndex": 5
+          },
+          {
+            "alias": "",
+            "columnName": "string.keyword",
+            "displayName": "String",
+            "groupInterval": null,
+            "name": "string",
+            "type": "string",
+            "table": "sample",
+            "visibleIndex": 6
+          }
+        ]
+      }
+    ],
+    "booleanCriteria": "AND",
+    "filters": [
+      {
+        "booleanCriteria": "AND",
+        "filters": [
+          {
+            "columnName": "string.keyword",
+            "artifactsName": "sample",
+            "type": "string",
+            "isGlobalFilter": false,
+            "isRuntimeFilter": false,
+            "isOptional": false,
+            "model": {
+              "operator": "SW",
+              "values": "",
+              "modelValues": [
+                "str"
+              ]
+            }
+          },
+          {
+            "booleanCriteria": "OR",
+            "filters": [
+              {
+                "columnName": "string.keyword",
+                "artifactsName": "sample",
+                "type": "string",
+                "isGlobalFilter": false,
+                "isRuntimeFilter": false,
+                "isOptional": false,
+                "model": {
+                  "operator": "CONTAINS",
+                  "values": "",
+                  "modelValues": [
+                    "string 30"
+                  ]
+                }
+              },
+              {
+                "columnName": "string.keyword",
+                "artifactsName": "sample",
+                "type": "string",
+                "isGlobalFilter": false,
+                "isRuntimeFilter": false,
+                "isOptional": false,
+                "model": {
+                  "operator": "EQ",
+                  "values": "",
+                  "modelValues": [
+                    "String 3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "columnName": "integer",
+            "artifactsName": "sample",
+            "type": "integer",
+            "isGlobalFilter": false,
+            "isRuntimeFilter": false,
+            "isOptional": false,
+            "model": {
+              "operator": "EQ",
+              "values": "",
+              "otherValue": 400,
+              "value": 400
+            }
+          }
+        ]
+      }
+    ],
+    "joins": [],
+    "sorts": [],
+    "store": {
+      "dataStore": "sampleAlias/sample",
+      "storageType": "ES"
+    },
+    "semanticId": "workbench::sample-elasticsearch"
+  },
+  "metricName": "sample-elasticsearch",
+  "scheduled": null
+}

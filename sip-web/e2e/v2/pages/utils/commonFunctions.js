@@ -63,11 +63,7 @@ module.exports = {
         wait ? wait : fluentWait,
         'Element "' + element.locator() + '" is not clickable'
       );
-      browser
-        .actions()
-        .mouseMove(element)
-        .click()
-        .perform();
+      browser.actions().mouseMove(element).click().perform();
     },
     // Possible options: /analyze/ , /login/
     pageToBeReady: pageName => {
@@ -98,11 +94,7 @@ module.exports = {
   },
   dragAndDrop(dragElement, dropElement) {
     // You can also use the `dragAndDrop` convenience action.
-    browser
-      .actions()
-      .dragAndDrop(dragElement, dropElement)
-      .mouseUp()
-      .perform();
+    browser.actions().dragAndDrop(dragElement, dropElement).mouseUp().perform();
   },
   openBaseUrl() {
     browser.get(protractorConf.config.baseUrl);
@@ -125,10 +117,7 @@ module.exports = {
     return urlParts.split('/')[0];
   },
   slideHorizontally(element, x_axis) {
-    browser
-      .actions()
-      .dragAndDrop(element, { x: x_axis, y: 0 })
-      .perform();
+    browser.actions().dragAndDrop(element, { x: x_axis, y: 0 }).perform();
   },
   goToHome() {
     browser.get(browser.baseUrl);
@@ -179,21 +168,29 @@ module.exports = {
       fluentWait,
       'Element "' + element.locator() + '" is not clickable'
     );
-    browser
-      .actions()
-      .mouseMove(element)
-      .click()
-      .perform();
+    browser.actions().mouseMove(element).click().perform();
+  },
+
+  elementToBeClickableAndDoubleClickByMouseMove(element) {
+    this.waitFor.elementToBePresent(element);
+    this.waitFor.elementToBeVisible(element);
+    browser.wait(
+      EC.elementToBeClickable(element),
+      fluentWait,
+      'Element "' + element.locator() + '" is not clickable'
+    );
+    browser.actions().mouseMove(element).doubleClick().perform();
   },
   validateHasText(el) {
     el.getText().then(text => {
       expect(text.trim().toLowerCase()).not.toBeNull();
     });
   },
-  waitForProgressBarToComplete(progressBarElement = null) {
+  waitForProgressBarToComplete(progressBarElement = null, timeouts = null) {
     browser.waitForAngular();
     this.waitFor.elementToBeNotVisible(
-      progressBarElement ? progressBarElement : progressBar
+      progressBarElement ? progressBarElement : progressBar,
+      timeouts
     );
   }
 };

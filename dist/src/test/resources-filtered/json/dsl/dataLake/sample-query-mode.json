@@ -9,8 +9,7 @@
   "projectCode": "workbench",
   "module": "ANALYZE",
   "sipQuery": {
-    "artifacts": [
-    ],
+    "artifacts": [],
     "booleanCriteria": "AND",
     "filters": [
       {

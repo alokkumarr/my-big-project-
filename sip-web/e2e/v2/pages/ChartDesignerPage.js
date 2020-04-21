@@ -33,14 +33,14 @@ class ChartsDesignerPage extends Designer {
     this._appliedFilter = filter =>
       element(
         by.xpath(
-          `//*[@e2e="designer-applied-filters"]/descendant::*[contains(text(),"${filter}")]`
+          `//div[contains(text(),'Filters:')]/following::*[contains(text(),'${filter}')]`
         )
       );
     this._reportSelectedFilters = element.all(
-      by.xpath('//filter-chips-u/descendant::mat-chip')
+      by.xpath('//filter-chips-u/descendant::code')
     );
     this._selectedFiltersText = element(
-      by.xpath('//filter-chips-u/descendant::mat-chip')
+      by.xpath('//filter-chips-u/descendant::code')
     );
     this._reportFilterText = element(
       by.xpath('//span[@class="filter-counter"]')
@@ -146,13 +146,12 @@ class ChartsDesignerPage extends Designer {
 
   verifyAppliedFilters(filters) {
     filters.forEach(filter => {
-      commonFunctions.waitFor.elementToBeVisible(this._appliedFilter(filter));
+      commonFunctions.waitFor.elementToBeVisible(this._appliedFilter(filter.toString().toLowerCase()));
     });
   }
 
   validateReportSelectedFilters(filters) {
-    commonFunctions.waitFor.elementToBeVisible(this._reportFilterText);
-    commonFunctions.waitFor.elementToBeVisible(this._reportFilterClear);
+    //commonFunctions.waitFor.elementToBeVisible(this._reportFilterText);
     commonFunctions.waitFor.elementToBeVisible(this._selectedFiltersText);
     this._reportSelectedFilters
       .map(function(elm) {
@@ -170,7 +169,7 @@ class ChartsDesignerPage extends Designer {
    * filters: array of string
    */
   validateAppliedFilters(analysisType, filters) {
-    browser.sleep(1000);
+    browser.sleep(2000);
     if (analysisType === Constants.CHART || analysisType === Constants.PIVOT) {
       this.verifyAppliedFilters(filters);
     } else if (

@@ -27,7 +27,9 @@ class AnalyzePage extends CreateAnalysisModel {
     this._deleteButton = element(
       by.css(`[e2e="actions-menu-selector-delete"]`)
     );
-    this._scheduleButton = element(by.css(`[e2e="actions-menu-selector-schedule"]`));
+    this._scheduleButton = element(
+      by.css(`[e2e="actions-menu-selector-schedule"]`)
+    );
     this._actionMenuOptions = element(
       by.xpath('//div[contains(@class,"mat-menu-panel")]')
     );
@@ -76,23 +78,20 @@ class AnalyzePage extends CreateAnalysisModel {
         )
       );
     this._scheduledTimingsInListView = reportName =>
-      element(
-        by.xpath(`//a[text()='${reportName}']/following::td[2]`));
+      element(by.xpath(`//a[text()='${reportName}']/following::td[2]`));
     this._scheduledTimingsInCardView = reportName =>
       element(
-        by.xpath(`//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`));
-    this._analysisTypeDropdown = element(
-      by.css(`[role="listbox"]`)
-    );
-    this._verifyAnalysisTypeListView = analysisName => element(
-      by.xpath(
-        `//a[text()='${analysisName}']/following::td[3]`
-      )
-    );
-    this._verifyAnalysisTypeCardView = analysisName => element(
-      by.xpath(
-        `//a[text()='${analysisName}']/preceding::mat-chip`
-      )
+        by.xpath(
+          `//a[text()='${reportName}']/following::mat-card-subtitle/span[2]`
+        )
+      );
+    this._analysisTypeDropdown = element(by.css(`[role="listbox"]`));
+    this._verifyAnalysisTypeListView = analysisName =>
+      element(by.xpath(`//a[text()='${analysisName}']/following::td[3]`));
+    this._verifyAnalysisTypeCardView = analysisName =>
+      element(by.xpath(`//a[text()='${analysisName}']/preceding::mat-chip`));
+    this._createAnalysisModalTitle = element(
+      by.xpath(` //h2[contains(text(),'Create New Analysis')]`)
     );
   }
 
@@ -122,12 +121,21 @@ class AnalyzePage extends CreateAnalysisModel {
   clickOnAddAnalysisButton() {
     commonFunctions.clickOnElement(this._addAnalysisButton);
     browser.sleep(2000);
+    let self = this;
+    // model is not displayed then again click
+    element(
+      this._createAnalysisModalTitle.isPresent().then(function (isVisible) {
+        if (!isVisible) {
+          log.info('again clickig on the add anlysis button');
+          commonFunctions.clickOnElement(self._addAnalysisButton);
+        }
+      })
+    );
   }
-
   clickOnActionMenu() {
     const self = this;
     element(
-      this._actionMenuButton.isPresent().then(function(isVisible) {
+      this._actionMenuButton.isPresent().then(function (isVisible) {
         if (isVisible) {
           commonFunctions.clickOnElement(self._actionMenuButton);
         }
@@ -142,7 +150,7 @@ class AnalyzePage extends CreateAnalysisModel {
   closeOpenedActionMenuFromCardView() {
     const self = this;
     element(
-      this._actionMenuOptions.isPresent().then(function(isVisible) {
+      this._actionMenuOptions.isPresent().then(function (isVisible) {
         if (isVisible) {
           commonFunctions.clickOnElement(self._containerOverlay);
           commonFunctions.waitFor.elementToBeNotVisible(
@@ -169,17 +177,24 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   verifyToastMessagePresent(message) {
-    this._toastMessage(message).isDisplayed().then(()=>{
-      this._toastMessage(message).getText().then(value=>{
-        if(value){
-          expect(value.trim()).toEqual(message);
-          commonFunctions.clickOnElement(this._toastMessage(message));
-          browser.sleep(2000); // Need to wait else logout button will not be visible
+    this._toastMessage(message)
+      .isDisplayed()
+      .then(
+        () => {
+          this._toastMessage(message)
+            .getText()
+            .then(value => {
+              if (value) {
+                expect(value.trim()).toEqual(message);
+                commonFunctions.clickOnElement(this._toastMessage(message));
+                browser.sleep(2000); // Need to wait else logout button will not be visible
+              }
+            });
+        },
+        () => {
+          log.debug('Toast Message did not display');
         }
-      });
-    },()=>{
-      log.debug("Toast Message did not display");
-    });
+      );
   }
 
   verifyAnalysisDeleted(name) {
@@ -210,7 +225,7 @@ class AnalyzePage extends CreateAnalysisModel {
     commonFunctions.clickOnElement(this._analyzeExecuteButton);
   }
 
-    clickOnActionLinkByAnalysisName(name) {
+  clickOnActionLinkByAnalysisName(name) {
     commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
   }
 
@@ -219,36 +234,38 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   /*Method to verify report is scheduled*/
-  verifyScheduledTimingsInCardView(reportName,scheduledTime) {
-    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInCardView(reportName));
+  verifyScheduledTimingsInCardView(reportName, scheduledTime) {
+    commonFunctions.waitFor.elementToBeVisible(
+      this._scheduledTimingsInCardView(reportName)
+    );
     element(
-      this._scheduledTimingsInCardView(reportName).getText().then(value => {
-        if (value) {
-          expect(value.trim()).toEqual(scheduledTime);
-        } else {
-          expect(false).toBe(
-            true,
-            'Scheduled Timings did not match'
-          );
-        }
-      })
+      this._scheduledTimingsInCardView(reportName)
+        .getText()
+        .then(value => {
+          if (value) {
+            expect(value.trim()).toEqual(scheduledTime);
+          } else {
+            expect(false).toBe(true, 'Scheduled Timings did not match');
+          }
+        })
     );
   }
 
   /*Method to verify report is scheduled*/
-  verifyScheduledTimingsInListView(reportName,scheduledTime) {
-    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInListView(reportName));
+  verifyScheduledTimingsInListView(reportName, scheduledTime) {
+    commonFunctions.waitFor.elementToBeVisible(
+      this._scheduledTimingsInListView(reportName)
+    );
     element(
-      this._scheduledTimingsInListView(reportName).getText().then(value => {
-        if (value) {
-          expect(value.trim()).toEqual(scheduledTime);
-        } else {
-          expect(false).toBe(
-            true,
-            'Scheduled Timings did not match'
-          );
-        }
-      })
+      this._scheduledTimingsInListView(reportName)
+        .getText()
+        .then(value => {
+          if (value) {
+            expect(value.trim()).toEqual(scheduledTime);
+          } else {
+            expect(false).toBe(true, 'Scheduled Timings did not match');
+          }
+        })
     );
   }
 
@@ -261,10 +278,10 @@ class AnalyzePage extends CreateAnalysisModel {
     this.clickOnCreateButton();
   }
 
-  goToViewAndSelectAnalysis(viewName,analysisName) {
-    if(viewName === "details") {
+  goToViewAndSelectAnalysis(viewName, analysisName) {
+    if (viewName === 'details') {
       this.clickOnAnalysisLink(analysisName);
-    }else {
+    } else {
       this.goToView(viewName);
       this.clickOnActionLinkByAnalysisName(analysisName);
     }
@@ -277,26 +294,31 @@ class AnalyzePage extends CreateAnalysisModel {
     commonFunctions.clickOnElement(this._analysisTypeDsiplay(analysisType));
   }
 
-  goToViewAndVerifyAnalysis(analysisName,reportType) {
+  goToViewAndVerifyAnalysis(analysisName, reportType) {
     this.goToView('card');
-    expect(this._verifyAnalysisTypeCardView(analysisName).getText()).toEqual(reportType.toUpperCase());
+    expect(this._verifyAnalysisTypeCardView(analysisName).getText()).toEqual(
+      reportType.toUpperCase()
+    );
     this.goToView('list');
-    expect(this._verifyAnalysisTypeListView(analysisName).getText()).toEqual(reportType.toUpperCase());
+    expect(this._verifyAnalysisTypeListView(analysisName).getText()).toEqual(
+      reportType.toUpperCase()
+    );
   }
 
-  chooseAnalysisTypeAndVerify(analysisType,chartName,pivotName,reportName){
+  chooseAnalysisTypeAndVerify(analysisType, chartName, pivotName, reportName) {
     this.clickOnAnalysisTypeDropDown();
     this.selectAnalysisType(analysisType);
     switch (analysisType) {
-      case "Chart": this.goToViewAndVerifyAnalysis(chartName,analysisType.toUpperCase());
+      case 'Chart':
+        this.goToViewAndVerifyAnalysis(chartName, analysisType.toUpperCase());
         break;
-      case "Pivot": this.goToViewAndVerifyAnalysis(pivotName,analysisType.toUpperCase());
+      case 'Pivot':
+        this.goToViewAndVerifyAnalysis(pivotName, analysisType.toUpperCase());
         break;
-      case "Report": this.goToViewAndVerifyAnalysis(reportName,analysisType.toUpperCase());
+      case 'Report':
+        this.goToViewAndVerifyAnalysis(reportName, analysisType.toUpperCase());
         break;
     }
   }
-
-
 }
 module.exports = AnalyzePage;

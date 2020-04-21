@@ -921,10 +921,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       elasticSearchQueryBuilder.setPriorPercentages(
           sipQuery.getArtifacts().get(0).getFields(), percentageData);
     }
-    String query;
-    query = elasticSearchQueryBuilder
-        .buildDataQuery(sipQuery, size, dskAttribute);
-    logger.trace("ES -Query {} " + query);
+    String query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dskAttribute);
+    logger.trace("ES -Query {} ", query);
     JsonNode response = storageConnectorService.executeESQuery(query, sipQuery.getStore());
     // re-arrange data field based upon sort before flatten
     boolean haveAggregate = dataFields.stream().anyMatch(field -> field.getAggregate() != null
