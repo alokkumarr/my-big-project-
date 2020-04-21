@@ -15,13 +15,13 @@
   systemd: name=garb state=stopped
   when:
     - mariadb_upgrade is defined
-    - mariadb_upgrade | length > 0
+    - mariadb_upgrade.stdout | length > 0
   ignore_errors: yes
 - name: Uninstall and Remove MariaDB galera Service
   yum: name=galera state=absent
   when:
     - mariadb_upgrade is defined
-    - mariadb_upgrade | length > 0
+    - mariadb_upgrade.stdout | length > 0
   ignore_errors: yes
 - name: Install MariaDB package
   yum: name=MariaDB-server state=present
