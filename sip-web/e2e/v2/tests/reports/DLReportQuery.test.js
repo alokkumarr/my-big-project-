@@ -77,6 +77,7 @@ describe('Executing DLReportQuery tests from DLReportQuery.test.js', () => {
           reportDesignerPage.enterAnalysisName(reportName);
           reportDesignerPage.enterAnalysisDescription(reportDescription);
           reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+          commonFunctions.waitForProgressBarToComplete();
 
           // Verify analysis displayed in list and card view
           analyzePage.goToView('list');

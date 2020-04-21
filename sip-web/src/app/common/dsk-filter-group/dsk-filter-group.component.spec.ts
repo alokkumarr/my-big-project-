@@ -3,14 +3,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DskFilterGroupComponent } from './dsk-filter-group.component';
 import { MaterialModule } from 'src/app/material.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { DataSecurityService } from '../datasecurity.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { DskFiltersService } from './../services/dsk-filters.service';
 import { of } from 'rxjs';
 import { JwtService } from 'src/app/common/services';
 import { NgxPopperModule } from 'ngx-popper';
 import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-const DataSecurityServiceStub: Partial<DataSecurityService> = {
+const DataSecurityServiceStub: Partial<DskFiltersService> = {
   getEligibleDSKFieldsFor: (customerId, productId) => {
     return of([]);
   }
@@ -21,6 +22,8 @@ const JwtServiceStub: Partial<JwtService> = {
   productId: ''
 };
 
+const filterStub = { booleanCriteria: 'AND', booleanQuery: [] };
+
 describe('DskFilterGroupComponent', () => {
   let component: DskFilterGroupComponent;
   let fixture: ComponentFixture<DskFilterGroupComponent>;
@@ -30,7 +33,7 @@ describe('DskFilterGroupComponent', () => {
       declarations: [DskFilterGroupComponent],
       providers: [
         {
-          provide: DataSecurityService,
+          provide: DskFiltersService,
           useValue: DataSecurityServiceStub
         },
         { provide: JwtService, useValue: JwtServiceStub }
@@ -39,7 +42,8 @@ describe('DskFilterGroupComponent', () => {
         MaterialModule,
         NoopAnimationsModule,
         NgxPopperModule,
-        FormsModule
+        FormsModule,
+        RouterTestingModule
       ],
       schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
@@ -48,10 +52,7 @@ describe('DskFilterGroupComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DskFilterGroupComponent);
     component = fixture.componentInstance;
+    component.filters = filterStub as any;
     fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 });

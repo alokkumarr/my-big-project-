@@ -24,6 +24,7 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
+  const fieldName = 'field';
 
   let host;
   let token;
@@ -82,13 +83,6 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           }
           let currentTime = new Date().getTime();
           const chartType = data.chartType.split(':')[1];
-          const filters = [
-            {
-              field: data.fieldName,
-              displayedValue: data.displayedValue // This week
-            }
-          ];
-
           let name = `e2e ${currentTime}`;
           let description =
             'Description:' +
@@ -118,22 +112,16 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
-
           executePage.clickOnEditLink();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
-          if (analysisType === Constants.REPORT) {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('SALES');
-          } else {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('sample');
-          }
-
+          chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
           chartDesignerPage.clickOnColumnInput();
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
           chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
+            data.fieldName.toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveDialogButton();
@@ -199,7 +187,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          // commented below code because of SIP-7804
+          //commented below code because of SIP-7804
           //executePage.verifyAppliedFilter(filters);
         } catch (e) {
           console.error(e);

@@ -411,4 +411,10 @@ export class JwtService {
       })
     )(product.productModules);
   }
+
+  fetchChildren(children) {
+    return children.filter(
+      child => !child.data.systemCategory
+    );
+  }
 }

@@ -10,6 +10,7 @@ import {
 } from '../../types';
 import { QueryDSL } from 'src/app/models';
 import { DesignerStates } from '../../consts';
+import { DesignerToolbarAciton } from '../../types';
 
 @Component({
   selector: 'multi-table-designer-layout',
@@ -18,6 +19,7 @@ import { DesignerStates } from '../../consts';
 })
 export class MultiTableDesignerLayoutComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() sorts: Sort[];
   @Input() filters: Filter[];

@@ -1,0 +1,77 @@
+{
+  "type": "report",
+  "semanticId": "workbench::sample-spark",
+  "name": "Untitled Analysis",
+  "description": "",
+  "createdBy": "sawadmin@synchronoss.com",
+  "userId": 1,
+  "customerCode": "SYNCHRONOSS",
+  "projectCode": "workbench",
+  "module": "ANALYZE",
+  "sipQuery": {
+    "artifacts": [
+      {
+        "artifactsName":"SALES",
+        "fields":[
+          {
+            "columnName":"string.keyword",
+            "type":"STRING"
+          },
+          {
+            "columnName":"integer",
+            "type":"INTEGER"
+          },
+          {
+            "columnName":"double",
+            "type":"DOUBLE"
+          }
+        ]
+      }
+    ],
+    "booleanCriteria": "AND",
+    "filters": [
+      {
+        "booleanCriteria":"AND",
+        "filters":[
+          {
+            "type":"DOUBLE",
+            "artifactsName":"SALES",
+            "columnName":"double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter":false,
+            "model":{
+              "operator":"LTE",
+              "value":99995.246
+            }
+          },
+          {
+            "type":"STRING",
+            "artifactsName":"SALES",
+            "columnName":"string",
+            "isGlobalFilter":false,
+            "model":{
+              "operator":"ISIN",
+              "modelValues":[
+                "string 244",
+                "string 245"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "joins": [
+    ],
+    "sorts": [
+    ],
+    "store": {
+      "dataStore": null,
+      "storageType": null
+    },
+    "semanticId": "workbench::sample-spark"
+  },
+  "categoryId": "4",
+  "metricName": "sample-spark",
+  "scheduled": null,
+  "designerEdit": false
+}
