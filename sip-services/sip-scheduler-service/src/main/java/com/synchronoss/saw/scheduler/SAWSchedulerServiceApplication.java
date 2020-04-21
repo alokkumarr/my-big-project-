@@ -19,8 +19,6 @@ import info.faljse.SDNotify.SDNotify;
     basePackages = {
       "com.synchronoss.saw.scheduler",
       "com.synchronoss.sip.utils"
-//        ,
-//      "com.synchronoss.bda.sip.config"
     })
 public class SAWSchedulerServiceApplication extends SpringBootServletInitializer {
 
