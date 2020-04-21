@@ -45,6 +45,10 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
       });
   }
 
+  fetchChildren(children) {
+    return this._jwt.fetchChildren(children);
+  }
+
   get publishableSubCategories(): any[] {
     if (!this.categories) {
       return [];
