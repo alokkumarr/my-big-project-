@@ -62,7 +62,6 @@ import com.synchronoss.saw.gateway.utils.HeadersRequestTransformer;
 import com.synchronoss.saw.gateway.utils.URLRequestTransformer;
 import com.synchronoss.saw.gateway.utils.UserCustomerMetaData;
 import com.synchronoss.sip.utils.RestUtil;
-import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author spau0004
@@ -193,9 +192,7 @@ public class GatewayController {
             }
             String uploadResponse = "";
             if (uploadResponseEntity != null) {
-              if (uploadResponseEntity.getBody() != null) {
-                uploadResponse = HtmlUtils.htmlEscape(uploadResponseEntity.getBody());
-              }
+              uploadResponse = uploadResponseEntity.getBody();
               logger.trace("uploadResponseEntity response structure {}", uploadResponse + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
             }
             responseEntity = new ResponseEntity<>(uploadResponse, makeResponseHeadersUpload(), HttpStatus.OK);
