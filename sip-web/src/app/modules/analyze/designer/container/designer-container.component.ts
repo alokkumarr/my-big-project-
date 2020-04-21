@@ -1293,7 +1293,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'comboType':
         this.updateAnalysis();
-        this.refreshDataObject();
+        this.requestDataIfPossible();
         break;
       case 'labelOptions':
         isDSLAnalysis(this.analysis)

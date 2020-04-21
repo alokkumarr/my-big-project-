@@ -40,6 +40,7 @@ export class DesignerComboTypeSelectorComponent {
 
   onComboTypeChange(comboType) {
     this.enablePercentByRow = comboType === 'column' ? true : false;
+    (<any>this.artifactColumn).displayType = comboType;
     const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
