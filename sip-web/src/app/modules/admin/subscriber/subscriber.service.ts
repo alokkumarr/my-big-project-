@@ -15,8 +15,8 @@ const apiUrl = AppConfig.api.url;
 export class SubscriberService {
   constructor(private http: HttpClient) {}
 
-  getSubscriber(id: string): Observable<SIPSubscriber> {
-    return this.http.get<SIPSubscriber>(apiUrl + `/subscribers/${id}`);
+  getSubscriber(id: string): Observable<any> {
+    return this.http.get(apiUrl + `/alerts/${id}`);
   }
 
   getAllSubscribers(): Observable<SIPSubscriber[]> {

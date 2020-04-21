@@ -39,6 +39,7 @@ import { map, tap } from 'rxjs/operators';
 import { SubscriberService } from 'src/app/modules/admin/subscriber/subscriber.service';
 import { SIPSubscriber } from 'src/app/modules/admin/subscriber/models/subscriber.model';
 import { AddSubscriberComponent } from 'src/app/modules/admin/subscriber/add-subscriber/add-subscriber.component';
+import { isUndefined } from 'util';
 const LAST_STEP_INDEX = 3;
 
 const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
@@ -156,7 +157,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   async transformAlertToFormObject(alert) {
-    const {
+    let {
       subscribers: subscriberIds,
       lookbackPeriod,
       aggregationType
@@ -165,8 +166,16 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const lookbackPeriodValue = parseInt(stringValue, 10);
 
     const subscriberObjs = await this.subscriberService
-      .getAllSubscribers()
+    .getAllSubscribers()
+    .toPromise();
+
+    if (isUndefined(subscriberIds)) {
+      const alertDetails = await this.subscriberService
+      .getSubscriber(alert.alertRulesSysId)
       .toPromise();
+
+      subscriberIds = alertDetails.alert.subscribers
+    }
 
     const subscribers = subscriberIds.reduce((emailList, id) => {
       const subscriber = subscriberObjs.find(s => s.id === id);
