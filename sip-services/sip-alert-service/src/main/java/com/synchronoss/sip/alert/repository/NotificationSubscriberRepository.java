@@ -23,4 +23,7 @@ public interface NotificationSubscriberRepository
       List<String> channelValues,
       String customerCode,
       Boolean active);
+
+  NotificationSubscriber findBySubscriberIdAndCustomerCode(String subscriberIds,
+      String customerCode);
 }

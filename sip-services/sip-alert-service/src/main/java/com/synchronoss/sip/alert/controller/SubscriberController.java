@@ -2,6 +2,7 @@ package com.synchronoss.sip.alert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.alert.modal.ModuleName;
 import com.synchronoss.sip.alert.modal.ModuleSubscriberMappingPayload;
@@ -11,6 +12,7 @@ import com.synchronoss.sip.alert.service.SubscriberService;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -175,9 +178,16 @@ public class SubscriberController {
   public NotificationSubscriber getSubscriber(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable("subscriberid") String subscriberId) {
-    NotificationSubscriber subscriber = subscriberService.getSubscriber(subscriberId);
-
+      @PathVariable("subscriberid") String subscriberId) throws IOException {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    if (ticket == null) {
+      response.setStatus(org.springframework.http.HttpStatus.UNAUTHORIZED.value());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return null;
+    }
+    NotificationSubscriber subscriber = subscriberService
+        .getSubscriberByIdAndCustCode(subscriberId, ticket.getCustCode());
     return subscriber;
   }
 
@@ -213,11 +223,20 @@ public class SubscriberController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable("subscriberid") String subscriberId,
-      @RequestBody NotificationSubscriber subscriber) {
+      @RequestBody NotificationSubscriber subscriber) throws IOException {
     Ticket ticket = SipCommonUtils.getTicket(request);
 
+    if (ticket == null || !(RoleType.ADMIN == ticket.getRoleType())) {
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return null;
+    }
     String customerCode = ticket.getCustCode();
-
+    NotificationSubscriber notificationSubscriber = subscriberService
+        .getSubscriberByIdAndCustCode(subscriberId, customerCode);
+    if (notificationSubscriber == null) {
+      response.sendError(HttpStatus.BAD_REQUEST.value());
+    }
     return subscriberService.updateSubscriber(subscriberId, subscriber, customerCode);
   }
 
@@ -232,7 +251,18 @@ public class SubscriberController {
   public void deleteSubscriber(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable("subscriberid") String subscriberId) {
+      @PathVariable("subscriberid") String subscriberId) throws IOException {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    if (ticket == null || !(RoleType.ADMIN == ticket.getRoleType())) {
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+    }
+    NotificationSubscriber subscriber = subscriberService
+        .getSubscriberByIdAndCustCode(subscriberId, ticket.getCustCode());
+    if (subscriber == null) {
+      response.sendError(HttpStatus.BAD_REQUEST.value());
+    }
+
     subscriberService.deleteSubscriber(subscriberId);
   }
 

@@ -14,6 +14,9 @@ public interface SubscriberService {
   List<NotificationSubscriber> addAllSubscribers(
       List<NotificationSubscriber> subscribers, String customerCode);
 
+  NotificationSubscriber getSubscriberByIdAndCustCode(String subscriberId,
+      String customerCode);
+
   NotificationSubscriber getSubscriber(String subscriberId);
 
   List<NotificationSubscriber> getSubscribersById(List<String> subscriberIds);

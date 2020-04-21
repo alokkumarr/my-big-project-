@@ -84,6 +84,13 @@ public class SubscriberServiceImpl implements SubscriberService {
   }
 
   @Override
+  public NotificationSubscriber getSubscriberByIdAndCustCode(String subscriberId,
+      String customerCode) {
+    return notificationSubscriberRepository
+        .findBySubscriberIdAndCustomerCode(subscriberId, customerCode);
+  }
+
+  @Override
   public NotificationSubscriber getSubscriber(String subscriberId) {
     NotificationSubscriber subscriber = null;
 
