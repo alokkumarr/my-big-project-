@@ -1526,43 +1526,48 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public Valid updateUser(User user) {
+		
+		boolean isPwdChanged = (user.getPassword() != null);
 		Valid valid = new Valid();
-		Optional<String> hashedPwd = this.hashPassword(user.getPassword().trim());
-		String encNewPass;
-		
-		if(hashedPwd.isPresent()) {
-			encNewPass = hashedPwd.get();
-		} else {
-			logger.error("Error during hashing password");
-			valid.setValid(false);
-			valid.setError("Error while hashing password");
-			return valid;
-		};
-		
-		
-		if (user.getPassword() == null){
-			  valid.setValid(false);
-		      valid.setError("Password can not be null");
-		      return valid;
-		}
-		
-		
-		String query = "UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ?, ENCRYPTED_PASSWORD = ?"
-				+ ", PWD_MODIFIED_DATE = SYSDATE(), FIRST_NAME = ?"
+		String encNewPass = null;
+		int index;
+		StringBuffer queryString = new StringBuffer("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ?");
+	    if(isPwdChanged) {
+	    	queryString.append(", ENCRYPTED_PASSWORD = ?");
+	    	Optional<String> hashedPwd = this.hashPassword(user.getPassword().trim());
+	    	index = 3;
+			if(hashedPwd.isPresent()) {
+				encNewPass = hashedPwd.get();
+			} else {
+				logger.error("Error during hashing password");
+				valid.setValid(false);
+				valid.setError("Error while hashing password");
+				return valid;
+			};
+			
+	    } else {
+	    	index = 2;
+	    }
+		queryString.append(", PWD_MODIFIED_DATE = SYSDATE(), FIRST_NAME = ?"
 				+ ", MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,  MODIFIED_DATE = SYSDATE(), PWD_MIGRATED = 1"
-				+ ", MODIFIED_BY = ? WHERE USER_SYS_ID = ?";
+				+ ", MODIFIED_BY = ? WHERE USER_SYS_ID = ?");
+		
 		final String pwd = encNewPass;
-    try {
-      jdbcTemplate.update(query.toString(), preparedStatement -> {
+		
+		
+		try {
+			jdbcTemplate.update(queryString.toString(), preparedStatement -> {
 	        preparedStatement.setString(1, user.getEmail());
 	        preparedStatement.setLong(2, user.getRoleId());
-	        preparedStatement.setString(3, pwd);
-	        preparedStatement.setString(4, user.getFirstName());
-	        preparedStatement.setString(5, user.getMiddleName());
-	        preparedStatement.setString(6, user.getLastName());
-	        preparedStatement.setInt(7, Integer.parseInt(user.getActiveStatusInd()));
-	        preparedStatement.setString(8, user.getMasterLoginId());
-	        preparedStatement.setLong(9, user.getUserId());
+	        if(isPwdChanged) {
+	        	preparedStatement.setString(index, pwd);
+	        }
+	        preparedStatement.setString(index+1, user.getFirstName());
+	        preparedStatement.setString(index+2, user.getMiddleName());
+	        preparedStatement.setString(index+3, user.getLastName());
+	        preparedStatement.setInt(index+4, Integer.parseInt(user.getActiveStatusInd()));
+	        preparedStatement.setString(index+5, user.getMasterLoginId());
+	        preparedStatement.setLong(index+6, user.getUserId());
       });
     } catch (DataIntegrityViolationException de) {
       logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
