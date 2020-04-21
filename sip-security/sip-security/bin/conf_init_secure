@@ -59,15 +59,6 @@ mk_conf() {
     $APPL_HOME/bin/mk_conf.sh "$@"
 }
 
-get_encryption_key() {
-    value=$(<${vars_file})
-
-    line=$(sed -n '/^encryption.key/p' ${file})
-
-    enc_key=$(cut -d'=' -f2 <<<"$line")
-    echo $enc_key
-}
-
 # extended pattern matching operators
 shopt -s extglob
 
@@ -88,10 +79,22 @@ get_encryption_key() {
     enc_key=$(cut -d'=' -f2 <<<"$line")
     echo $enc_key
 }
+
+generate_password() {
+    local password_file=$1
+    if [ -e $password_file ]; then
+        return
+    fi
+    local password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
+    echo $password > $password_file
+    chmod go-rwx $password_file
+}
+
 generate_password $db_password_file
 
 # Calculate encrypted database password
 db_init_pass=$(< $db_password_file)
+encryption_key=$(get_encryption_key)
 ds_cpass_val=
 [[ $db_init_pass ]] && {
     # Calc pass crypto
