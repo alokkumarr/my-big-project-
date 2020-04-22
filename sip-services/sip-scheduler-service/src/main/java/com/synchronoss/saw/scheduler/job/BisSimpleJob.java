@@ -46,9 +46,7 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
       restTemplate = restUtil.restTemplate(restUtil.getKeyStore(), restUtil.getKeyStorePassword(),
           restUtil.getTrustStore(), restUtil.getTrustStorePassword());
       logger.trace("restUtil.getKeyStore(): " + restUtil.getKeyStore());
-      logger.trace("restUtil.getKeyStorePassword(): " + restUtil.getKeyStorePassword());
       logger.trace("restUtil.getTrustStore(): " + restUtil.getTrustStore());
-      logger.trace("restUtil.getTrustStorePassword(): " + restUtil.getTrustStorePassword());
 
       restTemplate.postForLocation(bisTransferUrl, jobDetails);
     } catch (Exception exception) {

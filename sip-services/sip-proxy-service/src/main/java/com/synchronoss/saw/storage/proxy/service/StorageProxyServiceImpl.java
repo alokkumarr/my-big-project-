@@ -30,6 +30,8 @@ import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.es.kpi.GlobalFilterDataQueryBuilder;
 import com.synchronoss.saw.es.kpi.KPIDataQueryBuilder;
 import com.synchronoss.saw.model.Aggregate;
+import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.ChartOptions.LimitByAxis;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Store;
@@ -93,8 +95,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private final String analysisMetadataTable = "analysisMetadata";
   private static final String METASTORE = "services/metadata";
   public static final String CUSTOMER_CODE = "customerCode";
-  public static final String REPORT = "REPORT";
-
+  public static final String ANALYSIS_TYPE_REPORT = "REPORT";
+  private static final String ANALYSIS_TYPE_CHART = "CHART";
 
   @Value("${schema.file}")
   private String schemaFile;
@@ -632,6 +634,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               sipQueryFromSemantic);
     } else {
       response = new ExecuteAnalysisResponse();
+      if (ANALYSIS_TYPE_CHART.equalsIgnoreCase(analysis.getType())) {
+        LimitByAxis limitByAxis = analysis.getChartOptions().getLimitByAxis();
+        if (limitByAxis != null) {
+          sipQuery = reOrderFieldsByLimitByAxis(sipQuery, limitByAxis);
+        }
+      }
       List<Object> objList = executeESQueries(sipQuery, size, dskAttribute);
       response.setExecutionId(executionId);
       response.setData(objList);
@@ -639,7 +647,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     saveExecutionResult(
         executionType, response, analysis, startTime, authTicket, queryId, dskAttribute);
-    if (!REPORT.equalsIgnoreCase(analysis.getType())) {
+    if (!ANALYSIS_TYPE_REPORT.equalsIgnoreCase(analysis.getType())) {
 
       // return only requested data based on page no and page size, only for FE
       List<Object> pagingData = pagingData(page, pageSize, (List<Object>) response.getData());
@@ -659,6 +667,30 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           "Response returned back to scheduler {}", objectMapper.writeValueAsString(response));
     }
     return response;
+  }
+
+  /**
+   * This Method is used to reoder the fields of sipquery for chart top/bottom functionality based
+   * on the limitByAxis value .
+   *
+   * @param sipQuery SipQuery.
+   * @return Analysis
+   */
+  private SipQuery reOrderFieldsByLimitByAxis(SipQuery sipQuery, LimitByAxis limitByAxis) {
+    List<Artifact> artifacts = sipQuery.getArtifacts();
+    if (!CollectionUtils.isEmpty(artifacts)) {
+      // getting only first field because  charts contain only  one artifact
+      List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+      fields.stream()
+          .forEach(
+              field -> {
+                if (field.getArea().equalsIgnoreCase(LimitByAxis.axisEnumMap.get(limitByAxis))) {
+                  Collections.swap(fields, fields.indexOf(field), 0);
+                }
+              });
+      sipQuery.getArtifacts().get(0).setFields(fields);
+    }
+    return sipQuery;
   }
 
   private SipDskAttribute updateDskAttribute(
@@ -889,10 +921,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       elasticSearchQueryBuilder.setPriorPercentages(
           sipQuery.getArtifacts().get(0).getFields(), percentageData);
     }
-    String query;
-    query = elasticSearchQueryBuilder
-        .buildDataQuery(sipQuery, size, dskAttribute);
-    logger.trace("ES -Query {} " + query);
+    String query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dskAttribute);
+    logger.trace("ES -Query {} ", query);
     JsonNode response = storageConnectorService.executeESQuery(query, sipQuery.getStore());
     // re-arrange data field based upon sort before flatten
     boolean haveAggregate = dataFields.stream().anyMatch(field -> field.getAggregate() != null

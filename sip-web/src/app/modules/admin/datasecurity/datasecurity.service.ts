@@ -7,13 +7,12 @@ import * as fpGet from 'lodash/fp/get';
 import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
 import { Observable, of } from 'rxjs';
+import * as uniqWith from 'lodash/uniqWith';
+
 import {
   DSKFilterGroup,
-  DSKSecurityGroup,
-  DSKFilterField,
-  DSKFilterBooleanCriteria
-} from './dsk-filter.model';
-import * as uniqWith from 'lodash/uniqWith';
+  DSKSecurityGroup
+} from './../../../common/dsk-filter.model';
 
 const loginUrl = AppConfig.login.url;
 
@@ -55,10 +54,6 @@ export class DataSecurityService {
     }
   }
 
-  clearDSKEligibleFields() {
-    this.dskEligibleFields = null;
-  }
-
   getEligibleDSKFieldsFor(
     customerId,
     productId
@@ -94,41 +89,6 @@ export class DataSecurityService {
         this.dskEligibleFields = eligibleFields;
       })
     );
-  }
-
-  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false) {
-    let condition;
-    condition = filter.booleanQuery.length > 0;
-
-    return (
-      filter.booleanCriteria &&
-      condition &&
-      filter.booleanQuery.every(child => {
-        if ((<DSKFilterGroup>child).booleanCriteria) {
-          return this.isDSKFilterValid(<DSKFilterGroup>child, false);
-        }
-
-        const field = <DSKFilterField>child;
-        return (
-          field.columnName &&
-          field.model &&
-          field.model.values &&
-          field.model.values.length > 0
-        );
-      })
-    );
-  }
-
-  updateDskFiltersForGroup(groupId: string, filters: DSKFilterGroup) {
-    const path = `auth/admin/v1/dsk-security-groups/${groupId}`;
-    return this.putrequest(path, filters);
-  }
-
-  deleteDskFiltersForGroup(groupId: string): Promise<any> {
-    return this.updateDskFiltersForGroup(groupId, {
-      booleanCriteria: DSKFilterBooleanCriteria.AND,
-      booleanQuery: []
-    });
   }
 
   attributetoGroup(data) {
@@ -185,27 +145,5 @@ export class DataSecurityService {
     return this._http
       .post(`${loginUrl}/${path}`, params, httpOptions)
       .toPromise();
-  }
-
-  generatePreview(filterGroup: DSKFilterGroup): string {
-    const pStart = '<strong class="parens">(</strong>';
-    const pEnd = '<strong class="parens">)</strong>';
-    return filterGroup.booleanQuery
-      .map(query => {
-        if (query['booleanCriteria']) {
-          return `${pStart}${this.generatePreview(
-            query as DSKFilterGroup
-          )}${pEnd}`;
-        }
-
-        const field = <DSKFilterField>query;
-
-        return `${field.columnName} <span class="operator">${
-          field.model.operator
-        }</span> [${field.model.values.join(', ')}]`;
-      })
-      .join(
-        ` <strong class="bool-op">${filterGroup.booleanCriteria}</strong> `
-      );
   }
 }

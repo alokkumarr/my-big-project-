@@ -15,7 +15,10 @@ export class DesignerAnalysisOptionsComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
-  @Input() auxSettings: any;
+  @Input('auxSettings') set setAuxSettings(auxSettings: any) {
+    this.auxSettings = auxSettings;
+    this.limitByAxis = this.auxSettings.limitByAxis || 'dimension';
+  };
   @Input() chartTitle: string;
   @Input('sipQuery') set setArtifacts(sipQuery: QueryDSL) {
     this.sipQuery = sipQuery;
@@ -23,8 +26,10 @@ export class DesignerAnalysisOptionsComponent {
   }
 
   public sipQuery: QueryDSL;
+  public auxSettings;
   public selectedColumns: ArtifactColumn[];
   public config: PerfectScrollbarConfigInterface = {};
+  public limitByAxis: string;
 
   selectedColsTrackByFn(_, column) {
     return column.columnName;

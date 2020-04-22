@@ -73,10 +73,35 @@
       <label fxFlex i18n>Limit:</label>
       <designer-data-limit-selector
         (change)="change.emit($event)"
+        (stateChange)="stateChange($event)"
         [artifactColumn]="artifactColumn"
+        [state]="state"
         fxFlex="75"
       >
       </designer-data-limit-selector>
+    </div>
+
+    <div
+      *ngIf="
+        analysisType === 'chart' &&
+        asChartColumn(artifactColumn).area === 'y' &&
+        isGroupByPresent &&
+        !state &&
+        fieldCount < 2
+      "
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label> Limit Axis By: </label>
+      <mat-radio-group
+        fxLayout="row"
+        [(ngModel)]="limitByAxis"
+        (change)="onLimitByAxisChange()"
+        style="margin: 15px;"
+      >
+        <mat-radio-button value="dimension">Dimension</mat-radio-button>
+        <mat-radio-button style="padding-left: 15px;" value="groupBy">Group By</mat-radio-button>
+      </mat-radio-group>
     </div>
 
     <div

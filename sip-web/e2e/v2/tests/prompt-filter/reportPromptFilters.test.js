@@ -16,7 +16,6 @@ let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const Header = require('../../pages/components/Header');
-const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const users = require('../../helpers/data-generation/users');
@@ -24,6 +23,7 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing reportPromptFilters tests from reportPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
+  const fieldName = 'field';
 
   let analysisId;
   let host;
@@ -82,12 +82,13 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
             assert.isNotNull(token, 'token cannot be null');
           }
           let currentTime = new Date().getTime();
-          const filters = [
-            {
-              field: data.fieldName,
-              displayedValue: data.displayedValue // This week
-            }
-          ];
+          /*const filters = [
+            (data.fieldName).toString().toLowerCase(),
+              data.displayOperator,
+              data.displayedValue
+            // This week
+          ];*/
+
           let name = `e2e ${currentTime}`;
           let description =
             'Description:' +
@@ -117,22 +118,20 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
-
+          commonFunctions.waitForProgressBarToComplete();
           executePage.clickOnEditLink();
+          commonFunctions.waitForProgressBarToComplete();
+
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
-          if (analysisType === Constants.REPORT) {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('SALES');
-          } else {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('sample');
-          }
-
+          chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
           chartDesignerPage.clickOnColumnInput();
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
+
           chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
+            (data.fieldName).toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveDialogButton();
@@ -154,10 +153,9 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
             data.operator,
             data.value
           );
-
           chartDesignerPage.clickOnApplyFilterButton();
           header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters, Constants.REPORT);
+          executePage.verifyAppliedFilter(data.validateFilters, Constants.REPORT);
           //get analysis id from current url
           browser.getCurrentUrl().then(url => {
             editedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
@@ -179,7 +177,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           );
           chartDesignerPage.clickOnApplyFilterButton();
           //header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters, Constants.REPORT);
+          executePage.verifyAppliedFilter(data.validateFilters, Constants.REPORT);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
@@ -197,7 +195,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           );
           chartDesignerPage.clickOnApplyFilterButton();
           //header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters, Constants.REPORT);
+          executePage.verifyAppliedFilter(data.validateFilters, Constants.REPORT);
         } catch (e) {
           console.error(e);
         }

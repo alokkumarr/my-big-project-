@@ -6,7 +6,9 @@ import { MaterialModule } from 'src/app/material.module';
 import { of } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 
-const StoreStub = {};
+const StoreStub = {
+  dispatch: () => {}
+};
 const BreakpointObserverStub = {
   observe: () => of({ matches: [] })
 };
@@ -35,5 +37,23 @@ describe('Designer Combo Type Selector', () => {
 
   it('should exist', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should reset value to zero if number is negative', () => {
+    component.resetInvalidValueIfNeeded(-1);
+    expect(component.limitValue).toEqual(0);
+  });
+
+  it('should reset value to 99 if number is more than 99', () => {
+    component.resetInvalidValueIfNeeded(100);
+    expect(component.limitValue).toEqual(99);
+  });
+
+  it('should remove the limit value and type when reset', () => {
+    component.limitType = 'top';
+    component.limitValue = 2;
+    component.onToggleClicked('top');
+    expect(component.limitType).toBeNull();
+    expect(component.limitValue).toBeNull();
   });
 });

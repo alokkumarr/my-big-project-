@@ -177,9 +177,9 @@ public class SipDslIT extends BaseIT {
     filter2.addProperty("isGlobalFilter", false);
     model = new JsonObject();
     model.addProperty("format", "epoch_second");
-    model.addProperty("operator", "NEQ");
-    model.addProperty("value", 1483228800000L);
-    model.addProperty("otherValue", 1483228800000L);
+    model.addProperty("operator", "BTW");
+    model.addProperty("value", 1483228800L);
+    model.addProperty("otherValue", 1584513173L);
     filter2.add("model", model);
     filters.add(filter2);
 
@@ -1844,7 +1844,8 @@ public class SipDslIT extends BaseIT {
     Assert.assertEquals(dataNode.get(0).get("integer"), 100);
 
     ObjectNode sipQuery = (ObjectNode) analysis.get("sipQuery");
-    sipQuery.put("query", "select * from sales" + " where integer = ? and string = ? and date = ?");
+    sipQuery.put("query", "select * from sales"
+        + " where integer = ? and string = ? and date = ?");
     analysis.put("sipQuery", sipQuery);
 
     /**
@@ -1885,5 +1886,37 @@ public class SipDslIT extends BaseIT {
             .get("doc_count")
             .asInt();
     assertTrue(noOfRecords == 1);
+  }
+
+  @Test
+  public void testNestedFilterDl() {
+    ObjectNode analysis = getJsonObject("json/dsl/dataLake/sample-dl-nested-filter.json");
+    analysis.put("designerEdit",false);
+    logger.debug("Analysis body for execution : {}", analysis);
+    Response response = execute(token, analysis);
+    Assert.assertNotNull(response);
+    ObjectNode a = response.getBody().as(ObjectNode.class);
+    List<Map<String, String>> dataNode = response.getBody().path("data");
+    ArrayNode data = a.withArray("data");
+    logger.debug("Result : {}", data);
+    Long countOfRows = a.get("totalRows").asLong();
+    Assert.assertTrue(countOfRows == 2);
+    Assert.assertEquals(dataNode.get(0).get("integer"), 343);
+    Assert.assertEquals(dataNode.get(1).get("integer"), 344);
+  }
+
+  @Test
+  public void testNestedFilterEs() {
+    ObjectNode analysis = getJsonObject("json/dsl/es-analysis-with-nested-filter.json");
+    logger.debug("Analysis body for execution : {}", analysis);
+    Response response = execute(token, analysis);
+    Assert.assertNotNull(response);
+    ObjectNode a = response.getBody().as(ObjectNode.class);
+    List<Map<String, String>> dataNode = response.getBody().path("data");
+    ArrayNode data = a.withArray("data");
+    logger.debug("Result : {}", data);
+    Long countOfRows = a.get("totalRows").asLong();
+    Assert.assertTrue(countOfRows == 1);
+    Assert.assertEquals(dataNode.get(0).get("integer"), 400);
   }
 }

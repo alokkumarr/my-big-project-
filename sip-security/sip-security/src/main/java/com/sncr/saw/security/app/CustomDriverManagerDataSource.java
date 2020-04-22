@@ -1,10 +1,9 @@
 package com.sncr.saw.security.app;
 
+import com.synchronoss.sip.utils.Ccode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
-import com.sncr.saw.security.common.util.Ccode;
 
 
 @Configuration
@@ -18,6 +17,12 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
 	
 	@Value("${spring.datasource.username}")
 	private String username;
+
+
+    @Value("${encryption.key}")
+    private String encryptionKey;
+
+    private byte[] encryptionKeyBytes;
 	
 
 	
@@ -34,7 +39,11 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
 	@Override
 	public String getPassword(){	
 		String password = this.password;
-        return base64Decode(password);
+        if (encryptionKeyBytes == null) {
+            encryptionKeyBytes = Ccode.convertHexStringToByteArray(encryptionKey);
+        }
+
+        return base64Decode(password, encryptionKeyBytes);
     }
 	
 	
@@ -42,8 +51,8 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
 	 * @param token
 	 * @return
 	 */
-	public static String base64Decode(String token) {
-		return Ccode.cdecode(token);
+	public static String base64Decode(String token, byte []encryptionKeyBytes) {
+		return Ccode.cdecode(token, encryptionKeyBytes);
 	}
 	
 }

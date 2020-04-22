@@ -12,7 +12,7 @@
               </mat-card-content>
             </mat-card>
             <div class="input-field-filters">
-              <div fxLayout="row" *ngFor="let filter of data.filters;let i = index;">
+              <div fxLayout="row" *ngFor="let filter of queryFilters;let i = index;">
                 <mat-form-field class="col-12">
                   <mat-chip-list #chipList>
                     <mat-chip *ngFor="let opt of modelValueArray[i]" [selectable]="true"

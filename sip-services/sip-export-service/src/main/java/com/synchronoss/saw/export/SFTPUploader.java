@@ -47,9 +47,6 @@ public class SFTPUploader {
         builder.append("@")
             .append(host.trim()).append(":").append(Integer.toString(port))
             .append("/");
-
-        logger.trace("SFTP URL : " + builder.toString());
-
         return builder.toString();
     }
 

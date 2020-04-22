@@ -37,6 +37,7 @@
     [artifacts]="artifacts"
     [isInQueryMode]="isInQueryMode"
     [hasSIPQuery]="!!analysis.sipQuery"
+    (filterClick)="requestAction.emit('filter')"
     [data]="data"
     [analysis]="analysis"
     [dataCount]="dataCount"

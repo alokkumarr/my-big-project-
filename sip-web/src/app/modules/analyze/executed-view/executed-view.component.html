@@ -149,12 +149,13 @@
               executedAnalysis.type === 'report' &&
               executedAnalysis.designerEdit
             ) &&
-            (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
+            (executedAnalysis.sipQuery).filters
               .length > 0
           "
           [filters]="filters"
           [readonly]="true"
           [artifacts]="metric && metric.artifacts"
+          (onFilterClick)="onFiltersClick()"
         ></filter-chips-u>
 
         <div *ngIf="!executionId && !hasExecution && noPreviousExecution">

@@ -111,7 +111,7 @@ export class CreateSourceDialogComponent {
       ...formData
     };
     return this.datasourceService
-      .testChannelWithBody(channelData)
+      .testChannelWithBody(channelData, this.opType, this.channelData.channelId)
       .pipe(first());
   }
 
