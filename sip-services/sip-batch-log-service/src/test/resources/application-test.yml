@@ -35,3 +35,6 @@ logging:
   level:
     com.synchronoss.saw.logs: DEBUG
     org.springframework: INFO
+sip:
+  ssl:
+    enable : false

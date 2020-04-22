@@ -6,11 +6,12 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AddSecurityDialogComponent } from './../add-security-dialog/add-security-dialog.component';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { DataSecurityService } from './../datasecurity.service';
+import { DskFiltersService } from './../../../../common/services/dsk-filters.service';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
 import * as isEmpty from 'lodash/isEmpty';
 import * as cloneDeep from 'lodash/cloneDeep';
-import { DskFilterDialogComponent } from '../dsk-filter-dialog/dsk-filter-dialog.component';
-import { DSKFilterGroup } from '../dsk-filter.model';
+import { DskFilterDialogComponent } from '../../../../common/dsk-filter-dialog/dsk-filter-dialog.component';
+import { DSKFilterGroup } from '../../../../common/dsk-filter.model';
 import { ConfirmDialogComponent } from 'src/app/common/components/confirm-dialog';
 
 @Component({
@@ -35,7 +36,8 @@ export class SecurityGroupComponent implements OnInit {
     private _jwtService: JwtService,
     private _dialog: MatDialog,
     private _dxDataGridService: DxDataGridService,
-    private datasecurityService: DataSecurityService
+    private datasecurityService: DataSecurityService,
+    private _DskFiltersService: DskFiltersService
   ) {
     const navigationListener = this._router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -122,7 +124,8 @@ export class SecurityGroupComponent implements OnInit {
   updateDskFilters() {
     const data = {
       groupSelected: this.groupSelected,
-      filterGroup: cloneDeep(this.groupFilters)
+      filterGroup: cloneDeep(this.groupFilters),
+      mode: 'DSK'
     };
     return this._dialog
       .open(DskFilterDialogComponent, {
@@ -153,7 +156,7 @@ export class SecurityGroupComponent implements OnInit {
       .afterClosed()
       .subscribe(result => {
         if (result) {
-          this.datasecurityService
+          this._DskFiltersService
             .deleteDskFiltersForGroup(this.groupSelected.secGroupSysId)
             .then(() => {
               this.onGroupSelected(this.groupSelected);

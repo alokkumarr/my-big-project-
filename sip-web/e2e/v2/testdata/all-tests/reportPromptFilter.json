@@ -7,7 +7,11 @@
         "fieldType": "date",
         "value": "This Week",
         "fieldName": "Date",
-        "displayedValue": "TW",
+        "validateFilters": {
+          "fieldName": "date",
+          "displayOperator": "=",
+          "displayedValue": "TW"
+        },
         "description": "Admin should be apply prompt filter wih Date attribute"
       },
       "REPFL002": {
@@ -16,7 +20,11 @@
         "fieldType": "date",
         "value": "This Week",
         "fieldName": "Date",
-        "displayedValue": "TW",
+        "validateFilters": {
+          "fieldName": "date",
+          "displayOperator": "=",
+          "displayedValue": "TW"
+        },
         "description": "userOne should be apply prompt filter wih Date attribute"
       },
       "REPFL003": {
@@ -26,7 +34,11 @@
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to 99999.33",
+        "validateFilters": {
+          "fieldName": "double",
+          "displayOperator": "EQ",
+          "displayedValue": "99999.33"
+        },
         "description": "userOne should be apply prompt filter wih Number attribute"
       },
       "REPFL004": {
@@ -36,7 +48,11 @@
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals string 450",
+        "validateFilters": {
+          "fieldName": "string",
+          "displayOperator": "EQ",
+          "displayedValue": "string 450"
+        },
         "description": "Admin should be apply prompt filter wih String attribute"
       },
       "REPFL005": {
@@ -46,7 +62,11 @@
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals string 450",
+        "validateFilters": {
+          "fieldName": "string",
+          "displayOperator": "EQ",
+          "displayedValue": "string 450"
+        },
         "description": "userOne should be apply prompt filter wih String attribute"
       },
       "REPFL006": {
@@ -56,7 +76,11 @@
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to 99999.33",
+        "validateFilters": {
+          "fieldName": "double",
+          "displayOperator": "EQ",
+          "displayedValue": "99999.33"
+        },
         "description": "Admin should be apply prompt filter wih Number attribute"
       }
     }

@@ -48,7 +48,7 @@ public class ObserveController {
 
   private static final String ANALYSIS = "Analysis Id";
   private static final String ERROR_MESSAGE = "Expected missing on the request body.";
-  private static String UNAUTHORIZED =
+  private static final String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s privileges for dashboard!!";
 
   @Autowired
@@ -102,7 +102,7 @@ public class ObserveController {
       LOGGER.error(ERROR_MESSAGE, e);
       throw new SipJsonProcessingException(ERROR_MESSAGE);
     } catch (SipCreateEntityException ex) {
-      LOGGER.error("Problem on the storage while creating an entity {}", ex);
+      LOGGER.error("Problem on the storage while creating an entity", ex);
       throw new SipCreateEntityException("Problem on the storage while creating an entity");
     }
     return observeResponse;
@@ -233,7 +233,7 @@ public class ObserveController {
       LOGGER.error(ERROR_MESSAGE, e);
       throw new SipJsonProcessingException(ERROR_MESSAGE);
     } catch (SipUpdateEntityException ex) {
-      LOGGER.error("Entity does not exist {}", ex);
+      LOGGER.error("Entity does not exist", ex);
       throw new SipUpdateEntityException("Entity does not exist.");
     }
     return observeResponse;
@@ -288,7 +288,7 @@ public class ObserveController {
    * @param observeResponse ObserveResponse
    * @return AlertRuleResponse
    */
-  public ObserveResponse buildPrivilegesResponse(String privileges,
+  private ObserveResponse buildPrivilegesResponse(String privileges,
                                                  String message,
                                                  HttpServletResponse response,
                                                  ObserveResponse observeResponse) {
@@ -300,7 +300,7 @@ public class ObserveController {
       observeResponse.setMessage(String.format(message, privileges));
       return observeResponse;
     } catch (IOException ex) {
-      LOGGER.error("Error while validating permission {}", ex);
+      LOGGER.error("Error while validating permission", ex);
       return observeResponse;
     }
   }

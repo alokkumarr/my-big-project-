@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Filter;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.globalfilter.GlobalFilters;
 import com.synchronoss.saw.model.kpi.KPIBuilder;
@@ -533,5 +535,33 @@ public class BuilderUtil {
 
     Collections.reverse(fields);
     return fields;
+  }
+
+  /**
+   * This method builds the recursive filter with AND & OR conjunction.If we have multiple filter it
+   * means it is old filter which supports conjuction AND or OR but not both,So here the structure
+   * is converted into recursive structure with one filter consists of nesting.
+   *
+   * @param filters filterlist
+   * @param booleanCriteria booleanCriteria
+   * @return single nested filter
+   */
+  public static Filter buildNestedFilter(List<Filter> filters, BooleanCriteria booleanCriteria) {
+    if (filters.size() == 1) {
+      Filter filter = filters.get(0);
+      if (filter.getBooleanCriteria() == null && filter.getFilters() == null) {
+        Filter recursiveFilter = new Filter();
+        recursiveFilter.setBooleanCriteria(booleanCriteria);
+        recursiveFilter.setFilters(filters);
+        return recursiveFilter;
+      }
+      return filter;
+    } else {
+      Filter filter = new Filter();
+      booleanCriteria = booleanCriteria != null ? booleanCriteria : BooleanCriteria.AND;
+      filter.setBooleanCriteria(booleanCriteria);
+      filter.setFilters(filters);
+      return filter;
+    }
   }
 }

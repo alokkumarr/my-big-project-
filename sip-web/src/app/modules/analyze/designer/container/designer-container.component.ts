@@ -19,6 +19,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as forOwn from 'lodash/forOwn';
+import * as concat from 'lodash/concat';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as omit from 'lodash/omit';
@@ -89,7 +90,6 @@ import {
   DesignerUpdateAnalysisSubType,
   DesignerUpdateSorts,
   DesignerUpdateFilters,
-  DesignerUpdatebooleanCriteria,
   DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
@@ -137,7 +137,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     map$(analysis => analysis.sipQuery.sorts)
   );
   dslFilters$: Observable<Filter[]> = this.dslAnalysis$.pipe(
-    map$(analysis => analysis.sipQuery.filters)
+    map$(analysis => this.fetchFilters(analysis.sipQuery))
   );
 
   sipQuery$: Observable<QueryDSL> = this.dslAnalysis$.pipe(
@@ -154,7 +154,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   public sorts: Sort[] = [];
   public sortFlag = [];
   public filters: Filter[] = [];
-  public booleanCriteria = 'AND';
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
@@ -385,8 +384,25 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(this.analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
+      if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+        this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
+      }
+
+      if (isUndefined(get(this.filters[0], 'filters'))) {
+        const aggregatedFilters = this.filters.filter(option => {
+          return option.isAggregationFilter === true;
+        });
+        const oldFormatFilters = cloneDeep(this.filters);
+        this.filters = [];
+        const normalFilters = [{
+          booleanCriteria: queryBuilder.booleanCriteria,
+          filters: oldFormatFilters
+        }]
+
+        this.filters = concat(normalFilters, aggregatedFilters);
+      }
+
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
-    this.booleanCriteria = queryBuilder.booleanCriteria;
     this.isInQueryMode = this._store.selectSnapshot(
       DesignerState
     ).analysis.designerEdit;
@@ -395,6 +411,31 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
     this.addDefaultSorts();
     this.areMinRequirmentsMet = this.canRequestData();
+  }
+
+  fetchFilters(sipQuery) {
+    // if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+    //   console.log(sipQuery.filters);
+    //   return sipQuery.filters;
+    // }
+    if (isUndefined(get(sipQuery.filters[0], 'filters'))) {
+      const aggregatedFilters = sipQuery.filters.filter(option => {
+        return option.isAggregationFilter === true;
+      });
+
+      const oldFormatFilters = cloneDeep(sipQuery.filters);
+      sipQuery.filters = [];
+      const normalFilters = [{
+        booleanCriteria: sipQuery.booleanCriteria,
+        filters: oldFormatFilters
+      }]
+
+      sipQuery.filters = concat(normalFilters, aggregatedFilters);
+      return sipQuery.filters;
+    } else {
+      return sipQuery.filters;
+    }
+
   }
 
   initAuxSettings() {
@@ -605,13 +646,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   /**
    * setEmptyData - In case of no data returned from refresh,
-   * this returns a sane default emtpy data object based on
+   * this returns a same default empty data object based on
    * analysis type.
    *
    * @returns {Array<any>}
    */
   setEmptyData(): Array<any> {
     const emptyReportData = () => {
+      if (this.data === null) {
+        this.data = {};
+      }
       const columnMap = this.data[0] || {};
 
       forOwn(columnMap, (val, key) => {
@@ -803,34 +847,30 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           (this.analysis || this.analysisStarter).type
         );
         this._analyzeDialogService
-          .openFilterDialog(
-            this._store.selectSnapshot(DesignerState.analysisFilters),
-            this.artifacts,
-            this.booleanCriteria,
-            analysis.type,
-            supportsGlobalFilters,
-            this.filterService.supportsAggregatedFilters(analysis)
-          )
-          .afterClosed()
-          .subscribe((result: IToolbarActionResult) => {
-            if (result) {
-              this._store.dispatch(new DesignerUpdateFilters(result.filters));
-              this.filters = this.generateDSLDateFilters(result.filters);
-              this._store.dispatch(
-                new DesignerUpdatebooleanCriteria(result.booleanCriteria)
-              );
-              this.booleanCriteria = result.booleanCriteria;
-              this.onSettingsChange({ subject: 'filter' });
-            }
-          });
+        .openFilterDialog(
+          this._store.selectSnapshot(DesignerState.analysisFilters),
+          this.artifacts,
+          get(analysis, 'sipQuery.booleanCriteria'),
+          get(analysis, 'type'),
+          supportsGlobalFilters,
+          this.filterService.supportsAggregatedFilters(analysis)
+        )
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
+          if (result) {
+            this.filters = cloneDeep(result);
+            this._store.dispatch(new DesignerUpdateFilters(result));
+            this.onSettingsChange({ subject: 'filter' });
+          }
+        });
         break;
       case 'preview':
         const analysisForPreview = isDSLAnalysis(this.analysis)
           ? this._store.selectSnapshot(state => state.designerState.analysis)
           : this.analysis;
-        this._analyzeDialogService.openPreviewDialog(<
-          | Analysis
-          | AnalysisDSL>analysisForPreview);
+        this._analyzeDialogService.openPreviewDialog(<Analysis | AnalysisDSL>(
+          analysisForPreview
+        ));
         break;
       case 'description':
         this._analyzeDialogService
@@ -903,8 +943,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         })
       );
     } else if (['new', 'fork'].includes(this.designerMode)) {
-      (<Analysis>this
-        .analysis).categoryId = this._jwtService.userAnalysisCategoryId;
+      (<Analysis>(
+        this.analysis
+      )).categoryId = this._jwtService.userAnalysisCategoryId;
     }
 
     const analysisForSave = isDSLAnalysis(this.analysis)
@@ -961,7 +1002,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
 
     const sqlBuilder = {
-      booleanCriteria: this.booleanCriteria,
+      booleanCriteria: true,
       filters: this.filters,
       [sortProp]: this.sorts,
       ...partialSqlBuilder
@@ -1074,6 +1115,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         break;
       case 'filterRemove':
+        this._store.dispatch(new DesignerUpdateFilters(event.data));
         break;
       case 'joins':
         this._store.dispatch(new DesignerJoinsArray(event.data));
@@ -1100,7 +1142,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           .getRuntimeFilterValuesIfAvailable(analysis, 'preview', true)
           .then(model => {
             if (isUndefined(model)) {
-              this.areMinRequirmentsMet = false;
+              this._store.dispatch(
+                new DesignerUpdateQueryFilters(this.queryRunTimeFilters)
+              );
             } else {
               this._store.dispatch(
                 new DesignerUpdateQueryFilters(get(model, 'sipQuery.filters'))
@@ -1114,6 +1158,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           });
         break;
       case 'filter':
+        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+        this.requestDataIfPossible();
+        break;
       case 'sort':
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.requestDataIfPossible();
@@ -1159,7 +1206,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   changeToQueryModePermanently() {
     this._store.dispatch(new DesignerUpdateEditMode(true));
     this.filters = [];
-
     this.sorts = [];
   }
 
@@ -1193,6 +1239,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       case 'dateInterval':
       case 'aggregate':
       case 'filter':
+        if (!isUndefined(event.data))
+          this._store.dispatch(new DesignerUpdateFilters(event.data.data));
       case 'format':
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();
@@ -1246,7 +1294,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'comboType':
         this.updateAnalysis();
-        this.refreshDataObject();
+        this.requestDataIfPossible();
         break;
       case 'labelOptions':
         isDSLAnalysis(this.analysis)
@@ -1317,10 +1365,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'limitByAxis':
         this._store.dispatch(
-          new DesignerUpdateAnalysisChartLimitByOptions(
-            event.data.limitByAxis
-          )
-        )
+          new DesignerUpdateAnalysisChartLimitByOptions(event.data.limitByAxis)
+        );
         this.auxSettings = { ...this.auxSettings, ...event.data };
         this.requestDataIfPossible();
         break;
@@ -1456,7 +1502,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const answer = isRequestValid(sipQuery, this.analysis.type);
 
         if (!answer.willRequestBeValid) {
-          const { warning: { title, msg } } = answer as InvalidAnswer;
+          const {
+            warning: { title, msg }
+          } = answer as InvalidAnswer;
           this._analyzeDialogService.openWarningDialog(title, msg);
         }
         return every(requestCondition, Boolean) && answer.willRequestBeValid;

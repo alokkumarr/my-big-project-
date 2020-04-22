@@ -57,7 +57,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.util.HtmlUtils;
 
 @RestController
 @Api(value = "The controller provides operations related Route Entity "
@@ -126,9 +126,8 @@ public class SawBisRouteController {
   @Transactional
   public ResponseEntity<@Valid BisRouteDto> createRoute(
       @ApiParam(value = "Channel Id", required = true) @PathVariable Long channelId,
-      @ApiParam(value = "Route related information to store",
-          required = true) @Valid @RequestBody BisRouteDto requestBody)
-      throws NullPointerException, JsonParseException, JsonMappingException, IOException {
+      @ApiParam(value = "Route related information to store", required = true)
+        @Valid @RequestBody BisRouteDto requestBody) throws NullPointerException {
     logger.trace("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new NullPointerException("json body is missing in request body");
@@ -140,7 +139,7 @@ public class SawBisRouteController {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      ObjectNode routeData = null;
+      ObjectNode routeData;
       try {
         requestBody.setBisChannelSysId(channelId);
         BeanUtils.copyProperties(requestBody, routeEntity);
@@ -148,7 +147,7 @@ public class SawBisRouteController {
         routeEntity.setStatus(STATUS_ACTIVE);
         routeData = (ObjectNode) objectMapper.readTree(routeMetaData);
 
-        /**
+        /*
          * Check duplicate route.
          */
         JsonNode routeName = routeData.get("routeName");
@@ -168,9 +167,8 @@ public class SawBisRouteController {
       requestBody.setCreatedDate(routeEntity.getCreatedDate().getTime());
       JsonNode schedulerExpn = routeData.get("schedulerExpression");
       if (schedulerExpn != null) {
-        // String schedulerDetails = routeData.get("schedulerExpression").toString();
         BisSchedulerRequest schedulerRequest = new BisSchedulerRequest();
-        schedulerRequest.setChannelId(String.valueOf(channelId.toString()));
+        schedulerRequest.setChannelId(channelId.toString());
         schedulerRequest.setRouteId(String.valueOf(routeEntity.getBisRouteSysId()));
         schedulerRequest.setJobName(channel.getChannelType() + routeEntity.getBisChannelSysId()
             + routeEntity.getBisRouteSysId().toString());
@@ -178,7 +176,7 @@ public class SawBisRouteController {
         schedulerRequest.setJobGroup(String.valueOf(requestBody.getBisRouteSysId()));
 
         // If activeTab is immediate the its immediate job.
-        // irrespecitve of request set expression to empty
+        // irrespective of request set expression to empty
         // so that scheduler treats as immediate
         JsonNode activeTab = schedulerExpn.get("activeTab");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
@@ -222,7 +220,6 @@ public class SawBisRouteController {
             logger.error(e.getMessage());
           }
         }
-        // }
         logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + scheduleUri
             + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + insertUrl, schedulerRequest);

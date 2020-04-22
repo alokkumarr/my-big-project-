@@ -11,6 +11,7 @@ import { Store } from '@ngxs/store';
 })
 export class DesignerReportComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() filterClick = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() sorts: Sort[];
   @Input() analysis;
@@ -56,12 +57,15 @@ export class DesignerReportComponent {
   }
 
   onRemoveFilter(index) {
-    this.filters.splice(index, 1);
-    this.change.emit({ subject: 'filterRemove' });
+    this.change.emit({ subject: 'filterRemove', data: index.data });
   }
 
   onRemoveFilterAll() {
     this.filters.splice(0, this.filters.length);
-    this.change.emit({ subject: 'filterRemove' });
+    this.change.emit({ subject: 'filterRemove', data: [] });
+  }
+
+  onFiltersClick() {
+    this.filterClick.emit();
   }
 }

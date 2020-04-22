@@ -41,17 +41,15 @@ import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.Model;
 import com.synchronoss.bda.sip.dsk.Operator;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
-
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
+import com.synchronoss.sip.utils.Ccode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -130,8 +128,8 @@ public class UserRepositoryImpl implements UserRepository {
     logger.debug("lockingTime : {} ",lockingTime);
     logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
-    
-   // String pwd = password;
+
+
     String sql =
         "SELECT U.PWD_MODIFIED_DATE, U.ENCRYPTED_PASSWORD, C.PASSWORD_EXPIRY_DAYS "
             + "FROM USERS U, CUSTOMERS C "
@@ -259,8 +257,6 @@ public class UserRepositoryImpl implements UserRepository {
   			message = "Error encountered while changing password";
   			return message;
 		}
-		
-			
 		
 		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
@@ -395,6 +391,7 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 		String sql = "SELECT U.USER_SYS_ID, U.ENCRYPTED_PASSWORD FROM USERS U WHERE U.USER_ID = ?";
 		final String encNewPassword = encNewPass;
+
 		try {
 			ResetPasswordDetails pwdDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -1482,6 +1479,7 @@ public class UserRepositoryImpl implements UserRepository {
 	    }
 	    valid.setValid(true);
 	    return valid;
+
   }
 
 	@Override
@@ -1518,6 +1516,7 @@ public class UserRepositoryImpl implements UserRepository {
           ps.setString(10, user.getMasterLoginId());
           return ps;
         }, keyHolder);
+
 			return (Long) keyHolder.getKey();
 		} catch (Exception e) {
 			return -1L;
@@ -1569,6 +1568,7 @@ public class UserRepositoryImpl implements UserRepository {
 	        preparedStatement.setString(index+5, user.getMasterLoginId());
 	        preparedStatement.setLong(index+6, user.getUserId());
       });
+
     } catch (DataIntegrityViolationException de) {
       logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
       valid.setValid(false);
@@ -3315,6 +3315,7 @@ public class UserRepositoryImpl implements UserRepository {
         "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID,SEC_GROUP_SYS_ID, ENCRYPTED_PASSWORD, "
             + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, ID3_ENABLED, CREATED_DATE, CREATED_BY, PWD_MIGRATED ) "
             + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, SYSDATE(), ?, 1 ); ";
+
     try {
       jdbcTemplate.update(
           sql,
@@ -3376,6 +3377,7 @@ public class UserRepositoryImpl implements UserRepository {
             " UPDATE USERS SET EMAIL=? , ROLE_SYS_ID=?,SEC_GROUP_SYS_ID= ? , ENCRYPTED_PASSWORD =? , "
                 + "FIRST_NAME =? , MIDDLE_NAME =? , LAST_NAME=? , ACTIVE_STATUS_IND=? , ID3_ENABLED=? , MODIFIED_DATE= SYSDATE() , MODIFIED_BY=? "
                 + " where USER_SYS_ID=? and CUSTOMER_SYS_ID=? ; ";
+        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
         try {
             numberOfRowsUpdated = jdbcTemplate.update(
                 sql,
