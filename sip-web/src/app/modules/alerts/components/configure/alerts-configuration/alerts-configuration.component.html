@@ -143,6 +143,7 @@
             mat-icon-button
             (click)="changeAlertStatus(data.data)"
             i18n-matTooltip
+            class="subscribers-icon"
             [matTooltip]="data.data.activeInd ? 'Active' : 'Inactive'"
           >
             <mat-icon
@@ -162,8 +163,9 @@
             mat-icon-button
             i18n-matTooltip
             color="primary"
+            class="subscribers-icon"
             [attr.e2e]="'edit-alert-' + data.data.alertRuleName"
-            class="conf-container-content__body__gridBtn"
+            class="conf-container-content__body__gridBtn subscribers-icon"
             matTooltip="Edit"
             (click)="editAlert(data.data)"
           >
@@ -208,7 +210,7 @@
             i18n-matTooltip
             color="warn"
             [attr.e2e]="'delete-alert-' + data.data.alertRuleName"
-            class="conf-container-content__body__gridBtn"
+            class="conf-container-content__body__gridBtn subscribers-icon"
             matTooltip="Delete"
             (click)="deleteAlert(data.data)"
           >
