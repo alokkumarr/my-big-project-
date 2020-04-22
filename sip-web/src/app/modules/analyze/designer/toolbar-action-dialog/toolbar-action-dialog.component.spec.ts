@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog.component';
 import { MaterialModule } from 'src/app/material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AnalyzeService } from './../../services/analyze.service';
 import {
   MatDialog,
   MatDialogConfig,
@@ -72,7 +73,8 @@ describe('Designer Chart Component', () => {
         { provide: MAT_DIALOG_DATA, useValue: mockService },
         { provide: MatDialogConfig, useValue: mockService },
         { provide: DesignerService, useValue: mockService },
-        { provide: HeaderProgressService, useClass: HeaderProgressStubService }
+        { provide: HeaderProgressService, useClass: HeaderProgressStubService },
+        { provide: AnalyzeService, useClass: '' }
       ],
       imports: [MaterialModule, FormsModule, BrowserAnimationsModule],
       declarations: [ToolbarActionDialogComponent],

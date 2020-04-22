@@ -207,6 +207,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>sip-common-components</module>
         <module>bda-meta</module>
         <module>sip-xdf</module>
         <module>a2</module>

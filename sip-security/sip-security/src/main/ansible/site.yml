@@ -7,6 +7,7 @@
   hosts: saw-security
   become: true
   roles:
+    - sip-common-utils
     - sip-security-db
     - sip-security-web
 

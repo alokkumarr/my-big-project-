@@ -24,9 +24,8 @@ import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
-
+import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.IntegrationUtils;
-import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +52,6 @@ import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -72,7 +70,6 @@ import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.integration.sftp.session.SftpSession;
 import org.springframework.stereotype.Service;
-
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
 
@@ -139,6 +136,9 @@ public class SftpServiceImpl extends SipPluginContract {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
+
+  @Value("${encryption.sftp-key}")
+  private String encryptionKey;
   
   public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
   
@@ -448,7 +448,7 @@ public class SftpServiceImpl extends SipPluginContract {
         ObjectNode node = (ObjectNode) om.readTree(channelMetadata);
 
         String channelPassword = node.get("password").asText();
-        String decryptedPassword = SipCommonUtils.decryptPassword(channelPassword);
+        String decryptedPassword = Ccode.cdecode(channelPassword, encryptionKey.getBytes());
 
         payload.setPassword(decryptedPassword);
         return immediateConnectChannel(payload);

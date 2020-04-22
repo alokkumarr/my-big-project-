@@ -55,7 +55,7 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     ) {
       return;
     }
-    this.state = isEmpty(this.limitType) ||  isEmpty(this.limitValue);
+    this.state = isEmpty(this.limitType) || isEmpty(this.limitValue);
     this.emitChange(this.limitType, this.limitValue);
   }
 
@@ -63,20 +63,21 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
     if (this.limitType === limitType) {
       this.limitType = null;
       this.limitValue = null;
-      this.state = isEmpty(this.limitType) ||  isEmpty(this.limitValue);
+      this.state = isEmpty(this.limitType) || isEmpty(this.limitValue);
       this.emitChange(this.limitType, this.limitValue);
     }
   }
 
   emitChange(limitType, limitValue) {
-    const { table, columnName, dataField } = this.artifactColumn;
+   const { table, columnName, dataField, aggregate } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
         dataField,
         limitValue,
-        limitType
+        limitType,
+        aggregate
       })
     );
     this.change.emit({ subject: 'fetchLimit' });

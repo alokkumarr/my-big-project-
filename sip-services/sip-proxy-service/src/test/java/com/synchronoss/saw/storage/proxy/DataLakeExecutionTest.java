@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 public class DataLakeExecutionTest {
 
@@ -48,7 +49,7 @@ public class DataLakeExecutionTest {
     if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
       sipQuery.getFilters().forEach(filter -> {
         String filterValue = dl.getRunTimeFilters(filter);
-        if (filterValue != null) {
+        if (!StringUtils.isEmpty(filterValue)) {
           runTimeFilter1.add(filterValue);
         }
       });
@@ -72,7 +73,7 @@ public class DataLakeExecutionTest {
     if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
       sipQuery.getFilters().forEach(filt -> {
         String filterValue = dl.getRunTimeFilters(filt);
-        if (filterValue != null) {
+        if (!StringUtils.isEmpty(filterValue)) {
           runTimeFilter2.add(filterValue);
         }
       });
@@ -92,7 +93,7 @@ public class DataLakeExecutionTest {
     if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
       sipQuery.getFilters().forEach(filt3 -> {
         String filterValue = dl.getRunTimeFilters(filt3);
-        if (filterValue != null) {
+        if (!StringUtils.isEmpty(filterValue)) {
           runTimeFilter3.add(filterValue);
         }
       });
@@ -113,7 +114,7 @@ public class DataLakeExecutionTest {
     if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
       sipQuery.getFilters().forEach(filt3 -> {
         String filterValue = dl.getRunTimeFilters(filt3);
-        if (filterValue != null) {
+        if (!StringUtils.isEmpty(filterValue)) {
           runTimeFilter1.add(filterValue);
         }
       });
@@ -132,7 +133,7 @@ public class DataLakeExecutionTest {
     if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
       sipQuery.getFilters().forEach(filt -> {
         String filterValue = dl.getRunTimeFilters(filt);
-        if (filterValue != null) {
+        if (!StringUtils.isEmpty(filterValue)) {
           runTimeFilter2.add(filterValue);
         }
       });
@@ -151,7 +152,7 @@ public class DataLakeExecutionTest {
     if (!CollectionUtils.isEmpty(sipQuery.getFilters())) {
       sipQuery.getFilters().forEach(filt3 -> {
         String filterValue = dl.getRunTimeFilters(filt3);
-        if (filterValue != null) {
+        if (!StringUtils.isEmpty(filterValue)) {
           runTimeFilter3.add(filterValue);
         }
       });
