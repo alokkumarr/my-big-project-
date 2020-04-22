@@ -15,19 +15,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import org.springframework.context.annotation.ComponentScan;
-
 /**
  * @author gsan0003
  *
  */
 
 @SpringBootApplication
-//@ComponentScan(
-//    basePackages = {
-//        "com.sncr.saw.security",
-//        "com.synchronoss.bda.sip.config"
-//    })
 public class NSSOApplication extends SpringBootServletInitializer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NSSOApplication.class);

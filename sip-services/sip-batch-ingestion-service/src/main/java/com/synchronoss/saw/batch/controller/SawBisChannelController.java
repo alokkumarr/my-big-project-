@@ -16,14 +16,13 @@ import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.service.BisChannelService;
-
+import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
@@ -72,6 +72,9 @@ public class SawBisChannelController {
 
   @Autowired
   private BisChannelService bisChannelService;
+
+  @Value("${encryption.sftp-key}")
+  private String encryptionKey;
 
   private static final Long STATUS_ACTIVE = 1L;
   
@@ -124,7 +127,7 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = rootNode.get(FIELD_PASSWORD).asText();
-      String passwordPhrase = SipCommonUtils.encryptPassword(secretPhrase);
+      String passwordPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
       rootNode.put(FIELD_PASSWORD, passwordPhrase);
       requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     }
@@ -360,7 +363,7 @@ public class SawBisChannelController {
 
           rootNode.put(FIELD_PASSWORD, savedPassword);
         } else {
-          secretPhrase = SipCommonUtils.encryptPassword(passwordNode.asText());
+          secretPhrase = Ccode.cencode(passwordNode.asText(), encryptionKey.getBytes());
           rootNode.put(FIELD_PASSWORD, secretPhrase);
         }
 
@@ -511,7 +514,7 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = channelMetadata.get(FIELD_PASSWORD).asText();
-      String passwordPhrase = SipCommonUtils.encryptPassword(secretPhrase);
+      String passwordPhrase = Ccode.cencode(secretPhrase, encryptionKey.getBytes());
       channelMetadata.put(FIELD_PASSWORD, passwordPhrase);
     }
 

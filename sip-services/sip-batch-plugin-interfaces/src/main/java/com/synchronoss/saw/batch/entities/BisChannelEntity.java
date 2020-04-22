@@ -60,6 +60,17 @@ public class BisChannelEntity implements Serializable {
     this.status = status;
   }
 
+  @Column(name = "PWD_MIGRATED")
+  private Integer pwdMigrated;
+
+  public int getPwdMigrated() {
+    return pwdMigrated;
+  }
+
+  public void setPwdMigrated(int pwdMigrated) {
+    this.pwdMigrated = pwdMigrated;
+  }
+
   @Basic(optional = false)
   @Lob
   @Column(name = "CHANNEL_METADATA", nullable = false, length = 2147483647)
