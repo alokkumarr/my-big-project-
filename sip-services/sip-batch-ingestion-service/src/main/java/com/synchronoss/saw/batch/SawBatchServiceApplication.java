@@ -36,7 +36,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableRetry
 @SpringBootApplication
 @EnableScheduling
-@ComponentScan(basePackages = {"com.synchronoss.saw.batch","com.synchronoss.sip.utils"})
+@ComponentScan(
+    basePackages = {
+      "com.synchronoss.saw.batch",
+      "com.synchronoss.sip.utils"
+    })
 public class SawBatchServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 

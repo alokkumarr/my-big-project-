@@ -29,6 +29,7 @@
 
     <!-- Directories -->
     <app.optParDir>/opt/bda</app.optParDir>
+    <app.utildir>/opt/sip/sip-common-components</app.utildir>
     <app.optDir>${app.optParDir}/${app.nameVer}</app.optDir>
     <app.varDir>/var/bda/${app.name}</app.varDir>
     <app.etcDir>/etc/bda</app.etcDir>

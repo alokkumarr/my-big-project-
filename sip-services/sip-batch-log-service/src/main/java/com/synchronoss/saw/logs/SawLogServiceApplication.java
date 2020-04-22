@@ -8,11 +8,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @EntityScan(
     basePackages = {"com.synchronoss.saw.batch.entities", "com.synchronoss.saw.logs.entities"})
+@ComponentScan(
+    basePackages = {
+        "com.synchronoss.saw.logs.controller",
+        "com.synchronoss.sip.utils",
+
+    })
 public class SawLogServiceApplication {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SawLogServiceApplication.class);
