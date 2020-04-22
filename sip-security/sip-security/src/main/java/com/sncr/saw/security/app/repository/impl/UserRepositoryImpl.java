@@ -35,7 +35,7 @@ import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.AdvancedHashingUtil;
 import com.sncr.saw.security.common.util.AdvancedHashingUtil.CannotPerformOperationException;
 import com.sncr.saw.security.common.util.AdvancedHashingUtil.InvalidHashException;
-import com.sncr.saw.security.common.util.Ccode;
+import com.synchronoss.sip.utils.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.Model;
@@ -341,7 +341,7 @@ public class UserRepositoryImpl implements UserRepository {
 		});
 		logger.info("###Retrived users  count ::####"+ users.size());
 		String updateSql = "UPDATE USERS U  SET  U.ENCRYPTED_PASSWORD = ?, U.PWD_MIGRATED = 1" ;
-		
+	    final byte[] encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
 		
 	    try {
 			jdbcTemplate.batchUpdate(updateSql,users,10,
@@ -350,7 +350,7 @@ public class UserRepositoryImpl implements UserRepository {
 						@Override
 						public void setValues(PreparedStatement ps, UserDetails user) throws SQLException {
 							String existingPwd  =  user.getPassword();
-							String actualPwd = Ccode.cdecode(existingPwd);
+							String actualPwd = Ccode.cdecode(existingPwd, encryptionKeyBytes);
 							String hashedPwd = null;
 							try {
 								hashedPwd = AdvancedHashingUtil.createHash(actualPwd);
@@ -3377,7 +3377,7 @@ public class UserRepositoryImpl implements UserRepository {
             " UPDATE USERS SET EMAIL=? , ROLE_SYS_ID=?,SEC_GROUP_SYS_ID= ? , ENCRYPTED_PASSWORD =? , "
                 + "FIRST_NAME =? , MIDDLE_NAME =? , LAST_NAME=? , ACTIVE_STATUS_IND=? , ID3_ENABLED=? , MODIFIED_DATE= SYSDATE() , MODIFIED_BY=? "
                 + " where USER_SYS_ID=? and CUSTOMER_SYS_ID=? ; ";
-        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+    
         try {
             numberOfRowsUpdated = jdbcTemplate.update(
                 sql,
