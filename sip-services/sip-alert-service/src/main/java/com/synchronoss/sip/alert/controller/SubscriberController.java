@@ -236,6 +236,7 @@ public class SubscriberController {
         .getSubscriberByIdAndCustCode(subscriberId, customerCode);
     if (notificationSubscriber == null) {
       response.sendError(HttpStatus.BAD_REQUEST.value());
+      return null;
     }
     return subscriberService.updateSubscriber(subscriberId, subscriber, customerCode);
   }
@@ -256,11 +257,13 @@ public class SubscriberController {
     if (ticket == null || !(RoleType.ADMIN == ticket.getRoleType())) {
       response
           .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return;
     }
     NotificationSubscriber subscriber = subscriberService
         .getSubscriberByIdAndCustCode(subscriberId, ticket.getCustCode());
     if (subscriber == null) {
       response.sendError(HttpStatus.BAD_REQUEST.value());
+      return;
     }
 
     subscriberService.deleteSubscriber(subscriberId);
