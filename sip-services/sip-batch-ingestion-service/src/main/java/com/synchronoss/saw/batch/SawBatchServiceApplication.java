@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch;
 
+import com.synchronoss.saw.batch.service.migration.KeyMigration;
 import info.faljse.SDNotify.SDNotify;
 import javax.persistence.EntityManagerFactory;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
@@ -36,28 +37,31 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableRetry
 @SpringBootApplication
 @EnableScheduling
-@ComponentScan(basePackages = {"com.synchronoss.saw.batch","com.synchronoss.sip.utils"})
+@ComponentScan(
+    basePackages = {
+      "com.synchronoss.saw.batch",
+      "com.synchronoss.sip.utils"
+    })
 public class SawBatchServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 
   @Autowired
   private Environment environment;
-  
+
   @Value("${sip.transfer.core-pool-size}")
-  private String transferCorePoolSize; 
+  private String transferCorePoolSize;
   @Value("${sip.transfer.max-pool-size}")
   private String transferMaxPoolSize;
   @Value("${sip.transfer.queue-capacity}")
   private String transferQueueCapacity;
-  
-  
-  
   @Value("${sip.retry.core-pool-size}")
-  private String retryCorePoolSize; 
+  private String retryCorePoolSize;
   @Value("${sip.retry.max-pool-size}")
   private String retryMaxPoolSize;
   @Value("${sip.retry.queue-capacity}")
   private String retryQueueCapacity;
+
+  @Autowired KeyMigration keyMigration;
 
   /**
    * This is the entry method of the class.
@@ -72,11 +76,10 @@ public class SawBatchServiceApplication {
   /**
    * TomcatServletWebServerFactory has been overridden.
    */
-
   @Bean
   public TomcatServletWebServerFactory tomcatEmbedded() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-    tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
+    tomcat.addConnectorCustomizers(connector -> {
       if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
         ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
       }
@@ -84,16 +87,21 @@ public class SawBatchServiceApplication {
     return tomcat;
   }
 
+  /**
+   * Application starter function.
+   *
+   * @param event Application Event
+   */
   @EventListener
   public void onApplicationEvent(ApplicationReadyEvent event) {
     LOG.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
+    keyMigration.migrate();
   }
 
   @EventListener
   public void exitEvent(ExitCodeEvent event) {
     LOG.info("Application exiting : " + event.getExitCode());
-
   }
 
   /**
@@ -102,7 +110,6 @@ public class SawBatchServiceApplication {
    * @param entityManagerFactory entity manager.
    * @return {@link JpaTransactionManager}.
    */
-
   @Bean
   JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
     JpaTransactionManager transactionManager = new JpaTransactionManager();
@@ -127,12 +134,12 @@ public class SawBatchServiceApplication {
     template.setBackOffPolicy(backOffPolicy);
     return template;
   }
-  
+
   /**
    * Thread pool executor with initial
    * configuration for worker threads
    * to transfer files.
-   * 
+   *
    * @return task executor
    */
   @Bean
@@ -145,9 +152,9 @@ public class SawBatchServiceApplication {
 
     return executor;
   }
-  
+
   /**
-   * Threadpool exeuctor with initial
+   * Threadpool executor with initial
    * configuration for retry threads.
    * @return task executor
    */

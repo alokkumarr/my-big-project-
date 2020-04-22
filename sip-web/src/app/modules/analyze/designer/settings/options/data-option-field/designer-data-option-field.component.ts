@@ -60,9 +60,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       fpFilter(artifact => artifact.area === 'y')
     )(sipQuery.artifacts);
     this.fieldCount = fields.length;
-    this.isGroupByPresent = fpFilter(({ area }) => {
-      return area === 'g';
-    })(this.sipQuery.artifacts[0].fields).length > 0;
+    this.isGroupByPresent =
+      fpFilter(({ area }) => {
+        return area === 'g';
+      })(this.sipQuery.artifacts[0].fields).length > 0;
   }
   public typeIcon: string;
   public isGroupByPresent: boolean;
@@ -91,10 +92,11 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       (this.analysisType !== 'pivot' || // all charts
         this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
 
-    if (get(this.artifactColumn, 'area') === "y") {
-      this.state = isEmpty((<ArtifactColumnChart>this.artifactColumn).limitType) ||  isUndefined((<ArtifactColumnChart>this.artifactColumn).limitValue);
+    if (get(this.artifactColumn, 'area') === 'y') {
+      this.state =
+        isEmpty((<ArtifactColumnChart>this.artifactColumn).limitType) ||
+        isUndefined((<ArtifactColumnChart>this.artifactColumn).limitValue);
     }
-
 
     this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
@@ -205,7 +207,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   onLimitByAxisChange() {
-    this.change.emit({ subject: 'limitByAxis', data: { limitByAxis: this.limitByAxis } });
+    this.change.emit({
+      subject: 'limitByAxis',
+      data: { limitByAxis: this.limitByAxis }
+    });
   }
 
   stateChange(event) {
@@ -213,7 +218,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     if (this.state) {
       setTimeout(() => {
         this.limitByAxis = 'dimension';
-        this.change.emit({ subject: 'limitByAxis', data: { limitByAxis: 'dimension' } });
+        this.change.emit({
+          subject: 'limitByAxis',
+          data: { limitByAxis: 'dimension' }
+        });
       }, 300);
     }
   }

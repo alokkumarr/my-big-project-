@@ -76,6 +76,10 @@
       <artifactId>commons-compress</artifactId>
       <version>${compress}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -94,6 +98,61 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>de.dentrassi.maven</groupId>
+        <artifactId>rpm</artifactId>
+        <version>0.10.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>rpm</goal>
+            </goals>
+            <configuration>
+              <packageName>sip-common-components</packageName>
+              <version>${revision.nodash}</version>
+              <obsoletes>sip-common-components</obsoletes>
+              <entries>
+                <entry>
+                  <name>/opt/sip/sip-common-components</name>
+                  <directory>true</directory>
+                  <user>mapr</user>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-common-components/lib</name>
+                  <directory>true</directory>
+                  <user>mapr</user>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-common-components/bin</name>
+                  <directory>true</directory>
+                  <user>mapr</user>
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-common-components/lib/sip-common-components-${project.version}.jar</name>
+                  <collect>
+                    <from>target/sip-common-components-${project.version}.jar</from>
+                  </collect>
+                  <!--<ruleset>default</ruleset>-->
+                </entry>
+                <entry>
+                  <name>/opt/sip/sip-common-components/bin/ccode</name>
+                  <file>src/main/bin/ccode</file>
+                  <mode>0755</mode>
+                </entry>
+              </entries>
+              <afterInstallation>
+                <script>systemctl daemon-reload</script>
+              </afterInstallation>
+              <afterRemoval>
+                <script>systemctl daemon-reload</script>
+              </afterRemoval>
+              <signature>
+                <skip>true</skip>
+              </signature>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>3.0.0</version>
@@ -108,7 +167,7 @@
           <execution>
             <phase>test</phase>
             <configuration>
-              <configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml
+              <configLocation>${project.basedir}/../src/main/resources/checkstyle.xml
               </configLocation>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
               <violationSeverity>warning</violationSeverity>
