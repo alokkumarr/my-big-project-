@@ -54,6 +54,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.util.HtmlUtils;
+import com.google.json.JsonSanitizer;
 import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
 import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
@@ -148,8 +150,8 @@ public class GatewayController {
           if (!ServletFileUpload.isMultipartContent(request)) {
             proxiedRequest = createHttpUriRequest(request, userMetadata);
             proxiedResponse = httpClient.execute(proxiedRequest);
-            responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity()), makeResponseHeaders(proxiedResponse),
-                                                  HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
+            responseEntity = new ResponseEntity<>(JsonSanitizer.sanitize(read(proxiedResponse.getEntity())), makeResponseHeaders(proxiedResponse),
+                HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
           } else {
             logger.trace("Inside the file upload section....");
             if (uploadfiles == null || uploadfiles.length == 0) {
@@ -213,7 +215,8 @@ public class GatewayController {
       if (request.getRequestURI().endsWith(URLRequestTransformer.API_DOCS_PATH)) {
         proxiedRequest = createHttpUriRequest(request, new UserCustomerMetaData());
         proxiedResponse = httpClient.execute(proxiedRequest);
-        return new ResponseEntity<>(read(proxiedResponse.getEntity()), makeResponseHeaders(proxiedResponse), HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
+        return new ResponseEntity<>(JsonSanitizer.sanitize(read(proxiedResponse.getEntity())), makeResponseHeaders(proxiedResponse),
+                                    HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
       }
       responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
     }
@@ -290,13 +293,13 @@ public class GatewayController {
   }
 
   private String read(org.apache.http.HttpEntity entity) throws IOException {
-        if(entity == null){
-            return "";
-        }else{
-            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(entity.getContent()))) {
-                return buffer.lines().collect(Collectors.joining("\n"));
-            }
-        }
+    if (entity == null) {
+      return "";
+    } else {
+      try (BufferedReader buffer = new BufferedReader(new InputStreamReader(entity.getContent()))) {
+        return buffer.lines().collect(Collectors.joining("\n"));
+      }
+    }
   }
   
   @ExceptionHandler(value=NoHandlerFoundException.class)
@@ -306,7 +309,7 @@ public class GatewayController {
             apiGatewayProperties.getEndpoints().stream()
                     .filter(e ->requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
                     ).findFirst();
-    String endPoint = endpoint.get().getLocation() + requestURI;
+    String endPoint = endpoint.get().getLocation() + HtmlUtils.htmlEscape(requestURI);
     logger.trace("Destination Url: {}", endPoint);
     return endPoint;
   }

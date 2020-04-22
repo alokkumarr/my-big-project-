@@ -11,5 +11,6 @@ group:   ${app.group}
 #
 optdir:  ${app.optDir}    # /opt/bda/saw-security
 vardir:  ${app.varDir}    # /var/bda/saw-security
+utildir: ${app.utildir}
 #
 # more values can be added on the box

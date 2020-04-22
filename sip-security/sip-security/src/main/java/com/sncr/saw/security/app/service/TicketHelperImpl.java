@@ -29,14 +29,14 @@ public class TicketHelperImpl implements TicketHelper {
   public void moveTicketToDumpLocation(String ticketId) {}
 
   @Override
-  public Ticket createTicket(User user, Boolean isReCreate) throws Exception {
+  public Ticket createTicket(User user, Boolean isReCreate, String ticketId) throws Exception {
     Ticket ticket = null;
     try {
       if (!isReCreate) {
         prepareTicketDetails(user, false);
       }
       // create ticket xml
-      ticket = prepareTicket(user);
+      ticket = prepareTicket(user, ticketId);
       // inserting the ticket detail into DB, commenting code to update
       // xml in file path
       insertTicketDetails(ticket);
@@ -56,7 +56,7 @@ public class TicketHelperImpl implements TicketHelper {
     try {
       prepareTicketDetails(user, onlyDef);
       // create ticket xml
-      ticket = prepareTicket(user);
+      ticket = prepareTicket(user, null);
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -159,15 +159,15 @@ public class TicketHelperImpl implements TicketHelper {
   }
 
   @Override
-  public Ticket prepareTicket(User user) {
+  public Ticket prepareTicket(User user, String ticketId) {
     SecureRandom random = new SecureRandom();
     Ticket ticket = new Ticket();
-    String ticketId =
+    ticketId = ticketId == null ?
         Thread.currentThread().getId()
             + "_"
             + System.currentTimeMillis()
             + "_"
-            + random.nextInt(Integer.MAX_VALUE);
+            + random.nextInt(Integer.MAX_VALUE) : ticketId;
     ticket.setTicketId(ticketId);
     String winId =
         Thread.currentThread().getId()

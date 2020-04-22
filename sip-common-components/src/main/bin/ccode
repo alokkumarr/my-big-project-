@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu
+
+declare -r sip_common_components_home=/opt/sip/sip-common-components
+# Create ':' separated list of all files in $lib_dir
+declare lib_classpath=/opt/sip/sip-common-components/lib/*.jar
+
+CMD="exec java \
+     -cp $lib_classpath com.synchronoss.sip.utils.Ccode $@"
+
+$CMD

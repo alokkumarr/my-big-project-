@@ -32,22 +32,19 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.constants.ErrorMessages;
-import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.Model;
 import com.synchronoss.bda.sip.dsk.Operator;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 
-import java.sql.Connection;
+import com.synchronoss.sip.utils.Ccode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -122,7 +119,10 @@ public class UserRepositoryImpl implements UserRepository {
     logger.debug("lockingTime : {} ",lockingTime);
     logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
-    password = Ccode.cencode(password).trim();
+    byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+
+
+    password = Ccode.cencode(password, encryptionKeyBytes).trim();
     String pwd = password;
     String sql =
         "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS "
@@ -239,7 +239,8 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-		String encNewPass = Ccode.cencode(newPass).trim();
+        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+		String encNewPass = Ccode.cencode(newPass, encryptionKeyBytes).trim();
 		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
 		try {
@@ -314,8 +315,10 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-		String encOldPass = Ccode.cencode(oldPass).trim();
-		String encNewPass = Ccode.cencode(newPass).trim();
+        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+
+		String encOldPass = Ccode.cencode(oldPass, encryptionKeyBytes).trim();
+		String encNewPass = Ccode.cencode(newPass, encryptionKeyBytes).trim();
 		String sql = "SELECT U.USER_SYS_ID" + " FROM USERS U" + " WHERE U.USER_ID = ?"
 				+ " and  U.ENCRYPTED_PASSWORD = ?";
 
@@ -795,7 +798,7 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
 	public Ticket getTicketDetails(String ticketId) {
 		Ticket ticket = null;
-		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID FROM TICKET WHERE TICKET_ID=?";
+		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID, VALID_UPTO, VALID_INDICATOR FROM TICKET WHERE TICKET_ID=?";
 		try {
       ticket = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, ticketId), new UserRepositoryImpl.TicketDetailExtractor());
 		} catch (DataAccessException de) {
@@ -1094,6 +1097,8 @@ public class UserRepositoryImpl implements UserRepository {
 				ticket.setRoleType(RoleType.valueOf(rs.getString("ROLE_TYPE")));
 				ticket.setUserFullName(rs.getString("USER_NAME"));
 				ticket.setWindowId(rs.getString("WINDOW_ID"));
+				ticket.setValidUpto(rs.getLong("VALID_UPTO"));
+				ticket.setValid(rs.getBoolean("VALID_INDICATOR"));
 			}
 			return ticket;
 		}
@@ -1312,19 +1317,24 @@ public class UserRepositoryImpl implements UserRepository {
     String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
         + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
         + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
+
+    byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
     try {
-      jdbcTemplate.update(sql, preparedStatement -> {
-        preparedStatement.setString(1, user.getMasterLoginId());
-        preparedStatement.setString(2, user.getEmail());
-        preparedStatement.setLong(3, user.getRoleId());
-        preparedStatement.setLong(4, user.getCustomerId());
-        preparedStatement.setString(5, Ccode.cencode(user.getPassword()).trim());
-        preparedStatement.setString(6, user.getFirstName());
-        preparedStatement.setString(7, user.getMiddleName());
-        preparedStatement.setString(8, user.getLastName());
-        preparedStatement.setString(9, user.getActiveStatusInd());
-        preparedStatement.setString(10, createdBy);
-      });
+      jdbcTemplate.update(
+          sql,
+          preparedStatement -> {
+            preparedStatement.setString(1, user.getMasterLoginId());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setLong(3, user.getRoleId());
+            preparedStatement.setLong(4, user.getCustomerId());
+            preparedStatement.setString(
+                5, Ccode.cencode(user.getPassword(), encryptionKeyBytes).trim());
+            preparedStatement.setString(6, user.getFirstName());
+            preparedStatement.setString(7, user.getMiddleName());
+            preparedStatement.setString(8, user.getLastName());
+            preparedStatement.setString(9, user.getActiveStatusInd());
+            preparedStatement.setString(10, createdBy);
+          });
     } catch (DuplicateKeyException e) {
       logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
       valid.setValid(false);
@@ -1353,22 +1363,24 @@ public class UserRepositoryImpl implements UserRepository {
 				+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-
+        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
 		try {
-        jdbcTemplate.update(con -> {
-          PreparedStatement ps = con.prepareStatement(sql, new String[]{"USER_SYS_ID"});
-          ps.setString(1, user.getMasterLoginId());
-          ps.setString(2, user.getEmail());
-          ps.setLong(3, user.getRoleId());
-          ps.setLong(4, user.getCustomerId());
-          ps.setString(5, Ccode.cencode(user.getPassword()).trim());
-          ps.setString(6, user.getFirstName());
-          ps.setString(7, user.getMiddleName());
-          ps.setString(8, user.getLastName());
-          ps.setString(9, user.getActiveStatusInd());
-          ps.setString(10, user.getMasterLoginId());
-          return ps;
-        }, keyHolder);
+      jdbcTemplate.update(
+          con -> {
+            PreparedStatement ps = con.prepareStatement(sql, new String[] {"USER_SYS_ID"});
+            ps.setString(1, user.getMasterLoginId());
+            ps.setString(2, user.getEmail());
+            ps.setLong(3, user.getRoleId());
+            ps.setLong(4, user.getCustomerId());
+            ps.setString(5, Ccode.cencode(user.getPassword(), encryptionKeyBytes).trim());
+            ps.setString(6, user.getFirstName());
+            ps.setString(7, user.getMiddleName());
+            ps.setString(8, user.getLastName());
+            ps.setString(9, user.getActiveStatusInd());
+            ps.setString(10, user.getMasterLoginId());
+            return ps;
+          },
+          keyHolder);
 			return (Long) keyHolder.getKey();
 		} catch (Exception e) {
 			return -1L;
@@ -1377,28 +1389,35 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public Valid updateUser(User user) {
-		Valid valid = new Valid();
-		StringBuffer sql = new StringBuffer();
-		sql.append("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ? ");
-		if (user.getPassword() != null) {
-			sql.append(",ENCRYPTED_PASSWORD = '" + Ccode.cencode(user.getPassword()).trim() + "'");
-			sql.append(",PWD_MODIFIED_DATE = SYSDATE()");
-		}
+    Valid valid = new Valid();
+    byte[] encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+    StringBuffer sql = new StringBuffer();
+    sql.append("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ? ");
+    if (user.getPassword() != null) {
+      sql.append(
+          ",ENCRYPTED_PASSWORD = '"
+              + Ccode.cencode(user.getPassword(), encryptionKeyBytes).trim()
+              + "'");
+      sql.append(",PWD_MODIFIED_DATE = SYSDATE()");
+    }
 
-		sql.append(",FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,"
-				+ " MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ? WHERE USER_SYS_ID = ?");
+    sql.append(
+        ",FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,"
+            + " MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ? WHERE USER_SYS_ID = ?");
 
     try {
-      jdbcTemplate.update(sql.toString(), preparedStatement -> {
-        preparedStatement.setString(1, user.getEmail());
-        preparedStatement.setLong(2, user.getRoleId());
-        preparedStatement.setString(3, user.getFirstName());
-        preparedStatement.setString(4, user.getMiddleName());
-        preparedStatement.setString(5, user.getLastName());
-        preparedStatement.setInt(6, Integer.parseInt(user.getActiveStatusInd()));
-        preparedStatement.setString(7, user.getMasterLoginId());
-        preparedStatement.setLong(8, user.getUserId());
-      });
+      jdbcTemplate.update(
+          sql.toString(),
+          preparedStatement -> {
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setLong(2, user.getRoleId());
+            preparedStatement.setString(3, user.getFirstName());
+            preparedStatement.setString(4, user.getMiddleName());
+            preparedStatement.setString(5, user.getLastName());
+            preparedStatement.setInt(6, Integer.parseInt(user.getActiveStatusInd()));
+            preparedStatement.setString(7, user.getMasterLoginId());
+            preparedStatement.setLong(8, user.getUserId());
+          });
     } catch (DataIntegrityViolationException de) {
       logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
       valid.setValid(false);
@@ -3133,6 +3152,7 @@ public class UserRepositoryImpl implements UserRepository {
         "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID,SEC_GROUP_SYS_ID, ENCRYPTED_PASSWORD, "
             + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, ID3_ENABLED, CREATED_DATE, CREATED_BY ) "
             + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, SYSDATE(), ? ); ";
+    byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
     try {
       jdbcTemplate.update(
           sql,
@@ -3146,7 +3166,7 @@ public class UserRepositoryImpl implements UserRepository {
             } else {
               preparedStatement.setNull(5, Types.BIGINT);
             }
-            preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword()).trim());
+            preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword(),encryptionKeyBytes).trim());
             preparedStatement.setString(7, userDetails.getFirstName());
             preparedStatement.setString(8, userDetails.getMiddleName());
             preparedStatement.setString(9, userDetails.getLastName());
@@ -3182,6 +3202,7 @@ public class UserRepositoryImpl implements UserRepository {
             " UPDATE USERS SET EMAIL=? , ROLE_SYS_ID=?,SEC_GROUP_SYS_ID= ? , ENCRYPTED_PASSWORD =? , "
                 + "FIRST_NAME =? , MIDDLE_NAME =? , LAST_NAME=? , ACTIVE_STATUS_IND=? , ID3_ENABLED=? , MODIFIED_DATE= SYSDATE() , MODIFIED_BY=? "
                 + " where USER_SYS_ID=? and CUSTOMER_SYS_ID=? ; ";
+        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
         try {
             numberOfRowsUpdated = jdbcTemplate.update(
                 sql,
@@ -3193,7 +3214,7 @@ public class UserRepositoryImpl implements UserRepository {
                     } else {
                         preparedStatement.setNull(3, Types.BIGINT);
                     }
-                    preparedStatement.setString(4, Ccode.cencode(userDetails.getPassword()).trim());
+                    preparedStatement.setString(4, Ccode.cencode(userDetails.getPassword(), encryptionKeyBytes).trim());
                     preparedStatement.setString(5, userDetails.getFirstName());
                     preparedStatement.setString(6, userDetails.getMiddleName());
                     preparedStatement.setString(7, userDetails.getLastName());
@@ -3411,5 +3432,34 @@ public class UserRepositoryImpl implements UserRepository {
 
 		logger.info("DSK Object : {}",dskAttributeList.toString());
 		return dskAttributeList;
+	}
+
+	@Override
+	public Ticket getTicketForId3(String ticketId, String userId) {
+		Ticket ticket = null;
+		String sql =
+				"SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID, VALID_UPTO, T.VALID_INDICATOR"
+						+ " FROM TICKET T"
+						+ " INNER JOIN  USERS U ON (T.MASTER_LOGIN_ID = U.USER_ID)"
+						+ " INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID)"
+						+ " INNER JOIN ID3_TICKET_DETAILS IT ON (IT.SIP_TICKET_ID = T.TICKET_ID)"
+						+ " INNER JOIN ID3_CLIENT_DETAILS IC ON (IT.ID3_CLIENT_SYS_ID = IC.ID3_CLIENT_SYS_ID)"
+						+ " WHERE TICKET_ID = ? AND U.USER_ID = ?";
+		try {
+			ticket = jdbcTemplate.query(sql, preparedStatement -> {
+				preparedStatement.setString(1, ticketId);
+				preparedStatement.setString(2, userId);
+			}, new UserRepositoryImpl.TicketDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger
+					.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+							null, e);
+		}
+
+		return ticket;
+
 	}
 }

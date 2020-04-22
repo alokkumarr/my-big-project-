@@ -1,6 +1,7 @@
 import { TestBed, async } from '@angular/core/testing';
 import { FilterChipsComponent } from './filter-chips.component';
 import { AnalyzeService } from '../../../services/analyze.service';
+import { DskFiltersService } from '../../../../../common/services/dsk-filters.service';
 import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('Filter Chips Component', () => {
@@ -9,7 +10,8 @@ describe('Filter Chips Component', () => {
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
       declarations: [FilterChipsComponent],
-      providers: [{ provide: AnalyzeService, useValue: {} }]
+      providers: [{ provide: AnalyzeService, useValue: {} },
+        { provide: DskFiltersService, useValue: {} }]
     }).compileComponents();
   }));
 

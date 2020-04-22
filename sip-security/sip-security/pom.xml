@@ -208,6 +208,28 @@
             </configuration>
           </plugin>
 
+          <!--<plugin>-->
+            <!--<artifactId>maven-assembly-plugin</artifactId>-->
+            <!--<version>3.0.0</version>-->
+            <!--<configuration>-->
+              <!--<descriptorRefs>-->
+                <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+              <!--</descriptorRefs>-->
+              <!--<finalName>${project.artifactId}-${project.version}-classes</finalName>-->
+              <!--<appendAssemblyId>false</appendAssemblyId>-->
+            <!--</configuration>-->
+            <!--<executions>-->
+              <!--<execution>-->
+                <!--<id>jar-with-dependencies</id>-->
+                <!--<phase>package</phase>-->
+                <!--<goals>-->
+                  <!--<goal>single</goal>-->
+                <!--</goals>-->
+              <!--</execution>-->
+            <!--</executions>-->
+          <!--</plugin>-->
+
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

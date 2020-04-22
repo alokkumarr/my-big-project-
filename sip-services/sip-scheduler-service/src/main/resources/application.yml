@@ -33,9 +33,9 @@ server:
     key-store: /Users/spau0004/Desktop/keystore/keystore.jks
     key-alias: sipcert
     key-store-password: sip@123
-    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
-    trust-store-password: sip@123  
-    
+    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
+    trust-store-password: sip@123
+
 management:
 #  server:
 #    ssl:
@@ -76,4 +76,7 @@ sip-analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
 saw-dispatch-service-url: ${connector}://localhost:9400/exports
 bis-transfer-url: ${connector}://localhost:9642/ingestion/batch/channel/transfers/data
 sip-dispatch-row-limit: 10000
+
+encryption:
+  key: 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4
        

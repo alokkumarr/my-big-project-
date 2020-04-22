@@ -109,12 +109,6 @@ export class DesignerUpdateFilters {
   constructor(public filters: any) {}
 }
 
-export class DesignerUpdatebooleanCriteria {
-  /* Use for only new DSL analyses. This is for booleanCriteria in charts,  */
-  static readonly type = '[Designer] Update booleanCriteria for analysis';
-  constructor(public booleanCriteria: string) {}
-}
-
 export class DesignerUpdateAnalysisChartTitle {
   /* Use for only new DSL analyses */
   static readonly type = '[Designer] Update chart title for analysis';
@@ -218,6 +212,12 @@ export class DesignerUpdateAggregateInSorts {
   static readonly type =
     '[Designer] update aggregate in sorts on change of aggregagte';
   constructor(public column: any) {}
+}
+
+export class DesignerUpdateAnalysisChartLimitByOptions {
+  static readonly type =
+  '[Designer] update chart limit by options';
+  constructor(public limitByAxis: {}) {}
 }
 
 export class DesignerUpdateQueryFilters {

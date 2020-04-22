@@ -160,7 +160,7 @@ public class SecurityController {
 					user.setMasterLoginId(loginDetails.getMasterLoginId());
 					user.setValidMins((nSSOProperties.getValidityMins() != null
 							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
-					ticket = tHelper.createTicket(user, false);
+					ticket = tHelper.createTicket(user, false, null);
 				} else {
 					ticket.setValidityReason("Password Expired");
 				}
@@ -272,7 +272,7 @@ public class SecurityController {
 					user.setMasterLoginId(masterLoginId);
 					user.setValidMins((nSSOProperties.getValidityMins() != null
 							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
-					ticket = tHelper.createTicket(user, false);
+					ticket = tHelper.createTicket(user, false, null);
 					newRToken = new RefreshToken();
 					newRToken.setValid(true);
 					newRToken.setMasterLoginId(masterLoginId);

@@ -9,18 +9,17 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
-import com.synchronoss.saw.batch.utils.IntegrationUtils;
-import com.synchronoss.saw.batch.utils.SipObfuscation;
+import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactoryLocator;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
@@ -38,6 +37,9 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
 
   @Autowired
   private BisChannelDataRestRepository bisChannelDataRestRepository;
+
+  @Value("${encryption.sftp-key}")
+  private String encryptionKey;
 
   @Override
   public SessionFactory<LsEntry> getSessionFactory(Object key) {
@@ -73,8 +75,8 @@ public class RuntimeSessionFactoryLocator implements SessionFactoryLocator {
         String hostname = rootNode.get("hostName").asText();
         defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
         String portNumber = rootNode.get("portNo").asText();
-        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
-        String password = obfuscator.decrypt(rootNode.get("password").asText());
+        String password = Ccode
+            .cdecode(rootNode.get("password").asText(), encryptionKey.getBytes());
         defaultSftpSessionFactory.setHost(hostname);
         defaultSftpSessionFactory.setPort(Integer.valueOf(portNumber));
         String userName = rootNode.get("userName").asText();        
