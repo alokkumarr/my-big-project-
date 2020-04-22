@@ -1,6 +1,7 @@
 package sncr.bda.cli;
 
 import com.google.gson.*;
+import com.google.json.JsonSanitizer;
 import com.mapr.db.MapRDB;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
@@ -71,7 +72,8 @@ public class Request {
     public Request(String jStr)
     {
         jsonParser = new JsonParser();
-        request = jsonParser.parse(jStr);
+        String sanitizedStr = JsonSanitizer.sanitize(jStr);
+        request = jsonParser.parse(sanitizedStr);
     }
 
     public JsonObject search() {
