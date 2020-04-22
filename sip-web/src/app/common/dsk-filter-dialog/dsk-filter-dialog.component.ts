@@ -104,14 +104,24 @@ export class DskFilterDialogComponent implements OnInit {
   fetchAggregatedFilters(filters) {
     return filters.map(field => {
       if (!field.model) {
-        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span></span>`;
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+          <span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+            ${field.aggregate}(${field.columnName.split('.keyword')[0]})
+          </span>
+        </span>`;
       }
       if (field.model.operator === 'BTW') {
-        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+        ${field.aggregate}(${field.columnName.split('.keyword')[0]})
+          </span>
+          <span class="operator">${
           field.model.operator
         }</span> <span>[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
       } else {
-        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+        ${field.aggregate}(${field.columnName.split('.keyword')[0]})
+          </span>
+          <span class="operator">${
           field.model.operator || ''
         }</span> <span>[${[get(field, 'model.value')]}]</span>`;
       }
