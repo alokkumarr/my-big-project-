@@ -183,7 +183,7 @@ export const DATE_FORMATS = [
     momentValue: 'MMM-YY'
   },
   {
-    value: 'MMM d YYYY',
+    value: 'MMM d yyyy',
     momentValue: 'MMM Do YYYY',
     groupInterval: 'day',
     // there are some formats that the backend does not support
@@ -241,7 +241,7 @@ export const DATE_FORMATS = [
     groupInterval: 'day'
   },
   {
-    value: 'MMMM d YYYY, h:mm:ss a',
+    value: 'MMMM d yyyy, h:mm:ss a',
     momentValue: 'MMMM Do YYYY, h:mm:ss a',
     groupInterval: 'hour',
     // there are some formats that the backend does not support

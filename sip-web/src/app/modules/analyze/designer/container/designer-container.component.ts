@@ -348,7 +348,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         column.alias = '';
         delete column.aggregate;
         if (column.type === 'date') {
-          column.dateFormat = 'MMM d YYYY';
+          column.dateFormat = 'MMM d yyyy';
         }
         delete column.checked;
         return accumulator;
