@@ -37,6 +37,7 @@ import com.mapr.streams.Streams;
 import com.mapr.streams.impl.MarlinDocumentStream;
 import com.mapr.streams.impl.MessageStore;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -115,8 +116,10 @@ public class WorkbenchInspectController {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(appKeys.getBody());
-		JsonNode objects = mapper.readTree(json);
-		List<JsonNode> entities = new ArrayList<>();
+		String sanitizedJson = SipCommonUtils.sanitizeJson(json);		
+		JsonNode objects = mapper.readTree(sanitizedJson);
+		List<JsonNode> entities = new ArrayList<JsonNode>();
+
 
 		for (final JsonNode objNode : objects) {
 			ObjectNode resultNode = mapper.createObjectNode();
@@ -133,10 +136,11 @@ public class WorkbenchInspectController {
 			+ appKey.asText(), HttpMethod.GET, entity, Object[].class);
 			logger.debug("##### config response ###" + config.toString());
 			String configJson = mapper.writeValueAsString(config.getBody());
+			String sanitizedConfig = SipCommonUtils.sanitizeJson(configJson);
+			logger.debug("#####config response ::" + sanitizedConfig);
+			JsonNode configObjects = mapper.readTree(sanitizedConfig);
+			if (configObjects.isArray()) {	
 
-			logger.debug("#####config response ::" + configJson);
-			JsonNode configObjects = mapper.readTree(configJson);
-			if (configObjects.isArray()) {
 				logger.debug("Is array @####");
 				for (JsonNode jsonNode : configObjects) {
 					JsonNode streamInfo = jsonNode.get("streams_1");
