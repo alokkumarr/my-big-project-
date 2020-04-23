@@ -269,8 +269,8 @@ config file to support larger files upload (more than 1MB)
 
 ==== Branding Details
 
-Branding Logo/Image can be of format (JPG, JPEG, PNG) and 
-cannot the value provided while including configuration
+Branding Logo/Image can be of format (JPG, JPEG, PNG) and the size of
+the file cannot exceed the value provided while including configuration
 
 Branding color is a six-digit, three-byte hexadecimal number 
 specified with notation using a leading number
