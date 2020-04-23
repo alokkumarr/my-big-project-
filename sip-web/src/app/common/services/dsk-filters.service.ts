@@ -9,6 +9,7 @@ import * as flatten from 'lodash/flatten';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as fpFilter from 'lodash/fp/filter';
 
 import { Observable, of } from 'rxjs';
 import {
@@ -89,18 +90,17 @@ export class DskFiltersService {
     );
   }
 
-  isDSKFilterValid(filter, isTopLevel = false, data) {
-
+  isDSKFilterValid(filter, isTopLevel = false, data, filterObject) {
+    let condition;
     switch (data.mode) {
       case 'DSK':
-        let condition;
         condition = filter.booleanQuery.length > 0;
         return (
           filter.booleanCriteria &&
           condition &&
           filter.booleanQuery.every(child => {
             if ((<DSKFilterGroup>child).booleanCriteria) {
-              return this.isDSKFilterValid(<DSKFilterGroup>child, false, data);
+              return this.isDSKFilterValid(<DSKFilterGroup>child, false, data, filterObject);
             }
 
             const field = <DSKFilterField>child;
@@ -114,9 +114,36 @@ export class DskFiltersService {
         );
 
       case 'ANALYZE':
-      const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
-        let areValid = true;
+      const newFilters = filter.filters ? filter : filter[0];
+      condition = newFilters.filters.length > 0;
+      let checkFiltlers = (
+        newFilters.filters &&
+          condition &&
+          newFilters.filters.every(child => {
 
+            if ((child).filters) {
+              return this.isDSKFilterValid(child, false, data, filterObject);
+            }
+            const field = child;
+            return (
+              field.artifactsName
+            );
+          })
+        );
+
+      const flattenedFilters = this.analyzeService.flattenAndCheckFilters(filter, []);
+      const isAggregatePresent = fpFilter(({ isAggregationFilter }) => {
+        return isAggregationFilter;
+      })(flattenedFilters).length > 0;
+
+      if (!checkFiltlers && (isEmpty(filterObject.filters) && isAggregatePresent)) {
+        checkFiltlers = true;
+      }
+      if (!checkFiltlers && !isEmpty(filterObject.filters)) {
+        return checkFiltlers;
+      }
+
+        let areValid = true;
         forEach(
           flattenedFilters,
           ({
