@@ -75,8 +75,7 @@ import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
 import {
   COMPARISON_CHART_DATE_INTERVALS,
-  COMPARISON_CHART_DATE_INTERVALS_OBJ,
-  NUMBER_TYPES
+  COMPARISON_CHART_DATE_INTERVALS_OBJ
 } from 'src/app/common/consts';
 
 // setAutoFreeze(false);
@@ -342,13 +341,15 @@ export class DesignerState {
        If no data field exists, it is a non-data field. Do nothing */
 
     /* add dataField even if not present only for pivots with number type fields */
-    if (['report', 'esReport'].includes(analysis.type)) {
+    if (!['report', 'esReport'].includes(analysis.type)) {
       artifactColumn.dataField = DesignerService.dataFieldFor({
         columnName: artifactColumn.columnName,
         aggregate: artifactColumn.aggregate
         /* || artifacts[artifactIndex].fields[artifactColumnIndex].aggregate */
       } as ArtifactColumnDSL);
     }
+
+    console.log(artifactColumn);
 
     artifactColumn.displayName = DesignerService.displayNameFor({
       displayName:
