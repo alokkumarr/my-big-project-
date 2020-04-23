@@ -99,10 +99,10 @@ public class TicketHelperImpl implements TicketHelper {
       newTicket = prepareTicket(oldTicket, validMins);
       insertTicketDetails(newTicket);
     } catch (DataAccessException de) {
-      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), de);
       throw de;
     } catch (Exception e) {
-      logger.error("Exception occured while recreating the ticket: " + e.getMessage(), null, e);
+      logger.error("Exception occurred while recreating the ticket: " + e.getMessage(), e);
     }
     return newTicket;
   }

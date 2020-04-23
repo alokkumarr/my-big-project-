@@ -870,7 +870,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {}: DesignerClearGroupAdapters
+    {  }: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
@@ -1051,7 +1051,7 @@ export class DesignerState {
   @Action(DesignerUpdateAnalysisChartLimitByOptions)
   updateLimitByAxisOptions(
     { patchState, getState }: StateContext<DesignerStateModel>,
-    { limitByAxis } : DesignerUpdateAnalysisChartLimitByOptions
+    { limitByAxis }: DesignerUpdateAnalysisChartLimitByOptions
   ) {
     const analysis = getState().analysis;
     const chartOptions =

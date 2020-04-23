@@ -172,7 +172,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     project.setResultFormat(ResultFormat.JSON);
     List<Object> data = new ArrayList<>();
     for (String directory : directories) {
-      JsonNode node = objectMapper.readTree(directory);
+      String sanitizedDir  = SipCommonUtils.sanitizeJson(directory);
+      JsonNode node = objectMapper.readTree(sanitizedDir);
       data.add(node);
     }
     project.setData(data);
@@ -192,7 +193,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     List<Object> data = new ArrayList<>();
     for (String directory : directories) {
       logger.trace("Reading data in readSubDirectoriesByProjectId {}" + directory);
-      JsonNode node = objectMapper.readTree(directory);
+      String sanitizedDir  = SipCommonUtils.sanitizeJson(directory);
+      JsonNode node = objectMapper.readTree(sanitizedDir);
       data.add(node);
     }
     project.setData(data);
@@ -305,7 +307,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         sawDelimitedReader = new SAWDelimitedReader(filePath, Long.parseLong(defaultPreviewLimit), false);
         resultJSON = sawDelimitedReader.toJson();
       logger.trace("resutlJSON from preview service {}", resultJSON);
-      Inspect inspect = objectMapper.readValue(resultJSON, Inspect.class);
+      String sanitizedJson  = SipCommonUtils.sanitizeJson(resultJSON);
+      Inspect inspect = objectMapper.readValue(sanitizedJson, Inspect.class);
       project.setData(inspect.getSamples());
     }
     else {
@@ -314,7 +317,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         sawDelimitedReader = new SAWDelimitedReader(filePath, Long.parseLong(defaultPreviewLimit), true);
         resultJSON = sawDelimitedReader.toJson();
       logger.trace("resutlJSON from preview service {}", resultJSON);
-      Inspect inspect = objectMapper.readValue(resultJSON, Inspect.class);
+      String sanitizedJson  = SipCommonUtils.sanitizeJson(resultJSON);
+      Inspect inspect = objectMapper.readValue(sanitizedJson, Inspect.class);
       project.setData(inspect.getSamples());
     }
     logger.trace("response structure {}", objectMapper.writeValueAsString(project));

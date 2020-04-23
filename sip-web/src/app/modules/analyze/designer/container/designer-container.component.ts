@@ -868,9 +868,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysisForPreview = isDSLAnalysis(this.analysis)
           ? this._store.selectSnapshot(state => state.designerState.analysis)
           : this.analysis;
-        this._analyzeDialogService.openPreviewDialog(<
-          | Analysis
-          | AnalysisDSL>analysisForPreview);
+        this._analyzeDialogService.openPreviewDialog(<Analysis | AnalysisDSL>(
+          analysisForPreview
+        ));
         break;
       case 'description':
         this._analyzeDialogService
@@ -943,8 +943,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         })
       );
     } else if (['new', 'fork'].includes(this.designerMode)) {
-      (<Analysis>this
-        .analysis).categoryId = this._jwtService.userAnalysisCategoryId;
+      (<Analysis>(
+        this.analysis
+      )).categoryId = this._jwtService.userAnalysisCategoryId;
     }
 
     const analysisForSave = isDSLAnalysis(this.analysis)
@@ -1293,7 +1294,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'comboType':
         this.updateAnalysis();
-        this.refreshDataObject();
+        this.requestDataIfPossible();
         break;
       case 'labelOptions':
         isDSLAnalysis(this.analysis)
@@ -1364,10 +1365,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         break;
       case 'limitByAxis':
         this._store.dispatch(
-          new DesignerUpdateAnalysisChartLimitByOptions(
-            event.data.limitByAxis
-          )
-        )
+          new DesignerUpdateAnalysisChartLimitByOptions(event.data.limitByAxis)
+        );
         this.auxSettings = { ...this.auxSettings, ...event.data };
         this.requestDataIfPossible();
         break;
@@ -1503,7 +1502,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const answer = isRequestValid(sipQuery, this.analysis.type);
 
         if (!answer.willRequestBeValid) {
-          const { warning: { title, msg } } = answer as InvalidAnswer;
+          const {
+            warning: { title, msg }
+          } = answer as InvalidAnswer;
           this._analyzeDialogService.openWarningDialog(title, msg);
         }
         return every(requestCondition, Boolean) && answer.willRequestBeValid;

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -773,8 +774,6 @@ public class Id3SecurityController {
       throws IOException {
     DskGroupPayload payload;
 
-    // Ticket ticket = SipCommonUtils.getTicket(request);
-
     Id3Claims id3Claims = validateId3IdentityToken.validateToken(id3token, Id3Claims.Type.ID);
     if (id3Claims == null) {
       logger.error("Invalid Token");
@@ -796,8 +795,9 @@ public class Id3SecurityController {
       payload =
           dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
       if (!payload.getValid()) {
-        logger.error("Error occurred: {}", payload.getMessage());
-        response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), payload.getMessage());
+        String escapedMessage = HtmlUtils.htmlEscape(payload.getMessage());
+        logger.error("Error occurred: {}", escapedMessage);
+        response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), escapedMessage);
         return null;
       }
       return payload;
@@ -953,8 +953,9 @@ public class Id3SecurityController {
       return null;
     }
     if (!payload.getValid()) {
-      logger.error("Error occurred: {}", payload.getMessage());
-      response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), payload.getMessage());
+      String escapedMessage = HtmlUtils.htmlEscape(payload.getMessage());
+      logger.error("Error occurred: {}", escapedMessage);
+      response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), escapedMessage);
       return null;
     }
     return payload;

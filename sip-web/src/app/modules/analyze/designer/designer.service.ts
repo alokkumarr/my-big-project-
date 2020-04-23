@@ -314,9 +314,9 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-        artifactColumn.dataField = DesignerService.dataFieldFor(
-          <ArtifactColumnDSL>artifactColumn
-        );
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
       }
     };
 
@@ -437,9 +437,9 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
         artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-        artifactColumn.dataField = DesignerService.dataFieldFor(
-          <ArtifactColumnDSL>artifactColumn
-        );
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
       }
     };
 
@@ -626,9 +626,9 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
 
-        artifactColumn.dataField = DesignerService.dataFieldFor(
-          <ArtifactColumnDSL>artifactColumn
-        );
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;

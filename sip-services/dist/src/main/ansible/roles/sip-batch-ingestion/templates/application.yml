@@ -127,3 +127,7 @@ bis:
   destination-fs-user: mapr
   duplicate-entry: {{ sip_bis_duplicate_entry  | default('true') }}
   http-pool-size: 50
+
+encryption:
+  key: 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4
+  sftp-key: Saw12345Saw12345
