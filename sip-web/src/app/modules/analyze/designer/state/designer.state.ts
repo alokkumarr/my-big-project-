@@ -342,7 +342,7 @@ export class DesignerState {
        If no data field exists, it is a non-data field. Do nothing */
 
     /* add dataField even if not present only for pivots with number type fields */
-    if (NUMBER_TYPES.includes(artifactColumn.type) && analysis.type === 'pivot') {
+    if (['report', 'esReport'].includes(analysis.type)) {
       artifactColumn.dataField = DesignerService.dataFieldFor({
         columnName: artifactColumn.columnName,
         aggregate: artifactColumn.aggregate
