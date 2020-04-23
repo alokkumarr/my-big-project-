@@ -1,19 +1,13 @@
 package com.synchronoss.sip.alert.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.saw.model.Model.Operator;
-import com.synchronoss.sip.alert.modal.AlertNotificationLog;
-import com.synchronoss.sip.alert.modal.AlertResponse;
+
 import com.synchronoss.sip.alert.modal.AlertResult;
-import com.synchronoss.sip.alert.modal.AlertRuleResponse;
-import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.modal.AlertSubscriberToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,9 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import com.synchronoss.sip.alert.modal.AlertResponse;
+import com.synchronoss.sip.alert.modal.AlertRuleResponse;
+import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +50,7 @@ public class AlertUtils {
 
   private static String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
-  private static final Logger logger = LoggerFactory.getLogger(AlertUtils.class);
+
 
   /**
    * Return timestamp from the given date.
@@ -354,44 +351,5 @@ public class AlertUtils {
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
     objectNode.put(columnName, columnValue);
     return node;
-  }
-
-  /**
-   * @param notificationLog
-   * @param basePath
-   * @param table
-   */
-  public static void saveNotificationStatus(AlertNotificationLog notificationLog, String basePath,
-      String table) {
-    logger.info("Saving the notification status");
-    try {
-      MaprConnection connection = new MaprConnection(basePath, table);
-      String id = UUID.randomUUID().toString();
-      notificationLog.setNotificationSysId(id);
-      connection.insert(id, notificationLog);
-    } catch (Exception e) {
-      logger.error("Exception occured while writing the notificaton status." + e);
-    }
-  }
-
-  /**
-   * @param alertTriggerSysId
-   * @param basePath
-   * @param table
-   * @return
-   */
-  public static AlertResult getAlertResult(String alertTriggerSysId, String basePath,
-      String table) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    MaprConnection connection = new MaprConnection(basePath, table);
-    JsonNode jsonAlertRule = connection.findById(alertTriggerSysId);
-    AlertResult alertResult = null;
-    try {
-      objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-      alertResult = objectMapper.treeToValue(jsonAlertRule, AlertResult.class);
-    } catch (JsonProcessingException e) {
-      logger.error("Error occured while parsing the alert rule details : {}", e);
-    }
-    return alertResult;
   }
 }

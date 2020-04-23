@@ -5,19 +5,6 @@
   yum: name=/tmp/sip-alert.rpm state=present
   notify:
     - restart sip-alert
-
-- name: Look up SIP notifications Service database password
-  set_fact:
-    sip_notifications_db_password: >-
-      {{ lookup('password', inventory_dir
-        + '/sip-notifications-db-password chars=ascii_letters,digits') }}
-
-- name: lookup & setting database root password
-  set_fact:
-    root_password: >-
-        {{ lookup('password', inventory_dir
-        + '/mariadb-root-password chars=ascii_letters,digits') }}
-
 # Generate the random secret key to make key unique per SIP enviroment.
 - name: Generate sip-alert-subscriber jwt secret key
   set_fact:
@@ -28,40 +15,5 @@
   template: src=application.yml dest=/opt/bda/sip-alert-service/conf
   notify:
     - restart sip-alert
-
-- name: Set the SIP notifications (currently alert) Service database password
-  copy:
-    content: "{{ sip_notifications_db_password }}"
-    dest: /etc/bda/sip-notifications-db-password
-- name: Create user defined sip_notifications database
-  mysql_db:
-    name: "sip_notifications"
-    login_user: root
-    login_password: "{{ root_password }}"
-    state: present
-  when: "groups['saw-services'].index(inventory_hostname) == 0"
-  tags: mariadb
-
-- name: Create the sip_notifications users
-  mysql_user:
-   name: "sip_notifications"
-   password: "{{ sip_notifications_db_password }}"
-   host: "localhost"
-   priv: "sip_notifications.*:ALL,GRANT"
-   append_privs: "true"
-   login_user: root
-   login_password: "{{ root_password }}"
-   state: present
-  when: "groups['saw-services'].index(inventory_hostname) == 0"
-  tags: mariadb
-- name: create MariaDB user for sip_notifications to other sip-nodes
-  command: >
-    mysql -u root -e "CREATE USER IF NOT EXISTS 'sip_notifications'@'{{ hostvars[inventory_hostname]
-    ['ansible_default_ipv4']['address'] }}' IDENTIFIED BY
-    '{{ sip_notifications_db_password }}'" -p{{ saw_mariadb_db_password }}
-- name: GRANT PRIVILEGES for sip_notifications to other sip-nodes
-  command: >
-    mysql -u root -e "GRANT ALL PRIVILEGES ON sip_notifications.* TO 'sip_notifications'@'{{ hostvars[inventory_hostname]
-    ['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password }}
 - name: Enable SIP Alert Service
   systemd: name=sip-alert-proxy.socket enabled=true state=started
