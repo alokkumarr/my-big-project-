@@ -340,7 +340,7 @@ export class DesignerState {
     /* If artifact column had a data field, make sure it's updated with latest aggregate.
        If no data field exists, it is a non-data field. Do nothing */
 
-    /* add dataField even if not present only for pivots with number type fields */
+    /* add dataField even if not present only for pivots and charts */
     if (!['report', 'esReport'].includes(analysis.type)) {
       artifactColumn.dataField = DesignerService.dataFieldFor({
         columnName: artifactColumn.columnName,
@@ -348,8 +348,6 @@ export class DesignerState {
         /* || artifacts[artifactIndex].fields[artifactColumnIndex].aggregate */
       } as ArtifactColumnDSL);
     }
-
-    console.log(artifactColumn);
 
     artifactColumn.displayName = DesignerService.displayNameFor({
       displayName:
