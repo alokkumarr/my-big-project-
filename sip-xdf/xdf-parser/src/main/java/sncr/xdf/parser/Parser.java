@@ -24,6 +24,7 @@ import sncr.bda.conf.Output;
 import sncr.bda.conf.ParserInputFileFormat;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.bda.utils.BdaCoreUtils;
 import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.alert.AlertQueueManager;
@@ -342,7 +343,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
-        return ctx.fs.rename(sourceFilePath, archiveLocation);
+        Path normalizedSourceFilePath = BdaCoreUtils.normalizePath(sourceFilePath);
+        return ctx.fs.rename(normalizedSourceFilePath, archiveLocation);
     }
 
     @Override

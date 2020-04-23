@@ -838,15 +838,16 @@ public class ExternalSecurityController {
               payload.setValid(false);
               payload.setMessage("Unable to update the dsk attributes");
           }
-          // Fetch the attributes and return
-      } catch (Exception ex) {
-          logger.error("Error occurred while updating the security group attributes: " + ex.getMessage(), ex);
+      // Fetch the attributes and return
+    } catch (Exception ex) {
+      logger.error(
+          "Error occurred while updating the security group attributes: " + ex.getMessage(), ex);
 
-          payload = new DskGroupPayload();
-          payload.setValid(false);
-          payload.setMessage(ex.getMessage());
-          response.setStatus(HttpStatus.BAD_REQUEST.value());
-      }
+      payload = new DskGroupPayload();
+      payload.setValid(false);
+      payload.setMessage(ex.getMessage());
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+    }
 
       return payload;
   }

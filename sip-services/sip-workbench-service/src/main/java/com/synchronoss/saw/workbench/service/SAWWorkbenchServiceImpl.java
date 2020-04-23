@@ -119,10 +119,13 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         }
       }
     } else {
-      File directory = new File(defaultProjectRoot);
+      String normalizedProjectRoot = SipCommonUtils.normalizePath(defaultProjectRoot);
+      File directory = new File(normalizedProjectRoot);
       if (!directory.exists()) {
         if (directory.mkdirs()) {
-          File file = new File(defaultProjectRoot + defaultProjectPath);
+          String normalizedPath =
+              SipCommonUtils.normalizePath(defaultProjectRoot + defaultProjectPath);
+          File file = new File(normalizedPath);
           if (!file.exists())
             file.mkdirs();
         }
@@ -274,7 +277,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         continue;
       }
       byte[] bytes = file.getBytes();
-      java.nio.file.Path path = Paths.get(this.tmpDir + file.getOriginalFilename());
+      String normalizedPath=SipCommonUtils.normalizePath(this.tmpDir + file.getOriginalFilename());
+      java.nio.file.Path path = Paths.get(normalizedPath);
       java.nio.file.Path tmpPath = Files.write(path, bytes);
       String absolutePath = tmpPath.toAbsolutePath().toString();
       success = this.mdt.moveToRaw(projectPath, absolutePath, null, file.getOriginalFilename());
