@@ -4,6 +4,7 @@ import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.export.model.EmailDetails;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -62,15 +63,16 @@ public class GenericEmailController {
       throw new JSONValidationSAWException("Recipient address "
           + "and subject are required");
     }
-    
+
     if (emailDetails.getAttachmentFilePath() != null) {
-      File file = new File(emailDetails.getAttachmentFilePath());
+      String normalizedPath = SipCommonUtils.normalizePath(emailDetails.getAttachmentFilePath());
+      File file = new File(normalizedPath);
       if (!file.exists()) {
         throw new JSONValidationSAWException("Attachment file path "
             + "doesnt exists");
       }
     }
-    
+
     logger.trace("Email send request recieved");
     logger.trace("Subject ::" + emailDetails.getSubject());
     logger.trace("Recipients ::" + emailDetails.getRecipients());

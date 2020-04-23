@@ -23,6 +23,7 @@ import sncr.bda.conf.Field;
 import sncr.bda.conf.Output;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.bda.utils.BdaCoreUtils;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
@@ -485,9 +486,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     int archiveCounter = 0;
                     String currentTimestamp = LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
-
-                    Path archivePath = new Path(
-                        archiveDir + Path.SEPARATOR + currentTimestamp + "_" + UUID.randomUUID() + Path.SEPARATOR);
+                    String normalizedPath =
+                        BdaCoreUtils.normalizePath(
+                            archiveDir
+                                + Path.SEPARATOR
+                                + currentTimestamp
+                                + "_"
+                                + UUID.randomUUID()
+                                + Path.SEPARATOR);
+                    Path archivePath = new Path(normalizedPath);
                     ctx.fs.mkdirs(archivePath);
                     logger.debug("Archive directory " + archivePath);
 
@@ -515,7 +522,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
-        return ctx.fs.rename(sourceFilePath, archiveLocation);
+        Path normalizedSourceFilePath = BdaCoreUtils.normalizePath(sourceFilePath);
+        Path normalizedArchiveLocation = BdaCoreUtils.normalizePath(archiveLocation);
+        return ctx.fs.rename(normalizedSourceFilePath, normalizedArchiveLocation);
     }
 
     // Parse data without headers
@@ -1021,9 +1030,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                     String tempRejectedLocation = this.rejectedDatasetLocation + "_" + UUID.randomUUID()
                         + "_" + System.currentTimeMillis();
-                    logger.debug("Writing rejected data to temp directory " + tempRejectedLocation);
+                    String normalizedTempRejLocation= BdaCoreUtils.normalizePath(tempRejectedLocation);
+                    logger.debug("Writing rejected data to temp directory " + normalizedTempRejLocation);
 
-                    writeRdd(rejectedRecords, tempRejectedLocation);
+                    writeRdd(rejectedRecords, normalizedTempRejLocation);
 
 
                     if (HFileOperations.exists(this.rejectedDatasetLocation)) {
@@ -1031,7 +1041,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         HFileOperations.deleteEnt(this.rejectedDatasetLocation);
                     }
 
-                    this.ctx.fs.rename(new Path(tempRejectedLocation),
+                    this.ctx.fs.rename(new Path(normalizedTempRejLocation),
                         new Path(this.rejectedDatasetLocation));
                 }
             } catch (Exception exception) {

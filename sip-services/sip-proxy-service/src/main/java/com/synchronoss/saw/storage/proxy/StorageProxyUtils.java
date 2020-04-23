@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public class StorageProxyUtils {
 
   public static Boolean jsonSchemaValidate(StorageProxy proxy, String path)
       throws IOException, ProcessingException {
+    String normalizedPath = SipCommonUtils.normalizePath(path);
     // Validating JSON against schema
     Boolean result = true;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -79,7 +81,7 @@ public class StorageProxyUtils {
     JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
     JsonValidator validator = factory.getValidator();
     final JsonNode data = JsonLoader.fromString(objectMapper.writeValueAsString(proxy));
-    final JsonNode schema = JsonLoader.fromFile(new File(path));
+    final JsonNode schema = JsonLoader.fromFile(new File(normalizedPath));
     ProcessingReport report = validator.validate(schema, data);
     if (report.isSuccess() == false) {
       result = false;

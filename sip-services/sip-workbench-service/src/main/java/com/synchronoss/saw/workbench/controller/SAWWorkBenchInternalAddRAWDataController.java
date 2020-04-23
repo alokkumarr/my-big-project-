@@ -1,5 +1,6 @@
 package com.synchronoss.saw.workbench.controller;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -183,7 +184,8 @@ public class SAWWorkBenchInternalAddRAWDataController {
     Iterator<String> fileItr = fileList.keySet().iterator();
     while(fileItr.hasNext()){
       String fileName = fileItr.next();
-      File file = new File(fileList.get(fileName));
+      String normalizedFilePath= SipCommonUtils.normalizePath(fileList.get(fileName));
+      File file = new File(normalizedFilePath);
       size = size + file.length();
       files.add(file);
     }
@@ -400,5 +402,4 @@ public class SAWWorkBenchInternalAddRAWDataController {
     }
   
 }
-  
   

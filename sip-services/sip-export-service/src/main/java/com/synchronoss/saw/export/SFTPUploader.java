@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemOptions;
@@ -53,6 +54,7 @@ public class SFTPUploader {
     private static FileSystemOptions createFileSystemOptions (final String keyPath,
         final String passPhrase) throws FileSystemException{
 
+        String normalizedKeyPath = SipCommonUtils.normalizePath(keyPath);
         //create options for sftp
         FileSystemOptions options = new FileSystemOptions();
         //ssh key
@@ -63,12 +65,12 @@ public class SFTPUploader {
         //timeout
         sftpBuilder.setTimeout(options, 600000);
 
-        if (keyPath != null) {
+        if (normalizedKeyPath != null) {
             IdentityInfo identityInfo = null;
             if(passPhrase!=null){
-                identityInfo = new IdentityInfo(new File(keyPath), passPhrase.getBytes());
+                identityInfo = new IdentityInfo(new File(normalizedKeyPath), passPhrase.getBytes());
             }else{
-                identityInfo =  new IdentityInfo(new File(keyPath));
+                identityInfo =  new IdentityInfo(new File(normalizedKeyPath));
             }
             SftpFileSystemConfigBuilder.getInstance().setIdentityInfo(options, identityInfo);
         }
@@ -81,8 +83,9 @@ public class SFTPUploader {
         String privateKeyPath, String passPhrase)
             throws Exception {
         try {
+            String normalizedFile= SipCommonUtils.normalizePath(localFileFullName);
             // local zipped
-            File file = new File(localFileFullName);
+            File file = new File(normalizedFile);
             // URL preparation
             sftpURL = sftpURL + "/" + hostDir.trim() + "/" + fileName.trim();
             manager.init();
