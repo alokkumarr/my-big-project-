@@ -75,7 +75,8 @@ import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
 import {
   COMPARISON_CHART_DATE_INTERVALS,
-  COMPARISON_CHART_DATE_INTERVALS_OBJ
+  COMPARISON_CHART_DATE_INTERVALS_OBJ,
+  NUMBER_TYPES
 } from 'src/app/common/consts';
 
 // setAutoFreeze(false);
@@ -339,7 +340,9 @@ export class DesignerState {
 
     /* If artifact column had a data field, make sure it's updated with latest aggregate.
        If no data field exists, it is a non-data field. Do nothing */
-    if (artifactColumn.dataField) {
+
+    /* add dataField even if not present only for pivots with number type fields */
+    if (NUMBER_TYPES.includes(artifactColumn.type) && analysis.type === 'pivot') {
       artifactColumn.dataField = DesignerService.dataFieldFor({
         columnName: artifactColumn.columnName,
         aggregate: artifactColumn.aggregate
@@ -1091,10 +1094,12 @@ export class DesignerState {
           }
         });
       }
-      runTimeFilters = [{
-        booleanCriteria: 'AND',
-        filters: newFilters
-      }];
+      runTimeFilters = [
+        {
+          booleanCriteria: 'AND',
+          filters: newFilters
+        }
+      ];
     } else {
       for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
         if (isUndefined(filters[0].filters[i])) {
