@@ -384,23 +384,25 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(this.analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
-      if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
-        this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
-      }
+    if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+      this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
+    }
 
-      if (isUndefined(get(this.filters[0], 'filters'))) {
-        const aggregatedFilters = this.filters.filter(option => {
-          return option.isAggregationFilter === true;
-        });
-        const oldFormatFilters = cloneDeep(this.filters);
-        this.filters = [];
-        const normalFilters = [{
+    if (isUndefined(get(this.filters[0], 'filters'))) {
+      const aggregatedFilters = this.filters.filter(option => {
+        return option.isAggregationFilter === true;
+      });
+      const oldFormatFilters = cloneDeep(this.filters);
+      this.filters = [];
+      const normalFilters = [
+        {
           booleanCriteria: queryBuilder.booleanCriteria,
           filters: oldFormatFilters
-        }]
+        }
+      ];
 
-        this.filters = concat(normalFilters, aggregatedFilters);
-      }
+      this.filters = concat(normalFilters, aggregatedFilters);
+    }
 
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
     this.isInQueryMode = this._store.selectSnapshot(
@@ -425,17 +427,18 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
       const oldFormatFilters = cloneDeep(sipQuery.filters);
       sipQuery.filters = [];
-      const normalFilters = [{
-        booleanCriteria: sipQuery.booleanCriteria,
-        filters: oldFormatFilters
-      }]
+      const normalFilters = [
+        {
+          booleanCriteria: sipQuery.booleanCriteria,
+          filters: oldFormatFilters
+        }
+      ];
 
       sipQuery.filters = concat(normalFilters, aggregatedFilters);
       return sipQuery.filters;
     } else {
       return sipQuery.filters;
     }
-
   }
 
   initAuxSettings() {
@@ -847,22 +850,22 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           (this.analysis || this.analysisStarter).type
         );
         this._analyzeDialogService
-        .openFilterDialog(
-          this._store.selectSnapshot(DesignerState.analysisFilters),
-          this.artifacts,
-          get(analysis, 'sipQuery.booleanCriteria'),
-          get(analysis, 'type'),
-          supportsGlobalFilters,
-          this.filterService.supportsAggregatedFilters(analysis)
-        )
-        .afterClosed()
-        .subscribe((result: IToolbarActionResult) => {
-          if (result) {
-            this.filters = cloneDeep(result);
-            this._store.dispatch(new DesignerUpdateFilters(result));
-            this.onSettingsChange({ subject: 'filter' });
-          }
-        });
+          .openFilterDialog(
+            this._store.selectSnapshot(DesignerState.analysisFilters),
+            this.artifacts,
+            get(analysis, 'sipQuery.booleanCriteria'),
+            get(analysis, 'type'),
+            supportsGlobalFilters,
+            this.filterService.supportsAggregatedFilters(analysis)
+          )
+          .afterClosed()
+          .subscribe((result: IToolbarActionResult) => {
+            if (result) {
+              this.filters = cloneDeep(result);
+              this._store.dispatch(new DesignerUpdateFilters(result));
+              this.onSettingsChange({ subject: 'filter' });
+            }
+          });
         break;
       case 'preview':
         const analysisForPreview = isDSLAnalysis(this.analysis)

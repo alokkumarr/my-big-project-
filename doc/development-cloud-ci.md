@@ -2,7 +2,7 @@
 
 If you cannot run Docker [locally] or deploy from your development
 machine using Docker Machine to the [cloud], there is a third option
-of deploying a SAW development environment from the continuos
+of deploying a SAW development environment from the continuous
 integration server (Bamboo).  Follow these steps:
 
 1. Navigate to the [Bamboo plan] for deploying SAW to the cloud

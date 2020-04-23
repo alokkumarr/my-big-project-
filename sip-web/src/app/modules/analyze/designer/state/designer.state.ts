@@ -1091,10 +1091,12 @@ export class DesignerState {
           }
         });
       }
-      runTimeFilters = [{
-        booleanCriteria: 'AND',
-        filters: newFilters
-      }];
+      runTimeFilters = [
+        {
+          booleanCriteria: 'AND',
+          filters: newFilters
+        }
+      ];
     } else {
       for (var i = 0; i < runTimeFiltersInQueryCount; i++) {
         if (isUndefined(filters[0].filters[i])) {
