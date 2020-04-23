@@ -23,6 +23,8 @@
     - mariadb_upgrade is defined
     - mariadb_upgrade.stdout | length > 0
   ignore_errors: yes
+- name: Install MariaDB client package
+  yum: name=MariaDB-client state=latest
 - name: Install MariaDB package
   yum: name=MariaDB-server state=present
 - name: Install MariaDB Galera cluster arbitrator configuration
