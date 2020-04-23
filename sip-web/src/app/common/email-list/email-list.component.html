@@ -1,30 +1,57 @@
-<mat-form-field flex="20" style="width: 100%;">
-  <mat-chip-list #chipList>
-    <mat-chip
-      *ngFor="let email of emails; trackBy: trackByValue; let i = index"
-      (removed)="removeEmail(i)"
-      [attr.e2e]="'email-address-' + email"
+<ng-container *ngIf="allowCustomInput; else multiSelectSearch">
+  <mat-form-field flex="20" style="width: 100%;">
+    <mat-chip-list #chipList>
+      <mat-chip
+        *ngFor="let email of emails; trackBy: trackByValue; let i = index"
+        (removed)="removeEmail(i)"
+        [attr.e2e]="'email-address-' + email"
+      >
+        {{ email }}
+        <mat-icon
+          matChipRemove
+          fontIcon="icon-close"
+          [attr.e2e]="'remove-email-' + email"
+        ></mat-icon>
+      </mat-chip>
+      <input
+        class="email__chip"
+        placeholder="Emails separate by ';'"
+        #emailInput
+        type="text"
+        [formControl]="emailField"
+        [matChipInputFor]="chipList"
+        [matChipInputSeparatorKeyCodes]="separatorKeys"
+        [matChipInputAddOnBlur]="true"
+        (matChipInputTokenEnd)="addEmailIfCorrect($event.value)"
+        [attr.e2e]="'email-list-input'"
+      />
+    </mat-chip-list>
+  </mat-form-field>
+  <mat-error *ngIf="emailField?.errors?.pattern">
+    <strong>Invalid</strong> email!
+  </mat-error>
+</ng-container>
+
+<ng-template #multiSelectSearch>
+  <mat-form-field flex="20" style="width: 100%;">
+    <mat-select
+      [formControl]="multiEmailField"
+      placeholder="Emails"
+      [multiple]="true"
     >
-      {{ email }}
-      <mat-icon
-        matChipRemove
-        fontIcon="icon-close"
-        [attr.e2e]="'remove-email-' + email"
-      ></mat-icon>
-    </mat-chip>
-    <input
-      class="email__chip"
-      placeholder="Emails separate by ';'"
-      type="text"
-      [formControl]="emailField"
-      [matChipInputFor]="chipList"
-      [matChipInputSeparatorKeyCodes]="separatorKeys"
-      [matChipInputAddOnBlur]="true"
-      (matChipInputTokenEnd)="addEmailIfCorrect($event.value)"
-      [attr.e2e]="'email-list-input'"
-    />
-  </mat-chip-list>
-</mat-form-field>
-<mat-error *ngIf="emailField?.errors?.pattern">
-  <strong>Invalid</strong> email!
-</mat-error>
+      <mat-select-search [formControl]="emailSearchCtrl"></mat-select-search>
+      <mat-option *ngFor="let email of filteredEmails$ | async" [value]="email">
+        {{ email }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-error
+    *ngIf="
+      autoCompleteSuggestions &&
+      autoCompleteSuggestions.length === 0 &&
+      !allowCustomInput
+    "
+  >
+    No subscribers present. <strong>Add subscribers</strong> from below.
+  </mat-error>
+</ng-template>

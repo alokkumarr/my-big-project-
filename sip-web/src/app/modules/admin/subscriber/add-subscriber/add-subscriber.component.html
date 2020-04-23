@@ -1,0 +1,65 @@
+<h1 style="margin-bottom: 10px;" mat-dialog-title>
+  {{ action | titlecase }} Subscriber
+</h1>
+<mat-progress-bar
+  [style.marginBottom]="'10px'"
+  [style.visibility]="progress ? 'visible' : 'hidden'"
+  mode="indeterminate"
+></mat-progress-bar>
+<div mat-dialog-content>
+  <form [formGroup]="subscriberForm">
+    <div fxLayout="column" style="width: 400px;">
+      <mat-form-field>
+        <input
+          matInput
+          e2e="subscriber-form-name"
+          autocomplete="off"
+          placeholder="Name"
+          formControlName="subscriberName"
+          required
+        />
+        <mat-error *ngIf="subscriberForm.hasError('required', ['name'])"
+          >This field is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Notification Channel</mat-label>
+        <mat-select
+          e2e="subscriber-form-channel-type"
+          formControlName="channelType"
+        >
+          <mat-option
+            *ngFor="let channelType of channelTypes"
+            [value]="channelType"
+          >
+            {{ channelType | titlecase }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input
+          matInput
+          e2e="subscriber-form-channel-value"
+          autocomplete="off"
+          [placeholder]="subscriberForm.get('channelType').value | titlecase"
+          formControlName="channelValue"
+          required
+        />
+        <mat-error *ngIf="subscriberForm.hasError('required', ['channelValue'])"
+          >This field is required
+        </mat-error>
+        <mat-error *ngIf="subscriberForm.hasError('email', ['channelValue'])"
+          >A valid email is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button [disabled]="subscriberForm.invalid" mat-button (click)="onSave()">
+    Save
+  </button>
+</div>

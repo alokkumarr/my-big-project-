@@ -10,24 +10,11 @@ public class Email {
       "template",
       "recipients",
   })
+
   @JsonProperty("recipients")
   Set<String> recipients;
 
   String template;
-
-  /**
-   * Gets recipients.
-   *
-   * @return value of recipients
-   */
-  public Set<String> getRecipients() {
-    return recipients;
-  }
-
-  /** Sets recipients. */
-  public void setRecipients(Set<String> recipients) {
-    this.recipients = recipients;
-  }
 
   /**
    * Gets template.
@@ -38,8 +25,26 @@ public class Email {
     return template;
   }
 
-  /** Sets template. */
+  /**
+   * Sets template.
+   */
   public void setTemplate(String template) {
     this.template = template;
+  }
+
+  /**
+   * Gets recipients.
+   *
+   * @return value of recipients
+   */
+  public Set<String> getRecipients() {
+    return recipients;
+  }
+
+  /**
+   * Sets recipients.
+   */
+  public void setRecipients(Set<String> recipients) {
+    this.recipients = recipients;
   }
 }

@@ -84,7 +84,12 @@ export const routes: Routes = [
       },
       {
         path: 'branding',
-        component: AdminBrandingComponent,
+        component: AdminBrandingComponent
+      },
+      {
+        path: 'subscriber',
+        loadChildren: () =>
+          import('./subscriber/subscriber.module').then(m => m.SubscriberModule)
       },
       {
         path: '',

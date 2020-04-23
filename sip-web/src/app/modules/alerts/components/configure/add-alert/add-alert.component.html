@@ -76,37 +76,6 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Notification</mat-label>
-              <mat-select
-                formControlName="notification"
-                required
-                multiple
-                e2e="notification"
-              >
-                <mat-option
-                  *ngFor="let notification of notifications$ | async"
-                  [value]="notification.value"
-                  [disabled]="!notification.enabled"
-                  [attr.e2e]="notification.label"
-                  >{{ notification.label }}</mat-option
-                >
-              </mat-select>
-              <mat-error>This field is required</mat-error>
-            </mat-form-field>
-
-            <div
-              *ngIf="showNotificationEmail"
-              fxLayout="column"
-              style="width: 80%;"
-            >
-              <label i18n>Email</label>
-              <email-list
-                formControlName="notificationEmails"
-                [emails]="alertDefFormGroup.controls.notificationEmails.value"
-              ></email-list>
-            </div>
-
-            <mat-form-field appearance="outline">
               <mat-label>Alert status</mat-label>
               <mat-select formControlName="activeInd" e2e="alertStatus">
                 <mat-option
@@ -136,6 +105,59 @@
             </mat-form-field>
 
             <div>
+              <button
+                color="primary"
+                mat-stroked-button
+                matStepperNext
+                e2e="toSubscriberSelection"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </form>
+      </mat-step>
+      <mat-step [stepControl]="alertSubscribersFormGroup">
+        <form [formGroup]="alertSubscribersFormGroup">
+          <ng-template matStepLabel>Select subscribers</ng-template>
+          <div fxLayout="column" fxLayoutAlign="space-around center">
+            <div fxLayout="column" style="width: 80%;">
+              <label i18n>Emails</label>
+              <email-list
+                formControlName="subscribers"
+                [emails]="alertSubscribersFormGroup.controls.subscribers.value"
+                (emailsChange)="
+                  alertSubscribersFormGroup.controls.subscribers.setValue(
+                    $event
+                  )
+                "
+                [allowCustomInput]="false"
+                [autoCompleteSuggestions]="subscriberEmails$ | async"
+              ></email-list>
+            </div>
+
+            <div
+              fxFlex="45px"
+              fxLayout="row"
+              fxLayoutGap="36px"
+              class="padtop10"
+            >
+              <button
+                color="primary"
+                mat-button
+                e2e="addNewSubscriber"
+                (click)="addSubscriber()"
+              >
+                + Subscriber
+              </button>
+              <button
+                color="secondary"
+                mat-stroked-button
+                matStepperPrevious
+                e2e="toNameAlert"
+              >
+                Back
+              </button>
               <button
                 color="primary"
                 mat-stroked-button

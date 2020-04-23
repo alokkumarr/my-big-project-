@@ -8,19 +8,14 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatStepper } from '@angular/material';
+import { MatStepper, MatDialog } from '@angular/material';
 import * as fpGet from 'lodash/fp/get';
-import * as includes from 'lodash/includes';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as split from 'lodash/split';
 import * as compact from 'lodash/compact';
 import * as omit from 'lodash/omit';
-import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as range from 'lodash/range';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpToPairs from 'lodash/fp/toPairs';
-import * as fpMap from 'lodash/fp/map';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ObserveService } from '../../../../observe/services/observe.service';
@@ -28,7 +23,10 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import { lessThan } from '../../../../../common/validators';
 // import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
-import { entityNameErrorMessage, minimumNameLength } from './../../../../../common/validators/field-name-rule.validator';
+import {
+  entityNameErrorMessage,
+  minimumNameLength
+} from './../../../../../common/validators/field-name-rule.validator';
 
 import {
   AlertConfig,
@@ -38,6 +36,10 @@ import {
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { SubscriberService } from 'src/app/modules/admin/subscriber/subscriber.service';
+import { SIPSubscriber } from 'src/app/modules/admin/subscriber/models/subscriber.model';
+import { AddSubscriberComponent } from 'src/app/modules/admin/subscriber/add-subscriber/add-subscriber.component';
+import { isUndefined } from 'util';
 const LAST_STEP_INDEX = 3;
 
 const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
@@ -58,6 +60,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   @ViewChild('addAlertStepper', { static: true }) addAlertStepper: MatStepper;
   alertDefFormGroup: FormGroup;
   alertMetricFormGroup: FormGroup;
+  alertSubscribersFormGroup: FormGroup;
   alertRuleFormGroup: FormGroup;
   datapods$: Observable<any>;
   attributeValues$: Observable<any>;
@@ -81,12 +84,20 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   showNotificationEmail = false;
   showOtherThresholdValue = false;
   lookbackPeriodTypes = ['minute', 'hour', 'day', 'week', 'month'];
+  subscribers$: Observable<
+    SIPSubscriber[]
+  > = this.subscriberService.getAllSubscribers();
+  subscriberEmails$ = this.subscribers$.pipe(
+    map(subscribers => subscribers.map(s => s.channelValue))
+  );
 
   constructor(
     private _formBuilder: FormBuilder,
     public _configureAlertService: ConfigureAlertService,
     public _notify: ToastService,
-    public _observeService: ObserveService
+    public _observeService: ObserveService,
+    private subscriberService: SubscriberService,
+    private dialog: MatDialog
   ) {
     this.createAlertForm();
   }
@@ -94,16 +105,17 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   @Input() alertDefinition: AlertDefinition;
   @Output() onAddAlert = new EventEmitter<any>();
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.alertDefinition.action === 'update') {
       this.endActionText = 'Update';
-      const alertForm = this.transformAlertToFormObject(
+      const alertForm = await this.transformAlertToFormObject(
         this.alertDefinition.alertConfig
       );
       const { datapodId } = alertForm;
       // update value of attributeName so the request gets sent for the values
       this.loadMetrics(datapodId).then(() => {
         this.alertRuleFormGroup.get('attributeName').updateValueAndValidity();
+        this.alertSubscribersFormGroup.patchValue(alertForm);
         this.alertDefFormGroup.patchValue(alertForm);
         this.alertMetricFormGroup.patchValue(alertForm);
         this.alertRuleFormGroup.patchValue(alertForm);
@@ -123,10 +135,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const monitoringTypeValues = this.alertMetricFormGroup.get('monitoringType')
       .valueChanges;
 
-    this.aggregations$ = combineLatest(
+    this.aggregations$ = combineLatest([
       monitoringTypeValues,
       this._configureAlertService.getAggregations()
-    ).pipe(
+    ]).pipe(
       map(([monitoringType = {}, aggregations]) => [
         monitoringType === 'AGGREGATION_METRICS'
           ? null
@@ -144,49 +156,56 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  transformAlertToFormObject(alert) {
-    const {
-      notification: notificationsFromBackend,
+  async transformAlertToFormObject(alert) {
+    let {
+      subscribers: subscriberIds,
       lookbackPeriod,
       aggregationType
     } = alert;
     const [stringValue, lookbackPeriodType] = split(lookbackPeriod, '-');
     const lookbackPeriodValue = parseInt(stringValue, 10);
 
-    const notification = fpPipe(fpToPairs, fpMap(([key]) => key))(
-      notificationsFromBackend
-    );
+    const subscriberObjs = await this.subscriberService
+    .getAllSubscribers()
+    .toPromise();
 
-    const notificationEmails = get(
-      notificationsFromBackend,
-      'email.recipients',
-      []
-    );
+    if (isUndefined(subscriberIds)) {
+      const alertDetails = await this.subscriberService
+      .getSubscriber(alert.alertRulesSysId)
+      .toPromise();
+
+      subscriberIds = alertDetails.alert.subscribers
+    }
+
+    const subscribers = subscriberIds.reduce((emailList, id) => {
+      const subscriber = subscriberObjs.find(s => s.id === id);
+      return subscriber ? [...emailList, subscriber.channelValue] : emailList;
+    }, []);
 
     return {
       ...omit(alert, [
-        'notification',
+        'subscribers',
         'lookbackPeriod',
         'sipQuery',
         'aggregate'
       ]),
       lookbackPeriodType,
       lookbackPeriodValue,
-      notification,
-      aggregationType: aggregationType || 'none',
-      notificationEmails
+      subscribers,
+      aggregationType: aggregationType || 'none'
     };
   }
 
-  generateNotificationsForBackend(selectedNotifications, notificationEmails) {
-    const notifications: any = {};
-
-    if (includes(selectedNotifications, 'email')) {
-      notifications.email = {
-        recipients: notificationEmails
-      };
-    }
-    return notifications;
+  async generateNotificationsForBackend(
+    subscriberEmails: Array<string>
+  ): Promise<Array<string>> {
+    const subscribers = await this.subscriberService
+      .getAllSubscribers()
+      .toPromise();
+    return subscriberEmails.reduce((idList, email) => {
+      const subscriber = subscribers.find(s => s.channelValue === email);
+      return subscriber ? [...idList, subscriber.id] : idList;
+    }, []);
   }
 
   displayErrorMessage(state) {
@@ -196,10 +215,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     return entityNameErrorMessage(state);
   }
 
-  validatePattern(control) {
+  validateAlertNamePattern(control) {
     return new Promise((resolve, reject) => {
       if (/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(control.value)) {
-          resolve({ nameIsInValid: true });
+        resolve({ nameIsInValid: true });
       } else {
         resolve(null);
       }
@@ -208,14 +227,18 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
-      alertRuleName: ['', [Validators.required,
-        Validators.maxLength(30)],
-        this.validatePattern],
+      alertRuleName: [
+        '',
+        [Validators.required, Validators.maxLength(30)],
+        this.validateAlertNamePattern
+      ],
       alertRuleDescription: [''],
       alertSeverity: ['', [Validators.required]],
-      notification: [[], [Validators.required]],
-      notificationEmails: [[]],
       activeInd: [true]
+    });
+
+    this.alertSubscribersFormGroup = this._formBuilder.group({
+      subscribers: [[], [Validators.required]]
     });
 
     const thresholdValuevalidators = [
@@ -250,12 +273,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       attributeName: [''],
       attributeValue: ['']
     });
-
-    this.alertDefFormGroup
-      .get('notification')
-      .valueChanges.subscribe(values => {
-        this.showNotificationEmail = values.includes('email');
-      });
 
     this.alertRuleFormGroup
       .get('attributeName')
@@ -377,15 +394,15 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     return this.metricsList$.toPromise();
   }
 
-  constructPayload() {
+  async constructPayload(): Promise<AlertConfig> {
     const {
       alertRuleName,
       alertRuleDescription,
       alertSeverity,
-      notification: selectedNotifications,
-      notificationEmails,
       activeInd
     } = this.alertDefFormGroup.value;
+
+    const { subscribers } = this.alertSubscribersFormGroup.value;
 
     const {
       datapodId,
@@ -410,9 +427,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
     const sipQuery = this.generateSipQuery();
 
-    const notification = this.generateNotificationsForBackend(
-      selectedNotifications,
-      notificationEmails
+    const notification = await this.generateNotificationsForBackend(
+      subscribers
     );
     const lookbackPeriod = `${lookbackPeriodValue}-${lookbackPeriodType}`;
 
@@ -420,7 +436,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       alertRuleName,
       alertRuleDescription,
       alertSeverity,
-      notification,
+      subscribers: notification,
       activeInd,
       datapodId,
       datapodName,
@@ -580,8 +596,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     }
   }
 
-  createAlert() {
-    const payload = this.constructPayload();
+  async createAlert() {
+    const payload = await this.constructPayload();
     if (this.alertDefFormGroup.invalid) {
       return;
     }
@@ -594,8 +610,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.subscriptions.push(createSubscriber);
   }
 
-  updateAlert() {
-    const payload = this.constructPayload();
+  async updateAlert() {
+    const payload = await this.constructPayload();
     if (this.alertDefFormGroup.invalid) {
       return;
     }
@@ -606,6 +622,24 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.notifyOnAction(data);
       });
     this.subscriptions.push(updateSubscriber);
+  }
+
+  addSubscriber() {
+    const dialogRef = this.dialog.open(AddSubscriberComponent, {
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(subscriber => {
+      if (subscriber) {
+        this.subscribers$ = this.subscriberService.getAllSubscribers();
+        this.subscriberEmails$ = this.subscribers$.pipe(
+          map(subscribers => subscribers.map(s => s.channelValue))
+        );
+        const emails = this.alertSubscribersFormGroup.get('subscribers').value;
+        this.alertSubscribersFormGroup
+          .get('subscribers')
+          .setValue([...emails, subscriber.channelValue]);
+      }
+    });
   }
 
   notifyOnAction(data) {

@@ -41,7 +41,7 @@ export interface AlertConfig {
   datapodId: string;
   datapodName: string;
   activeInd: boolean;
-  notification: any;
+  subscribers: Array<string>;
   categoryId?: string;
   product?: string;
   createdBy?: any;

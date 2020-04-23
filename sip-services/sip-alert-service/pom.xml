@@ -22,6 +22,7 @@
         <jackson-coreutils>1.8</jackson-coreutils>
         <mapr.version>6.1.0-mapr</mapr.version>
         <json-core>1.2.5</json-core>
+        <flyway.db>5.2.0</flyway.db>
     </properties>
     <repositories>
         <repository>
@@ -52,6 +53,11 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
         <dependency>
@@ -152,6 +158,16 @@
         <groupId>io.jsonwebtoken</groupId>
         <artifactId>jjwt</artifactId>
         <version>0.7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>${flyway.db}</version>
+      </dependency>
+      <!-- This is for mariadb -->
+      <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
       </dependency>
     </dependencies>
     <build>
