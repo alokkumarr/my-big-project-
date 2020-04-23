@@ -26,6 +26,7 @@ import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.IntegrationUtils;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
