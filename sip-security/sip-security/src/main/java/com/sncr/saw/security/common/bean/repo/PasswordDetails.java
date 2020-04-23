@@ -13,7 +13,14 @@ public class PasswordDetails {
 
 	private Date pwdModifiedDate;
 	private Integer passwordExpiryDays;
+	private String encryptedPwd;
 	
+	public String getEncryptedPwd() {
+		return encryptedPwd;
+	}
+	public void setEncryptedPwd(String encryptedPwd) {
+		this.encryptedPwd = encryptedPwd;
+	}
 	public Date getPwdModifiedDate() {
 		return pwdModifiedDate;
 	}

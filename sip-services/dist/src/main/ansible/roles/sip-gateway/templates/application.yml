@@ -106,18 +106,6 @@ api:
         -   location: ${alert.service.host}
             method: DELETE
             path: '[/]alerts.*'
-        -   location: ${alert.service.host}
-            method: GET
-            path: '[/]subscribers.*'
-        -   location: ${alert.service.host}
-            method: POST
-            path: '[/]subscribers.*'
-        -   location: ${alert.service.host}
-            method: PUT
-            path: '[/]subscribers.*'
-        -   location: ${alert.service.host}
-            method: DELETE
-            path: '[/]subscribers.*'
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]dslanalysis.*'
