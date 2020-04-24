@@ -1,13 +1,11 @@
 package com.synchronoss.sip;
 
-import com.synchronoss.sip.alert.service.MigrateAlerts;
 import com.synchronoss.sip.alert.service.evaluator.EvaluatorListener;
 import info.faljse.SDNotify.SDNotify;
 import javax.validation.constraints.NotNull;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -36,9 +34,6 @@ public class SipAlertServiceApplication {
   @Value("${sip.service.taskExecutor.queueCapacity}")
   @NotNull
   private Integer queueCapacity;
-
-  @Autowired
-  MigrateAlerts migrateAlerts;
 
   /**
    * Start sip-semantic-service.
@@ -98,11 +93,5 @@ public class SipAlertServiceApplication {
   public void onApplicationEvent(ApplicationReadyEvent event) {
     logger.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
-
-    try {
-      migrateAlerts.start();
-    } catch (Exception ex) {
-      logger.error("Analysis migration failed", ex);
-    }
   }
 }
