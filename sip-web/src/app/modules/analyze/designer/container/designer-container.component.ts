@@ -108,7 +108,7 @@ import {
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
-import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from '../../consts';
+import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES, QUERY_RUNTIME_IDENTIFIER } from '../../consts';
 import { MatDialog } from '@angular/material';
 import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
 import { findDuplicateColumns } from 'src/app/common/components/report-grid/report-grid.component';
@@ -1129,9 +1129,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         if (typeof event.data.query !== 'string') {
           break;
         }
-        this.areMinRequirmentsMet = this.canRequestData();
-        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this._store.dispatch(new DesignerUpdateQuery(event.data.query));
+        this.areMinRequirmentsMet = this.canRequestData();
+        const analysisDef = this._store.selectSnapshot(DesignerState)
+        .analysis;
+        if (!analysisDef.designerEdit) {
+          this.areMinRequirmentsMet = analysisDef.designerEdit;
+        } else {
+          if (!isUndefined(analysisDef.sipQuery.query)) {
+            const runTimeFiltersInQueryCount =
+            analysisDef.sipQuery.query.split(QUERY_RUNTIME_IDENTIFIER).length - 1;
+            if (runTimeFiltersInQueryCount > 0) {
+              this.areMinRequirmentsMet = get(analysisDef, 'sipQuery.filters[0].filters').length === runTimeFiltersInQueryCount;
+            }
+          }
+        }
+        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+
         break;
       case 'submitQuery':
         this.changeToQueryModePermanently();
