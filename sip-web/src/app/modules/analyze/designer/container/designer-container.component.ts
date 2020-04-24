@@ -910,7 +910,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.requestDataIfPossible();
         break;
       case 'modeToggle':
-        this.areMinRequirmentsMet = this.canRequestData();
         this.toggleDesignerQueryModes();
         break;
     }
@@ -966,6 +965,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
+    if (!this.isInQueryMode) {
+      this.areMinRequirmentsMet = this.canRequestData();
+    } else {
+      const analysisDef = this._store.selectSnapshot(DesignerState)
+        .analysis;
+        if (isUndefined(analysisDef.sipQuery.query)) {
+          this.areMinRequirmentsMet = false;
+        }
+    }
   }
 
   getSqlBuilder(): SqlBuilder {
