@@ -12,11 +12,34 @@
     flat: yes
     fail_on_missing: no
   when: "groups['saw-services'].index(inventory_hostname) == 0"
+- name : Check password already migrated
+  stat: path=/etc/bda/saw-scheduler-db-password-migrated
+  register: saw_scheduler_db_password_migrated
 - name: Look up Scheduler Service database password
   set_fact:
-    saw_scheduler_db_password: >-
+    saw_scheduler_db_get_password: >-
       {{ lookup('password', inventory_dir
         + '/sip-scheduler-db-password chars=ascii_letters,digits') }}
+- name: Run the password encryption if not encoded.
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ saw_scheduler_db_get_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 "
+  register: saw_scheduler_db_password_encoded
+  when: not saw_scheduler_db_password_migrated.stat.exists
+- name: Register the sip-scheduler Encoded paswword value (If Password not encoded)
+  set_fact:
+    saw_scheduler_db_password: >-
+      {{ saw_scheduler_db_password_encoded.stdout }}
+  when: not saw_scheduler_db_password_migrated.stat.exists
+- name: Register the sip-scheduler Encoded paswword value (If already Encoded )
+  set_fact:
+    saw_scheduler_db_password: >-
+      {{ saw_scheduler_db_get_password }}
+  when: saw_scheduler_db_password_migrated.stat.exists
+- name: Markng the SIP-scheduler password migration
+  file:
+    path: /etc/bda/saw-scheduler-db-password-migrated
+    state: touch
+    mode: 0755
+  when: not saw_scheduler_db_password_migrated.stat.exists
 - name: Install SAW scheduler Service configuration file
   template: src=application.yml dest=/opt/bda/saw-scheduler-service/conf
   notify:
@@ -25,6 +48,9 @@
   copy:
     content: "{{ saw_scheduler_db_password }}"
     dest: /etc/bda/saw-scheduler-db-password
+- name: Run the password decoding
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ saw_security_db_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 decrypt"
+  register: saw_scheduler_get_db_password
 - name: Run SAW scheduler initial database setup
   command: /opt/bda/saw-scheduler-service/db-setup/init
   # Note: Run database initialization only on one of the nodes
@@ -37,17 +63,20 @@
     fail_on_missing: no
 - name: Look up mariadb database password
   set_fact:
-    saw_mariadb_db_password: >-
+    saw_mariadb_db_get_password: >-
       {{ lookup('password', inventory_dir+'/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Run the password decoding if its encoded.
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ saw_mariadb_db_get_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 decrypt"
+  register: saw_mariadb_db_password
 - name: create MariaDB user for saw_scheduler to other sip-nodes
   command: >
     mysql -u root -e "CREATE USER IF NOT EXISTS 'saw_scheduler'@'{{ hostvars[inventory_hostname]
     ['ansible_default_ipv4']['address'] }}' IDENTIFIED VIA ed25519 USING
-    PASSWORD('{{ saw_scheduler_db_password }}')" -p{{ saw_mariadb_db_password }}
+    PASSWORD('{{ saw_scheduler_get_db_password.stdout }}')" -p{{ saw_mariadb_db_password.stdout }}
 - name: GRANT PRIVILEGES for saw_scheduler to other sip-nodes
   command: >
     mysql -u root -e "GRANT ALL PRIVILEGES ON saw_scheduler.* TO 'saw_scheduler'@'{{ hostvars
-    [inventory_hostname]['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password }}
+    [inventory_hostname]['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password.stdout }}
 # Workaround: The service restart handler will run only after all
 # tasks have completed.  This causes the service to remain running
 # using the old port when the new socket activation proxy starts up,

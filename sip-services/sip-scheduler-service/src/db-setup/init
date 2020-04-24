@@ -11,46 +11,27 @@ marker=/etc/bda/saw-scheduler-initial-setup
 if [ -f $marker ]; then
     echo "Initial database setup has already been run, so not running again"
     echo "(Marker file: $marker)"
-    #change DB password in configuration
-    password=$(< /etc/bda/saw-scheduler-db-password)
-    sed -i "s/<db-password>/${password}/" /opt/bda/saw-scheduler-service/conf/application.yml
-    echo "db-password update successfully"
     exit
 fi
 touch $marker
-
-# create saw-scheduler db password.
-# extended pattern matching operators
-shopt -s extglob
-
-# Set database password
-db_password_file=/etc/bda/saw-scheduler-db-password
-
-# Generate database passwords
-generate_password() {
-    local password_file=$1
-    if [ -e $password_file ]; then
-        return
-    fi
-    local password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
-    echo $password > $password_file
-    chmod go-rwx $password_file
-}
-generate_password $db_password_file
 
 # Generate DB passwords ends here.
 
 ## Initialize SAW scheduler database
 create_database="CREATE DATABASE saw_scheduler"
 
-password=$(< /etc/bda/saw-scheduler-db-password)
-root_password_f=/etc/bda/mariadb-root-password
+password=$( /opt/sip/sip-common-components/bin/ccode \
+$(< /etc/bda/saw-scheduler-db-password) \
+'20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4' decrypt)
+root_password=$( /opt/sip/sip-common-components/bin/ccode \
+$(< /etc/bda/mariadb-root-password) \
+'20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4' decrypt)
+
 create_user="CREATE USER 'saw_scheduler'@'localhost'"
 #root password might be already initialized run the conditional statement
 # to make sure its work for both cases.
-if [ -f $root_password_f ] ; then
+if [ -f $root_password ] ; then
    # root password
-   root_password=$(< /etc/bda/mariadb-root-password)
    mysql -u root -p$root_password -e "$create_database"
    mysql -u root -p$root_password -e "$create_user IDENTIFIED BY '$password'"
    mysql -u root -p$root_password -e "GRANT ALL ON saw_scheduler.* TO 'saw_scheduler'@'localhost'"

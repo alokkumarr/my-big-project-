@@ -58,13 +58,6 @@ mk_conf() {
     $APPL_HOME/bin/mk_conf.sh "$@"
 }
 
-get_encryption_key() {
-    line=$(sed -n '/^encryption.key/p' ${vars_file})
-
-    enc_key=$(cut -d'=' -f2 <<<"$line")
-    echo $enc_key
-}
-
 # extended pattern matching operators
 shopt -s extglob
 
@@ -73,33 +66,18 @@ db_password_file=/etc/bda/saw-security-db-password
 initial_setup_marker=/etc/bda/saw-security-initial-setup
 
 # For old environments, if password file does not exist, initialize to default
-if [ ! -e $db_password_file -a -e $initial_setup_marker ]; then
-   echo saw_security > $db_password_file
-   chmod go-rwx $db_password_file
-fi
-
-# Generate database passwords
-generate_password() {
-    local password_file=$1
-    if [ -e $password_file ]; then
-        return
-    fi
-    local password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
-    echo $password > $password_file
-    chmod go-rwx $password_file
-}
-generate_password $db_password_file
+#if [ ! -e $db_password_file -a -e $initial_setup_marker ]; then
+#   echo saw_security > $db_password_file
+#   chmod go-rwx $db_password_file
+#fi
 
 # Calculate encrypted database password
 db_init_pass=$(< $db_password_file)
-encryption_key=$(get_encryption_key)
 ds_cpass_val=
 [[ $db_init_pass ]] && {
-    # Calc pass crypto
-    ( $UTIL_HOME/bin/ccode ) || exit
-    db_cenc_pass=$($UTIL_HOME/bin/ccode "$db_init_pass" ${encryption_key})
-    ds_cpass_val='db.cpass='"$db_cenc_pass"
-    echo '# pass crypto created'
+    # set pass crypto
+    ds_cpass_val='db.cpass='"$db_init_pass"
+    echo '# pass crypto set'
 }
 
 # Generate conf files from template

@@ -12,28 +12,53 @@
     flat: yes
     fail_on_missing: no
   when: "groups['saw-services'].index(inventory_hostname) == 0"
-
+- name : Check password already migrated
+  stat: path=/etc/bda/sip-ingestion-db-password-migrated
+  register: saw_ingestion_db_password_migrated
 - name: Look up Batch Ingestion Service database password
   set_fact:
-    saw_batch_ingestion_db_password: >-
+    saw_batch_ingestion_get_db_password: >-
       {{ lookup('password', inventory_dir
         + '/sip-batch-ingestion-db-password chars=ascii_letters,digits') }}
-
-- name: lookup & setting database root password
+- name: Run the password ecoding if not encoded.
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ saw_batch_ingestion_get_db_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4"
+  register: saw_batch_ingestion_db_password_encoded
+  when: not saw_ingestion_db_password_migrated.stat.exists
+- name: Register the sip-batch-ingestion Encoded paswword value (If Password not encoded)
   set_fact:
-    root_password: >-
-        {{ lookup('password', inventory_dir
-        + '/mariadb-root-password chars=ascii_letters,digits') }}
-
-- name: Install SAW Batch Ingestion Service configuration file
-  template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
-  notify:
-    - restart sip-batch-ingestion
-
+    saw_batch_ingestion_db_password: >-
+      {{ saw_batch_ingestion_db_password_encoded.stdout }}
+  when: not saw_ingestion_db_password_migrated.stat.exists
+- name: Register the sip-batch-ingestion Encoded paswword value (If already Encoded )
+  set_fact:
+    saw_batch_ingestion_db_password: >-
+      {{ saw_batch_ingestion_get_db_password }}
+  when: saw_ingestion_db_password_migrated.stat.exists
+- name: Markng the SIP-batch-ingestion password migration
+  file:
+    path: /etc/bda/sip-ingestion-db-password-migrated
+    state: touch
+    mode: 0755
+  when: not saw_ingestion_db_password_migrated.stat.exists
 - name: Set the SAW Batch Ingestion Service database password
   copy:
     content: "{{ saw_batch_ingestion_db_password }}"
     dest: /etc/bda/saw-batch-ingestion-db-password
+- name: lookup & setting database root password
+  set_fact:
+    root_get_password: >-
+        {{ lookup('password', inventory_dir
+        + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Run the password decoding
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ root_get_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 decrypt"
+  register: root_password
+- name: Run the password decoding for BIS
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ saw_batch_ingestion_db_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 decrypt"
+  register: saw_batch_ingestion_get_db_password
+- name: Install SAW Batch Ingestion Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
+  notify:
+    - restart sip-batch-ingestion
 
 - name: Ensure a list of packages installed
   yum:
@@ -50,7 +75,7 @@
   mysql_db:
     name: "sip_bis"
     login_user: root
-    login_password: "{{ root_password }}"
+    login_password: "{{ root_password.stdout }}"
     state: present
   when: "groups['saw-services'].index(inventory_hostname) == 0"
   tags: mariadb
@@ -58,12 +83,12 @@
 - name: Create the sip_bis users
   mysql_user:
    name: "sip_bis"
-   password: "{{ saw_batch_ingestion_db_password }}"
+   password: "{{ saw_batch_ingestion_get_db_password.stdout }}"
    host: "localhost"
    priv: "sip_bis.*:ALL,GRANT"
    append_privs: "true"
    login_user: root
-   login_password: "{{ root_password }}"
+   login_password: "{{ root_password.stdout }}"
    state: present
   when: "groups['saw-services'].index(inventory_hostname) == 0"
   tags: mariadb
@@ -71,10 +96,10 @@
   command: >
     mysql -u root -e "CREATE USER IF NOT EXISTS 'sip_bis'@'{{ hostvars[inventory_hostname]
     ['ansible_default_ipv4']['address'] }}' IDENTIFIED BY
-    '{{ saw_batch_ingestion_db_password }}'" -p{{ saw_mariadb_db_password }}
+    '{{ saw_batch_ingestion_get_db_password.stdout }}'" -p{{ root_password.stdout }}
 - name: GRANT PRIVILEGES for sip_bis to other sip-nodes
   command: >
     mysql -u root -e "GRANT ALL PRIVILEGES ON sip_bis.* TO 'sip_bis'@'{{ hostvars[inventory_hostname]
-    ['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password }}
+    ['ansible_default_ipv4']['address'] }}'" -p{{ root_password.stdout }}
 - name: Enable SIP Batch Ingestion Service
   systemd: name=sip-batch-ingestion-proxy.socket enabled=true state=started

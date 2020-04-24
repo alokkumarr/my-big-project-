@@ -13,12 +13,6 @@
   shell: "mysql --version | grep 10.3"
   register: mariadb_upgrade
   ignore_errors: yes
-- name: Stop MariaDB server if mariadb upgrade required to 10.4
-  systemd: name=mariadb state=stopped
-  when:
-   - mariadb_upgrade is defined
-   - mariadb_upgrade.stdout | length > 0
-  ignore_errors: yes
 - name: Uninstall and Remove MariaDB galera Service
   yum: name=galera state=absent
   when:
@@ -105,11 +99,34 @@
     flat: yes
     fail_on_missing: no
   when: "groups['saw-security'].index(inventory_hostname) == 0"
+- name : Check password already migrated
+  stat: path=/etc/bda/mariadb-root-password-migrated
+  register: mariadb_root_password_migrated
 - name: Look up MariaDB root database password
   set_fact:
-    mariadb_root_password: >-
+    mariadb_root_get_password: >-
       {{ lookup('password', inventory_dir
         + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Run the password encryption if not encoded.
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ mariadb_root_get_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 "
+  register: mariadb_root_password_encoded
+  when: not mariadb_root_password_migrated.stat.exists
+- name: Register the sip-batch-ingestion Encoded paswword value (If Password not encoded)
+  set_fact:
+    mariadb_root_password: >-
+      {{ mariadb_root_password_encoded.stdout }}
+  when: not mariadb_root_password_migrated.stat.exists
+- name: Register the sip-batch-ingestion Encoded paswword value (If already Encoded )
+  set_fact:
+    mariadb_root_password: >-
+      {{ mariadb_root_get_password }}
+  when: mariadb_root_password_migrated.stat.exists
+- name: Markng the MariaDB root migration
+  file:
+    path: /etc/bda/saw-scheduler-db-password-migrated
+    state: touch
+    mode: 0755
+  when: not mariadb_root_password_migrated.stat.exists
 - name: Store the MariaDB root password
   copy:
     content: "{{ mariadb_root_password }}"

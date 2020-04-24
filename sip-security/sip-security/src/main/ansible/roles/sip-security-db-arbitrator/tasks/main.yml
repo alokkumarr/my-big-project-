@@ -11,12 +11,6 @@
   shell: "mysql --version | grep 10.3"
   register: mariadb_upgrade
   ignore_errors: yes
-- name: Stop Garb service if running for upgrade to 10.4
-  systemd: name=garb state=stopped
-  when:
-    - mariadb_upgrade is defined
-    - mariadb_upgrade.stdout | length > 0
-  ignore_errors: yes
 - name: Uninstall and Remove MariaDB galera Service
   yum: name=galera state=absent
   when:
