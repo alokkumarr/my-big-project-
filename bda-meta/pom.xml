@@ -137,8 +137,6 @@
       <artifactId>gson</artifactId>
       <version>${gson.version}</version>
     </dependency>
-
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

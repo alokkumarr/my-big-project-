@@ -6,6 +6,7 @@ import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -166,7 +167,8 @@ public class ExportUtils {
     byte[] readBuffer = new byte[2048];
     int amountRead;
     int written = 0;
-    try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+    String normalizedPath = SipCommonUtils.normalizePath(exportBean.getFileName());
+    try (FileInputStream inputStream = new FileInputStream(normalizedPath)) {
       while ((amountRead = inputStream.read(readBuffer)) > 0) {
         zos.write(readBuffer, 0, amountRead);
         written += amountRead;

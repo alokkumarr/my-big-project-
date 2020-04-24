@@ -26,6 +26,7 @@ import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 import com.synchronoss.sip.utils.Ccode;
 import com.synchronoss.sip.utils.IntegrationUtils;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -609,7 +610,7 @@ public class SftpServiceImpl extends SipPluginContract {
     String path = processor.getFilePath(defaultDestinationLocation,
           destination, File.separator + getBatchId());
 
-    File localDirectory  = new File(path);
+    File localDirectory  = new File(SipCommonUtils.normalizePath(path));
     logger.trace(
           "directory where the file will be downloaded  :" + localDirectory.getAbsolutePath());
     try {
@@ -1352,7 +1353,7 @@ public class SftpServiceImpl extends SipPluginContract {
             path = destinationDirPath.get();
           }
 
-          File localDirectory = new File(path);
+          File localDirectory = new File(SipCommonUtils.normalizePath(path));
           if (localDirectory != null && !this.processor
               .isDestinationExists(localDirectory.getPath())) {
 
@@ -1371,7 +1372,8 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.info("Actual file name after downloaded in the  :"
               + localDirectory.getAbsolutePath() + " file name "
               + localFile.getName());
-          FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
+          String normalizedPath = SipCommonUtils.normalizePath(localFile.getPath());
+          FSDataOutputStream fos = fs.create(new Path(normalizedPath));
           logger.trace("starting template get for file ::" + fileName);
           SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(
               sesionFactory);

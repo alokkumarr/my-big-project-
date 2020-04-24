@@ -1,19 +1,19 @@
 package com.sncr.saw.security.app.service;
 
-import com.google.common.base.Preconditions;
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.SecurityUtils;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
 @Service
 public class SecurityService {
@@ -22,6 +22,13 @@ public class SecurityService {
 
   @Autowired private UserRepository userRepository;
 
+  
+  @PostConstruct
+  public void init(){
+	  
+	  userRepository.migratePwdsEncryption();
+	  
+  }
   /**
    * Validate customerId to avoid direct reference.
    *

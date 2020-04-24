@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -111,7 +112,8 @@ public class MigrateExecutions {
     String analysisFile = args[0];
     System.out.println("Convert analysis from file = " + analysisFile);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    File jsonFile = new File(analysisFile);
+    String normalizedAnalysisPath = SipCommonUtils.normalizePath(analysisFile);
+    File jsonFile = new File(normalizedAnalysisPath);
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
 
     JsonObject queryBuilderObject = jsonObject.getAsJsonObject(FieldNames.QUERY_BUILDER);

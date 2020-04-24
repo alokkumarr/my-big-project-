@@ -18,6 +18,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
 import sncr.bda.base.MetadataBase;
+import sncr.bda.utils.BdaCoreUtils;
 
 /**
  * Created by srya0001 on 10/26/2017.
@@ -175,7 +176,8 @@ public class DLMetadata extends MetadataBase {
             String project = f.getPath().getParent().getParent().getParent().getParent().getParent().getName();
 
             byte[] content = new byte[(int)f.getLen()];
-            FSDataInputStream file = fs.open(f.getPath());
+            Path normalizedPath = BdaCoreUtils.normalizePath(f.getPath());
+            FSDataInputStream file = fs.open(normalizedPath);
             file.readFully(0, content);
             file.close();
 
@@ -365,9 +367,9 @@ public class DLMetadata extends MetadataBase {
     }
     public int moveToRaw(String projectPath, String absoluteFilePath, String directory, String asName) throws Exception {
 
+        String normalizedPath = dlRoot + Path.SEPARATOR + projectPath;
         // Build full path to directory
-        Path rawPath = new Path(dlRoot
-                + Path.SEPARATOR + projectPath);
+        Path rawPath = new Path(normalizedPath);
 
         // Create staging directory if necessary
         if(!fs.exists(rawPath)){
@@ -377,13 +379,16 @@ public class DLMetadata extends MetadataBase {
         // Check if we have file to upload
         if(asName != null) {
             // Yes, we have file to upload
-            Path filePath = new Path(rawPath + Path.SEPARATOR + asName);
+            String normalizedFilePath = BdaCoreUtils.normalizePath(rawPath + Path.SEPARATOR + asName);
+            Path filePath = new Path(normalizedFilePath);
             if(fs.exists(filePath)){
               String fileDate = new SimpleDateFormat("mmss").format(new Date());
               asName = asName.substring(0, asName.indexOf('.')) +"_"+fileDate + asName.substring(asName.indexOf('.'), asName.length());
-              filePath = new Path(rawPath + Path.SEPARATOR + asName);
+              String normalizePath=BdaCoreUtils.normalizePath(rawPath + Path.SEPARATOR + asName);
+              filePath = new Path(normalizePath);
             }
-            Path localPath = new Path("file://" + absoluteFilePath);
+            String normalizedAbsolutePath = BdaCoreUtils.normalizePath("file://" + absoluteFilePath);
+            Path localPath = new Path(normalizedAbsolutePath);
             fs.copyFromLocalFile(true, localPath, filePath);
         }
         return 0;

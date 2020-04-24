@@ -207,13 +207,16 @@ public class RestUtil {
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
+        String normalizedKeyStorePath = SipCommonUtils.normalizePath(keyStore);
+        String normalizedtrustStorePath = SipCommonUtils.normalizePath(trustStore);
         sslContext =
             SSLContextBuilder.create()
                 .loadKeyMaterial(
-                    new File(keyStore),
+                    new File(normalizedKeyStorePath),
                     keyStorePassword.toCharArray(),
                     keyStorePassword.toCharArray())
-                .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray())
+                .loadTrustMaterial(
+                    new File(normalizedtrustStorePath), trustStorePassword.toCharArray())
                 .build();
         client =
             HttpClients.custom()
@@ -249,11 +252,15 @@ public class RestUtil {
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
+        String normalizedKeyStorePath = SipCommonUtils.normalizePath(keyStore);
+        String normalizedtrustStorePath = SipCommonUtils.normalizePath(trustStore);
         sslContext =
             SSLContextBuilder.create()
                 .loadKeyMaterial(
-                    new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
-                .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray())
+                    new File(normalizedKeyStorePath),
+                    keyPassword.toCharArray(),
+                    keyPassword.toCharArray())
+                .loadTrustMaterial(new File(normalizedtrustStorePath), trustPassword.toCharArray())
                 .build();
         client =
             HttpClients.custom()
@@ -288,13 +295,16 @@ public class RestUtil {
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
+        String normalizedKeyStorePath = SipCommonUtils.normalizePath(keyStore);
+        String normalizedtrustStorePath = SipCommonUtils.normalizePath(trustStore);
         sslContext =
             SSLContextBuilder.create()
                 .loadKeyMaterial(
-                    new File(keyStore),
+                    new File(normalizedKeyStorePath),
                     keyStorePassword.toCharArray(),
                     keyStorePassword.toCharArray())
-                .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray())
+                .loadTrustMaterial(
+                    new File(normalizedtrustStorePath), trustStorePassword.toCharArray())
                 .build();
       } catch (Exception e) {
         logger.error("Error occured while building SSL context", e);
@@ -349,12 +359,15 @@ public class RestUtil {
             + trustStore
             + " restTemplate keyStore: "
             + keyStore);
-
+    String normalizedKeyStorePath = SipCommonUtils.normalizePath(keyStore);
+    String normalizedtrustStorePath = SipCommonUtils.normalizePath(trustStore);
     SSLContext sslContext =
         SSLContextBuilder.create()
             .loadKeyMaterial(
-                new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
-            .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray())
+                new File(normalizedKeyStorePath),
+                keyPassword.toCharArray(),
+                keyPassword.toCharArray())
+            .loadTrustMaterial(new File(normalizedtrustStorePath), trustPassword.toCharArray())
             .build();
     return sslContext;
   }

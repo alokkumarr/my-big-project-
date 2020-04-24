@@ -8,21 +8,24 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import sncr.bda.utils.BdaCoreUtils;
 
 public class NioFileProcessor implements FileProcessor{
 
   private static final Logger logger = Logger.getLogger(NioFileProcessor.class);
-  
+
   @Override
   public boolean isDestinationExists(String destination) throws Exception {
-    File destinationPath = new File(destination);
+    String normalizedDestinationPath = BdaCoreUtils.normalizePath(destination);
+    File destinationPath = new File(normalizedDestinationPath);
     return destinationPath.exists();
   }
 
   @Override
-  public void createDestination(String destination, StringBuffer connectionLogs) throws IOException {
-    Files.createDirectories(Paths.get(destination));
-    
+  public void createDestination(String destination, StringBuffer connectionLogs)
+      throws IOException {
+    String normalizedDestinationPath = BdaCoreUtils.normalizePath(destination);
+    Files.createDirectories(Paths.get(normalizedDestinationPath));
   }
 
   @Override
@@ -34,8 +37,9 @@ public class NioFileProcessor implements FileProcessor{
  
   @Override
   public boolean isFileExistsWithPermissions(String location) throws Exception {
-    File destinationPath = new File(location);
-   return  destinationPath.canRead() 
+    String normalizedLocationPath = BdaCoreUtils.normalizePath(location);
+    File destinationPath = new File(normalizedLocationPath);
+   return  destinationPath.canRead()
           && destinationPath.canWrite() && destinationPath.canExecute();
   }
 
@@ -67,12 +71,13 @@ public class NioFileProcessor implements FileProcessor{
   @Override
   public int getDataFileBasedOnPattern(String filePath) throws Exception {
     logger.trace("Getting the status for the file pattern starts here :" + filePath);
-    String extension = FilenameUtils.getExtension(filePath);
-    File parentFileName = new File(filePath);
+    String normalizedFilePath = BdaCoreUtils.normalizePath(filePath);
+    String extension = FilenameUtils.getExtension(normalizedFilePath);
+    File parentFileName = new File(normalizedFilePath);
     int size =
         parentFileName.list((directory, localfileName) -> localfileName.endsWith(extension)).length;
     logger
-        .trace("Getting the status for the file pattern ends here :" + filePath + " size :" + size);
+        .trace("Getting the status for the file pattern ends here :" + normalizedFilePath + " size :" + size);
     return size;
   }
 
