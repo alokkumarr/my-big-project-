@@ -20,7 +20,7 @@
 - name: Register the sip-exporter Encoded paswword value (If Password not encoded)
   set_fact:
     mysqld_exporter_db_password: >-
-      {{ saw_security_db_password_encoded.stdout }}
+      {{ mysqld_exporter_db_password_encoded.stdout }}
   when: not mysqld_exporter_db_password_encoded.stat.exists
 - name: Register the sip-security Encoded paswword value (If already Encoded )
   set_fact:
