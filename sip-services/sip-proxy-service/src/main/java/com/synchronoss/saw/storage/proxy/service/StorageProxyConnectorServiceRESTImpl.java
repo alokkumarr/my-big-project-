@@ -583,7 +583,8 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   private RestClient prepareRESTESConnectionwithSsl(CredentialsProvider credentialsProvider)
       throws Exception {
     KeyStore truststore = KeyStore.getInstance("jks");
-    File file = new File(keyStorePath);
+    String normalizedKeyStorePath = SipCommonUtils.normalizePath(keyStorePath);
+    File file = new File(normalizedKeyStorePath);
 
     try (InputStream is = Files.newInputStream(Paths.get(file.toURI()))) {
       truststore.load(is, storePassword.toCharArray());

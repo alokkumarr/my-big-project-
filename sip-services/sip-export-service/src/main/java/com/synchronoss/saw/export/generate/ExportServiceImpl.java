@@ -23,6 +23,7 @@ import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.sip.utils.RestUtil;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -273,7 +274,8 @@ public class ExportServiceImpl implements ExportService {
       Long recordsTolimit) {
     try {
       logger.trace("Inside streamResponseToFile");
-      File file = new File(exportBean.getFileName());
+      String normalizedPath = SipCommonUtils.normalizePath(exportBean.getFileName());
+      File file = new File(normalizedPath);
       file.getParentFile().mkdirs();
       // if the file is found, append the content
       // this is basically for entire for loop to execute correctly on the same file
@@ -478,7 +480,8 @@ public class ExportServiceImpl implements ExportService {
     if (!(lastExportedSize != null
         && lastExportLimit != null
         && (lastExportedSize < lastExportLimit))) {
-      File xlsxFile = new File(exportBean.getFileName());
+      String normalizedPath = SipCommonUtils.normalizePath(exportBean.getFileName());
+      File xlsxFile = new File(normalizedPath);
       BufferedOutputStream stream = null;
       XlsxExporter xlsxExporter = new XlsxExporter();
       Workbook workBook = null;
@@ -592,7 +595,8 @@ public class ExportServiceImpl implements ExportService {
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get(JOBGROUP));
       ObjectMapper jsonMapper = new ObjectMapper();
       try {
-        File f = new File(ftpDetailsFile);
+        String normalizedFtpDetailsFile = SipCommonUtils.normalizePath(ftpDetailsFile);
+        File f = new File(normalizedFtpDetailsFile);
         if (f.exists() && !f.isDirectory()) {
           FtpCustomer obj = jsonMapper.readValue(f, FtpCustomer.class);
           for (FTPDetails alias : obj.getFtpList()) {
@@ -618,7 +622,8 @@ public class ExportServiceImpl implements ExportService {
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get(JOBGROUP));
       ObjectMapper jsonMapper = new ObjectMapper();
       try {
-        File f = new File(s3DetailsFile);
+        String normalizedS3DetailsFile = SipCommonUtils.normalizePath(s3DetailsFile);
+        File f = new File(normalizedS3DetailsFile);
         if (f.exists() && !f.isDirectory()) {
           S3Customer obj = jsonMapper.readValue(f, S3Customer.class);
           for (S3Details alias : obj.getS3List()) {
@@ -676,7 +681,8 @@ public class ExportServiceImpl implements ExportService {
 
     try {
       MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-      File file = new File(exportBean.getFileName());
+      String normalizedPath = SipCommonUtils.normalizePath(exportBean.getFileName());
+      File file = new File(normalizedPath);
       final String emailSubject = exportBean.getReportName() + " | " + exportBean.getPublishDate();
       String emailBody = serviceUtils.prepareMailBody(exportBean, mailBody);
       if (zip) {
@@ -731,7 +737,8 @@ public class ExportServiceImpl implements ExportService {
   }
 
   void dispatchFileToS3(ExportBean exportBean, String finalS3, String finalJobGroup, boolean zip) {
-    File cfile = new File(exportBean.getFileName());
+    String normalizedPath=SipCommonUtils.normalizePath(exportBean.getFileName());
+    File cfile = new File(normalizedPath);
     logger.debug("Final S3 = {}", finalS3);
 
     if (zip) {
@@ -759,7 +766,8 @@ public class ExportServiceImpl implements ExportService {
       logger.trace("AliasTemp : {}", aliasTemp);
       ObjectMapper jsonMapper = new ObjectMapper();
       try {
-        S3Customer s3Customer = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
+        String normalizedS3DetailsFile = SipCommonUtils.normalizePath(s3DetailsFile);
+        S3Customer s3Customer = jsonMapper.readValue(new File(normalizedS3DetailsFile), S3Customer.class);
         for (S3Details alias : s3Customer.getS3List()) {
           if (alias.getCustomerCode().equals(finalJobGroup) && aliasTemp.equals(alias.getAlias())) {
             logger
@@ -980,7 +988,8 @@ public class ExportServiceImpl implements ExportService {
 
     if (!StringUtils.isEmpty(finalFtp)) {
       try {
-        File file = new File(exportBean.getFileName());
+        String normalizedPath=SipCommonUtils.normalizePath(exportBean.getFileName());
+        File file = new File(normalizedPath);
         String fileName = file.getAbsolutePath();
         if (zip) {
           fileName = ExportUtils.buildZipFile(exportBean, file);
@@ -1022,8 +1031,8 @@ public class ExportServiceImpl implements ExportService {
         } else {
           destinationFileName = tempFileName + dtf.format(now) + "." + fileType;
         }
-
-        FtpCustomer obj = jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
+        String normalizedFtpDetailsFile = SipCommonUtils.normalizePath(ftpDetailsFile);
+        FtpCustomer obj = jsonMapper.readValue(new File(normalizedFtpDetailsFile), FtpCustomer.class);
         for (FTPDetails alias : obj.getFtpList()) {
           if (alias.getCustomerName().equals(finalJobGroup) && aliasTemp.equals(alias.getAlias())) {
             String privatekeyFile = alias.getPrivatekeyFile();
@@ -1218,7 +1227,8 @@ public class ExportServiceImpl implements ExportService {
       Analysis analysis, String executionId, ExportBean exportBean) {
     long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
     long totalNumberOfBatch = 0;
-    File file = new File(exportBean.getFileName());
+    String normalizedPath=SipCommonUtils.normalizePath(exportBean.getFileName());
+    File file = new File(normalizedPath);
     file.getParentFile().mkdir();
     boolean flag = true;
     long pageNo = 1, totalRowsCount = 0, rowCount = 1;

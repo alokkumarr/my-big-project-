@@ -109,8 +109,7 @@
             <configuration>
               <packageName>sip-common-components</packageName>
               <version>${revision.nodash}</version>
-              <obsoletes>sip-common-components</obsoletes>
-              <entries>
+	       <entries>
                 <entry>
                   <name>/opt/sip/sip-common-components</name>
                   <directory>true</directory>

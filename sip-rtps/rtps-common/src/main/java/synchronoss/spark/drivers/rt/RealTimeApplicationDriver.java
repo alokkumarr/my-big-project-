@@ -2,6 +2,7 @@ package synchronoss.spark.drivers.rt;
 
 import com.typesafe.config.ConfigFactory;
 import info.faljse.SDNotify.SDNotify;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function0;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -39,7 +40,8 @@ public class RealTimeApplicationDriver {
 
         // Read configuration file
         logger.info("Configuration file : " + configurationFilePath);
-        final com.typesafe.config.Config appConfig = ConfigFactory.parseFile(new File(configurationFilePath));
+        String normalizedConfigurationPath= FilenameUtils.normalize(configurationFilePath);
+        final com.typesafe.config.Config appConfig = ConfigFactory.parseFile(new File(normalizedConfigurationPath));
 
         // Check configuration parameters
         if(!checkConfiguration(appConfig)){
