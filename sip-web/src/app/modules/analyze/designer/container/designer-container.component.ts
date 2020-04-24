@@ -910,6 +910,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.requestDataIfPossible();
         break;
       case 'modeToggle':
+        this.areMinRequirmentsMet = this.canRequestData();
         this.toggleDesignerQueryModes();
         break;
     }
