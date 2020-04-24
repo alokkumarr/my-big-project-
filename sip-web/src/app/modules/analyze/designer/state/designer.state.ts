@@ -339,7 +339,9 @@ export class DesignerState {
 
     /* If artifact column had a data field, make sure it's updated with latest aggregate.
        If no data field exists, it is a non-data field. Do nothing */
-    if (artifactColumn.dataField) {
+
+    /* add dataField even if not present only for pivots and charts */
+    if (!['report', 'esReport'].includes(analysis.type)) {
       artifactColumn.dataField = DesignerService.dataFieldFor({
         columnName: artifactColumn.columnName,
         aggregate: artifactColumn.aggregate

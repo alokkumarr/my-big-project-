@@ -29,7 +29,7 @@ export class DesignerAnalysisOptionsComponent {
   public auxSettings;
   public selectedColumns: ArtifactColumn[];
   public config: PerfectScrollbarConfigInterface = {};
-  public limitByAxis: string;
+  public limitByAxis: string = '';
 
   selectedColsTrackByFn(_, column) {
     return column.columnName;

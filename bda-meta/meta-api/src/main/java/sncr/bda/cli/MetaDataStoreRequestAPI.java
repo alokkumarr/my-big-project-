@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.joda.time.DateTime;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
@@ -18,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.mapr.db.MapRDB;
+
 import sncr.bda.admin.ProjectAdmin;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
@@ -30,6 +33,7 @@ import sncr.bda.metastore.exception.MetaStoreSearchNotFoundException;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+import com.google.json.JsonSanitizer;
 
 /**
  * The class handles basic requests to Metadata Store
@@ -79,12 +83,14 @@ public class MetaDataStoreRequestAPI {
 
     public MetaDataStoreRequestAPI(String jStr) {
       jsonParser = new JsonParser();
-      request = jsonParser.parse(jStr);
+      String sanitizedStr = JsonSanitizer.sanitize(jStr);
+      request = jsonParser.parse(sanitizedStr);
     }
     public MetaDataStoreRequestAPI(List<MetaDataStoreStructure> metaDataStoreStructure) throws JsonSyntaxException, JsonProcessingException {
       ObjectMapper mapper = new ObjectMapper();
       jsonParser = new JsonParser();
-      request = jsonParser.parse(mapper.writeValueAsString(metaDataStoreStructure));
+      String sanitizedStructure = JsonSanitizer.sanitize(mapper.writeValueAsString(metaDataStoreStructure));
+      request = jsonParser.parse(sanitizedStructure);
     }
   
     public String getId() {
