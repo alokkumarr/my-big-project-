@@ -21,12 +21,12 @@
   set_fact:
     mysqld_exporter_db_password: >-
       {{ mysqld_exporter_db_password_encoded.stdout }}
-  when: not mysqld_exporter_db_password_encoded.stat.exists
+  when: not sip_mariadb_exporter_db_password_migrated.stat.exists
 - name: Register the sip-security Encoded paswword value (If already Encoded )
   set_fact:
     mysqld_exporter_db_password: >-
       {{ mysqld_exporter_get_db_password }}
-  when: mysqld_exporter_db_password_encoded.stat.exists
+  when: sip_mariadb_exporter_db_password_migrated.stat.exists
 - name: Set the mysqld exporter database password
   copy:
     content: "{{ mysqld_exporter_db_password }}"
@@ -36,7 +36,7 @@
     path: /etc/bda/sip-mariadb-exporter-db-password-migrated
     state: touch
     mode: 0755
-  when: not mysqld_exporter_db_password_encoded.stat.exists
+  when: not sip_mariadb_exporter_db_password_migrated.stat.exists
 - name: lookup & setting database root password
   set_fact:
     root_get_password: >-
