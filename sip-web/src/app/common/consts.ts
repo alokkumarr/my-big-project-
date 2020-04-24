@@ -129,7 +129,7 @@ export const CHART_COLORS = [
 
 export const DATE_FORMATS = [
   {
-    value: 'YYYY',
+    value: 'yyyy',
     momentValue: 'YYYY',
     groupInterval: 'year',
     label: '2017'
@@ -141,13 +141,13 @@ export const DATE_FORMATS = [
     label: 'September 2017'
   },
   {
-    value: 'MMM YYYY',
+    value: 'MMM yyyy',
     momentValue: 'MMM YYYY',
     groupInterval: 'month',
     label: 'Sept 2017'
   },
   {
-    value: 'MM YYYY',
+    value: 'MM yyyy',
     momentValue: 'MM YYYY',
     groupInterval: 'month',
     label: '09 2017'
