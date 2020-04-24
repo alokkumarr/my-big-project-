@@ -1296,9 +1296,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.refreshDataObject();
         break;
       case 'comboType':
+      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      this.artifacts = [...this.artifacts];
         this.updateAnalysis();
         this.refreshDataObject();
-        this.requestDataIfPossible();
+        if (get(this.analysis, 'chartOptions.chartType') !== 'comparison') {
+          this.requestDataIfPossible();
+        }
         break;
       case 'labelOptions':
         isDSLAnalysis(this.analysis)
