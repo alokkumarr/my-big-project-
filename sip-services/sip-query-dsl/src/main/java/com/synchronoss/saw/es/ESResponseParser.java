@@ -60,13 +60,13 @@ public class ESResponseParser {
             dataObj.put(columnName, childNode.get(KEY).bigIntegerValue());
             break;
           case FLOAT:
-            dataObj.put(columnName, decimalFormat.format(childNode.get(KEY).floatValue()));
+            dataObj.put(columnName, Float.valueOf(decimalFormat.format(childNode.get(KEY).floatValue())));
             break;
           case DOUBLE:
-            dataObj.put(columnName, decimalFormat.format(childNode.get(KEY).doubleValue()));
+            dataObj.put(columnName, Double.valueOf(decimalFormat.format(childNode.get(KEY).doubleValue())));
             break;
           case BIG_DECIMAL:
-            dataObj.put(columnName, decimalFormat.format(childNode.get(KEY).doubleValue()));
+            dataObj.put(columnName, Double.valueOf(decimalFormat.format(childNode.get(KEY).doubleValue())));
             break;
           case INT:
             dataObj.put(columnName, childNode.get(KEY).intValue());
