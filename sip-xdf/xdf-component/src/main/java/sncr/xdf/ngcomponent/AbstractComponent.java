@@ -453,6 +453,8 @@ public abstract class AbstractComponent implements WithContext{
             else{
                 ((WithSpark) this).initSpark(null, ctx, ngctx);
             }
+            logger.debug("Spark session config - spark.unsafe.sorter.spill.read.ahead.enabled -> value :: "
+                + ctx.sparkSession.sparkContext().getConf().get("spark.unsafe.sorter.spill.read.ahead.enabled"));
         }
         ngctx.serviceStatus.put(ComponentServices.Spark, true);
         return 0;

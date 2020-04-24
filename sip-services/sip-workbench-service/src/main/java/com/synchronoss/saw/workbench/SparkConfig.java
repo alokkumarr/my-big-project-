@@ -98,6 +98,7 @@ public class SparkConfig {
 				.set("spark.sql.inMemoryColumnarStorage.compressed", this.sparkInMemoryColStorageCompressed)
 		        .set("spark.sql.inMemoryColumnarStorage.batchSize", this.sparkSqlInMemoryBatchSize)
 		        .set("spark.sql.caseSensitive", this.sparkSqlCaseSensitive)
+                .set("spark.unsafe.sorter.spill.read.ahead.enabled", "false")
 				.setMaster(this.sparkMaster)
 				.setAppName(this.appName);
 		
