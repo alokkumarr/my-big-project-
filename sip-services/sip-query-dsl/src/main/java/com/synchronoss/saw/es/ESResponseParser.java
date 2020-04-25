@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.synchronoss.saw.constants.CommonQueryConstants;
 import com.synchronoss.saw.model.Field;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,11 +25,12 @@ public class ESResponseParser {
   private static final String BUCKETS = "buckets";
   private static String GROUP_BY_FIELD = "group_by_field";
   private static final String KEY_AS_STRING = "key_as_string";
+  private DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
   private String[] groupByFields;
   private List<Field> aggregationFields;
 
-  public ESResponseParser(List<Field> aggregationFields,String[] groupByFields) {
+  public ESResponseParser(List<Field> aggregationFields, String[] groupByFields) {
     this.aggregationFields = aggregationFields;
     this.groupByFields = groupByFields;
   }
@@ -58,13 +60,13 @@ public class ESResponseParser {
             dataObj.put(columnName, childNode.get(KEY).bigIntegerValue());
             break;
           case FLOAT:
-            dataObj.put(columnName, childNode.get(KEY).floatValue());
+            dataObj.put(columnName, Float.valueOf(decimalFormat.format(childNode.get(KEY).floatValue())));
             break;
           case DOUBLE:
-            dataObj.put(columnName, childNode.get(KEY).doubleValue());
+            dataObj.put(columnName, Double.valueOf(decimalFormat.format(childNode.get(KEY).doubleValue())));
             break;
           case BIG_DECIMAL:
-            dataObj.put(columnName, childNode.get(KEY).doubleValue());
+            dataObj.put(columnName, Double.valueOf(decimalFormat.format(childNode.get(KEY).doubleValue())));
             break;
           case INT:
             dataObj.put(columnName, childNode.get(KEY).intValue());
@@ -98,7 +100,8 @@ public class ESResponseParser {
             ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
             : fieldName;
 
-        flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
+        Object formatValue = getFormatedValue(childNode, fieldName);
+        flatValues.put(columnName, formatValue);
       }
       flatStructure.add(flatValues);
     } else {
@@ -114,11 +117,34 @@ public class ESResponseParser {
             ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
             : fieldName;
 
-        flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
+        Object formatValue = getFormatedValue(childNode, fieldName);
+        flatValues.put(columnName, formatValue);
       });
       flatStructure.add(flatValues);
     }
     return flatStructure;
+  }
+
+  /**
+   * Decimal precision value #.##
+   *
+   * @param childNode
+   * @param fieldName
+   * @return formated value
+   */
+  private Object getFormatedValue(JsonNode childNode, String fieldName) {
+    Object formatValue = null;
+    JsonNode nodeValue = childNode.get(fieldName).get(VALUE);
+    if (nodeValue != null) {
+      if (nodeValue.isDouble()) {
+        formatValue = decimalFormat.format(nodeValue.doubleValue());
+      } else if (nodeValue.isFloat()) {
+        formatValue = decimalFormat.format(nodeValue.floatValue());
+      } else {
+        formatValue = nodeValue;
+      }
+    }
+    return formatValue;
   }
 
   /**
