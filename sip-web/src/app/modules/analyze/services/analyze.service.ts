@@ -535,6 +535,10 @@ export class AnalyzeService {
       return area === 'g';
     })(model.sipQuery.artifacts[0].fields);
 
+    let zfields = fpFilter(({ area }) => {
+      return area === 'z';
+    })(model.sipQuery.artifacts[0].fields);
+
     if (gfields.length === 0) {
       return model;
     }
@@ -549,6 +553,10 @@ export class AnalyzeService {
       forEach(xfields, x => {
         fields.push(x);
       })
+
+      forEach(zfields, z => {
+        fields.push(z);
+      })
     } else {
       forEach(xfields, x => {
         fields.push(x);
@@ -556,6 +564,10 @@ export class AnalyzeService {
 
       forEach(gfields, g => {
         fields.push(g);
+      })
+
+      forEach(zfields, z => {
+        fields.push(z);
       })
     }
     model.sipQuery.artifacts[0].fields = fields;

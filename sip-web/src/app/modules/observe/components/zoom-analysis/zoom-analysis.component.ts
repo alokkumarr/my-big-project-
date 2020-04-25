@@ -70,14 +70,14 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this.aggregatePreview = aggregatedFilters.map(field => {
           if (!field.model) {
-            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span></span>`;
+            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.aggregate}(${field.columnName.split('.keyword')[0]})</span></span>`;
           }
           if (field.model.operator === 'BTW') {
-            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.aggregate}(${field.columnName.split('.keyword')[0]})</span> <span class="operator">${
               field.model.operator
             }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
           } else {
-            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+            return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.aggregate}(${field.columnName.split('.keyword')[0]})</span> <span class="operator">${
               field.model.operator || ''
             }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
           }

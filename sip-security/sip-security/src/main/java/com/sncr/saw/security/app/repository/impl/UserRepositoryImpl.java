@@ -32,6 +32,10 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.constants.ErrorMessages;
+import com.sncr.saw.security.common.util.AdvancedHashingUtil;
+import com.sncr.saw.security.common.util.AdvancedHashingUtil.CannotPerformOperationException;
+import com.sncr.saw.security.common.util.AdvancedHashingUtil.InvalidHashException;
+import com.synchronoss.sip.utils.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.Model;
@@ -43,7 +47,8 @@ import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-
+import java.sql.BatchUpdateException;
+import java.sql.Connection;
 import com.synchronoss.sip.utils.Ccode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -59,6 +64,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -68,9 +75,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -119,26 +128,27 @@ public class UserRepositoryImpl implements UserRepository {
     logger.debug("lockingTime : {} ",lockingTime);
     logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
-    byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
 
-
-    password = Ccode.cencode(password, encryptionKeyBytes).trim();
-    String pwd = password;
     String sql =
-        "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS "
+        "SELECT U.PWD_MODIFIED_DATE, U.ENCRYPTED_PASSWORD, C.PASSWORD_EXPIRY_DAYS "
             + "FROM USERS U, CUSTOMERS C "
-            + "WHERE U.USER_ID = ? AND U.ENCRYPTED_PASSWORD = ? "
+            + "WHERE U.USER_ID = ?  "
             + " AND U.ACTIVE_STATUS_IND = '1' "
             + "AND U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID";
     try {
       PasswordDetails passwordDetails = jdbcTemplate.query(sql, preparedStatement -> {
             preparedStatement.setString(1, masterLoginId);
-            preparedStatement.setString(2, pwd);
           },
           new UserRepositoryImpl.PwdDetailExtractor());
+      
+      
 
       if (passwordDetails != null) {
-        isAuthenticated = true;
+        isAuthenticated = AdvancedHashingUtil.verifyPassword(
+        		password.trim(),passwordDetails.getEncryptedPwd());
+        
+        
+        logger.debug("Is Authenticated ::"+ isAuthenticated);
         if (!isPwdExpired(passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
           isPasswordActive = true;
         }
@@ -239,8 +249,17 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
-		String encNewPass = Ccode.cencode(newPass, encryptionKeyBytes).trim();
+		Optional<String> hashedPwd = this.hashPassword(newPass.trim());
+		String encNewPass = null;
+		
+		if(hashedPwd.isPresent()) {
+			encNewPass = this.hashPassword(newPass.trim()).get();
+		} else {
+			logger.error("Error during hashing password");
+  			message = "Error encountered while changing password";
+  			return message;
+		}
+		
 		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
 		try {
@@ -256,7 +275,7 @@ public class UserRepositoryImpl implements UserRepository {
 			 */
 
 			sql = "SELECT PH.* FROM PASSWORD_HISTORY PH WHERE PH.USER_SYS_ID=? ORDER BY PH.DATE_OF_CHANGE DESC ";
-
+			final String  encNewPassword = encNewPass;
 			message = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, userSysId);
@@ -273,7 +292,7 @@ public class UserRepositoryImpl implements UserRepository {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
 						preparedStatement.setString(1, sysId);
 						preparedStatement.setString(2, userSysId);
-						preparedStatement.setString(3, encNewPass);
+						preparedStatement.setString(3, encNewPassword);
 					}
 				});
 
@@ -281,7 +300,7 @@ public class UserRepositoryImpl implements UserRepository {
 						+ "U.PWD_MODIFIED_DATE=SYSDATE(),U.MODIFIED_BY ='CHANGE_PASSWORD' WHERE U.USER_SYS_ID=?";
 				jdbcTemplate.update(sql, new PreparedStatementSetter() {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
-						preparedStatement.setString(1, encNewPass);
+						preparedStatement.setString(1, encNewPassword);
 						preparedStatement.setString(2, userSysId);
 					}
 				});
@@ -307,6 +326,66 @@ public class UserRepositoryImpl implements UserRepository {
 
 		return message;
 	}
+	
+	@Override
+	public void migratePwdsEncryption() {
+		logger.info("###Beginning of migration ####");
+		String sql = "SELECT U.USER_SYS_ID, U.ENCRYPTED_PASSWORD FROM USERS U" + " WHERE U.PWD_MIGRATED = 0" ;
+		
+		List<UserDetails> users = jdbcTemplate.query(sql, new RowMapper<UserDetails>() {
+			public UserDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+				UserDetails userDetails = new UserDetails();
+				userDetails.setUserId(rs.getLong(1));
+				userDetails.setPassword(rs.getString(2));
+				return userDetails;
+			}
+		});
+		logger.info("###Retrived users  count ::####"+ users.size());
+		String updateSql = "UPDATE USERS U  SET  U.ENCRYPTED_PASSWORD = ?, U.PWD_MIGRATED = 1 where "
+				+ "U.USER_SYS_ID = ?" ;
+	    final byte[] encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+	   
+	    
+	    for(UserDetails user: users) {
+	    	/**
+	    	 * Decrypt existing password with old algorithm
+	    	 */
+	    	 String actualPwd = null;
+	    	
+	    	try {
+	    		logger.info("### New update with user ..."+ user.getUserId());
+		    	String existingPwd  =  user.getPassword();
+			    actualPwd = Ccode.cdecode(existingPwd, encryptionKeyBytes);
+	    	} catch(Exception exception) {
+	    		logger.error("Exception while decoding old password"
+	    				+ exception.getMessage());
+	    	}
+	    	
+			/**
+			 * If original password is not encoded with old algorithm
+			 * decode of old aglorithm creates a null. Update only
+			 * if it is not null
+			 */
+			if( actualPwd != null && !actualPwd.equals("")) {
+				String hashedPwd = null;
+				try {
+					hashedPwd = AdvancedHashingUtil.createHash(actualPwd);
+					jdbcTemplate.update(updateSql,hashedPwd, user.getUserId());
+					logger.info("##Update completed");
+				} catch (CannotPerformOperationException e) {
+					logger.error("Exception while hashing pwd for user ::" 
+				    + user.getUserId());
+				}
+				
+				
+			}
+			
+	    	
+	    }
+	         
+	}
+		
+
 
 	@Override
 	public String changePassword(String loginId, String newPass, String oldPass) {
@@ -315,22 +394,27 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
-
-		String encOldPass = Ccode.cencode(oldPass, encryptionKeyBytes).trim();
-		String encNewPass = Ccode.cencode(newPass, encryptionKeyBytes).trim();
-		String sql = "SELECT U.USER_SYS_ID" + " FROM USERS U" + " WHERE U.USER_ID = ?"
-				+ " and  U.ENCRYPTED_PASSWORD = ?";
+		String encNewPass = null;
+		Optional<String> hashedPwd = this.hashPassword(newPass.trim());
+		if(hashedPwd.isPresent()) {
+			encNewPass = hashedPwd.get();
+		} else {
+			logger.error("Error during hashing password");
+  			message = "Error encountered while changing password";
+  			return message;
+		}
+		String sql = "SELECT U.USER_SYS_ID, U.ENCRYPTED_PASSWORD FROM USERS U WHERE U.USER_ID = ?";
+		final String encNewPassword = encNewPass;
 
 		try {
-			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+			ResetPasswordDetails pwdDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, loginId);
-					preparedStatement.setString(2, encOldPass);
 				}
-			}, new UserRepositoryImpl.StringExtractor("user_sys_id"));
-
-			if (userSysId == null) {
+			}, new UserRepositoryImpl.PasswordResetExtractor());
+			
+			if (pwdDetails == null || !AdvancedHashingUtil.
+					verifyPassword(oldPass.trim(), pwdDetails.getPassword())) {
 				message = "Value provided for old Password did not match.";
 				return message;
 			}
@@ -338,9 +422,9 @@ public class UserRepositoryImpl implements UserRepository {
 
 			message = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, userSysId);
+					preparedStatement.setString(1, pwdDetails.getUserSysId());
 				}
-			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
+			}, new UserRepositoryImpl.PasswordValidator(newPass));
 			if (message != null && message.equals("valid")) {
 				String sysId = System.currentTimeMillis() + "";
 
@@ -349,16 +433,16 @@ public class UserRepositoryImpl implements UserRepository {
 
         jdbcTemplate.update(sql, preparedStatement -> {
           preparedStatement.setString(1, sysId);
-          preparedStatement.setString(2, userSysId);
-          preparedStatement.setString(3, encNewPass);
+          preparedStatement.setString(2, pwdDetails.getUserSysId());
+          preparedStatement.setString(3, encNewPassword);
         });
 
 				sql = "update USERS U  set U.ENCRYPTED_PASSWORD=?"
 						+ " ,  U.PWD_MODIFIED_DATE=sysdate(),U.MODIFIED_BY ='change_password' where U.USER_SYS_ID=?";
 				int i = jdbcTemplate.update(sql, new PreparedStatementSetter() {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
-						preparedStatement.setString(1, encNewPass);
-						preparedStatement.setString(2, userSysId);
+						preparedStatement.setString(1, encNewPassword);
+						preparedStatement.setString(2, pwdDetails.getUserSysId());
 					}
 				});
 				if (i == 1) {
@@ -500,6 +584,7 @@ public class UserRepositoryImpl implements UserRepository {
 				passwordDetails = new PasswordDetails();
 				passwordDetails.setPwdModifiedDate(rs.getDate("PWD_MODIFIED_DATE"));
 				passwordDetails.setPasswordExpiryDays(rs.getInt("PASSWORD_EXPIRY_DAYS"));
+				passwordDetails.setEncryptedPwd(rs.getString("ENCRYPTED_PASSWORD"));
 			}
 			return passwordDetails;
 		}
@@ -1067,6 +1152,38 @@ public class UserRepositoryImpl implements UserRepository {
 			return resetValid;
 		}
 	}
+	
+	
+	public class PasswordResetExtractor implements ResultSetExtractor<ResetPasswordDetails> {
+		@Override
+		public ResetPasswordDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
+			ResetPasswordDetails pwdDetails = new ResetPasswordDetails();
+			
+			if (rs.next()) {
+				pwdDetails.setUserSysId(rs.getString("USER_SYS_ID"));
+				pwdDetails.setPassword(rs.getString("ENCRYPTED_PASSWORD"));
+			}
+			
+			return pwdDetails;
+		}
+	}
+	
+	public class ResetPasswordDetails {
+		String userSysId;
+		String password;
+		public String getUserSysId() {
+			return userSysId;
+		}
+		public void setUserSysId(String userSysId) {
+			this.userSysId = userSysId;
+		}
+		public String getPassword() {
+			return password;
+		}
+		public void setPassword(String password) {
+			this.password = password;
+		}
+	}
 
 	public class StringExtractor implements ResultSetExtractor<String> {
 		private String fieldName;
@@ -1106,21 +1223,35 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	public class PasswordValidator implements ResultSetExtractor<String> {
-		String encNewPass = null;
+		String pwd = null;
 
-		public PasswordValidator(String encNewPass) {
-			this.encNewPass = encNewPass;
+		public PasswordValidator(String pwd) {
+			this.pwd = pwd;
 		}
 
 		@Override
 		public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-			String password = null;
+			String oldpwd = null;
 			int counter = 0;
 			while (rs.next() && counter <= 4) {
-				password = rs.getString("PASSWORD") != null ? rs.getString("PASSWORD").trim()
+				
+				
+				oldpwd = rs.getString("PASSWORD") != null ? rs.getString("PASSWORD").trim()
 						: rs.getString("PASSWORD");
-				if (password.equals(encNewPass)) {
-					return "New password should not match to the last 5 password !!";
+				
+				
+				String isValid = null;
+				try {
+					if(AdvancedHashingUtil.
+						verifyPassword(pwd, oldpwd)) {
+						return "New password should not match to the last 5 password !!";
+					}
+				} catch (CannotPerformOperationException e) {
+					logger.error("Exception while verifying password history");
+					return  "Invalid";
+				} catch (InvalidHashException e) {
+					logger.error("Exception while verifying password history");
+					return "Invalid";
 				}
 				counter = counter + 1;
 			}
@@ -1313,46 +1444,56 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Valid addUser(User user, String createdBy) {
-    Valid valid = new Valid();
-    String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
-        + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
-        + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
+		Valid valid = new Valid();
+		Optional<String> hashedPwd = this.hashPassword(user.getPassword().trim());
+		String encNewPass;
+		
+		if(hashedPwd.isPresent()) {
+			encNewPass = hashedPwd.get();
+		} else {
+			logger.error("Error during hashing password");
+			valid.setValid(false);
+			valid.setError("Error while hashing password");
+			return valid;
+		};
+		
+		
+    
+		String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
+        + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY, PWD_MIGRATED ) "
+        + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ?, 1 ); ";
+	    try {
+	      jdbcTemplate.update(sql, preparedStatement -> {
+	        preparedStatement.setString(1, user.getMasterLoginId());
+	        preparedStatement.setString(2, user.getEmail());
+	        preparedStatement.setLong(3, user.getRoleId());
+	        preparedStatement.setLong(4, user.getCustomerId());
+			preparedStatement.setString(5, encNewPass);
+	        preparedStatement.setString(6, user.getFirstName());
+	        preparedStatement.setString(7, user.getMiddleName());
+	        preparedStatement.setString(8, user.getLastName());
+	        preparedStatement.setString(9, user.getActiveStatusInd());
+	        preparedStatement.setString(10, createdBy);
+	      });
+	    } catch (DuplicateKeyException e) {
+	      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+	      valid.setValid(false);
+	      valid.setError("User cannot be added. Login ID already Exists!");
+	      return valid;
+	    } catch (DataIntegrityViolationException de) {
+	      logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
+	      valid.setValid(false);
+	      valid.setError("Please enter valid input in the field(s)");
+	      return valid;
+	    } catch (Exception e) {
+	      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+	      valid.setValid(false);
+	      valid.setError(e.getMessage());
+	      return valid;
+	    }
+	    valid.setValid(true);
+	    return valid;
 
-    byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
-    try {
-      jdbcTemplate.update(
-          sql,
-          preparedStatement -> {
-            preparedStatement.setString(1, user.getMasterLoginId());
-            preparedStatement.setString(2, user.getEmail());
-            preparedStatement.setLong(3, user.getRoleId());
-            preparedStatement.setLong(4, user.getCustomerId());
-            preparedStatement.setString(
-                5, Ccode.cencode(user.getPassword(), encryptionKeyBytes).trim());
-            preparedStatement.setString(6, user.getFirstName());
-            preparedStatement.setString(7, user.getMiddleName());
-            preparedStatement.setString(8, user.getLastName());
-            preparedStatement.setString(9, user.getActiveStatusInd());
-            preparedStatement.setString(10, createdBy);
-          });
-    } catch (DuplicateKeyException e) {
-      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
-      valid.setValid(false);
-      valid.setError("User cannot be added. Login ID already Exists!");
-      return valid;
-    } catch (DataIntegrityViolationException de) {
-      logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
-      valid.setValid(false);
-      valid.setError("Please enter valid input in the field(s)");
-      return valid;
-    } catch (Exception e) {
-      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
-      valid.setValid(false);
-      valid.setError(e.getMessage());
-      return valid;
-    }
-    valid.setValid(true);
-    return valid;
   }
 
 	@Override
@@ -1363,24 +1504,33 @@ public class UserRepositoryImpl implements UserRepository {
 				+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+		
+		Optional<String> hashedPwd = this.hashPassword(user.getPassword().trim());
+		String encNewPass;
+		
+		if(hashedPwd.isPresent()) {
+			encNewPass = hashedPwd.get();
+		} else {
+			logger.error("Error during hashing password");
+			return -1L;
+		};
+
 		try {
-      jdbcTemplate.update(
-          con -> {
-            PreparedStatement ps = con.prepareStatement(sql, new String[] {"USER_SYS_ID"});
-            ps.setString(1, user.getMasterLoginId());
-            ps.setString(2, user.getEmail());
-            ps.setLong(3, user.getRoleId());
-            ps.setLong(4, user.getCustomerId());
-            ps.setString(5, Ccode.cencode(user.getPassword(), encryptionKeyBytes).trim());
-            ps.setString(6, user.getFirstName());
-            ps.setString(7, user.getMiddleName());
-            ps.setString(8, user.getLastName());
-            ps.setString(9, user.getActiveStatusInd());
-            ps.setString(10, user.getMasterLoginId());
-            return ps;
-          },
-          keyHolder);
+        jdbcTemplate.update(con -> {
+          PreparedStatement ps = con.prepareStatement(sql, new String[]{"USER_SYS_ID"});
+          ps.setString(1, user.getMasterLoginId());
+          ps.setString(2, user.getEmail());
+          ps.setLong(3, user.getRoleId());
+          ps.setLong(4, user.getCustomerId());
+          ps.setString(5, encNewPass);
+          ps.setString(6, user.getFirstName());
+          ps.setString(7, user.getMiddleName());
+          ps.setString(8, user.getLastName());
+          ps.setString(9, user.getActiveStatusInd());
+          ps.setString(10, user.getMasterLoginId());
+          return ps;
+        }, keyHolder);
+
 			return (Long) keyHolder.getKey();
 		} catch (Exception e) {
 			return -1L;
@@ -1389,35 +1539,50 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public Valid updateUser(User user) {
-    Valid valid = new Valid();
-    byte[] encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
-    StringBuffer sql = new StringBuffer();
-    sql.append("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ? ");
-    if (user.getPassword() != null) {
-      sql.append(
-          ",ENCRYPTED_PASSWORD = '"
-              + Ccode.cencode(user.getPassword(), encryptionKeyBytes).trim()
-              + "'");
-      sql.append(",PWD_MODIFIED_DATE = SYSDATE()");
-    }
+		
+		boolean isPwdChanged = (user.getPassword() != null);
+		Valid valid = new Valid();
+		String encNewPass = null;
+		int index;
+		StringBuffer queryString = new StringBuffer("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ?");
+	    if(isPwdChanged) {
+	    	queryString.append(", ENCRYPTED_PASSWORD = ?");
+	    	Optional<String> hashedPwd = this.hashPassword(user.getPassword().trim());
+	    	index = 3;
+			if(hashedPwd.isPresent()) {
+				encNewPass = hashedPwd.get();
+			} else {
+				logger.error("Error during hashing password");
+				valid.setValid(false);
+				valid.setError("Error while hashing password");
+				return valid;
+			};
+			
+	    } else {
+	    	index = 2;
+	    }
+		queryString.append(", PWD_MODIFIED_DATE = SYSDATE(), FIRST_NAME = ?"
+				+ ", MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,  MODIFIED_DATE = SYSDATE(), PWD_MIGRATED = 1"
+				+ ", MODIFIED_BY = ? WHERE USER_SYS_ID = ?");
+		
+		final String pwd = encNewPass;
+		
+		
+		try {
+			jdbcTemplate.update(queryString.toString(), preparedStatement -> {
+	        preparedStatement.setString(1, user.getEmail());
+	        preparedStatement.setLong(2, user.getRoleId());
+	        if(isPwdChanged) {
+	        	preparedStatement.setString(index, pwd);
+	        }
+	        preparedStatement.setString(index+1, user.getFirstName());
+	        preparedStatement.setString(index+2, user.getMiddleName());
+	        preparedStatement.setString(index+3, user.getLastName());
+	        preparedStatement.setInt(index+4, Integer.parseInt(user.getActiveStatusInd()));
+	        preparedStatement.setString(index+5, user.getMasterLoginId());
+	        preparedStatement.setLong(index+6, user.getUserId());
+      });
 
-    sql.append(
-        ",FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,"
-            + " MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ? WHERE USER_SYS_ID = ?");
-
-    try {
-      jdbcTemplate.update(
-          sql.toString(),
-          preparedStatement -> {
-            preparedStatement.setString(1, user.getEmail());
-            preparedStatement.setLong(2, user.getRoleId());
-            preparedStatement.setString(3, user.getFirstName());
-            preparedStatement.setString(4, user.getMiddleName());
-            preparedStatement.setString(5, user.getLastName());
-            preparedStatement.setInt(6, Integer.parseInt(user.getActiveStatusInd()));
-            preparedStatement.setString(7, user.getMasterLoginId());
-            preparedStatement.setLong(8, user.getUserId());
-          });
     } catch (DataIntegrityViolationException de) {
       logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
       valid.setValid(false);
@@ -3148,11 +3313,23 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public Valid addUserDetails(UserDetails userDetails, String createdBy) {
     Valid valid = new Valid();
+	Optional<String> hashedPwd = this.hashPassword(userDetails.getPassword().trim());
+	String encNewPass;
+	
+	if(hashedPwd.isPresent()) {
+		encNewPass = hashedPwd.get();
+	} else {
+		logger.error("Error during hashing password");
+		valid.setValid(false);
+		valid.setError("Error while hashing password");
+		return valid;
+	};
+    
     String sql =
         "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID,SEC_GROUP_SYS_ID, ENCRYPTED_PASSWORD, "
-            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, ID3_ENABLED, CREATED_DATE, CREATED_BY ) "
-            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, SYSDATE(), ? ); ";
-    byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, ID3_ENABLED, CREATED_DATE, CREATED_BY, PWD_MIGRATED ) "
+            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, SYSDATE(), ?, 1 ); ";
+
     try {
       jdbcTemplate.update(
           sql,
@@ -3166,7 +3343,7 @@ public class UserRepositoryImpl implements UserRepository {
             } else {
               preparedStatement.setNull(5, Types.BIGINT);
             }
-            preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword(),encryptionKeyBytes).trim());
+            preparedStatement.setString(6, encNewPass);
             preparedStatement.setString(7, userDetails.getFirstName());
             preparedStatement.setString(8, userDetails.getMiddleName());
             preparedStatement.setString(9, userDetails.getLastName());
@@ -3197,12 +3374,24 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Valid updateUserDetails(UserDetails userDetails, String modifiedBy) {
         Valid valid = new Valid();
+        Optional<String> hashedPwd = this.hashPassword(userDetails.getPassword().trim());
+    	String encNewPass;
+    	
+    	if(hashedPwd.isPresent()) {
+    		encNewPass = hashedPwd.get();
+    	} else {
+    		logger.error("Error during hashing password");
+    		valid.setValid(false);
+    		valid.setError("Error while hashing password");
+    		return valid;
+    	};
+        
         int numberOfRowsUpdated=0;
         String sql =
             " UPDATE USERS SET EMAIL=? , ROLE_SYS_ID=?,SEC_GROUP_SYS_ID= ? , ENCRYPTED_PASSWORD =? , "
                 + "FIRST_NAME =? , MIDDLE_NAME =? , LAST_NAME=? , ACTIVE_STATUS_IND=? , ID3_ENABLED=? , MODIFIED_DATE= SYSDATE() , MODIFIED_BY=? "
                 + " where USER_SYS_ID=? and CUSTOMER_SYS_ID=? ; ";
-        byte []encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
+    
         try {
             numberOfRowsUpdated = jdbcTemplate.update(
                 sql,
@@ -3214,7 +3403,7 @@ public class UserRepositoryImpl implements UserRepository {
                     } else {
                         preparedStatement.setNull(3, Types.BIGINT);
                     }
-                    preparedStatement.setString(4, Ccode.cencode(userDetails.getPassword(), encryptionKeyBytes).trim());
+                    preparedStatement.setString(4, encNewPass);
                     preparedStatement.setString(5, userDetails.getFirstName());
                     preparedStatement.setString(6, userDetails.getMiddleName());
                     preparedStatement.setString(7, userDetails.getLastName());
@@ -3461,5 +3650,17 @@ public class UserRepositoryImpl implements UserRepository {
 
 		return ticket;
 
+	}
+	
+	
+	private Optional<String> hashPassword(String pwd) {
+		String hashedPwd = null;
+		try {
+			hashedPwd = AdvancedHashingUtil.createHash(pwd.trim());
+		} catch (CannotPerformOperationException e) {
+			logger.error("Error during hashing password");
+			return Optional.empty();
+		}
+		return Optional.of(hashedPwd);
 	}
 }

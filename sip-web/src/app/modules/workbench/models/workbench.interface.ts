@@ -64,7 +64,7 @@ export interface SFTPRouteMetadata {
   disableDuplicate?: boolean;
   disableConcurrency?: boolean;
   fileExclusions?: string;
-  lastModifiedLimitHours?: string;
+  lastModifiedLimitHours?: number;
 }
 
 export interface APIChannelMetadata {

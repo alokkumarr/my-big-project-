@@ -65,6 +65,7 @@
         </mat-expansion-panel-header>
         <div fxLayout="row">
           <div style="width: 83%;">
+
               <code
               [innerHTML]="
                 previewString ||
@@ -74,7 +75,7 @@
             </code>
 
             <code
-              [innerHTML]="fetchAggregatedFilters(aggregatedFilters)"
+              [innerHTML]="fetchAggregatedFilters(aggregatedFilters) || ''"
               *ngIf="data.mode === 'ANALYZE'"
               style="margin-left: 50px;"
               >

@@ -89,9 +89,9 @@ export class DskFilterDialogComponent implements OnInit {
     this.errorState = !this.datasecurityService.isDSKFilterValid(
       this.data.mode === 'DSK' ? this.dskFilterObject : concat([analyzeResult], this.aggregatedFilters),
       true,
-      this.data
+      this.data,
+      analyzeResult
     );
-
     if (this.errorState) {
       this.previewString = '';
     } else {
@@ -102,16 +102,29 @@ export class DskFilterDialogComponent implements OnInit {
   }
 
   fetchAggregatedFilters(filters) {
+    if (this.errorState) {
+      return '';
+    }
     return filters.map(field => {
       if (!field.model) {
-        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span></span>`;
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+          <span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+            ${field.aggregate || ''}(${field.columnName.split('.keyword')[0]})
+          </span>
+        </span>`;
       }
       if (field.model.operator === 'BTW') {
-        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+        ${field.aggregate || ''}(${field.columnName.split('.keyword')[0]})
+          </span>
+          <span class="operator">${
           field.model.operator
         }</span> <span>[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
       } else {
-        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.columnName.split('.keyword')[0]}</span> <span class="operator">${
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>
+        ${field.aggregate || ''}(${field.columnName.split('.keyword')[0]})
+          </span>
+          <span class="operator">${
           field.model.operator || ''
         }</span> <span>[${[get(field, 'model.value')]}]</span>`;
       }

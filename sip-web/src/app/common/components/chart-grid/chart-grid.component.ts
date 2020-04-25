@@ -341,9 +341,16 @@ export class ChartGridComponent {
     });
     const { fields } = analysis.sipQuery.artifacts[0];
     forEach(fields, serie => {
-      const matchedObj = find(seriesData.data, ({ dataType, aggregate }) => {
-        return dataType === serie.type && aggregate === serie.aggregate;
-      });
+      const matchedObj = find(
+        seriesData.data,
+        ({ dataType, aggregate, name }) => {
+          return (
+            dataType === serie.type &&
+            aggregate === serie.aggregate &&
+            name.includes(serie.name)
+          );
+        }
+      );
       set(matchedObj, 'color', serie.seriesColor);
     });
     return updates;
