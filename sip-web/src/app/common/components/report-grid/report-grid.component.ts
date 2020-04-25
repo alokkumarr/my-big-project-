@@ -16,7 +16,6 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as isUndefined from 'lodash/isUndefined';
-import * as fpFilter from 'lodash/fp/filter';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
@@ -31,7 +30,6 @@ import { Subscription, BehaviorSubject } from 'rxjs';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 import * as isEqual from 'lodash/isEqual';
-import * as moment from 'moment';
 
 import {
   AGGREGATE_TYPES,
@@ -200,10 +198,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       }
       this.columns = this.artifacts2Columns(artifact);
     }
-    this.data = transformDateFields(
-      flattenReportData(data, this.analysis),
-      this.columns
-    );
+    this.data = flattenReportData(data, this.analysis);
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -216,10 +211,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         load: options =>
           this.dataLoader(options).then(value => {
             return {
-              data: transformDateFields(
-                flattenReportData(value.data, this.analysis),
-                this.columns
-              ),
+              data: flattenReportData(value.data, this.analysis),
               totalCount: value.totalCount
             };
           })
@@ -627,23 +619,4 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     });
   }
-}
-
-function transformDateFields(data, fields: ReportGridField[]) {
-  const columnNames = fpPipe(
-    fpFilter(field => DATE_TYPES.includes(field.type)),
-    fpMap(field => field.dataField)
-  )(fields);
-
-  if (isEmpty(columnNames)) {
-    return data;
-  }
-
-  forEach(data, dataPoint => {
-    forEach(columnNames, columnName => {
-      const date = moment.utc(dataPoint[columnName], 'YYYY-MM-DD hh:mm:ss');
-      dataPoint[columnName] = date;
-    });
-  });
-  return data;
 }
