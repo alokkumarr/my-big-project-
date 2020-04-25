@@ -99,7 +99,6 @@ public class ESResponseParser {
             : fieldName;
 
         flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
-        flatValues.put(columnName, formatValue);
       }
       flatStructure.add(flatValues);
     } else {
@@ -116,7 +115,6 @@ public class ESResponseParser {
             : fieldName;
 
         flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
-        flatValues.put(columnName, formatValue);
       });
       flatStructure.add(flatValues);
     }
