@@ -67,7 +67,7 @@ public class BisChannelEntity implements Serializable {
     return pwdMigrated;
   }
 
-  public void setPwdMigrated(int pwdMigrated) {
+  public void setPwdMigrated(Integer pwdMigrated) {
     this.pwdMigrated = pwdMigrated;
   }
 
