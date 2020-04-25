@@ -12,9 +12,9 @@ import {
 } from '../consts';
 
 export const displayNameWithoutAggregateFor = (column): string => {
-  if (!column.dataField) {
-    return column.displayName;
-  }
+  // if (!column.dataField) {
+  //   return column.displayName;
+  // }
 
   const match = column.displayName.match(/\((.+)\)/);
   return match ? match[1] : column.displayName;
