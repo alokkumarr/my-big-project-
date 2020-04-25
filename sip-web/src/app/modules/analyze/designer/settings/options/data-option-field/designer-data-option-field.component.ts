@@ -117,13 +117,14 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   onAliasChange(alias) {
-    const { table, columnName, dataField } = this.artifactColumn;
+    const { table, columnName, dataField, aggregate } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
         alias,
-        dataField
+        dataField,
+        aggregate
       })
     );
     this.change.emit({ subject: 'alias' });

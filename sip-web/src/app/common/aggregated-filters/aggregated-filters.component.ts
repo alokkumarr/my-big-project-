@@ -93,6 +93,7 @@ export class AggregatedFiltersComponent implements OnInit {
       delete this.filter.model;
     }
     this.filter.isRuntimeFilter = checked;
+    console.log(this.filter);
     this.filterChange.emit(this.filter);
   }
 
