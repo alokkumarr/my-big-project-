@@ -8,7 +8,23 @@ import {
   Format,
   DesignerChangeEvent
 } from '../../../types';
-import { DATE_FORMATS, DATE_FORMATS_OBJ } from '../../../../consts';
+import {
+  CHART_DATE_FORMATS,
+  CHART_DATE_FORMATS_OBJ,
+  PIVOT_DATE_FORMATS,
+  PIVOT_DATE_FORMATS_OBJ
+} from '../../../../consts';
+
+const dateFormatsMap = {
+  pivot: {
+    array: PIVOT_DATE_FORMATS,
+    obj: PIVOT_DATE_FORMATS_OBJ
+  },
+  chart: {
+    array: CHART_DATE_FORMATS,
+    obj: CHART_DATE_FORMATS_OBJ
+  }
+};
 
 @Component({
   selector: 'designer-date-format-selector',
@@ -33,7 +49,7 @@ export class DesignerDateFormatSelectorComponent {
       switch (this.analysisType) {
         case 'chart':
           this.artifactColumn.dateFormat = <string>format;
-          const groupInterval = DATE_FORMATS_OBJ[format].groupInterval;
+          const groupInterval = dateFormatsMap.chart.obj[format].groupInterval;
 
           this.store.dispatch(
             new DesignerUpdateArtifactColumn({
@@ -44,7 +60,6 @@ export class DesignerDateFormatSelectorComponent {
               groupInterval
             })
           );
-          this.onGroupIntervalChangedForChart(groupInterval);
           break;
 
         case 'pivot':
@@ -74,15 +89,10 @@ export class DesignerDateFormatSelectorComponent {
     }
   }
 
-  onGroupIntervalChangedForChart(groupInterval) {
-    if (groupInterval === 'minute') {
-      console.log('minute interval selected');
-    }
-  }
-
   getDateLabel(artifactColumn) {
+    const dateFormatsObj = get(dateFormatsMap, `${this.analysisType}.obj`);
     return get(
-      DATE_FORMATS_OBJ,
+      dateFormatsObj,
       `[${artifactColumn.dateFormat || artifactColumn.format}].label`,
       ''
     );
@@ -90,8 +100,9 @@ export class DesignerDateFormatSelectorComponent {
 
   openDateFormatDialog() {
     const columnFormat = this.artifactColumn.dateFormat;
+    const dateFormats = get(dateFormatsMap, `${this.analysisType}.array`);
     this._analyzeDialogService
-      .openDateFormatDialog(<string>columnFormat, DATE_FORMATS)
+      .openDateFormatDialog(<string>columnFormat, dateFormats)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }
