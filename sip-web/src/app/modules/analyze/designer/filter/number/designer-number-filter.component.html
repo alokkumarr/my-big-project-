@@ -1,7 +1,7 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
   <mat-form-field
     class="select-form-field"
-    style="max-width: 145px"
+    style="max-width: 145px; margin-left: 7px;"
     appearance="outline"
   >
     <mat-label>Operator</mat-label>
@@ -21,7 +21,7 @@
   </mat-form-field>
 
   <ng-container
-    *ngIf="filterModel.operator === BETWEEN_NUMBER_FILTER_OPERATOR.value"
+    *ngIf="filterModel.operator === BETWEEN_NUMBER_FILTER_OPERATOR.value && filterModel.operator.length > 0"
   >
     <mat-form-field class="filter__number-field" style="margin-right: 8px">
       <input
@@ -36,7 +36,7 @@
     <span> and </span>
   </ng-container>
 
-  <mat-form-field class="filter__number-field">
+  <mat-form-field class="filter__number-field" *ngIf="filterModel.operator && filterModel.operator.length > 0">
     <input
       matInput
       type="number"

@@ -24,6 +24,7 @@ const users = require('../../helpers/data-generation/users');
 describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
+  const fieldName = 'field';
 
   let host;
   let token;
@@ -127,22 +128,18 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           const analysisPage = new AnalyzePage();
           analysisPage.clickOnAnalysisLink(name);
           const executePage = new ExecutePage();
-
+          commonFunctions.waitForProgressBarToComplete();
           executePage.clickOnEditLink();
+          commonFunctions.waitForProgressBarToComplete();
           const chartDesignerPage = new ChartDesignerPage();
           chartDesignerPage.clickOnFilterButton();
-          if (analysisType === Constants.REPORT) {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('SALES');
-          } else {
-            chartDesignerPage.clickOnAddFilterButtonByTableName('sample');
-          }
-
+          chartDesignerPage.clickOnAddFilterButtonByField(fieldName);
           chartDesignerPage.clickOnColumnInput();
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
           chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
+            (data.fieldName).toString().toLowerCase()
           ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveDialogButton();

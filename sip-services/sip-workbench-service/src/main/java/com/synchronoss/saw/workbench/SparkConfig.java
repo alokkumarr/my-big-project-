@@ -1,5 +1,6 @@
 package com.synchronoss.saw.workbench;
 
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 
 import javax.annotation.PreDestroy;
@@ -97,6 +98,7 @@ public class SparkConfig {
 				.set("spark.sql.inMemoryColumnarStorage.compressed", this.sparkInMemoryColStorageCompressed)
 		        .set("spark.sql.inMemoryColumnarStorage.batchSize", this.sparkSqlInMemoryBatchSize)
 		        .set("spark.sql.caseSensitive", this.sparkSqlCaseSensitive)
+                .set("spark.unsafe.sorter.spill.read.ahead.enabled", "false")
 				.setMaster(this.sparkMaster)
 				.setAppName(this.appName);
 		
@@ -130,14 +132,14 @@ public class SparkConfig {
 		logger.debug("#### Setting librarires as class path for spark context ######");
 		
 		JavaSparkContext jsc = new  JavaSparkContext(SparkContext.getOrCreate(conf()));
-		
-		if(libPath != null && !libPath.isEmpty()) {
-			File folder = new File(libPath);
+        String normalizedLibPath  = SipCommonUtils.normalizePath(libPath);
+		if(normalizedLibPath != null && !normalizedLibPath.isEmpty()) {
+			File folder = new File(normalizedLibPath);
 			File[] files = folder.listFiles();
 			if(files != null) {
 				for(File file: files) {
-					logger.debug("adding file "+ libPath + file.getName() + "to classpath");
-					jsc.addJar(libPath + file.getName());
+					logger.debug("adding file "+ normalizedLibPath + file.getName() + "to classpath");
+					jsc.addJar(normalizedLibPath + file.getName());
 				}
 			}
 			

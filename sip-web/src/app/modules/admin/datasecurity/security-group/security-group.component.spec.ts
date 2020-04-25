@@ -10,6 +10,7 @@ import { ErrorDetailDialogService } from '../../../../common/services/error-deta
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { ToastService } from '../../../../common/services/toastMessage.service';
+import { DskFiltersService } from './../../../../common/services/dsk-filters.service';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -22,6 +23,12 @@ const DataSecurityServiceStub = {
     return new Promise(res => res({ data: {} }));
   }
 };
+
+const DSKFilterServiceStub = {
+  deleteDskFiltersForGroup: () => {
+    return {};
+  }
+}
 
 const JWTServiceStub = {
   getTokenObj: () => {
@@ -64,6 +71,7 @@ describe('security-group component', () => {
         { provide: JwtService, useValue: JWTServiceStub },
         { provide: MatDialog, useValue: mockService },
         { provide: MatDialogConfig, useValue: mockService },
+        { provide: DskFiltersService, useValue: DSKFilterServiceStub },
         LocalSearchService,
         ToastService,
         ErrorDetailDialogService

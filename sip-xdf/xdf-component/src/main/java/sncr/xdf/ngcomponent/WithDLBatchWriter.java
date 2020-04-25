@@ -25,6 +25,7 @@ import com.google.gson.JsonElement;
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.bda.utils.BdaCoreUtils;
 import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.DSMapKey;
@@ -157,7 +158,8 @@ public interface WithDLBatchWriter {
                     
                     WithDLBatchWriterHelper.logger.debug("Deleting source :: "+ moveTask.source );
                     //Delete temporary data object directory
-                    HFileOperations.fs.delete(new Path(moveTask.source ), true);
+                    String normalizedPath= BdaCoreUtils.normalizePath(moveTask.source);
+                    HFileOperations.fs.delete(new Path(normalizedPath ), true);
                 }
             } //<-- for
             
@@ -187,10 +189,11 @@ public interface WithDLBatchWriter {
                                       MoveDataDescriptor moveDataDesc,
                                       InternalContext ctx, Map<String, Long> partitionKeys ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
-            
-            
-            Path source = new Path(moveDataDesc.source + partitionKey);
-            Path dest = new Path(moveDataDesc.dest +  partitionKey);
+
+            String normalizedSourcePath =BdaCoreUtils.normalizePath( moveDataDesc.source + partitionKey);
+            String normalizedDestPath = BdaCoreUtils.normalizePath(moveDataDesc.dest +  partitionKey);
+            Path source = new Path(normalizedSourcePath);
+            Path dest = new Path(normalizedDestPath);
 
             String ext = "." + moveDataDesc.format.toLowerCase();
 
@@ -406,7 +409,8 @@ public interface WithDLBatchWriter {
                     for (int i = 0; i < list.length; i++) {
                     	
                     	if(!list[i].getPath().getName().contains(ngctx.batchID + "." + ngctx.startTs + ".")) {
-                    		fs.delete(list[i].getPath(), true);
+                            Path normalizedPath = BdaCoreUtils.normalizePath(list[i].getPath());
+                    		fs.delete(normalizedPath, true);
                     	}
                         
                     }

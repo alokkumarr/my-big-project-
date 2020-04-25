@@ -1,5 +1,7 @@
 package com.synchronoss.saw;
 
+import static com.synchronoss.saw.util.BuilderUtil.buildNestedFilter;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,11 +10,10 @@ import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
+import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.Type;
 import com.synchronoss.saw.model.Filter;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -38,6 +40,7 @@ import org.junit.Test;
 public class SIPDSLTest {
   private static final String esFileName = "sample.json";
   private static final String dlFileName = "sample_dl.json";
+  private static final String ES_NESTED_FILTER_ANALYSIS = "sample_nested_filter_Dsl.json";
 
   /** Query Builder Tests with aggregation. */
   @Test
@@ -96,9 +99,10 @@ public class SIPDSLTest {
       List<Filter> filters = sipdsl.getSipQuery().getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
 
-      builder = elasticSearchQueryBuilder.buildFilters(filters, builder);
       boolQueryBuilder1 =
-          elasticSearchQueryBuilder.buildBooleanQuery(sipdsl.getSipQuery(), builder);
+          elasticSearchQueryBuilder.buildFilterQuery(
+              buildNestedFilter(
+                  filters, sipdsl.getSipQuery().getBooleanCriteria()));
       searchSourceBuilder.query(boolQueryBuilder1);
     }
     Assert.assertNotNull(boolQueryBuilder1);
@@ -110,6 +114,7 @@ public class SIPDSLTest {
     File file = new File(classLoader.getResource(fileName).getPath());
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
     return sipdsl;
   }
@@ -308,30 +313,58 @@ public class SIPDSLTest {
     model.setValue(Double.valueOf(1));
 
     List<Filter> filterList = sipdsl.getSipQuery().getFilters();
+    Filter oldFilter1 = new Filter();
+    oldFilter1.setArtifactsName("SALES");
+    oldFilter1.setColumnName("integer");
+    oldFilter1.setIsGlobalFilter(false);
+    oldFilter1.setType(Filter.Type.INTEGER);
+    model = new Model();
+    model.setOperator(Operator.GTE);
+    model.setValue((double) 1);
+    oldFilter1.setModel(model);
+    filterList.add(oldFilter1);
+
     Filter filter = new Filter();
-    filter.setArtifactsName("SALES");
-    filter.setColumnName("double");
-    filter.setIsGlobalFilter(false);
-    filter.setType(Filter.Type.DOUBLE);
-    filter.setModel(model);
+    Filter filter1 = new Filter();
+    filter1.setArtifactsName("SALES");
+    filter1.setColumnName("double");
+    filter1.setIsGlobalFilter(false);
+    filter1.setType(Filter.Type.DOUBLE);
+    filter1.setModel(model);
+    filter.setBooleanCriteria(BooleanCriteria.OR);
+    Filter filter2 = new Filter();
+    filter2.setArtifactsName("SALES");
+    filter2.setColumnName("string");
+    filter2.setIsGlobalFilter(false);
+    filter2.setType(Filter.Type.STRING);
+    model = new Model();
+    model.setOperator(Operator.ISIN);
+    model.setModelValues(Collections.singletonList("string 123"));
+    filter2.setModel(model);
+    List<Filter> filterSubList = new ArrayList<>();
+    filterSubList.add(filter1);
+    filterSubList.add(filter2);
+    filter.setFilters(filterSubList);
     filterList.add(filter);
 
     sipdsl.getSipQuery().setFilters(filterList);
 
-    String assertQuerytFilter = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
+    String assertQuerytFilter = dlSparkQueryBuilder
+        .buildDataQuery(sipdsl.getSipQuery());
     String queryWithFilter =
-        "SELECT SALES.string, SALES.integer FROM SALES WHERE (SALES.double >= 1.0)";
-    Assert.assertEquals(queryWithFilter, assertQuerytFilter);
+        "SELECT SALES.string, SALES.integer FROM SALES WHERE ((SALES.integer >= 1.0 AND (SALES.double >= 1.0 OR upper(SALES.string) IN (upper('string 123') ))))";
+    Assert.assertEquals(queryWithFilter, assertQuerytFilter.trim());
   }
 
   @Test
   public void testDlSelect() throws IOException {
     SIPDSL sipdsl = getSipDsl(dlFileName);
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+
     String query = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertion =
-        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE (SALES.long = 1000.0 AND SALES.Double = 2000.0) GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
-    Assert.assertEquals(query, assertion);
+        "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE ((SALES.long = 1000.0 AND SALES.Double = 2000.0))  GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+    Assert.assertEquals(assertion, query);
 
     sipdsl.getSipQuery().setFilters(new ArrayList<Filter>());
     String queryWithoutFilters = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
@@ -344,36 +377,107 @@ public class SIPDSLTest {
   public void testDlWithDSK() throws IOException {
     SIPDSL sipdsl = getSipDsl(dlFileName);
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
-    DataSecurityKey dsk = new DataSecurityKey();
-    List<String> values = new ArrayList<>();
-    DataSecurityKeyDef dskDef = new DataSecurityKeyDef();
-    dskDef.setName("SALES.string");
-    values.add("String 1");
-    values.add("str");
-    dskDef.setValues(values);
-    List<DataSecurityKeyDef> dskDefList = new ArrayList<>();
-    dskDefList.add(dskDef);
-    DataSecurityKeyDef dskDef1 = new DataSecurityKeyDef();
-    dskDef1.setName("SALES.string");
-    List<String> values1 = new ArrayList<>();
-    values1.add("String 123");
-    values1.add("string 456");
-    dskDef1.setValues(values1);
-    dskDefList.add(dskDef1);
-    dsk.setDataSecuritykey(dskDefList);
-    String query = dlSparkQueryBuilder.buildDskDataQuery(sipdsl.getSipQuery(), dsk);
-    String assertQuery = "SELECT "
-        + "SALES.string AS `String`, "
-        + "avg(SALES.integer), "
-        + "avg(SALES.long), "
-        + "SALES.date, "
-        + "avg(SALES.double), "
-        + "count(distinct SALES.float) as `distinctCount(float)` "
-        + "FROM SALES "
-        + "INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE (SALES.long = 1000.0 AND "
-        + "SALES.Double = 2000.0) AND SALES.string in ('String 1', 'str') AND "
-        + "SALES.string in ('String 123', 'string 456') GROUP BY SALES.string, SALES.date "
-        + "ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+
+    SipDskAttribute sipDskAttribute = new SipDskAttribute();
+    sipDskAttribute.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.AND);
+
+    SipDskAttribute subAtt = new SipDskAttribute();
+    subAtt.setColumnName("string");
+    subAtt.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.AND);
+    com.synchronoss.bda.sip.dsk.Model model = new com.synchronoss.bda.sip.dsk.Model();
+    model.setOperator(com.synchronoss.bda.sip.dsk.Operator.ISIN);
+    List<String> modelValues = new ArrayList<>();
+    modelValues.add("String 1");
+    modelValues.add("str");
+    model.setValues(modelValues);
+    subAtt.setModel(model);
+    List<SipDskAttribute> dskAttributes = new ArrayList<>();
+    dskAttributes.add(subAtt);
+
+    subAtt = new SipDskAttribute();
+    subAtt.setColumnName("string");
+    subAtt.setBooleanCriteria(com.synchronoss.bda.sip.dsk.BooleanCriteria.AND);
+    model = new com.synchronoss.bda.sip.dsk.Model();
+    model.setOperator(com.synchronoss.bda.sip.dsk.Operator.ISIN);
+    modelValues = new ArrayList<>();
+    modelValues.add("String 123");
+    modelValues.add("string 456");
+    model.setValues(modelValues);
+    subAtt.setModel(model);
+    dskAttributes.add(subAtt);
+    sipDskAttribute.setBooleanQuery(dskAttributes);
+
+    String query = dlSparkQueryBuilder.buildDskQuery(sipdsl.getSipQuery(), sipDskAttribute);
+    String assertQuery = "SELECT SALES.string AS `String`, avg(SALES.integer), avg(SALES.long),"
+        + " SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)`"
+        + " FROM SALES"
+        + " INNER JOIN PRODUCT"
+        + " ON SALES.string = PRODUCT.string_2"
+        + " WHERE ((SALES.long = 1000.0 AND SALES.Double = 2000.0))"
+        + "  AND  (upper(SALES.string) IN (upper('String 1'), upper('str') )"
+        + " AND upper(SALES.string) IN (upper('String 123'), upper('string 456') ))"
+        + " GROUP BY SALES.string, SALES.date"
+        + " ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(query,assertQuery);
+  }
+
+  @Test
+  public void testBuildNestedFilter() throws IOException {
+    SIPDSL sipDsl = getSipDsl(ES_NESTED_FILTER_ANALYSIS);
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    BoolQueryBuilder queryBuilder =
+        elasticSearchQueryBuilder.buildFilterQuery(sipDsl.getSipQuery().getFilters().get(0));
+    Assert.assertNotNull(queryBuilder);
+  }
+
+  @Test
+  public void testBuildingFilterQuery() {
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    Filter filter = new Filter();
+    filter.setArtifactsName("sample");
+    filter.setColumnName("integer");
+    filter.setIsGlobalFilter(false);
+    filter.setType(Filter.Type.INTEGER);
+    Model model = new Model();
+    model.setOperator(Operator.GTE);
+    model.setValue((double) 1);
+    filter.setModel(model);
+    Optional<QueryBuilder> queryBuilder = elasticSearchQueryBuilder.buildFilter(filter);
+    Assert.assertNotNull(queryBuilder);
+    Assert.assertTrue(queryBuilder.isPresent());
+    Assert.assertNotNull(queryBuilder.get());
+  }
+
+  @Test
+  public void testRuntimeFilterInPreviewMode() {
+    ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+    Filter filter = new Filter();
+    filter.setArtifactsName("sample");
+    filter.setColumnName("integer");
+    filter.setIsGlobalFilter(false);
+    filter.setIsRuntimeFilter(Boolean.TRUE);
+    filter.setType(Filter.Type.INTEGER);
+    Optional<QueryBuilder> queryBuilder = elasticSearchQueryBuilder.buildFilter(filter);
+    Assert.assertNotNull(queryBuilder);
+    Assert.assertFalse(queryBuilder.isPresent());
+  }
+
+  @Test
+  public void testBuildingStringFilter() {
+    Filter filter = new Filter();
+    filter.setArtifactsName("sample");
+    filter.setColumnName("string");
+    filter.setIsGlobalFilter(false);
+    filter.setIsRuntimeFilter(Boolean.TRUE);
+    filter.setType(Filter.Type.STRING);
+    Model model = new Model();
+    List<String> modelValues = new ArrayList<>();
+    modelValues.add("String 1");
+    modelValues.add("str");
+    model.setModelValues(Collections.singletonList(modelValues));
+    model.setOperator(Operator.EQ);
+    filter.setModel(model);
+    QueryBuilder queryBuilder = QueryBuilderUtil.stringFilter(filter);
+    Assert.assertNotNull(queryBuilder);
   }
 }

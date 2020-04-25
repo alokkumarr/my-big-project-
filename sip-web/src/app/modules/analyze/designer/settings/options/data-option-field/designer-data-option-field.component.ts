@@ -7,6 +7,9 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
+import * as isEmpty from 'lodash/isEmpty';
+import * as get from 'lodash/get';
+import * as isUndefined from 'lodash/isUndefined';
 import { Store } from '@ngxs/store';
 
 import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
@@ -57,9 +60,10 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       fpFilter(artifact => artifact.area === 'y')
     )(sipQuery.artifacts);
     this.fieldCount = fields.length;
-    this.isGroupByPresent = fpFilter(({ area }) => {
-      return area === 'g';
-    })(this.sipQuery.artifacts[0].fields).length > 0;
+    this.isGroupByPresent =
+      fpFilter(({ area }) => {
+        return area === 'g';
+      })(this.sipQuery.artifacts[0].fields).length > 0;
   }
   public typeIcon: string;
   public isGroupByPresent: boolean;
@@ -70,6 +74,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public supportsDateFormat = false;
   public isDataField = false;
   public colorPickerConfig = {};
+  public state: boolean;
 
   constructor(private _store: Store) {
     this.onAliasChange = debounce(this.onAliasChange, ALIAS_CHANGE_DELAY);
@@ -86,6 +91,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       this.analysisSubtype !== 'comparison' && // no date formats supported in comparison chart
       (this.analysisType !== 'pivot' || // all charts
         this.asPivotColumn(this.artifactColumn).groupInterval === 'day'); // pivot only if day is selected
+
+    if (get(this.artifactColumn, 'area') === 'y') {
+      this.state =
+        isEmpty((<ArtifactColumnChart>this.artifactColumn).limitType) ||
+        isUndefined((<ArtifactColumnChart>this.artifactColumn).limitValue);
+    }
 
     this.isDataField = DATA_AXIS.includes(
       (<ArtifactColumnChart>this.artifactColumn).area
@@ -106,13 +117,14 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   onAliasChange(alias) {
-    const { table, columnName, dataField } = this.artifactColumn;
+    const { table, columnName, dataField, aggregate } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
         alias,
-        dataField
+        dataField,
+        aggregate
       })
     );
     this.change.emit({ subject: 'alias' });
@@ -196,6 +208,22 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   onLimitByAxisChange() {
-    this.change.emit({ subject: 'limitByAxis', data: { limitByAxis: this.limitByAxis } });
+    this.change.emit({
+      subject: 'limitByAxis',
+      data: { limitByAxis: this.limitByAxis }
+    });
+  }
+
+  stateChange(event) {
+    this.state = event.data;
+    if (this.state) {
+      setTimeout(() => {
+        this.limitByAxis = 'dimension';
+        this.change.emit({
+          subject: 'limitByAxis',
+          data: { limitByAxis: 'dimension' }
+        });
+      }, 300);
+    }
   }
 }

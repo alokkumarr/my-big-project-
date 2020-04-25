@@ -73,7 +73,7 @@ export class SftpRouteComponent implements OnInit, DetailForm {
       disableConcurrency: [false],
       batchSize: ['', [Validators.required]],
       fileExclusions: ['', this.validatefileExclusion],
-      lastModifiedLimitHours: ['', Validators.pattern(/^\d*[1-9]\d*$/)]
+      lastModifiedLimitHours: ['']
     });
 
     this.detailsFormGroup

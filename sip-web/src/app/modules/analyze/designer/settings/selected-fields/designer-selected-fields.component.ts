@@ -16,6 +16,7 @@ import * as findIndex from 'lodash/findIndex';
 import * as debounce from 'lodash/debounce';
 import * as has from 'lodash/has';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as get from 'lodash/get';
 import * as reduce from 'lodash/reduce';
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
@@ -39,6 +40,7 @@ import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipF
 import { getFilterDisplayName } from './../../../consts';
 import { PerfectScrollbarComponent } from 'ngx-perfect-scrollbar';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
+import { DskFiltersService } from '../../../../../common/services/dsk-filters.service';
 
 @Component({
   selector: 'designer-selected-fields',
@@ -49,12 +51,47 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   @ViewChildren(PerfectScrollbarComponent) scrollbars;
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  public previewString;
+  public aggregatePreview;
   @Output() removeFilter = new EventEmitter();
+  @Output() filterClick = new EventEmitter();
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
-  @Input() filters: Filter[];
+  filters;
+  // @Input() filters: Filter[];
+  @Input('filters') set setFilters(filters: Filter[]) {
+    if (!filters) {
+      return;
+    }
+    this.filters = filters;
+    this.previewString = this.datasecurityService.generatePreview(
+      this.changeIndexToNames(filters, 'booleanQuery', 'filters'), 'ANALYZE'
+    );
+
+    const aggregatedFilters = this.filters.filter(option => {
+      return option.isAggregationFilter === true;
+    });
+
+    this.aggregatePreview = aggregatedFilters.map(field => {
+      if (!field.model) {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}><span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.aggregate}(${field.columnName.split('.keyword')[0]})</span></span>`;
+      }
+      if (field.model.operator === 'BTW') {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.aggregate}(${field.columnName.split('.keyword')[0]})</span> <span class="operator">${
+          field.model.operator
+        }</span> <span [attr.e2e]="'ffilter-model-value'">[${get(field, 'model.otherValue')} and ${get(field, 'model.value')}]</span>`;
+      } else {
+        return `<span ${field.isRuntimeFilter ? 'class="prompt-filter"' : ''}>${field.aggregate}(${field.columnName.split('.keyword')[0]})</span> <span class="operator">${
+          field.model.operator || ''
+        }</span> <span [attr.e2e]="'ffilter-model-value'">[${[get(field, 'model.value')]}]</span>`;
+      }
+    })
+    this.flattenedfilters = this.analyzeService.flattenAndFetchFiltersChips(filters, []);
+  }
+
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   private subscriptions: Subscription[] = [];
+  flattenedfilters;
 
   @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
     IDEsignerSettingGroupAdapter[]
@@ -73,7 +110,8 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   constructor(
     private _dndPubsub: DndPubsubService,
     private _store: Store,
-    private analyzeService: AnalyzeService
+    private analyzeService: AnalyzeService,
+    private datasecurityService: DskFiltersService
   ) {
     this._changeSettingsDebounced = debounce(
       this._changeSettingsDebounced,
@@ -268,5 +306,40 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
 
   dragReleased() {
     this._dndPubsub.emit('dragEnd');
+  }
+
+  removeFilterFromTree(filter, index) {
+    if (this.filters[0].booleanCriteria) {
+      this.flattenedfilters.splice(index, 1);
+      if (filter.isAggregationFilter) {
+        this.filters = cloneDeep(this.filters.filter(option => {
+          return option.uuid !== filter.uuid;
+        }));
+        this.removeFilter.emit({subject: 'filters', data: this.filters});
+      } else {
+        this.analyzeService.deleteFilterFromTree(this.filters[0], filter.uuid);
+        setTimeout(() => {
+          this.removeFilter.emit({subject: 'filters', data: this.filters});
+        }, 650);
+      }
+
+
+    } else {
+      this.flattenedfilters.splice(index, 1);
+      this.filters.splice(index, 1);
+      this.removeFilter.emit({subject: 'filters', data: this.filters});
+    }
+
+  }
+
+  changeIndexToNames(dskObject, source, target) {
+    const convertToString = JSON.stringify(dskObject);
+    const replaceIndex = convertToString.replace(/"filters":/g, '"booleanQuery":');
+    const convertToJson = JSON.parse(replaceIndex);
+    return convertToJson[0];
+  }
+
+  openFilterDialog() {
+    this.filterClick.emit();
   }
 }

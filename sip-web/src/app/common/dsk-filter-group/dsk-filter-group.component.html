@@ -1,0 +1,234 @@
+<div
+  [ngClass]="{'boolean-criteria-header': data.mode === 'DSK' , 'analyze-criteria-header': data.mode === 'ANALYZE' }"
+  fxLayout="row"
+  fxLayoutAlign="space-between center"
+>
+  <div fxFlex>
+    <button
+      mat-raised-button
+      color="primary"
+      matTooltip="Toggle Boolean Criteria"
+      [attr.e2e]="'toggle-criteria'"
+      (click)="toggleCriteria()"
+      [disabled]="!((data.mode === 'ANALYZE' && !data.isInRuntimeMode) || data.mode === 'DSK')"
+    >
+      {{ filterGroup.booleanCriteria }}
+    </button>
+    <button
+      mat-icon-button
+      [popper]="newDSKChild"
+      popperApplyClass="new-child-popper"
+      popperTrigger="click"
+      [popperHideOnClickOutside]="true"
+      [attr.e2e]="'add-new-filter'"
+      popperPlacement="right"
+      *ngIf="(data.mode === 'ANALYZE' && !data.isInRuntimeMode) || data.mode === 'DSK'"
+    >
+      <mat-icon fontIcon="icon-plus2"></mat-icon>
+    </button>
+    <popper-content #newDSKChild>
+      <button mat-button [attr.e2e]="'add-field'" (click)="addField(newDSKChild)">Field</button>
+      <button mat-button [attr.e2e]="'add-group'" (click)="addGroup(newDSKChild)">Group</button>
+    </popper-content>
+    <mat-error
+      style="display: inline-block;"
+      *ngIf="filterGroup.booleanQuery.length < 1"
+      >Add <strong>1 or more </strong> fields or groups.</mat-error
+    >
+  </div>
+  <button
+    mat-icon-button
+    *ngIf="(data.mode === 'DSK' && selfIndex >= 0 ) || (data.mode === 'ANALYZE' && !data.isInRuntimeMode && selfIndex >= 0)"
+    aria-label="Remove dsk field attribute"
+    [attr.e2e]="'remove-field'"
+    matTooltip="Remove Group"
+    (click)="onRemoveGroup.emit(selfIndex)"
+  >
+    <mat-icon fontIcon="icon-close"></mat-icon>
+  </button>
+</div>
+
+<div
+  class="dsk-query-child"
+  *ngFor="let child of filterGroup.booleanQuery; let childId = index"
+  [ngClass]="{ 'dsk-query-child__group': child['booleanCriteria'] }"
+>
+  <dsk-filter-group
+    [filterGroup]="child"
+    [selfIndex]="childId"
+    [data]="data"
+    (onRemoveGroup)="removeGroup($event)"
+    (onChange)="onChange.emit(this.filterGroup)"
+    *ngIf="child['booleanCriteria']; else attributeFields"
+  ></dsk-filter-group>
+
+  <ng-template #attributeFields>
+    <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center">
+      <div fxLayout="column" fxFlex="30" fxLayoutAlign="start stretch" *ngIf="data.mode === 'DSK'">
+        <mat-form-field appearance="outline">
+          <mat-label>Attribute</mat-label>
+          <input
+            matInput
+            required
+            placeholder="Attribute"
+            (keydown)="preventSpace($event)"
+            [ngModel]="child['columnName']"
+            [matAutocomplete]="fieldAutocomplete"
+            (ngModelChange)="updateAttributeName(childId, $event)"
+          />
+        </mat-form-field>
+
+        <mat-autocomplete #fieldAutocomplete="matAutocomplete">
+          <mat-option
+            *ngFor="let field of filterAutocompleteFields(child['columnName'])"
+            [value]="field.columnName"
+          >
+            {{ field.displayName || field.columnName }} ({{ field.columnName }})
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="!child['columnName']"
+          >Field Name is <strong>required</strong>.</mat-error
+        >
+      </div>
+
+      <div fxLayout="column" fxFlex fxLayoutAlign="start stretch" *ngIf="data.mode === 'DSK'">
+        <mat-form-field>
+          <mat-chip-list
+            #chipList
+            (change)="onChange.emit(filterGroup)"
+            required
+          >
+            <mat-chip
+              *ngFor="let item of child['model'].values; let valueId = index"
+              [removable]="true"
+              (removed)="removeValue(childId, valueId)"
+            >
+              {{ item }}
+              <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
+            </mat-chip>
+            <input
+              autocomplete="new-password"
+              placeholder="Add new value"
+              [matChipInputFor]="chipList"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              [matChipInputAddOnBlur]="true"
+              (matChipInputTokenEnd)="addValue(childId, $event)"
+            />
+          </mat-chip-list>
+        </mat-form-field>
+        <mat-error *ngIf="child['model'].values.length === 0"
+          >At least 1 value is <strong>required</strong>.</mat-error
+        >
+      </div>
+
+      <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center"
+        *ngIf="data.mode === 'ANALYZE' && !filterGroup.booleanQuery[childId].isAggregationFilter"
+      >
+        <div class="input-fields" fxLayout="row"
+        *ngIf="(data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter) || !data.isInRuntimeMode"
+        >
+          <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+              <mat-label>Artifacts</mat-label>
+              <mat-select (selectionChange)="artifactSelect($event.value, childId)"
+                          [value]="filterGroup.booleanQuery[childId].artifactsName" [attr.e2e]="'filter-artifacts'">
+                <mat-option *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn"
+                            [value]="artifact.artifactName">
+                  {{ artifact.artifactName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="select-form-field" appearance="outline" style="width: 150px">
+              <mat-label> Columns
+                <span
+                *ngIf="!filterGroup.booleanQuery[childId].isOptional && data.isInRuntimeMode"
+                class="mandatory-asterisk"
+                style="color:red; margin-left: 47px"
+                >*</span>
+              </mat-label>
+              <mat-select (selectionChange)="columnsSelect($event.value, childId)"
+                          [value]="filterGroup.booleanQuery[childId].columnName"
+                          [disabled]="data.isInRuntimeMode"
+                          [attr.e2e]="'filter-columns'">
+                <mat-option *ngFor="let column of fetchColumns(childId);"
+                            [value]="column.columnName">
+                  {{ column.displayName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div [ngSwitch]="TYPE_MAP[fetchType(childId)]"
+              *ngIf="(!data.isInRuntimeMode && !filterGroup.booleanQuery[childId].isRuntimeFilter)
+                || (data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter)"
+            >
+              <div *ngIf="!filterGroup.booleanQuery[childId].isGlobalFilter || data.isInRuntimeMode">
+                <designer-string-filter
+                  *ngSwitchCase="'string'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-string-filter>
+                <designer-date-filter
+                  *ngSwitchCase="'date'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-date-filter>
+                <designer-number-filter
+                  *ngSwitchCase="'number'"
+                  (filterModelChange)="onFilterModelChange($event, childId)"
+                  [filterModel]="filterGroup.booleanQuery[childId].model"
+                >
+                </designer-number-filter>
+              </div>
+
+            </div>
+          </div>
+          <div
+            fxLayout="row"
+            class="filter__action__space"
+            fxLayoutAlign="space-between center"
+            *ngIf="data.showFilterOptions"
+          >
+            <mat-checkbox
+              *ngIf="(!data.isInRuntimeMode && data.supportsGlobalFilters) && showGlobalOption"
+              [checked]="filterGroup.booleanQuery[childId].isGlobalFilter"
+              (change)="onGlobalCheckboxToggle($event.checked, childId)"
+              i18n
+              e2e="filter-dialog-global-checkbox"
+            >
+              Global
+            </mat-checkbox>
+            <mat-checkbox
+              *ngIf="!data.isInRuntimeMode"
+              (change)="onRuntimeCheckboxToggle($event.checked, childId)"
+              i18n
+              e2e="filter-dialog-prompt-checkbox"
+              [checked]="filterGroup.booleanQuery[childId].isRuntimeFilter"
+            >
+              Prompt
+            </mat-checkbox>
+            <mat-checkbox
+              *ngIf="!data.isInRuntimeMode && filterGroup.booleanQuery[childId].isRuntimeFilter"
+              [checked]="filterGroup.booleanQuery[childId].isOptional"
+              (change)="onOptionalCheckboxToggle($event.checked, childId)"
+              i18n
+              e2e="filter-dialog-optional-checkbox"
+            >
+              Optional
+            </mat-checkbox>
+          </div>
+      </div>
+
+      <button
+        mat-icon-button
+        aria-label="Remove dsk field attribute"
+        matTooltip="Remove Field"
+        *ngIf="data.mode === 'DSK' || (data.mode === 'ANALYZE' && !data.isInRuntimeMode)"
+        (click)="removeField(childId)"
+      >
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
+    </div>
+  </ng-template>
+</div>

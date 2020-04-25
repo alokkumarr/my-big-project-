@@ -6,6 +6,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DndPubsubService } from 'src/app/common/services';
 import { Store } from '@ngxs/store';
 import { AnalyzeService } from '../../../services/analyze.service';
+import { DskFiltersService }  from '../../../../../common/services/dsk-filters.service';
 import { of } from 'rxjs';
 
 const DndPubsubServiceStub = {
@@ -42,7 +43,8 @@ describe('Designer Component', () => {
         {
           provide: AnalyzeService,
           useValue: AnalyzeServiceStub
-        }
+        },
+        { provide: DskFiltersService, useValue: {} }
       ],
       imports: [MaterialModule, NoopAnimationsModule],
       declarations: [DesignerSelectedFieldsComponent],

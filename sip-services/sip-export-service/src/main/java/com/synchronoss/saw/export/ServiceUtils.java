@@ -9,6 +9,7 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
 import com.synchronoss.saw.export.generate.ExportBean;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import org.slf4j.Logger;
@@ -87,7 +88,8 @@ public class ServiceUtils {
 
   public boolean deleteFile(String sourceFile, boolean isDeleteSourceFile) throws IOException {
     logger.debug(" Requested file to deleted  :" + this.getClass().getName() + ":" + sourceFile);
-    File file = new File(sourceFile);
+    String normalizedPath= SipCommonUtils.normalizePath(sourceFile);
+    File file = new File(normalizedPath);
     if (!file.exists()) return false;
 
     if (isDeleteSourceFile) {

@@ -10,6 +10,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.log4j.Logger;
+import sncr.bda.utils.BdaCoreUtils;
 
 public class HFileProcessor implements FileProcessor {
 
@@ -38,7 +39,8 @@ public class HFileProcessor implements FileProcessor {
     Configuration conf = new Configuration();
     conf.set("hadoop.job.ugi", user);
     FileSystem fs = FileSystem.get(URI.create(location), conf);
-    FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
+    String normalizedPath = BdaCoreUtils.normalizePath(localFile.getPath());
+    FSDataOutputStream fos = fs.create(new Path(normalizedPath));
     IOUtils.copyBytes(stream, fos, 8192, false);
     fos.close();
     fs.close();

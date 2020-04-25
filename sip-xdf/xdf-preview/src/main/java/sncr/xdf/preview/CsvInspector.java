@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Scanner;
+import sncr.bda.utils.BdaCoreUtils;
 
 public class CsvInspector {
 
@@ -43,7 +44,8 @@ public class CsvInspector {
     public static void main(String[] args){
 
         try {
-            String cnf =  new Scanner(new File(args[0])).useDelimiter("\\Z").next();
+            String normalizedPath = BdaCoreUtils.normalizePath(args[0]);
+            String cnf =  new Scanner(new File(normalizedPath)).useDelimiter("\\Z").next();
             CsvInspector parser = new CsvInspector(cnf, "");
             parser.parseSomeLines();
             String str = parser.toJson();

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
+import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
@@ -20,11 +21,12 @@ import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
-import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
-
+import com.synchronoss.sip.utils.Ccode;
+import com.synchronoss.sip.utils.IntegrationUtils;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,18 +46,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javassist.NotFoundException;
 import javax.annotation.PostConstruct;
-import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -73,9 +70,7 @@ import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.integration.sftp.session.SftpSession;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
 
@@ -142,6 +137,9 @@ public class SftpServiceImpl extends SipPluginContract {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
+
+  @Value("${encryption.sftp-key}")
+  private String encryptionKey;
   
   public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
   
@@ -423,6 +421,45 @@ public class SftpServiceImpl extends SipPluginContract {
     return connectionLogs.toString();
   }
 
+  /**
+   * Test connectivity for existing channel.
+   *
+   * @param payload Test connection payload
+   * @param channelId Channel ID
+   * @return Test connectivity result
+   * @throws SipNestedRuntimeException In case of errors
+   * @throws IOException In case of connectivity issues
+   */
+  public String immediateConnectChannelWithChannelId(
+      BisConnectionTestPayload payload, Long channelId)
+      throws Exception {
+
+    String password = payload.getPassword();
+
+    if (StringUtils.isBlank(password)) {
+      // retrieve password for channel, decrypt and set to payload
+      Optional<BisChannelEntity> channelEntityOpt =
+          bisChannelDataRestRepository.findById(channelId);
+
+      if (channelEntityOpt.isPresent()) {
+        BisChannelEntity bisChannelEntity = channelEntityOpt.get();
+
+        String channelMetadata = bisChannelEntity.getChannelMetadata();
+        ObjectMapper om = new ObjectMapper();
+        ObjectNode node = (ObjectNode) om.readTree(channelMetadata);
+
+        String channelPassword = node.get("password").asText();
+        String decryptedPassword = Ccode.cdecode(channelPassword, encryptionKey.getBytes());
+
+        payload.setPassword(decryptedPassword);
+        return immediateConnectChannel(payload);
+      } else {
+        return "Invalid channel";
+      }
+    } else {
+      return immediateConnectChannel(payload);
+    }
+  }
 
   @Override
   public String immediateConnectChannel(BisConnectionTestPayload payload)
@@ -573,7 +610,7 @@ public class SftpServiceImpl extends SipPluginContract {
     String path = processor.getFilePath(defaultDestinationLocation,
           destination, File.separator + getBatchId());
 
-    File localDirectory  = new File(path);
+    File localDirectory  = new File(SipCommonUtils.normalizePath(path));
     logger.trace(
           "directory where the file will be downloaded  :" + localDirectory.getAbsolutePath());
     try {
@@ -1316,7 +1353,7 @@ public class SftpServiceImpl extends SipPluginContract {
             path = destinationDirPath.get();
           }
 
-          File localDirectory = new File(path);
+          File localDirectory = new File(SipCommonUtils.normalizePath(path));
           if (localDirectory != null && !this.processor
               .isDestinationExists(localDirectory.getPath())) {
 
@@ -1335,7 +1372,8 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.info("Actual file name after downloaded in the  :"
               + localDirectory.getAbsolutePath() + " file name "
               + localFile.getName());
-          FSDataOutputStream fos = fs.create(new Path(localFile.getPath()));
+          String normalizedPath = SipCommonUtils.normalizePath(localFile.getPath());
+          FSDataOutputStream fos = fs.create(new Path(normalizedPath));
           logger.trace("starting template get for file ::" + fileName);
           SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(
               sesionFactory);

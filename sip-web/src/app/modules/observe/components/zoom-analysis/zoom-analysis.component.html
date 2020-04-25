@@ -21,21 +21,26 @@
       class="filter-row"
       *ngIf="(filterCount$ | async) > 0"
     >
-      <div fxLayout="column">
-        <span class="filter-counter" i18n
-          >{(filterCount$ | async), plural, =1 {1 Filter} other
-          {{{(filterCount$ | async)}} Filters} } Applied</span
+    <div style="font-size: 15px;">
+        <mat-icon
+          class="icon-filter"
+          style="font-size: 12px;"
+          color="primary"
+          fonticon="icon-filter">
+        </mat-icon>
+        <code
+        [innerHTML]="
+          previewString ||
+          ''
+        "
         >
+      </code>
+      <code
+        [innerHTML]="aggregatePreview || ''"
+        style="margin-left: 50px;"
+        >
+      </code>
       </div>
-
-      <mat-chip-list #chipList>
-        <mat-chip
-          *ngFor="let filter of filters$ | async; let i = index"
-          style="padding-bottom: 1px;padding-top: 3px;"
-        >
-          {{ getDisplayName(filter) }}
-        </mat-chip>
-      </mat-chip-list>
     </div>
 
     <div

@@ -11,7 +11,6 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
-import org.apache.kafka.common.requests.ApiError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +37,13 @@ import com.mapr.streams.Streams;
 import com.mapr.streams.impl.MarlinDocumentStream;
 import com.mapr.streams.impl.MessageStore;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 
-import akka.japi.Option;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.web.util.HtmlUtils;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -69,11 +69,7 @@ public class WorkbenchInspectController {
 	
 	public static final String RTIS_CONFIG_URL =  "/internal/rtisconfig/config/";
 	public static final String RTIS_APP_KEYS_URL =  "/internal/rtisconfig/appKeys";
-	
-	
-	
 
-	  
 	@PostConstruct
 	public void init() {
 		restTemplate = restUtil.restTemplate();
@@ -90,12 +86,12 @@ public class WorkbenchInspectController {
 	 * @throws JsonProcessingException exception while parsing json
 	 * @throws Exception exception
 	 */
-	@ApiOperation(value = "Retrives stream details such as name and topic name", nickname = "retrieveStream",
+	@ApiOperation(value = "Retrieves stream details such as name and topic name", nickname = "retrieveStream",
 		      notes = "", response = HttpStatus.class)
 		  @ApiResponses(
 		      value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
 		          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-		          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
+		          @ApiResponse(code = 500, message = "Server is down. Contact System administrator")})
 	@RequestMapping(value = "{project}/streams", method = RequestMethod.GET, 
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -105,8 +101,8 @@ public class WorkbenchInspectController {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", req.getHeader("Authorization"));
-		HttpEntity<String> entity = new HttpEntity<String>(headers);
-		logger.debug("Authroization header.....####" + req.
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		logger.debug("Authorization header.....####" + req.
 				getHeader("Authorization"));
 		
 		logger.debug(" RTIS base url ::"+ this.rtisUrl);
@@ -115,13 +111,15 @@ public class WorkbenchInspectController {
 		
 		ResponseEntity<Object[]> appKeys = restTemplate.
 				exchange(rtisAppkeysUrl,
-				HttpMethod.GET, entity, Object[].class, new Object[0]);
+				HttpMethod.GET, entity, Object[].class);
 		logger.debug(appKeys.toString());
 
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(appKeys.getBody());
-		JsonNode objects = mapper.readTree(json);
+		String sanitizedJson = SipCommonUtils.sanitizeJson(json);		
+		JsonNode objects = mapper.readTree(sanitizedJson);
 		List<JsonNode> entities = new ArrayList<JsonNode>();
+
 
 		for (final JsonNode objNode : objects) {
 			ObjectNode resultNode = mapper.createObjectNode();
@@ -135,20 +133,18 @@ public class WorkbenchInspectController {
 			 
 			ResponseEntity<Object[]> config = restTemplate.exchange(
 				rtisConfigUrl 
-			+ appKey.asText(), HttpMethod.GET, entity,
-					Object[].class, new Object[0]);
+			+ appKey.asText(), HttpMethod.GET, entity, Object[].class);
 			logger.debug("##### config response ###" + config.toString());
 			String configJson = mapper.writeValueAsString(config.getBody());
-			logger.debug("#####config response ::" + configJson);
-			JsonNode configObjects = mapper.readTree(configJson);
+			String sanitizedConfig = SipCommonUtils.sanitizeJson(configJson);
+			logger.debug("#####config response ::" + sanitizedConfig);
+			JsonNode configObjects = mapper.readTree(sanitizedConfig);
 			if (configObjects.isArray()) {	
+
 				logger.debug("Is array @####");
 				for (JsonNode jsonNode : configObjects) {
-					
-					//resultNode.put("streams_2:", jsonNode.get("streams_2"));
-					
 					JsonNode streamInfo = jsonNode.get("streams_1");
-					List<String> streamsNames = new ArrayList<String>();
+					List<String> streamsNames = new ArrayList<>();
 					
 					if(streamInfo.isArray()) {
 						for (final JsonNode streamNode : streamInfo) {
@@ -156,26 +152,17 @@ public class WorkbenchInspectController {
 					        streamsNames.add(streamNode.get("queue").asText());
 					    }
 					}
-					
-					
-					
-					Optional<List<String>> eventTypes = this.retriveEventTypes(streamsNames.get(0));
+					Optional<List<String>> eventTypes = this.retrieveEventTypes(streamsNames.get(0));
 					if(eventTypes.isPresent()) {
 						ArrayNode eventSNode = mapper.valueToTree(eventTypes.get());
 						resultNode.putArray("eventTypes").addAll(eventSNode);
 						resultNode.set("stream", jsonNode.get("streams_1"));
-					} 
-					
-					
-					
-					
+					}
 				}
 			}
 			entities.add(resultNode);
-
 		}
-
-		return new ResponseEntity<List<JsonNode>>(entities, HttpStatus.OK);
+		return new ResponseEntity<>(entities, HttpStatus.OK);
 	}
 	
 	/**
@@ -187,12 +174,12 @@ public class WorkbenchInspectController {
 	 * @return stream content
 	 * @throws IOException 
 	 */
-	@ApiOperation(value = "Retrives stream contents of stream", nickname = "retrieveStreamContents",
+	@ApiOperation(value = "Retrieves stream contents of stream", nickname = "retrieveStreamContents",
 		      notes = "", response = HttpStatus.class)
     @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-          @ApiResponse(code = 500, message = "Server is down. Contact System adminstrator")})
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator")})
 	@RequestMapping(value = "{project}/streams/{stream}/content/{eventType}", 
 			method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -202,24 +189,24 @@ public class WorkbenchInspectController {
 			@PathVariable(name = "eventType", required = true) String eventType) throws IOException {
 		
 			logger.debug("Stream Name :::" + stream);
-			List<JsonNode> entities = new ArrayList<JsonNode>();
-			MarlinDocumentStream docStream = this.retriveStream(stream);
+			List<JsonNode> entities = new ArrayList<>();
+			MarlinDocumentStream docStream = this.retrieveStream(stream);
 			if(docStream == null) {
-					    return new ResponseEntity<Object>
-					    ("No stream exists with name "+ stream, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<Object>(
+					"No stream exists with name "
+					+ HtmlUtils.htmlEscape(stream), HttpStatus.BAD_REQUEST);
 			}
 			ObjectMapper mapper = new ObjectMapper();
 			docStream.forEach(document -> {
 				try {
-				System.out.print("########Retrived stream content...." + document.asJsonString());
+					logger.debug("########Retrieved stream content.... {}", document.asJsonString());
 					JsonNode json = mapper.readTree(document.asJsonString());
 					String valText = json.get("value").asText();
 					logger.debug("###Value###::"+ valText);
 					byte[] bytes =  Base64.getDecoder().decode(valText);
-					logger.debug("###bytes legnth ::" + bytes.length);
+					logger.debug("###bytes length ::" + bytes.length);
 					String content = new String(bytes);
-					
-					
+
 					JsonNode jsonObj = mapper.readTree(content);
 					logger.debug("####Entire JSON ::"+ jsonObj);
 					if(jsonObj.get("EVENT_TYPE").
@@ -231,40 +218,31 @@ public class WorkbenchInspectController {
 						logger.debug("####Final ###"+ data);
 						entities.add(mapper.readTree(data));
 					}
-					
-					
-					
-			} catch (IOException exception) {
-				logger.error(exception.getMessage());
-			}	catch (Exception exception) {
-				logger.error(exception.getMessage());
-			}
-						
+				} catch (Exception exception) {
+					logger.error(exception.getMessage(), exception);
+				}
 			});
-
 		
 		return entities;
-
 	}
-	
-	
+
 	/**
 	 * Retrieves unique event types from content.
 	 * 
 	 * @param stream stream name
 	 * @return list of event types
 	 */
-	private Optional<List<String>> retriveEventTypes(String stream) {
+	private Optional<List<String>> retrieveEventTypes(String stream) {
 		   
-			MarlinDocumentStream docStream = this.retriveStream(stream);
+			MarlinDocumentStream docStream = this.retrieveStream(stream);
 			if(docStream == null) {
 				return Optional.empty();
 			}
 			ObjectMapper mapper = new ObjectMapper();
-			final List<String> eventTypes = new ArrayList<String>();
+			final List<String> eventTypes = new ArrayList<>();
 			docStream.forEach(document -> {
 				try {
-				System.out.print("########Retrived stream content...." + document.asJsonString());
+					logger.debug("########Retrieved stream content.... {}", document.asJsonString());
 					JsonNode json = mapper.readTree(document.asJsonString());
 					String valText = json.get("value").asText();
 					logger.debug("###Value###::"+ valText);
@@ -279,27 +257,18 @@ public class WorkbenchInspectController {
 					logger.debug("####Event Type ::"+ value);
 					eventTypes.add(value.asText());
 					
-			} catch (com.mapr.db.exceptions.TableNotFoundException exception) {
-				logger.error(exception.getMessage());
-			}	catch (Exception exception) {
-				logger.error(exception.getMessage());
-			}
-						
+				} catch (Exception exception) {
+					logger.error(exception.getMessage(), exception);
+				}
 			});
 		
 		return Optional.of(eventTypes.stream().distinct().
 				collect(Collectors.toList()));
-
-	
-		
 	}
 	
-	private MarlinDocumentStream retriveStream(String stream) {
-
+	private MarlinDocumentStream retrieveStream(String stream) {
 		logger.debug("Stream Name :::" + stream);
-
 		logger.debug("#####stream name:::" + stream);
-
 		MessageStore store = null;
 		MarlinDocumentStream docStream = null;
 		boolean isStreamExists = false ;
@@ -310,23 +279,17 @@ public class WorkbenchInspectController {
 			isStreamExists = true;
 		} catch (com.mapr.db.exceptions.TableNotFoundException exception) {
 			logger.info("#### no stream exists ####");
-			logger.warn(exception.getMessage());
-		}catch(IOException exception) {
-			logger.warn(exception.getMessage());
-		}catch(java.lang.IllegalArgumentException exception) {
-			logger.warn(exception.getMessage());
-		}catch(Exception exception) {
-			logger.warn(exception.getMessage());
+			logger.warn(exception.getMessage(), exception);
+		} catch(Exception exception) {
+			logger.warn(exception.getMessage(), exception);
 		}
-		
+
 		if(isStreamExists) {
 			logger.debug("########Retrived store...." + store);
 		    docStream = (MarlinDocumentStream) store.find();
 			store.close();
 		}
-
 		
 		return docStream;
-
 	}
 }

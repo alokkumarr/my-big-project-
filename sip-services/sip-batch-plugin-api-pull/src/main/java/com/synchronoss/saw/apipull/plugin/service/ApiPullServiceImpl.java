@@ -27,6 +27,7 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -887,7 +888,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
     boolean status = true;
 
     InputStream stream = new ByteArrayInputStream(content.getBytes());
-    File file = new File(destinationFilePath);
+    String normalizedDestPath= SipCommonUtils.normalizePath(destinationFilePath);
+    File file = new File(normalizedDestPath);
     processor.transferFile(stream, file, defaultDestinationLocation, mapRfsUser);
 
     return status;
