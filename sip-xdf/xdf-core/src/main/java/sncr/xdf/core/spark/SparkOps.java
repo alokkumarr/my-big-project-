@@ -15,6 +15,13 @@ public class SparkOps {
 
     public static void setSparkConfig(SparkConf sparkConf,
                                       List<sncr.bda.conf.Parameter> sysParams) {
+        /**
+         * spark.unsafe.sorter.spill.read.ahead.enabled
+         * This property added to solve "Stream is corrupted" issue in XDF (tc613)
+         * while writing dataset to the disk in parquet format.
+         *
+         */
+        sparkConf.set("spark.unsafe.sorter.spill.read.ahead.enabled", "false");
         for (sncr.bda.conf.Parameter param : sysParams) {
             logger.debug("Process parameter: " + param.getName() + " value: " + param.getValue());
             if ((param.getValue() == null || param.getValue().isEmpty())) {

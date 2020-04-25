@@ -267,6 +267,14 @@ config file to support larger files upload (more than 1MB)
 
        client_max_body_size 25m;
 
+==== Branding Details
+
+Branding Logo/Image can be of format (JPG, JPEG, PNG) and the size of
+the file cannot exceed the value provided in the configuration
+
+Branding color is a six-digit, three-byte hexadecimal number 
+specified with notation using a leading number
+
 === XDF-NG
 
 ==== Prerequisites

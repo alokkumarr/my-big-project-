@@ -20,7 +20,7 @@
           "operatorValue": "0"
         },
         "expectedAggregate": {
-          "fieldName": "string",
+          "fieldName": "count(string)",
           "displayOperator": "EQ",
           "displayedValue": "0"
         },
@@ -55,7 +55,7 @@
           "operatorValue": "5"
         },
         "expectedAggregate": {
-          "fieldName": "COUNTY",
+          "fieldName": "count(COUNTY)",
           "displayOperator": "LTE",
           "displayedValue": "5"
         },
@@ -92,7 +92,7 @@
           "operatorValue": "25"
         },
         "expectedAggregate": {
-          "fieldName": "date",
+          "fieldName": "count(date)",
           "displayOperator": "LT",
           "displayedValue": "25"
         },
@@ -129,7 +129,7 @@
           "operatorValue": "0"
         },
         "expectedAggregate": {
-          "fieldName": "long",
+          "fieldName": "sum(long)",
           "displayOperator": "EQ",
           "displayedValue": "0"
         },
@@ -164,7 +164,7 @@
           "operatorValue": "300"
         },
         "expectedAggregate": {
-          "fieldName": "float",
+          "fieldName": "max(float)",
           "displayOperator": "NEQ",
           "displayedValue": "300"
         },
@@ -199,7 +199,7 @@
           "operatorValue": "100"
         },
         "expectedAggregate": {
-          "fieldName": "integer",
+          "fieldName": "max(integer)",
           "displayOperator": "NEQ",
           "displayedValue": "100"
         },
@@ -234,7 +234,7 @@
           "operatorValue": "10"
         },
         "expectedAggregate": {
-          "fieldName": "double",
+          "fieldName": "max(double)",
           "displayOperator": "GTE",
           "displayedValue": "10"
         },
@@ -270,7 +270,7 @@
           "secondValue": "1000"
         },
         "expectedAggregate": {
-          "fieldName": "string",
+          "fieldName": "distinctcount(string)",
           "displayOperator": "BTW",
           "displayedValue": "0 and 1000"
         },

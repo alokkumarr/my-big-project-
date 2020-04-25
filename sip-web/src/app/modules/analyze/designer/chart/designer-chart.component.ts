@@ -61,12 +61,16 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
     if (data) {
       fpPipe(
         fpFlatMap(mapobj => {
-          const matchedObj = find(mapobj.data, ({ dataType, aggregate }) => {
-            return (
-              dataType === data.artifact.type &&
-              aggregate === data.artifact.aggregate
-            );
-          });
+          const matchedObj = find(
+            mapobj.data,
+            ({ dataType, aggregate, name }) => {
+              return (
+                dataType === data.artifact.type &&
+                aggregate === data.artifact.aggregate &&
+                name.includes(data.artifact.name)
+              );
+            }
+          );
           set(matchedObj, 'color', data.artifact.seriesColor);
           this.updater.next([mapobj]);
         })
@@ -249,9 +253,16 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
       return path === 'series';
     });
     map(dataFields, serie => {
-      const matchedObj = find(seriesData.data, ({ dataType, aggregate }) => {
-        return dataType === serie.type && aggregate === serie.aggregate;
-      });
+      const matchedObj = find(
+        seriesData.data,
+        ({ dataType, aggregate, name }) => {
+          return (
+            dataType === serie.type &&
+            aggregate === serie.aggregate &&
+            name.includes(serie.name)
+          );
+        }
+      );
       set(matchedObj, 'color', serie.seriesColor);
     });
     if (this.updater) {
