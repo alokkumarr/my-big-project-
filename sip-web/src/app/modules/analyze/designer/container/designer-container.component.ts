@@ -108,7 +108,7 @@ import {
   DesignerUpdateQueryFilters
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
-import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from '../../consts';
+import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES, QUERY_RUNTIME_IDENTIFIER } from '../../consts';
 import { MatDialog } from '@angular/material';
 import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
 import { findDuplicateColumns } from 'src/app/common/components/report-grid/report-grid.component';
@@ -384,23 +384,25 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     this.filters = isDSLAnalysis(this.analysis)
       ? this.generateDSLDateFilters(queryBuilder.filters)
       : queryBuilder.filters;
-      if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
-        this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
-      }
+    if (this.analysis.type === 'report' && get(this.analysis, 'designerEdit')) {
+      this.queryRunTimeFilters = this.isInQueryMode ? this.filters : [];
+    }
 
-      if (isUndefined(get(this.filters[0], 'filters'))) {
-        const aggregatedFilters = this.filters.filter(option => {
-          return option.isAggregationFilter === true;
-        });
-        const oldFormatFilters = cloneDeep(this.filters);
-        this.filters = [];
-        const normalFilters = [{
+    if (isUndefined(get(this.filters[0], 'filters'))) {
+      const aggregatedFilters = this.filters.filter(option => {
+        return option.isAggregationFilter === true;
+      });
+      const oldFormatFilters = cloneDeep(this.filters);
+      this.filters = [];
+      const normalFilters = [
+        {
           booleanCriteria: queryBuilder.booleanCriteria,
           filters: oldFormatFilters
-        }]
+        }
+      ];
 
-        this.filters = concat(normalFilters, aggregatedFilters);
-      }
+      this.filters = concat(normalFilters, aggregatedFilters);
+    }
 
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
     this.isInQueryMode = this._store.selectSnapshot(
@@ -425,17 +427,18 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
       const oldFormatFilters = cloneDeep(sipQuery.filters);
       sipQuery.filters = [];
-      const normalFilters = [{
-        booleanCriteria: sipQuery.booleanCriteria,
-        filters: oldFormatFilters
-      }]
+      const normalFilters = [
+        {
+          booleanCriteria: sipQuery.booleanCriteria,
+          filters: oldFormatFilters
+        }
+      ];
 
       sipQuery.filters = concat(normalFilters, aggregatedFilters);
       return sipQuery.filters;
     } else {
       return sipQuery.filters;
     }
-
   }
 
   initAuxSettings() {
@@ -847,22 +850,22 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           (this.analysis || this.analysisStarter).type
         );
         this._analyzeDialogService
-        .openFilterDialog(
-          this._store.selectSnapshot(DesignerState.analysisFilters),
-          this.artifacts,
-          get(analysis, 'sipQuery.booleanCriteria'),
-          get(analysis, 'type'),
-          supportsGlobalFilters,
-          this.filterService.supportsAggregatedFilters(analysis)
-        )
-        .afterClosed()
-        .subscribe((result: IToolbarActionResult) => {
-          if (result) {
-            this.filters = cloneDeep(result);
-            this._store.dispatch(new DesignerUpdateFilters(result));
-            this.onSettingsChange({ subject: 'filter' });
-          }
-        });
+          .openFilterDialog(
+            this._store.selectSnapshot(DesignerState.analysisFilters),
+            this.artifacts,
+            get(analysis, 'sipQuery.booleanCriteria'),
+            get(analysis, 'type'),
+            supportsGlobalFilters,
+            this.filterService.supportsAggregatedFilters(analysis)
+          )
+          .afterClosed()
+          .subscribe((result: IToolbarActionResult) => {
+            if (result) {
+              this.filters = cloneDeep(result);
+              this._store.dispatch(new DesignerUpdateFilters(result));
+              this.onSettingsChange({ subject: 'filter' });
+            }
+          });
         break;
       case 'preview':
         const analysisForPreview = isDSLAnalysis(this.analysis)
@@ -962,6 +965,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
+    if (!this.isInQueryMode) {
+      this.areMinRequirmentsMet = this.canRequestData();
+    } else {
+      const analysisDef = this._store.selectSnapshot(DesignerState)
+        .analysis;
+        if (isUndefined(analysisDef.sipQuery.query)) {
+          this.areMinRequirmentsMet = false;
+        }
+    }
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -1126,9 +1138,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         if (typeof event.data.query !== 'string') {
           break;
         }
-        this.areMinRequirmentsMet = this.canRequestData();
-        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this._store.dispatch(new DesignerUpdateQuery(event.data.query));
+        this.areMinRequirmentsMet = this.canRequestData();
+        const analysisDef = this._store.selectSnapshot(DesignerState)
+        .analysis;
+        if (!analysisDef.designerEdit) {
+          this.areMinRequirmentsMet = analysisDef.designerEdit;
+        } else {
+          if (!isUndefined(analysisDef.sipQuery.query)) {
+            const runTimeFiltersInQueryCount =
+            analysisDef.sipQuery.query.split(QUERY_RUNTIME_IDENTIFIER).length - 1;
+            if (runTimeFiltersInQueryCount > 0) {
+              this.areMinRequirmentsMet = get(analysisDef, 'sipQuery.filters[0].filters').length === runTimeFiltersInQueryCount;
+            }
+          }
+        }
+        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+
         break;
       case 'submitQuery':
         this.changeToQueryModePermanently();
@@ -1293,8 +1319,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.refreshDataObject();
         break;
       case 'comboType':
+      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      this.artifacts = [...this.artifacts];
         this.updateAnalysis();
-        this.requestDataIfPossible();
+        this.refreshDataObject();
+        if (get(this.analysis, 'chartOptions.chartType') !== 'comparison') {
+          this.requestDataIfPossible();
+        }
         break;
       case 'labelOptions':
         isDSLAnalysis(this.analysis)

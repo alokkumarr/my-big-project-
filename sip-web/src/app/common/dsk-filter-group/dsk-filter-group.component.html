@@ -38,7 +38,7 @@
   </div>
   <button
     mat-icon-button
-    *ngIf="(data.mode === 'DSK' && selfIndex >= 0 ) || (data.mode === 'ANALYZE' && !data.isInRuntimeMode)"
+    *ngIf="(data.mode === 'DSK' && selfIndex >= 0 ) || (data.mode === 'ANALYZE' && !data.isInRuntimeMode && selfIndex >= 0)"
     aria-label="Remove dsk field attribute"
     [attr.e2e]="'remove-field'"
     matTooltip="Remove Group"

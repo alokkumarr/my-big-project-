@@ -129,7 +129,6 @@ public class UserRepositoryImpl implements UserRepository {
     logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
 
-
     String sql =
         "SELECT U.PWD_MODIFIED_DATE, U.ENCRYPTED_PASSWORD, C.PASSWORD_EXPIRY_DAYS "
             + "FROM USERS U, CUSTOMERS C "
@@ -147,6 +146,9 @@ public class UserRepositoryImpl implements UserRepository {
       if (passwordDetails != null) {
         isAuthenticated = AdvancedHashingUtil.verifyPassword(
         		password.trim(),passwordDetails.getEncryptedPwd());
+        
+        
+        logger.debug("Is Authenticated ::"+ isAuthenticated);
         if (!isPwdExpired(passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
           isPasswordActive = true;
         }
@@ -330,7 +332,6 @@ public class UserRepositoryImpl implements UserRepository {
 		logger.info("###Beginning of migration ####");
 		String sql = "SELECT U.USER_SYS_ID, U.ENCRYPTED_PASSWORD FROM USERS U" + " WHERE U.PWD_MIGRATED = 0" ;
 		
-		
 		List<UserDetails> users = jdbcTemplate.query(sql, new RowMapper<UserDetails>() {
 			public UserDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
 				UserDetails userDetails = new UserDetails();
@@ -340,38 +341,51 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 		});
 		logger.info("###Retrived users  count ::####"+ users.size());
-		String updateSql = "UPDATE USERS U  SET  U.ENCRYPTED_PASSWORD = ?, U.PWD_MIGRATED = 1" ;
+		String updateSql = "UPDATE USERS U  SET  U.ENCRYPTED_PASSWORD = ?, U.PWD_MIGRATED = 1 where "
+				+ "U.USER_SYS_ID = ?" ;
 	    final byte[] encryptionKeyBytes = nSSOProperties.getEncryptionKeyBytes();
-		
-	    try {
-			jdbcTemplate.batchUpdate(updateSql,users,10,
-			        new ParameterizedPreparedStatementSetter<UserDetails>() {
-			             
-						@Override
-						public void setValues(PreparedStatement ps, UserDetails user) throws SQLException {
-							String existingPwd  =  user.getPassword();
-							String actualPwd = Ccode.cdecode(existingPwd, encryptionKeyBytes);
-							String hashedPwd = null;
-							try {
-								hashedPwd = AdvancedHashingUtil.createHash(actualPwd);
-								ps.setString(1,hashedPwd);
-							} catch (CannotPerformOperationException e) {
-								logger.error("Exception while hashing pwd for user ::" 
-							    + user.getUserId());
-							}
-							
-						}
-			        });
-		} catch (DataAccessException e) {
-			logger.error("DataAccessException while migration of  pwd for user ::");
-		}
-	    catch (Exception e) {
-	    	logger.error("Exception while hashing pwd for user ::" );
-		}
+	   
+	    
+	    for(UserDetails user: users) {
+	    	/**
+	    	 * Decrypt existing password with old algorithm
+	    	 */
+	    	 String actualPwd = null;
+	    	
+	    	try {
+	    		logger.info("### New update with user ..."+ user.getUserId());
+		    	String existingPwd  =  user.getPassword();
+			    actualPwd = Ccode.cdecode(existingPwd, encryptionKeyBytes);
+	    	} catch(Exception exception) {
+	    		logger.error("Exception while decoding old password"
+	    				+ exception.getMessage());
+	    	}
+	    	
+			/**
+			 * If original password is not encoded with old algorithm
+			 * decode of old aglorithm creates a null. Update only
+			 * if it is not null
+			 */
+			if( actualPwd != null && !actualPwd.equals("")) {
+				String hashedPwd = null;
+				try {
+					hashedPwd = AdvancedHashingUtil.createHash(actualPwd);
+					jdbcTemplate.update(updateSql,hashedPwd, user.getUserId());
+					logger.info("##Update completed");
+				} catch (CannotPerformOperationException e) {
+					logger.error("Exception while hashing pwd for user ::" 
+				    + user.getUserId());
+				}
+				
+				
+			}
+			
+	    	
+	    }
 	         
 	}
 		
-	
+
 
 	@Override
 	public String changePassword(String loginId, String newPass, String oldPass) {
