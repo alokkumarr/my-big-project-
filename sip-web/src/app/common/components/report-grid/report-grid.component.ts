@@ -16,7 +16,6 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as isUndefined from 'lodash/isUndefined';
-import * as fpFilter from 'lodash/fp/filter';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
@@ -35,8 +34,7 @@ import * as isEqual from 'lodash/isEqual';
 import {
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
-  DATE_FORMATS,
-  DATE_FORMATS_OBJ
+  ES_REPORTS_DATE_FORMATS
 } from '../../consts';
 
 import {
@@ -50,7 +48,6 @@ import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.comp
 
 import { flattenReportData } from '../../../common/utils/dataFlattener';
 import { ArtifactDSL, AnalysisDSL } from 'src/app/models';
-import moment from 'moment';
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -201,10 +198,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       }
       this.columns = this.artifacts2Columns(artifact);
     }
-    this.data = transformDateFields(
-      flattenReportData(data, this.analysis),
-      this.columns
-    );
+    this.data = flattenReportData(data, this.analysis);
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -217,10 +211,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         load: options =>
           this.dataLoader(options).then(value => {
             return {
-              data: transformDateFields(
-                flattenReportData(value.data, this.analysis),
-                this.columns
-              ),
+              data: flattenReportData(value.data, this.analysis),
               totalCount: value.totalCount
             };
           })
@@ -481,7 +472,9 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       {
         format: payload.format || payload.dateFormat,
         type,
-        availableFormats: DATE_FORMATS
+        ...(this.analysis.type === 'esReport'
+          ? { availableFormats: ES_REPORTS_DATE_FORMATS }
+          : {})
       },
       format => {
         changeColumnProp('format', format);
@@ -545,13 +538,11 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
         const format = isNumberType
           ? { formatter: getFormatter(preprocessedFormat) }
-          : this.getDateFormat(column.format || column.dateFormat);
-
-        const dataType = isNumberType ? 'number' : type;
+          : column.format || column.dateFormat;
         const field: ReportGridField = {
           caption: column.alias || column.displayName,
           dataField: this.getDataField(column),
-          dataType,
+          dataType: isNumberType ? 'number' : type,
           type,
           visibleIndex: column.visibleIndex,
           visible: isUndefined(column.visible) ? true : column.visible,
@@ -575,21 +566,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         return field;
       })
     )(artifacts);
-  }
-
-  getDateFormat(format) {
-    if (!format) {
-      return format;
-    }
-    const { momentValue, momentFormatFrombackend } = DATE_FORMATS_OBJ[format];
-    return {
-      formatter: value => {
-        const formatted = moment
-          .utc(value)
-          .format(momentFormatFrombackend || momentValue);
-        return formatted;
-      }
-    };
   }
 
   preprocessFormatIfNeeded(format, type, aggregate) {
@@ -643,23 +619,4 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     });
   }
-}
-
-function transformDateFields(data, fields: ReportGridField[]) {
-  const columnNames = fpPipe(
-    fpFilter(field => DATE_TYPES.includes(field.type)),
-    fpMap(field => field.dataField)
-  )(fields);
-
-  if (isEmpty(columnNames)) {
-    return data;
-  }
-
-  forEach(data, dataPoint => {
-    forEach(columnNames, columnName => {
-      const date = moment.utc(dataPoint[columnName], 'YYYY-MM-DD hh:mm:ss');
-      dataPoint[columnName] = date;
-    });
-  });
-  return data;
 }

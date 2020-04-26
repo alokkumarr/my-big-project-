@@ -25,7 +25,7 @@ const AnalyzeServiceStub = {
   calcNameMap: () => ({})
 };
 
-describe('Designer Component', () => {
+describe('Designer Selected fields Component', () => {
   let component: DesignerSelectedFieldsComponent;
   let fixture: ComponentFixture<DesignerSelectedFieldsComponent>;
 
@@ -56,6 +56,7 @@ describe('Designer Component', () => {
     fixture = TestBed.createComponent(DesignerSelectedFieldsComponent);
     component = fixture.componentInstance;
     component.filters = [];
+    component.flattenedfilters = [];
     fixture.detectChanges();
   });
 

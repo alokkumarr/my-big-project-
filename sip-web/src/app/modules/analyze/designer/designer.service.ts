@@ -47,7 +47,8 @@ import {
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
   DEFAULT_DATE_INTERVAL,
-  DEFAULT_DATE_FORMAT
+  DEFAULT_PIVOT_DATE_FORMAT,
+  CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 import { DATA_AXIS } from './consts';
@@ -641,7 +642,7 @@ export class DesignerService {
 
     const applyNonDatafieldDefaults = artifactColumn => {
       if (DATE_TYPES.includes(artifactColumn.type)) {
-        artifactColumn.format = DEFAULT_DATE_FORMAT.value;
+        artifactColumn.format = CHART_DEFAULT_DATE_FORMAT.value;
       }
     };
 
@@ -807,7 +808,7 @@ export class DesignerService {
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:
-                artifactColumn.format || DEFAULT_DATE_FORMAT.value
+                artifactColumn.format || DEFAULT_PIVOT_DATE_FORMAT.value
             } : {format: artifactColumn.format})
           };
         })
@@ -854,7 +855,7 @@ export class DesignerService {
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:
-                artifactColumn.format || DEFAULT_DATE_FORMAT.value
+                artifactColumn.format || CHART_DEFAULT_DATE_FORMAT.value
             } : {})
           };
         })
