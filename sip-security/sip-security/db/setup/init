@@ -18,14 +18,19 @@ touch $marker
 
 # Create database users
 mysql -u root < $dir/init.sql
+password=$( /opt/sip/sip-common-components/bin/ccode \
+$(< /etc/bda/saw-security-db-password) \
+'20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4' decrypt)
 password=$(< /etc/bda/saw-security-db-password)
 create_user="CREATE USER 'saw_security'@'localhost'"
-mysql -u root -e "$create_user IDENTIFIED BY '$password'"
+mysql -u root -e "$create_user IDENTIFIED VIA ed25519 USING PASSWORD('$password') "
 mysql -u root -e "GRANT ALL ON saw_security.* TO 'saw_security'@'localhost'"
 
 # Set root password
-password=$(< /etc/bda/mariadb-root-password)
-mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$password')"
+root_password=$( /opt/sip/sip-common-components/bin/ccode \
+$(< /etc/bda/mariadb-root-password) \
+'20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4' decrypt)
+mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$root_password')"
 
 # Populate database
 python $dir/Initial_Setup.py --vars
