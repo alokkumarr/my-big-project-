@@ -6,7 +6,7 @@ import { DxDataGridService } from '../../../../common/services/dxDataGrid.servic
 import { WorkbenchService } from '../../services/workbench.service';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 
-import { isUndefined, forEach} from 'lodash';
+import { isUndefined, forEach } from 'lodash';
 
 @Component({
   selector: 'dataset-detail-view',
@@ -46,7 +46,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
       !isUndefined(this.timerSubscription) &&
       !this.timerSubscription.isStopped
     ) {
-     // this.stopPolling();
+      // this.stopPolling();
     }
     this.workBench.removeDataFromLS('dsMetadata');
   }
@@ -67,18 +67,20 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   }
 
   getPreview() {
-    this.workBench.retrievePreview(this.dsMetadata.system.name).subscribe(data => {
-      this.previewStatus = data.status;
-      if (this.previewStatus === 'success') {
-        this.previewData = JSON.parse(data.rows);
-        setTimeout(() => {
-          this.dataGrid.instance.refresh();
-        });
-        this.stopPolling();
-      } else if (this.previewStatus === 'failed') {
-        this.stopPolling();
-      }
-    });
+    this.workBench
+      .retrievePreview(this.dsMetadata.system.name)
+      .subscribe(data => {
+        this.previewStatus = data.status;
+        if (this.previewStatus === 'success') {
+          this.previewData = JSON.parse(data.rows);
+          setTimeout(() => {
+            this.dataGrid.instance.refresh();
+          });
+          this.stopPolling();
+        } else if (this.previewStatus === 'failed') {
+          this.stopPolling();
+        }
+      });
   }
 
   /**
@@ -95,7 +97,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   }
 
   stopPolling() {
-    this.timerSubscription.unsubscribe();
+    this.timerSubscription && this.timerSubscription.unsubscribe();
     this.poll = false;
   }
 
