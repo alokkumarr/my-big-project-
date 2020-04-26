@@ -63,11 +63,11 @@ public class BisChannelEntity implements Serializable {
   @Column(name = "PWD_MIGRATED")
   private Integer pwdMigrated;
 
-  public int getPwdMigrated() {
+  public Integer getPwdMigrated() {
     return pwdMigrated;
   }
 
-  public void setPwdMigrated(int pwdMigrated) {
+  public void setPwdMigrated(Integer pwdMigrated) {
     this.pwdMigrated = pwdMigrated;
   }
 
