@@ -225,27 +225,27 @@ export const DATE_FORMATS_OBJ = fpPipe(
 
 export const CHART_DATE_FORMATS = [
   {
-    value: 'MMMM d YYYY, h:mm:ss a',
+    value: 'MMMM d yyyy, h:mm:ss a',
     groupInterval: 'hour',
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {
-    value: 'MMM d YYYY',
+    value: 'MMM d yyyy',
     groupInterval: 'day',
     label: ' Sep 1st 2017'
   },
   {
-    value: 'MMM YYYY',
+    value: 'MMM yyyy',
     groupInterval: 'month',
     label: 'September 2017'
   },
   {
-    value: 'MM YYYY',
+    value: 'MM yyyy',
     groupInterval: 'month',
     label: '09 2017'
   },
   {
-    value: 'YYYY',
+    value: 'yyyy',
     groupInterval: 'year',
     label: '2017'
   }
