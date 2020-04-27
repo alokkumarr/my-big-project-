@@ -86,12 +86,22 @@
   register: result
   until: result is success
   delay: 30
+- name : Check password already migrated
+  stat: path=/etc/bda/mariadb-root-password-migrated
+  register: mariadb_root_password_migrated
 # Note: Run mysql_upgrade for upgrades from MariaDB 5.5, which are
 # always single-node environments.  When environments with MariaDB 5.5
 # no longer exist, the mysql_upgrade task below can be removed.
 - name: Run MariaDB databases upgrade
   shell: "mysql_upgrade --password=$(< /etc/bda/mariadb-root-password)"
-  when: "groups['saw-security'].index(inventory_hostname) == 0"
+  when:
+    - "groups['saw-security'].index(inventory_hostname) == 0"
+    -  not mariadb_root_password_migrated.stat.exists
+- name: Run MariaDB databases upgrade
+  shell: "mysql_upgrade --password=$( /opt/sip/sip-common-components/bin/ccode $(< /etc/bda/mariadb-root-password) '20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4' decrypt)"
+  when:
+    - "groups['saw-security'].index(inventory_hostname) == 0"
+    - mariadb_root_password_migrated.stat.exists
 - name: Migrate MariaDB root password from old location
   fetch:
     src: /etc/bda/mariadb-root-password
@@ -99,9 +109,6 @@
     flat: yes
     fail_on_missing: no
   when: "groups['saw-security'].index(inventory_hostname) == 0"
-- name : Check password already migrated
-  stat: path=/etc/bda/mariadb-root-password-migrated
-  register: mariadb_root_password_migrated
 - name: Look up MariaDB root database password
   set_fact:
     mariadb_root_get_password: >-
