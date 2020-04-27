@@ -68,7 +68,7 @@ import { AnalyzeService } from '../../services/analyze.service';
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
-  DATE_FORMATS_OBJ,
+  CHART_DATE_FORMATS_OBJ,
   QUERY_RUNTIME_IDENTIFIER
 } from '../../consts';
 import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
@@ -790,7 +790,7 @@ export class DesignerState {
           groupInterval.groupInterval = isComparisonChart
             ? artifactColumn.groupInterval ||
               COMPARISON_CHART_DATE_INTERVALS[0].value
-            : DATE_FORMATS_OBJ[
+            : CHART_DATE_FORMATS_OBJ[
                 artifactColumn.dateFormat || <string>artifactColumn.format
               ].groupInterval;
 
@@ -800,7 +800,6 @@ export class DesignerState {
                 .formatForBackEnd
             : artifactColumn.dateFormat;
           break;
-
         case 'pivot':
           groupInterval.groupInterval = 'day';
           break;

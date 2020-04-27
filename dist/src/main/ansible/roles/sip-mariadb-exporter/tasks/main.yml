@@ -5,20 +5,46 @@
     mode: u+x,g+x,o+x
   with_fileglob:
     - mariadb_exporter/*
+- name : Check mariadb Exporter password already migrated
+  stat: path=/etc/bda/sip-mariadb-exporter-db-password-migrated
+  register: sip_mariadb_exporter_db_password_migrated
 - name: Look up mysqld exporter database password
   set_fact:
-    mysqld_exporter_db_password: >-
+    mysqld_exporter_get_db_password: >-
       {{ lookup('password', inventory_dir
         + '/mysqld-exporter-db-password chars=ascii_letters,digits') }}
-- name: lookup & setting database root password
+- name: Run the password ecoding if not encoded.
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ mysqld_exporter_get_db_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4"
+  register: mysqld_exporter_db_password_encoded
+  when: not sip_mariadb_exporter_db_password_migrated.stat.exists
+- name: Register the sip-exporter Encoded paswword value (If Password not encoded)
   set_fact:
-    root_password: >-
-        {{ lookup('password', inventory_dir
-        + '/mariadb-root-password chars=ascii_letters,digits') }}
+    mysqld_exporter_db_password: >-
+      {{ mysqld_exporter_db_password_encoded.stdout }}
+  when: not sip_mariadb_exporter_db_password_migrated.stat.exists
+- name: Register the sip-security Encoded paswword value (If already Encoded )
+  set_fact:
+    mysqld_exporter_db_password: >-
+      {{ mysqld_exporter_get_db_password }}
+  when: sip_mariadb_exporter_db_password_migrated.stat.exists
 - name: Set the mysqld exporter database password
   copy:
     content: "{{ mysqld_exporter_db_password }}"
     dest: /etc/bda/mysqld-exporter-db-password
+- name: Markng the password migration
+  file:
+    path: /etc/bda/sip-mariadb-exporter-db-password-migrated
+    state: touch
+    mode: 0755
+  when: not sip_mariadb_exporter_db_password_migrated.stat.exists
+- name: lookup & setting database root password
+  set_fact:
+    root_get_password: >-
+        {{ lookup('password', inventory_dir
+        + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Run the password decoding if its encoded.
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ root_get_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 decrypt"
+  register: root_password
 - name: Ensure a list of packages installed
   yum:
     name: "{{ packages }}"
@@ -32,17 +58,17 @@
 - name: Create the mysqld_exporter users
   mysql_user:
    name: "mysqld_exporter"
-   password: "{{ mysqld_exporter_db_password }}"
+   password: "{{ mysqld_exporter_get_db_password }}"
    host: "localhost"
    priv: "*.*:PROCESS,SELECT,REPLICATION CLIENT"
    append_privs: "true"
    login_user: root
-   login_password: "{{ root_password }}"
+   login_password: "{{ root_password.stdout }}"
    state: present
   when: "groups['saw-services'].index(inventory_hostname) == 0"
   tags: mariadb
 - name: Update mysqld_exporter users max_user_connections on database
-  command: mysql -u root -p"{{ root_password }}" -e "ALTER USER 'mysqld_exporter'@'localhost' WITH MAX_USER_CONNECTIONS 2;"
+  command: mysql -u root -p"{{ root_password.stdout }}" -e "ALTER USER 'mysqld_exporter'@'localhost' WITH MAX_USER_CONNECTIONS 2;"
 - name: Copy mysqld_exporter.cnf file to /etc/bda
   template:
     src: mysqld_exporter.cnf

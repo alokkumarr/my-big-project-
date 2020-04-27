@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as clone from 'lodash/clone';
-import * as replace from 'lodash/replace';
 import * as sum from 'lodash/sum';
 import * as map from 'lodash/map';
 import * as round from 'lodash/round';
@@ -31,6 +30,7 @@ import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
 import * as values from 'lodash/values';
 import * as toString from 'lodash/toString';
+import * as replace from 'lodash/replace';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isArray from 'lodash/isArray';
 
@@ -45,7 +45,6 @@ import {
   DATE_TYPES,
   AGGREGATE_TYPES_OBJ,
   CHART_COLORS,
-  DATE_FORMATS_OBJ,
   DATE_INTERVALS
 } from '../consts';
 
@@ -352,8 +351,7 @@ export class ChartService {
       this.formatDatesIfNeeded(
         parsedData,
         dateFields,
-        aggregateYFields.length > 0,
-        chartType
+        aggregateYFields.length > 0
       );
     } else {
       this.dateStringToTimestamp(parsedData, dateFields);
@@ -474,36 +472,27 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat }) => {
-          const {
-            momentFormat,
-            momentFormatForBackend
-          } = this.getMomentDateFormat(dateFormat);
-          const colName = removeKeyword(columnName);
-          const format = momentFormatForBackend || momentFormat;
-          const unix = moment(dataPoint[colName], format).utc().unix();
-          const miliseconds = unix * 1000;
-          dataPoint[colName] = miliseconds;
+          const momentDateFormat = this.getMomentDateFormat(dateFormat)
+            .dateFormat;
+          dataPoint[removeKeyword(columnName)] =
+            moment(dataPoint[removeKeyword(columnName)], momentDateFormat)
+              .utc()
+              .unix() * 1000;
         });
       });
     }
   }
 
-  formatDatesIfNeeded(
-    parsedData,
-    dateFields,
-    aggregatesExist,
-    chartType: string
-  ) {
+  formatDatesIfNeeded(parsedData, dateFields, aggregatesExist) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({ columnName, dateFormat, groupInterval }) => {
           const dateFormats = this.getMomentDateFormat(
             dateFormat,
-            groupInterval,
-            chartType
+            groupInterval
           );
           const parseFormat = aggregatesExist
-            ? dateFormats.momentFormat
+            ? dateFormats.dateFormat
             : 'YYYY-MM-DD hh:mm:ss';
           dataPoint[removeKeyword(columnName)] = moment
             .utc(dataPoint[removeKeyword(columnName)], parseFormat)
@@ -566,21 +555,7 @@ export class ChartService {
     };
   }
 
-  getMomentDateFormat(dateFormat, groupInterval = null, chartType = null) {
-    if (chartType !== 'comparison') {
-      const { value, momentValue, momentFormatForBackend } = DATE_FORMATS_OBJ[
-        dateFormat
-      ];
-      return {
-        /* Date format saved with column will cater to backend. Make adjustments for FE */
-        dateFormat: value,
-
-        momentFormatForBackend: momentFormatForBackend,
-        /* If an explicit moment format is defined for this date format, return that too */
-        momentFormat: momentValue
-      };
-    }
-
+  getMomentDateFormat(dateFormat, groupInterval = null) {
     const momentFormatId = DATE_INTERVALS.findIndex(
       interval =>
         interval.formatForBackEnd === dateFormat &&

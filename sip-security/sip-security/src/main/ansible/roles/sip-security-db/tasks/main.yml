@@ -7,29 +7,31 @@
   yum_repository:
     name: mariadb
     description: MariaDB repository
-    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.3/centos7-amd64') }}"
+    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.4/centos7-amd64') }}"
     gpgcheck: no
+- name: Check the Mariadb version to determine if upgrade is required
+  shell: "mysql --version | grep 10.3"
+  register: mariadb_upgrade
+  ignore_errors: yes
+- name: Uninstall and Remove MariaDB galera Service
+  yum: name=galera state=absent
+  when:
+    - mariadb_upgrade is defined
+    - mariadb_upgrade.stdout | length > 0
 - name: Install MariaDB package
   # Note: While using the MariaDB repository, use the capitalized
   # package name "MariaDB-server" instead of "mariadb-server"
   yum: name=MariaDB-server state=present
   notify:
     - restart mariadb
+- name: Install MariaDB client package
+  yum: name=MariaDB-client state=latest
 
 # Mariadb Security at rest - also known as DARE - Only for secure clusters
 - name: Include mariadb-dare.yml if sip_secure=true
   include: mariadb-dare.yml
   when: sip_secure
-  
-# Workaround: MariaDB 10.3.10 introduced changes that cause the error
-# "/bin/galera_new_cluster: line 31: return: can only `return' from a
-# function or sourced script" when bootstrapping the cluster.  Remove
-# the offending line until MariaDB is fixed.
-- name: Remove invalid line from galera_new_cluster
-  lineinfile:
-    path: /bin/galera_new_cluster
-    state: absent
-    regexp: '^return \$extcode$'
+
 - name: Install MariaDB configuration additions
   template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.cnf
 # Workaround: The MariaDB Galera cluster initialization below invokes
@@ -63,6 +65,15 @@
   template:
     src: sip-mariadb-host-index
     dest: /etc/sip/sip-mariadb-host-index
+- name: Set the safe_to_bootstrap as 1 before cluster restart
+  lineinfile:
+    path: /var/lib/mysql/grastate.dat
+    regexp: 'safe_to_bootstrap*'
+    line: 'safe_to_bootstrap: 1'
+  when:
+    - mariadb_upgrade is defined
+    - mariadb_upgrade.stdout | length > 0
+    - "groups['saw-security'].index(inventory_hostname) == 0"
 # Note: The MariaDB Galera cluster initialization must run before
 # MariaDB service is started, because the "galera_new_cluster" will
 # start the MariaDB service if the node is chosen as a bootstrap node.
@@ -72,24 +83,57 @@
 # cluster initialized above
 - name: Enable and start MariaDB service
   systemd: name=mariadb enabled=true state=started
+  register: result
+  until: result is success
+  delay: 30
+- name : Check password already migrated
+  stat: path=/etc/bda/mariadb-root-password-migrated
+  register: mariadb_root_password_migrated
 # Note: Run mysql_upgrade for upgrades from MariaDB 5.5, which are
 # always single-node environments.  When environments with MariaDB 5.5
 # no longer exist, the mysql_upgrade task below can be removed.
 - name: Run MariaDB databases upgrade
   shell: "mysql_upgrade --password=$(< /etc/bda/mariadb-root-password)"
-  when: "groups['saw-security'].index(inventory_hostname) == 0"
+  when:
+    - "groups['saw-security'].index(inventory_hostname) == 0"
+    -  not mariadb_root_password_migrated.stat.exists
+- name: Run MariaDB databases upgrade
+  shell: "mysql_upgrade --password=$( /opt/sip/sip-common-components/bin/ccode $(< /etc/bda/mariadb-root-password) '20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4' decrypt)"
+  when:
+    - "groups['saw-security'].index(inventory_hostname) == 0"
+    - mariadb_root_password_migrated.stat.exists
 - name: Migrate MariaDB root password from old location
   fetch:
     src: /etc/bda/mariadb-root-password
     dest: "{{ inventory_dir + '/mariadb-root-password' }}"
     flat: yes
     fail_on_missing: no
-  when: "groups['saw-services'].index(inventory_hostname) == 0"
+  when: "groups['saw-security'].index(inventory_hostname) == 0"
 - name: Look up MariaDB root database password
   set_fact:
-    mariadb_root_password: >-
+    mariadb_root_get_password: >-
       {{ lookup('password', inventory_dir
         + '/mariadb-root-password chars=ascii_letters,digits') }}
+- name: Run the password encryption if not encoded.
+  shell: "/opt/sip/sip-common-components/bin/ccode {{ mariadb_root_get_password }} 20-89-C3-13-D6-29-9E-91-6C-35-C2-4D-0A-B5-2C-D4 "
+  register: mariadb_root_password_encoded
+  when: not mariadb_root_password_migrated.stat.exists
+- name: Register the sip-batch-ingestion Encoded paswword value (If Password not encoded)
+  set_fact:
+    mariadb_root_password: >-
+      {{ mariadb_root_password_encoded.stdout }}
+  when: not mariadb_root_password_migrated.stat.exists
+- name: Register the sip-batch-ingestion Encoded paswword value (If already Encoded )
+  set_fact:
+    mariadb_root_password: >-
+      {{ mariadb_root_get_password }}
+  when: mariadb_root_password_migrated.stat.exists
+- name: Markng the MariaDB root migration
+  file:
+    path: /etc/bda/mariadb-root-password-migrated
+    state: touch
+    mode: 0755
+  when: not mariadb_root_password_migrated.stat.exists
 - name: Store the MariaDB root password
   copy:
     content: "{{ mariadb_root_password }}"

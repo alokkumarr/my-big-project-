@@ -43,9 +43,8 @@ public class EncryptionKeyMigration implements KeyMigration {
     logger.info("encryptionKey : {}, secretKey : {}", encryptionKey, secretKey);
     List<BisChannelEntity> entities = bisChannelRepository.findAll();
     entities.forEach(entity -> {
-      if (entity.getPwdMigrated() == 0) {
-        logger.info("Migration for sysId : {}", entity.getBisChannelSysId());
-        BisChannelDto bisChannelDto = null;
+      if (entity.getPwdMigrated() != null && entity.getPwdMigrated() == 0) {
+        logger.info("Migration for channel Id : {}", entity.getBisChannelSysId());
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -64,7 +63,7 @@ public class EncryptionKeyMigration implements KeyMigration {
             rootNode.put("password", secretPhrase);
 
 
-            bisChannelDto = new BisChannelDto();
+            BisChannelDto bisChannelDto = new BisChannelDto();
             BeanUtils.copyProperties(entity, bisChannelDto);
             bisChannelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
             logger.info("migration for channel : {}", bisChannelDto.getBisChannelSysId());
@@ -78,7 +77,7 @@ public class EncryptionKeyMigration implements KeyMigration {
             BeanUtils.copyProperties(bisChannelDto, channelEntity);
             channelEntity.setPwdMigrated(1);
             channelEntity = bisChannelRepository.save(channelEntity);
-            logger.info("channel : {} updated succesfully", channelEntity.getBisChannelSysId());
+            logger.info("channel : {} updated successfully", channelEntity.getBisChannelSysId());
           }
         } catch (Exception e) {
           logger.error("Exception while reading the list :", e);

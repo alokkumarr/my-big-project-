@@ -127,165 +127,136 @@ export const CHART_COLORS = [
   '#DFB2B2'
 ];
 
-export const DATE_FORMATS = [
+export const PIVOT_DATE_FORMATS = [
   {
-    value: 'YYYY',
-    momentValue: 'YYYY',
-    groupInterval: 'year',
-    label: '2017'
-  },
-  {
-    value: 'MMMM yyyy',
-    momentValue: 'MMMM YYYY',
-    groupInterval: 'month',
-    label: 'September 2017'
-  },
-  {
-    value: 'MMM YYYY',
-    momentValue: 'MMM YYYY',
-    groupInterval: 'month',
-    label: 'Sept 2017'
-  },
-  {
-    value: 'MM YYYY',
-    momentValue: 'MM YYYY',
-    groupInterval: 'month',
-    label: '09 2017'
-  },
-  {
-    label: '2017-11',
-    value: 'yyyy-MM',
-    momentValue: 'YYYY-MM',
-    groupInterval: 'month'
-  },
-  {
-    label: 'September 1',
-    value: 'MMMM d',
-    momentValue: 'MMMM D',
-    groupInterval: 'month'
-  },
-  {
-    label: '09-2017',
-    value: 'MM-yyyy',
-    groupInterval: 'month',
-    momentValue: 'MM-YYYY'
-  },
-  {
-    label: 'Sept-2017',
-    value: 'MMM-yyyy',
-    groupInterval: 'month',
-    momentValue: 'MMM-YYYY'
-  },
-  {
-    label: 'Sept-17 (Month-year)',
-    value: 'MMM-yy',
-    groupInterval: 'month',
-    momentValue: 'MMM-YY'
-  },
-  {
-    value: 'MMM d YYYY',
-    momentValue: 'MMM Do YYYY',
-    groupInterval: 'day',
-    // there are some formats that the backend does not support
-    // for example "Do" for days ex: 1st, 2nd ...
-    // so we have to use a different foramt for backend
-    momentFormatForBackend: 'MMM D, YYYY',
-    label: ' Sep 1st 2017'
-  },
-  {
-    label: '09/15/17',
-    value: 'MM/dd/yy',
-    groupInterval: 'day',
-    momentValue: 'MM/DD/YY'
-  },
-  {
-    label: '15/09/17',
-    value: 'dd/MM/yy',
-    groupInterval: 'day',
-    momentValue: 'DD/MM/YY'
-  },
-  {
-    label: '2017-11-23',
+    label: 'Default',
     value: 'yyyy-MM-dd',
-    momentValue: 'YYYY-MM-DD',
-    groupInterval: 'day'
-  },
-  {
-    label: 'September-15',
-    value: 'MMMM-dd',
-    groupInterval: 'day',
-    momentValue: 'MMMM-DD'
-  },
-  {
-    label: 'Sept-15 (Month-day)',
-    value: 'MMM-dd',
-    groupInterval: 'day',
-    momentValue: 'MMM-DD'
+    momentValue: 'YYYY-MM-DD'
   },
   {
     label: 'September 1, 2017',
     value: 'MMMM d, yyyy',
-    momentValue: 'MMMM D, YYYY',
-    groupInterval: 'day'
+    momentValue: 'MMMM D, YYYY'
   },
   {
     label: '09/01/2017 (MM/DD/YYYY)',
     value: 'MM/dd/yyyy',
-    momentValue: 'MM/DD/YYYY',
-    groupInterval: 'day'
+    momentValue: 'MM/DD/YYYY'
   },
   {
     label: '01/09/2017 (DD/MM/YYYY)',
     value: 'dd/MM/yyyy',
-    momentValue: 'DD/MM/YYYY',
-    groupInterval: 'day'
+    momentValue: 'DD/MM/YYYY'
   },
   {
-    value: 'MMMM d YYYY, h:mm:ss a',
-    momentValue: 'MMMM Do YYYY, h:mm:ss a',
-    groupInterval: 'hour',
-    // there are some formats that the backend does not support
-    // for example "Do" for days ex: 1st, 2nd ...
-    // so we have to use a different foramt for backend
-    momentFormatForBackend: 'MMMM D YYYY, h:mm:ss a',
-    label: 'September 1st 2017, 1:28:31 pm'
+    label: 'September 2017',
+    value: 'MMMM yyyy',
+    momentValue: 'MMMM YYYY'
   },
   {
-    label: '09/15/17 11:20',
-    value: 'MM/dd/yyyy hh:mm',
-    groupInterval: 'minute',
-    momentValue: 'MM/DD/YYYY HH:mm'
+    label: 'September 1',
+    value: 'MMMM d',
+    momentValue: 'MMMM D'
   },
   {
-    label: '09/15 11:20',
-    value: 'MM/dd HH:mm',
-    groupInterval: 'minute',
-    momentValue: 'MM/DD HH:mm'
+    label: '09/01/2017 11:20:36',
+    value: 'MM/dd/yyyy HH:mm:ss',
+    momentValue: 'MM/DD/YYYY HH:mm:ss'
   }
-  // {
-  //   label: '09/01/2017 11:20:36',
-  //   value: 'MM/dd/yyyy HH:mm:ss',
-  //   momentValue: 'MM/DD/YYYY HH:mm:ss',
-  //   groupInterval: 'second'
-  // },
-  // {
-  //   label: '09/15/17 11:20:36',
-  //   value: 'MM/dd/yyyy hh:mm:ss',
-  //   groupInterval: 'second',
-  //   momentValue: 'MM/DD/YYYY HH:mm:ss'
-  // }
 ];
+
+export const DEFAULT_PIVOT_DATE_FORMAT = PIVOT_DATE_FORMATS[0];
+
+export const PIVOT_DATE_FORMATS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(PIVOT_DATE_FORMATS);
+
+export const ES_REPORTS_DATE_FORMATS = [...PIVOT_DATE_FORMATS];
+
+export const DATE_FORMATS = [
+  {
+    label: 'Default',
+    value: 'yyyy-MM-dd',
+    momentValue: 'YYYY-MM-DD'
+  },
+  {
+    label: 'September 1, 2017',
+    value: 'longDate',
+    momentValue: 'MMMM D, YYYY'
+  },
+  {
+    label: '09/01/2017 (MM/DD/YYYY)',
+    value: 'shortDate',
+    momentValue: 'MM/DD/YYYY'
+  },
+  {
+    label: '01/09/2017 (DD/MM/YYYY)',
+    value: 'dd/MM/yyyy',
+    momentValue: 'DD/MM/YYYY'
+  },
+  {
+    label: 'September 2017',
+    value: 'monthAndYear',
+    momentValue: 'MMMM YYYY'
+  },
+  {
+    label: 'September 1',
+    value: 'monthAndDay',
+    momentValue: 'MMMM D'
+  },
+  {
+    label: '09/01/2017 11:20:36',
+    value: 'MM/dd/yyyy HH:mm:ss',
+    momentValue: 'MM/DD/YYYY HH:mm:ss'
+  }
+];
+
+export const CUSTOM_HEADERS = {
+  SKIP_TOAST: 'SIP-Skip-Error-Toast'
+};
+
+export const DEFAULT_DATE_FORMAT = DATE_FORMATS[0];
 
 export const DATE_FORMATS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(DATE_FORMATS);
 
-export const DEFAULT_DATE_FORMAT = DATE_FORMATS[11];
+export const CHART_DATE_FORMATS = [
+  {
+    value: 'MMMM d YYYY, h:mm:ss a',
+    groupInterval: 'hour',
+    label: 'September 1st 2017, 1:28:31 pm'
+  },
+  {
+    value: 'MMM d YYYY',
+    groupInterval: 'day',
+    label: ' Sep 1st 2017'
+  },
+  {
+    value: 'MMM YYYY',
+    groupInterval: 'month',
+    label: 'September 2017'
+  },
+  {
+    value: 'MM YYYY',
+    groupInterval: 'month',
+    label: '09 2017'
+  },
+  {
+    value: 'YYYY',
+    groupInterval: 'year',
+    label: '2017'
+  }
+];
 
-export const CUSTOM_HEADERS = {
-  SKIP_TOAST: 'SIP-Skip-Error-Toast'
-};
+export const CHART_DEFAULT_DATE_FORMAT = CHART_DATE_FORMATS[1];
+
+export const CHART_DATE_FORMATS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(CHART_DATE_FORMATS);
 
 export const AGGREGATE_TYPES = [
   {
@@ -593,80 +564,4 @@ export const DATASET_CATEGORIES_TYPE = [
     value: 'Aggregated Data Set',
     displayName: 'Aggregated Data Set'
   }
-];
-
-export const CUSTOM_DATE_PRESET_VALUE = 'NA';
-export const DATE_PRESETS = [
-  {
-    value: 'Yesterday',
-    keyword: 'YESTERDAY',
-    label: 'Yesterday'
-  },
-  {
-    value: 'Today',
-    keyword: 'TODAY',
-    label: 'Today'
-  },
-  {
-    value: 'TW',
-    keyword: 'THIS_WEEK',
-    label: 'This Week'
-  },
-  {
-    value: 'MTD',
-    keyword: 'MONTH_TO_DATE',
-    label: 'MTD (Month to Date)'
-  },
-  {
-    value: 'YTD',
-    keyword: 'YEAR_TO_DATE',
-    label: 'YTD (Year to Date)'
-  },
-  {
-    value: 'LW',
-    keyword: 'LAST_WEEK',
-    label: 'Last Week'
-  },
-  {
-    value: 'LTW',
-    keyword: 'LAST_2_WEEKS',
-    label: 'Last 2 Weeks'
-  },
-  {
-    value: 'LM',
-    keyword: 'LAST_MONTH',
-    label: 'Last Month'
-  },
-  {
-    value: 'LQ',
-    keyword: 'LAST_QUARTER',
-    label: 'Last Quarter'
-  },
-  {
-    value: 'LTM',
-    keyword: 'LAST_3_MONTHS',
-    label: 'Last 3 Months'
-  },
-  {
-    value: 'LSM',
-    keyword: 'LAST_6_MONTHS',
-    label: 'Last 6 Months'
-  },
-  {
-    value: 'LY',
-    keyword: 'LAST_YEAR',
-    label: 'Last Year'
-  },
-  {
-    value: CUSTOM_DATE_PRESET_VALUE,
-    keyword: 'CUSTOM',
-    label: 'Custom'
-  }
-];
-
-export const LESS_THAN_4_DAYS_DATE_PRESETS = ['Yesterday', 'Today'];
-export const LESS_THAN_A_WEEK_DATE_PRESETS = [
-  ...LESS_THAN_4_DAYS_DATE_PRESETS,
-  'TW',
-  'LW'
 ];

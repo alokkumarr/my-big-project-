@@ -1,3 +1,8 @@
+- name: SAW Security (MariaDB Galera cluster arbitrator)
+  hosts: saw-security-arbitrator
+  become: true
+  roles:
+    - sip-security-db-arbitrator
 - name: SAW Security
   hosts: saw-security
   become: true
@@ -5,8 +10,4 @@
     - sip-common-utils
     - sip-security-db
     - sip-security-web
-- name: SAW Security (MariaDB Galera cluster arbitrator)
-  hosts: saw-security-arbitrator
-  become: true
-  roles:
-    - sip-security-db-arbitrator
+

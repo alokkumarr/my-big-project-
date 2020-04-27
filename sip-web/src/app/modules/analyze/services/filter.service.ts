@@ -11,6 +11,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
+import * as isUndefined from 'lodash/isUndefined';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
 import { AnalyzeService } from './analyze.service';
@@ -121,7 +122,8 @@ export class FilterService {
     const flattenedFilters = cloneDeep(this._analyzeService.flattenAndFetchFilters(filters, []));
     const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
     if (analysis.type === 'report' && reportType === 'query') {
-      return filters;
+      const queryFilters = this.fetchFilters(analysis.sipQuery);
+      return queryFilters;
     }
     // due to a bug, the backend sends runtimeFilters, with the values that were last used
     // so we have to delete model from runtime filters
@@ -143,14 +145,32 @@ export class FilterService {
       return Promise.resolve(clone);
     }
 
+    let runtimeFilters = analysis.sipQuery.filters;
     const reportType = analysis.type === 'report' && analysis.designerEdit ? 'query' : 'designer';
     if (analysis.type === 'report' && reportType === 'query') {
+      runtimeFilters = cleanedRuntimeFilters;
       if (cleanedRuntimeFilters[0].filters.length === 0) {
         return Promise.resolve(clone);
       }
     }
+    return this.openRuntimeModal(clone, runtimeFilters, navigateBack, designerPage);
+  }
 
+  fetchFilters(sipQuery) {
+    if (isUndefined(get(sipQuery.filters[0], 'filters'))) {
+      const oldFormatFilters = cloneDeep(sipQuery.filters);
+      sipQuery.filters = [];
+      const normalFilters = [
+        {
+          booleanCriteria: sipQuery.booleanCriteria,
+          filters: oldFormatFilters
+        }
+      ];
 
-    return this.openRuntimeModal(clone, analysis.sipQuery.filters, navigateBack, designerPage);
+      sipQuery.filters = normalFilters;
+      return sipQuery.filters;
+    } else {
+      return sipQuery.filters;
+    }
   }
 }

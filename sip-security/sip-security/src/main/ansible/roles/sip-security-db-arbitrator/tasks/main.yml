@@ -5,10 +5,22 @@
   yum_repository:
     name: mariadb
     description: MariaDB repository
-    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.3/centos7-amd64') }}"
+    baseurl: "{{ sip_mariadb_yum_url | default('http://yum.mariadb.org/10.4/centos7-amd64') }}"
     gpgcheck: no
+- name: Check the Mariadb version
+  shell: "mysql --version | grep 10.3"
+  register: mariadb_upgrade
+  ignore_errors: yes
+- name: Uninstall and Remove MariaDB galera Service
+  yum: name=galera state=absent
+  when:
+    - mariadb_upgrade is defined
+    - mariadb_upgrade.stdout | length > 0
+  ignore_errors: yes
+- name: Install MariaDB client package
+  yum: name=MariaDB-client state=latest
 - name: Install MariaDB package
-  yum: name=mariadb-server state=present
+  yum: name=MariaDB-server state=present
 - name: Install MariaDB Galera cluster arbitrator configuration
   template: src=garb.sh dest=/etc/sysconfig/garb
 - name: Enable and start MariaDB Galera cluster arbitrator service

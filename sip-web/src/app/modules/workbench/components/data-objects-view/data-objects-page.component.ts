@@ -256,7 +256,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
     this.workBench.getAllProjectsAllowableTagList().subscribe(result => {
       let allowableTags = [];
       forEach(result, res => {
-        if( res.allowableTags ){
+        if (res.allowableTags) {
           allowableTags = concat(allowableTags, res.allowableTags);
         }
       });
