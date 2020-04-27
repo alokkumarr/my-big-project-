@@ -6,7 +6,7 @@
     fail_on_missing: no
   when: "groups['saw-security'].index(inventory_hostname) == 0"
 - name : Check password already migrated
-  stat: path=/etc/bda/saw-security-db-password_migrated
+  stat: path=/etc/bda/saw-security-db-password-migrated
   register: saw_security_db_password_migrated
 - name: Look up Security Service database password
   set_fact:
