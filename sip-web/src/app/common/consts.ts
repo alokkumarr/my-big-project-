@@ -245,7 +245,7 @@ export const CHART_DATE_FORMATS = [
     label: '09 2017'
   },
   {
-    value: 'yyyy',
+    value: 'YYYY',
     groupInterval: 'year',
     label: '2017'
   }
