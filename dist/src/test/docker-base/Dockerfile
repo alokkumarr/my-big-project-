@@ -16,7 +16,7 @@ FROM centos:7.7.1908
 # rpmd1 and rpmd2 are dependencies for rpm (as configured below).
 # openjdk-devel is being installed to satisfy the mapr dependency.
 
-ARG path=http://mirror.centos.org/centos/7/updates/x86_64/Packages/
+ARG path=http://mirror.centos.org/centos/7.7.1908/updates/x86_64/Packages/
 ARG rpmd1=java-1.8.0-openjdk-headless-1.8.0.222.b10-1.el7_7.x86_64.rpm
 ARG rpmd2=java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64.rpm
 ARG rpm=java-1.8.0-openjdk-devel-1.8.0.222.b10-1.el7_7.x86_64.rpm
