@@ -51,7 +51,7 @@
     <guava.version>20.0</guava.version>
     <joda.version>2.9.4</joda.version>
     <snappy.version>1.0.4.1</snappy.version>
-    <commons-collections.version>3.2.1</commons-collections.version>
+    <commons-collections.version>3.2.2</commons-collections.version>
     <mapr.core.version>6.1.0</mapr.core.version>
     <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
     <kafka.driver.version>1.1.1-mapr-1808</kafka.driver.version>
