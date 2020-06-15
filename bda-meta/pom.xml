@@ -43,7 +43,7 @@
     <common.lang>2.6</common.lang>
     <json.vesion>20080701</json.vesion>
     <joda.version>2.9.4</joda.version>
-    <commons-collections.version>3.2.1</commons-collections.version>
+    <commons-collections.version>3.2.2</commons-collections.version>
     <mapr.core.version>6.1.0</mapr.core.version>
     <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
     <maprdb.version>${mapr.core.version}-mapr</maprdb.version>
