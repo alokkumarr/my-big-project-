@@ -15,7 +15,7 @@
   <version>${revision}</version>
   <packaging>jar</packaging>
   <properties>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <compress>1.18</compress>
   </properties>
   <dependencies>
