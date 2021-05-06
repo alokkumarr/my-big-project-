@@ -59,7 +59,7 @@
     "extends-classes": "1.0.5",
     "file-saver": "1.3.3",
     "hammerjs": "2.0.8",
-    "highcharts": "7.1.2",
+    "highcharts": "9.0.0",
     "html2pdf.js": "0.9.1",
     "immer": "2.1.3",
     "json-2-csv": "3.1.1",
