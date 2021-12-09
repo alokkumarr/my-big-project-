@@ -47,7 +47,7 @@
         <kafka.mapr.client>1.1.1-mapr-1808</kafka.mapr.client>
         <mapr.client>6.1.0-mapr</mapr.client>
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
-        <io.netty.version>4.0.42.Final</io.netty.version>
+        <io.netty.version>4.1.71.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
         <jackson.core.version>2.9.8</jackson.core.version>
 
