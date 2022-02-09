@@ -53,7 +53,7 @@
     <snappy.version>1.0.4.1</snappy.version>
     <commons-collections.version>3.2.1</commons-collections.version>
     <mapr.core.version>6.1.0</mapr.core.version>
-    <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
+    <mapr.hadoop.client.version>2.10.1</mapr.hadoop.client.version>
     <kafka.driver.version>1.1.1-mapr-1808</kafka.driver.version>
     <mapr.streams.version>6.1.0-mapr</mapr.streams.version>
     <gson.version>2.2.4</gson.version>
