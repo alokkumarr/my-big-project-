@@ -48,7 +48,7 @@
         <mapr.client>6.1.0-mapr</mapr.client>
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
         <io.netty.version>4.0.42.Final</io.netty.version>
-        <spring.release>4.1.6.RELEASE</spring.release>
+        <spring.release>5.3.19</spring.release>
         <jackson.core.version>2.9.8</jackson.core.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
