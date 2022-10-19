@@ -34,7 +34,7 @@
 		<common.io>2.6</common.io>
 		<mapr.core.version>6.1.0</mapr.core.version>
 		<scala.major.version>2.11</scala.major.version>
-		<jackson.core.version>2.9.6</jackson.core.version>
+		<jackson.core.version>2.13.4.1</jackson.core.version>
 		<mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
 		<Json4s.latestVersion>3.5.3</Json4s.latestVersion>
 		<spark.mapr.version>2.4.4.0-mapr-630</spark.mapr.version>
